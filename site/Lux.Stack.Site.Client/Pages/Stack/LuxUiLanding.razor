@@ -40,7 +40,7 @@
     @* The live showcase sits in the hero, like a product shot that works. *@
     <div class="mx-auto max-w-(--breakpoint-2xl) px-4 pb-20 sm:px-6 lg:px-8">
         <div class="mb-5 flex flex-wrap items-end justify-between gap-4">
-            <p class="pg-eyebrow-mono flex items-center gap-2"><span class="size-1.5 animate-pulse bg-(--lux-primary)" aria-hidden="true"></span>Live · pick a component, then use it</p>
+            <p class="flex items-center gap-2 font-mono text-xs text-(--lux-text-muted)"><span class="size-1.5 rounded-full lib-pulse-dot bg-(--lux-primary)" aria-hidden="true"></span>Pick a component, then interact with it live</p>
             <RendererBadge />
         </div>
         <Showcase />
@@ -51,7 +51,7 @@
 <section aria-labelledby="platforms" class="border-b border-(--lux-border)">
     <div class="mx-auto max-w-(--breakpoint-2xl) px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
         <div class="grid gap-6 lg:grid-cols-2 lg:items-end">
-            <h2 id="platforms" class="text-4xl font-semibold leading-none tracking-[-0.045em] text-(--lux-text-highlighted) sm:text-6xl">
+            <h2 id="platforms" class="text-4xl font-semibold leading-none tracking-[-0.03em] text-(--lux-text-highlighted) sm:text-6xl">
                 One codebase:<br /><span class="pg-accent">web, phone, TV.</span>
             </h2>
             <p class="text-lg text-(--lux-text-muted) lg:max-w-xl lg:justify-self-end">
@@ -102,7 +102,7 @@
 <section aria-labelledby="components" class="border-b border-(--lux-border)">
     <div class="mx-auto max-w-(--breakpoint-2xl) px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
         <div class="grid gap-6 lg:grid-cols-2 lg:items-end">
-            <h2 id="components" class="text-4xl font-semibold leading-none tracking-[-0.045em] text-(--lux-text-highlighted) sm:text-6xl">
+            <h2 id="components" class="text-4xl font-semibold leading-none tracking-[-0.03em] text-(--lux-text-highlighted) sm:text-6xl">
                 @Count components,<br /><span class="pg-accent">one stylesheet.</span>
             </h2>
             <p class="text-lg text-(--lux-text-muted) lg:max-w-xl lg:justify-self-end">
@@ -165,7 +165,7 @@
     <div class="pg-glow absolute inset-0 -z-10 rotate-180" aria-hidden="true"></div>
     <div class="mx-auto max-w-(--breakpoint-2xl) px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
         <div class="grid gap-6 lg:grid-cols-2 lg:items-end">
-            <h2 id="pipeline" class="text-4xl font-semibold leading-none tracking-[-0.045em] text-(--lux-text-highlighted) sm:text-6xl">
+            <h2 id="pipeline" class="text-4xl font-semibold leading-none tracking-[-0.03em] text-(--lux-text-highlighted) sm:text-6xl">
                 What happens<br />on a <span class="pg-accent">click</span>
             </h2>
             <p class="text-lg text-(--lux-text-muted) lg:max-w-xl lg:justify-self-end">
@@ -202,10 +202,10 @@
 <section aria-labelledby="start" class="relative isolate overflow-hidden">
     <div class="pg-dots absolute inset-0 -z-10 [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]" aria-hidden="true"></div>
     <div class="mx-auto max-w-4xl px-4 py-24 text-center sm:px-6 lg:py-32">
-        <p class="pg-eyebrow-mono"><span class="font-pixel text-2xl font-black text-(--lux-primary-text)">@Count</span> components · <span class="font-pixel text-2xl font-black text-(--lux-primary-text)">4</span> render modes · web and MAUI Blazor Hybrid</p>
-        <h2 id="start" class="mt-6 text-4xl font-semibold leading-none tracking-[-0.045em] text-(--lux-text-highlighted) sm:text-6xl">
+        <h2 id="start" class="text-4xl font-semibold leading-none tracking-[-0.03em] text-(--lux-text-highlighted) sm:text-6xl">
             Start with Lux.UI.
         </h2>
+        <p class="mt-4 font-mono text-xs text-(--lux-text-muted)"><span class="font-pixel text-xl font-black text-(--lux-primary-text)">@Count</span> components · <span class="font-pixel text-xl font-black text-(--lux-primary-text)">4</span> render modes · web and MAUI Blazor Hybrid</p>
         <div class="mx-auto mt-10 max-w-lg text-start">
             <CodeBlock Code="dotnet add package Lux.UI --prerelease" Class="rounded-xl border border-(--lux-border)" />
         </div>

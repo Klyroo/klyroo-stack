@@ -1,0 +1,102 @@
+@namespace Lux.Stack.Site.Client.Components.Stages
+@using Lux.Spreadsheet
+
+@* Animated 5-Stage Dirty-CSV Pipeline: pick a messy real-world CSV preset and watch 20-row header scan, NFD accent folding, and 80%-pass column mapping run live inside LxSpreadsheetImport. *@
+<div class="overflow-hidden rounded-2xl border border-(--lux-border) bg-(--lux-bg)">
+    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-(--lux-border) bg-(--lux-bg-muted)/50 px-5 py-3">
+        <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Dirty CSV presets">
+            <span class="me-1 font-mono text-xs text-(--lux-text-muted)">Preset CSV:</span>
+            @foreach (var preset in Presets)
+            {
+                var active = _presetKey == preset.Key;
+                <button type="button"
+                        class="@($"inline-flex min-h-7 items-center rounded-md border px-2.5 py-1 font-mono text-xs transition-colors {(active ? "font-semibold" : "border-(--lux-border) bg-(--lux-bg) text-(--lux-text-muted) hover:text-(--lux-text-highlighted)")}")"
+                        style="@(active ? "background:var(--lib-pill-bg);border-color:var(--lib-pill-bg);color:#ffffff" : null)"
+                        @onclick="@(() => LoadPreset(preset.Key))">
+                    @preset.Label
+                </button>
+            }
+        </div>
+        <span class="font-mono text-xs text-(--lux-text-muted)">10k rows benchmark: <strong class="text-(--lux-text-highlighted)">23.0 ms</strong></span>
+    </div>
+
+    @* 5-Stage Signal Pipeline *@
+    <div class="border-b border-(--lux-border) bg-(--lux-bg-muted)/25 px-5 py-4">
+        <div class="relative mb-3 hidden h-3 lg:block" aria-hidden="true">
+            <div class="absolute inset-x-0 top-1/2 border-t border-dashed border-(--lux-border-accented)"></div>
+            <div class="lib-beam"></div>
+        </div>
+        <ol class="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-5">
+            @foreach (var stage in Stages)
+            {
+                <li class="rounded-xl border border-(--lux-border) bg-(--lux-bg) px-3 py-2">
+                    <span class="font-mono text-[11px] font-semibold" style="color:var(--lib-accent)">@stage.Step</span>
+                    <p class="mt-0.5 text-xs font-medium text-(--lux-text-highlighted)">@stage.Title</p>
+                </li>
+            }
+        </ol>
+    </div>
+
+    <div class="p-5">
+        <LxSpreadsheetImport @key="_presetKey" Importer="@_importer" Title="@ActivePreset.Title" Wizard="true" />
+    </div>
+</div>
+
+@code {
+    private sealed record CsvPreset(string Key, string Label, string Title, string FileName, string Csv);
+
+    private static readonly (string Step, string Title)[] Stages =
+    [
+        ("01", "Ingest CSV / Paste"),
+        ("02", "20-Row Header Scan"),
+        ("03", "NFD + 80% Auto-Map"),
+        ("04", "Reconcile Unknowns"),
+        ("05", "Batch Submit & Retry"),
+    ];
+
+    private static readonly CsvPreset[] Presets =
+    [
+        new(
+            "french-banner",
+            "French Banner + Semicolons",
+            "Import European Rates (Banner Auto-Skipped)",
+            "tarifs-2026.csv",
+            "Export Comptable 2026;;\nGénéré automatiquement;;\nCode;Montant;Devise\nA-101;1250,50;€\nA-102;4890,00;USD\nA-103;890,25;EUR"),
+        new(
+            "unknown-values",
+            "Unknown Currency Values",
+            "Import Rates (Reconcile Unknown Options)",
+            "rates-dirty.csv",
+            "Code;Amount;Currency\nB-201;640,00;GBP\nB-202;1200,00;€\nB-203;950,00;CHF"),
+        new(
+            "duplicates",
+            "Duplicate Rows",
+            "Import Rates (Intra-File Deduplication)",
+            "rates-dups.csv",
+            "Code;Amount;Currency\nC-301;450,00;EUR\nC-301;450,00;EUR\nC-302;1890,00;USD"),
+    ];
+
+    private string _presetKey = "french-banner";
+    private SpreadsheetImporter _importer = default!;
+
+    private CsvPreset ActivePreset => Presets.First(p => p.Key == _presetKey);
+
+    public SpreadsheetHeroStage() => LoadPreset("french-banner");
+
+    private void LoadPreset(string key)
+    {
+        _presetKey = key;
+        var preset = Presets.First(p => p.Key == key);
+        _importer = new SpreadsheetImporter(new SpreadsheetSchema
+        {
+            Key = $"stage-{key}",
+            Columns =
+            [
+                new SpreadsheetColumnSchema { Key = "code", Label = "Code", Headers = ["Code", "SKU"], Required = true },
+                new SpreadsheetColumnSchema { Key = "price", Label = "Unit Price", Headers = ["Montant", "Amount", "Prix"], Kind = SpreadsheetColumnKind.Number, DecimalSeparator = ',', Required = true, Rules = [SpreadsheetRule.Min(0)] },
+                new SpreadsheetColumnSchema { Key = "currency", Label = "Currency", Headers = ["Devise", "Currency"], Kind = SpreadsheetColumnKind.Select, Required = true, Options = [new("EUR", "Euro", ["€", "EUR"]), new("USD", "US Dollar", ["$", "USD"])] }
+            ]
+        });
+        _importer.LoadText(preset.Csv, preset.FileName);
+    }
+}

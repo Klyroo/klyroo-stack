@@ -1,0 +1,158 @@
+@namespace Lux.Stack.Site.Client.Components.Stages
+@using Lux.Query
+@using Lux.Table
+
+@* Enterprise Tree-Grid & Grouping Theater: live Lux.Table LxDataList + real DataListTree hierarchy + animated 2px progress line + interactive controls. *@
+<div class="overflow-hidden rounded-2xl border border-(--lux-border) bg-(--lux-bg)">
+    @* Animated 2px progress line *@
+    <div class="relative h-0.5 w-full overflow-hidden bg-(--lux-border)" aria-hidden="true">
+        <div class="h-full w-1/3 rounded-full @(_simulating ? "animate-pulse" : "")"
+             style="background:var(--lib-accent);transform:translateX(@(_simulating ? "180%" : "0%"));transition:transform 650ms cubic-bezier(0.16, 1, 0.3, 1)"></div>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-(--lux-border) bg-(--lux-bg-muted)/50 px-5 py-3">
+        <div class="flex flex-wrap items-center gap-2">
+            <div class="w-56">
+                <LxInput Value="@_search" ValueChanged="@(v => _search = v)" Placeholder="Filter packages or layers..." aria-label="Filter Lux.Table rows" Size="LxSize.Sm" />
+            </div>
+            <button type="button"
+                    class="@($"inline-flex min-h-7 items-center rounded-md border px-2.5 py-1 font-mono text-xs transition-colors {(_groupByLayer ? "font-semibold" : "border-(--lux-border) bg-(--lux-bg) text-(--lux-text-muted) hover:text-(--lux-text-highlighted)")}")"
+                    style="@(_groupByLayer ? "background:var(--lib-pill-bg);border-color:var(--lib-pill-bg);color:#ffffff" : null)"
+                    @onclick="@(() => _groupByLayer = !_groupByLayer)">
+                @(_groupByLayer ? "Grouped by Layer" : "Group by Layer")
+            </button>
+            <button type="button"
+                    class="@($"inline-flex min-h-7 items-center rounded-md border px-2.5 py-1 font-mono text-xs transition-colors {(_showTree ? "font-semibold" : "border-(--lux-border) bg-(--lux-bg) text-(--lux-text-muted) hover:text-(--lux-text-highlighted)")}")"
+                    style="@(_showTree ? "background:var(--lib-pill-bg);border-color:var(--lib-pill-bg);color:#ffffff" : null)"
+                    @onclick="@(() => _showTree = !_showTree)">
+                @(_showTree ? "Tree Rails: ON" : "Show Tree Rails")
+            </button>
+            <button type="button"
+                    class="inline-flex min-h-7 items-center rounded-md border border-(--lux-border) bg-(--lux-bg) px-2.5 py-1 font-mono text-xs text-(--lux-text-muted) hover:border-(--lux-border-accented) hover:text-(--lux-text-highlighted)"
+                    @onclick="PulseLoadAsync">
+                Pulse Loading Line
+            </button>
+        </div>
+
+        <div class="flex items-center gap-3 font-mono text-xs tabular-nums text-(--lux-text-muted)">
+            <span><strong class="text-(--lux-text-highlighted)">@VisibleRows.Count</strong> / @AllRows.Length rows</span>
+            <span style="color:var(--lib-accent)">@VisibleRows.Sum(r => r.Tests) tests</span>
+        </div>
+    </div>
+
+    <div class="grid divide-y divide-(--lux-border) xl:grid-cols-[minmax(0,1fr)_280px] xl:divide-x xl:divide-y-0">
+        <div class="min-w-0 p-5">
+            <LxDataList TItem="TableDemoRow" Schema="@Schema" Items="@VisibleRows" UrlSync="false">
+                <LxDataListTable TItem="TableDemoRow"
+                                 HeaderMenu="true"
+                                 ShowProgressLine="true"
+                                 GroupBy="@(_groupByLayer ? LayerGroupBy : null)"
+                                 Summaries="@(new DataListSummaries<TableDemoRow>())">
+                    <LxDataListColumn TItem="TableDemoRow" Field="pkg" Title="Package" />
+                    <LxDataListColumn TItem="TableDemoRow" Field="layer" Title="Layer" />
+                    <LxDataListColumn TItem="TableDemoRow" Field="aot" Title="NativeAOT" />
+                    <LxDataListColumn TItem="TableDemoRow" Field="sizeKb" Title="Size (KB)" Summary="DataListSummaryKind.Sum" />
+                    <LxDataListColumn TItem="TableDemoRow" Field="tests" Title="Tests" Summary="DataListSummaryKind.Sum" />
+                </LxDataListTable>
+            </LxDataList>
+        </div>
+
+        @* Headless DataListTree<T> Hierarchy Rail Preview *@
+        <div class="min-w-0 bg-(--lux-bg-muted)/30 p-5">
+            <div class="flex items-center justify-between gap-2">
+                <span class="font-mono text-[11px] font-semibold uppercase tracking-wider text-(--lux-text-highlighted)">DataListTree&lt;T&gt;</span>
+                <span class="font-mono text-[11px]" style="color:var(--lib-accent)">NativeAOT</span>
+            </div>
+            <p class="mt-1.5 text-xs text-(--lux-text-muted)">
+                Click any parent package to expand or collapse hierarchy rails in pure C#.
+            </p>
+
+            <ul class="mt-4 space-y-1 font-mono text-xs">
+                @foreach (var node in TreeNodes)
+                {
+                    var expanded = _expandedNodes.Contains(node.Id);
+                    <li>
+                        <button type="button"
+                                class="flex min-h-7 w-full items-center justify-between rounded-md px-2 py-1 text-start text-(--lux-text-highlighted) hover:bg-(--lux-bg-muted)"
+                                @onclick="@(() => ToggleNode(node.Id))">
+                            <span class="flex items-center gap-1.5">
+                                <span class="inline-block w-3 text-center" style="color:var(--lib-accent)">@(expanded ? "▾" : "▸")</span>
+                                <span class="font-semibold">@node.Name</span>
+                            </span>
+                            <span class="text-[11px] text-(--lux-text-muted) tabular-nums">@node.Children.Length</span>
+                        </button>
+                        @if (expanded || _showTree)
+                        {
+                            <ul class="ms-3.5 border-s border-dashed border-(--lux-border-accented) ps-3 pt-1 space-y-1">
+                                @foreach (var child in node.Children)
+                                {
+                                    <li class="flex items-center justify-between text-[11.5px] text-(--lux-text-muted)">
+                                        <span class="truncate">@child</span>
+                                        <span class="size-1.5 shrink-0 rounded-full" style="background:var(--lib-accent)"></span>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+
+@code {
+    private sealed record TableDemoRow(string Id, string Package, string Layer, string NativeAot, int SizeKb, int Tests);
+    private sealed record TreeGroup(string Id, string Name, string[] Children);
+
+    private static readonly DataListSchema<TableDemoRow> Schema = DataListSchema.For<TableDemoRow>(s => s
+        .RowKey(r => r.Id)
+        .Search(r => r.Package, r => r.Layer)
+        .Field(r => r.Package, f => f.Key("pkg").Sortable())
+        .Field(r => r.Layer, f => f.Key("layer").Sortable())
+        .Field(r => r.NativeAot, f => f.Key("aot").Sortable())
+        .Field(r => r.SizeKb, f => f.Key("sizeKb").Sortable())
+        .Field(r => r.Tests, f => f.Key("tests").Sortable()));
+
+    private static readonly DataListGroupBy<TableDemoRow> LayerGroupBy = new() { Key = r => r.Layer };
+
+    private static readonly TableDemoRow[] AllRows =
+    [
+        new("1", "Lux.Query.Core", "Headless Core", "AOT Ready", 68, 42),
+        new("2", "Lux.Table.Core", "Headless Core", "AOT Ready", 44, 28),
+        new("3", "Lux.Form.Core", "Headless Core", "AOT Ready", 76, 36),
+        new("4", "Lux.Table", "Blazor & MAUI UI", "Trimmable", 92, 18),
+        new("5", "Lux.Dashboard", "Blazor & MAUI UI", "Trimmable", 84, 24),
+        new("6", "Lux.Spreadsheet", "Blazor & MAUI UI", "Trimmable", 64, 22),
+    ];
+
+    private static readonly TreeGroup[] TreeNodes =
+    [
+        new("stack", "Lux.Stack", ["Lux.Query.Core", "Lux.Table.Core", "Lux.Table"]),
+        new("ui", "LxDataList", ["LxDataListTable", "HeaderMenu", "FooterSummaries"]),
+    ];
+
+    private string _search = "";
+    private bool _groupByLayer = true;
+    private bool _showTree = true;
+    private bool _simulating;
+    private readonly HashSet<string> _expandedNodes = ["stack", "ui"];
+
+    private IReadOnlyList<TableDemoRow> VisibleRows =>
+        string.IsNullOrWhiteSpace(_search)
+            ? AllRows
+            : AllRows.Where(r => r.Package.Contains(_search, StringComparison.OrdinalIgnoreCase)
+                              || r.Layer.Contains(_search, StringComparison.OrdinalIgnoreCase)).ToList();
+
+    private void ToggleNode(string id)
+    {
+        if (!_expandedNodes.Add(id)) _expandedNodes.Remove(id);
+    }
+
+    private async Task PulseLoadAsync()
+    {
+        _simulating = true;
+        StateHasChanged();
+        await Task.Delay(700);
+        _simulating = false;
+    }
+}

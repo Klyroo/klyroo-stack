@@ -1,0 +1,156 @@
+@namespace Lux.Stack.Site.Client.Components.Stages
+@using System.Globalization
+@using Lux.Dashboard
+@using Lux.Display
+@inject FilePreviewService FilePreview
+
+@* 3-Wave Telemetry Cascade Stage: live DashboardController waves with animated signal beam, global region filters, replayable staged loading, and RFC 4180 CSV export. *@
+<div class="overflow-hidden rounded-2xl border border-(--lux-border) bg-(--lux-bg)">
+    @* Top Control Strip *@
+    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-(--lux-border) bg-(--lux-bg-muted)/50 px-5 py-3">
+        <div class="flex flex-wrap items-center gap-2" role="group" aria-label="Dashboard region filters">
+            <span class="font-mono text-xs text-(--lux-text-muted)">Region:</span>
+            @foreach (var region in new[] { "All", "EU", "US", "APAC" })
+            {
+                var active = _region == region;
+                <button type="button"
+                        class="@($"inline-flex min-h-7 items-center rounded-md border px-2.5 py-1 font-mono text-xs transition-colors {(active ? "font-semibold" : "border-(--lux-border) bg-(--lux-bg) text-(--lux-text-muted) hover:text-(--lux-text-highlighted)")}")"
+                        style="@(active ? "background:var(--lib-pill-bg);border-color:var(--lib-pill-bg);color:#ffffff" : null)"
+                        @onclick="@(() => SelectRegion(region))">
+                    @region
+                </button>
+            }
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+            <button type="button"
+                    class="inline-flex min-h-7 items-center gap-1.5 rounded-md border border-(--lux-border) bg-(--lux-bg) px-3 py-1 font-mono text-xs text-(--lux-text-highlighted) hover:border-(--lux-border-accented)"
+                    @onclick="ReplayWavesAsync">
+                <span class="size-1.5 rounded-full lib-pulse-dot" style="background:var(--lib-accent)"></span>
+                Replay 3-Wave Load
+            </button>
+            <button type="button"
+                    class="inline-flex min-h-7 items-center rounded-md border border-(--lux-border) bg-(--lux-bg) px-3 py-1 font-mono text-xs text-(--lux-text-muted) hover:border-(--lux-border-accented) hover:text-(--lux-text-highlighted)"
+                    @onclick="ExportCsv">
+                Preview CSV
+            </button>
+        </div>
+    </div>
+
+    @* Animated 3-Wave Signal Cascade Track *@
+    <div class="border-b border-(--lux-border) bg-(--lux-bg-muted)/25 px-5 py-4">
+        <div class="relative mb-3 hidden h-3 md:block" aria-hidden="true">
+            <div class="absolute inset-x-0 top-1/2 border-t border-dashed border-(--lux-border-accented)"></div>
+            <div class="lib-beam"></div>
+        </div>
+        <div class="grid gap-3 md:grid-cols-3">
+            @foreach (var wave in Waves)
+            {
+                var ready = _waveStage >= wave.Stage;
+                <div class="flex items-center justify-between gap-2 rounded-xl border border-(--lux-border) bg-(--lux-bg) px-3.5 py-2.5 font-mono text-xs">
+                    <div>
+                        <span class="font-semibold text-(--lux-text-highlighted)">@wave.Title</span>
+                        <p class="mt-0.5 font-sans text-[11px] text-(--lux-text-muted)">@wave.Detail</p>
+                    </div>
+                    <span class="shrink-0 rounded-md px-2 py-0.5 text-[11px] font-semibold"
+                          style="@(ready ? "background:var(--lib-pill-bg);color:#ffffff" : "background:var(--lux-bg-muted);color:var(--lux-text-muted)")">
+                        @(ready ? wave.Latency : "Queued")
+                    </span>
+                </div>
+            }
+        </div>
+    </div>
+
+    @* Live Analytical Widgets *@
+    <div class="space-y-5 p-5">
+        <LxDashboardStats Title="Wave 1 · Executive Metrics" Items="@CurrentStats" Span="1" />
+        <div class="grid gap-5 lg:grid-cols-2">
+            <LxDashboardGauge Title="Wave 2 · Annual ARR Goal"
+                              Value="@AttainmentPct"
+                              Max="100" Target="85" Span="1"
+                              Format="DashboardFormatPreset.Percent"
+                              Caption="@($"€{CurrentArr / 1000.0:0}k / €750k")" />
+            <LxDashboardBars Title="Wave 2 · Traffic by Target"
+                             Items="@CurrentBars" Span="1"
+                             Format="DashboardFormatPreset.Compact" />
+        </div>
+    </div>
+</div>
+
+@code {
+    private static readonly (int Stage, string Title, string Detail, string Latency)[] Waves =
+    [
+        (1, "Essential", "Primary KPIs hydrate immediately", "12 ms"),
+        (2, "Background", "Gauge & platform breakdowns stream next", "44 ms"),
+        (3, "Deferred", "CSV export & heavy detail wait on demand", "On-demand"),
+    ];
+
+    private string _region = "All";
+    private int _waveStage = 3;
+
+    private double CurrentArr => _region switch
+    {
+        "EU" => 264_000,
+        "US" => 248_000,
+        "APAC" => 132_000,
+        _ => 644_000
+    };
+
+    private double AttainmentPct => Math.Min(100, Math.Round(CurrentArr / 750_000.0 * 100.0, 1));
+
+    private IReadOnlyList<DashboardStatsItem> CurrentStats => _waveStage < 1
+        ? []
+        :
+        [
+            new("arr", "Annual Recurring Revenue", CurrentArr, DashboardFormatPreset.Compact, Delta: 16.4, Progress: AttainmentPct),
+            new("hit", "Cache Hit Ratio", 0.984, DashboardFormatPreset.Ratio, Delta: 4.3, Progress: 98.4),
+            new("sessions", "Web & MAUI Sessions", _region == "All" ? 24850 : 8420, DashboardFormatPreset.Compact, Delta: 17.2),
+            new("p95", "Query Latency", 16.6, DashboardFormatPreset.Number, Delta: -18.5, InvertDelta: true)
+        ];
+
+    private IReadOnlyList<DashboardBarItem> CurrentBars => _waveStage < 2
+        ? []
+        :
+        [
+            new("Blazor Web (SSR + Server)", _region == "All" ? 14200 : 4900, Tag: "Web"),
+            new(".NET MAUI iOS & Android", _region == "All" ? 7850 : 2540, Tag: "Mobile"),
+            new(".NET MAUI Desktop", _region == "All" ? 2800 : 980, Tag: "Desktop")
+        ];
+
+    private void SelectRegion(string region)
+    {
+        _region = region;
+        _waveStage = 3;
+    }
+
+    private async Task ReplayWavesAsync()
+    {
+        _waveStage = 0;
+        StateHasChanged();
+        await Task.Delay(260);
+        _waveStage = 1;
+        StateHasChanged();
+        await Task.Delay(340);
+        _waveStage = 2;
+        StateHasChanged();
+        await Task.Delay(280);
+        _waveStage = 3;
+    }
+
+    private void ExportCsv()
+    {
+        var table = new DashboardDataTable(
+            [new("metric", "Metric"), new("region", "Region"), new("value", "Value", Numeric: true)],
+            [
+                new Dictionary<string, string?> { ["metric"] = "Annual Recurring Revenue", ["region"] = _region, ["value"] = CurrentArr.ToString(CultureInfo.InvariantCulture) },
+                new Dictionary<string, string?> { ["metric"] = "Target Attainment %", ["region"] = _region, ["value"] = AttainmentPct.ToString(CultureInfo.InvariantCulture) }
+            ]);
+        var name = DashboardFormat.ResolveFileName($"LuxDashboard-{_region}");
+        FilePreview.Open(new FilePreviewFile
+        {
+            Src = name,
+            Name = name,
+            Mime = "text/csv",
+            Content = DashboardFormat.ExportCsv(table, CultureInfo.InvariantCulture)
+        });
+    }
+}
