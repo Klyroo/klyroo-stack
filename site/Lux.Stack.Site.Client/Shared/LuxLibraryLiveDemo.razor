@@ -92,6 +92,71 @@
                 </div>
                 break;
 
+            case "query-facets-cursor":
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="font-mono text-xs text-(--blux-text-muted)">FacetMode:</span>
+                        <BxButton Label="ExcludeSelf (multi-select UX)" Size="BxSize.Sm" Color="@(_qFacetMode == FacetMode.ExcludeSelf ? BxColor.Primary : BxColor.Neutral)" Variant="ButtonVariant.Soft" OnClick="@(() => SetFacetMode(FacetMode.ExcludeSelf))" />
+                        <BxButton Label="IncludeSelf (strict intersection)" Size="BxSize.Sm" Color="@(_qFacetMode == FacetMode.IncludeSelf ? BxColor.Primary : BxColor.Neutral)" Variant="ButtonVariant.Soft" OnClick="@(() => SetFacetMode(FacetMode.IncludeSelf))" />
+                        <BxButton Label="Next Cursor Page" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" Disabled="@(_qCursorResult.NextCursor is null)" OnClick="@NextCursorPage" />
+                        <BxButton Label="Reset Cursor" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Ghost" Disabled="@(_qCursor is null)" OnClick="@ResetCursorPage" />
+                    </div>
+                    <div class="grid gap-3 lg:grid-cols-2">
+                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">
+                            <p class="font-mono text-xs uppercase text-(--blux-text-muted)">Live Facet Buckets (Click to filter)</p>
+                            <div class="mt-2 flex flex-wrap gap-2">
+                                @if (_qCursorResult.Facets is { Count: > 0 } facets)
+                                {
+                                    @foreach (var opt in facets[0].Options)
+                                    {
+                                        var active = _qFacetCat == opt.Value;
+                                        <BxButton Label="@($"{opt.Value} ({opt.Count})")" Size="BxSize.Sm" Color="@(active ? BxColor.Primary : BxColor.Neutral)" Variant="@(active ? ButtonVariant.Solid : ButtonVariant.Outline)" OnClick="@(() => ToggleFacetCat(opt.Value))" />
+                                    }
+                                }
+                            </div>
+                            <p class="mt-3 font-mono text-[11px] text-(--blux-text-muted)">
+                                Active cursor: <code class="text-(--blux-text-highlighted)">@(_qCursor ?? "(first page)")</code><br />
+                                NextCursor: <code class="text-(--blux-text-highlighted)">@(_qCursorResult.NextCursor ?? "(end of stream)")</code>
+                            </p>
+                        </div>
+                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">
+                            <p class="font-mono text-xs uppercase text-(--blux-text-muted)">Keyset Cursor Slice (Take = 2 · Total = @_qCursorResult.TotalCount)</p>
+                            <ul class="mt-2 space-y-1.5 font-mono text-xs">
+                                @foreach (var item in _qCursorResult.Items)
+                                {
+                                    <li class="flex justify-between rounded-lg bg-(--blux-bg) px-2.5 py-1.5">
+                                        <span>#@item.Id @item.Name (@item.Category)</span>
+                                        <strong>€@item.Price</strong>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                break;
+
+            case "query-url-codecs":
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <div class="w-48"><BxInput Value="@_uSearch" ValueChanged="@OnUrlSearch" Placeholder="Search term (q)..." aria-label="URL search" /></div>
+                        <BxButton Label="@($"Prefix: {(_uPrefix ?? "(none)")}")" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@ToggleUrlPrefix" />
+                        <BxButton Label="@($"Layout: {_uLayout}")" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@ToggleUrlLayout" />
+                        <BxButton Label="@($"Page: {_uPage}")" Size="BxSize.Sm" Color="BxColor.Primary" Variant="ButtonVariant.Soft" OnClick="@NextUrlPage" />
+                        <BxButton Label="@(_uOnlyAudio ? "Category: Audio" : "Category: All")" Size="BxSize.Sm" Color="@(_uOnlyAudio ? BxColor.Success : BxColor.Neutral)" Variant="ButtonVariant.Soft" OnClick="@ToggleUrlAudio" />
+                    </div>
+                    <div class="rounded-xl border border-(--blux-border) bg-(--pg-code-bg) p-3 font-mono text-xs text-[#d7dcde]">
+                        <p class="mb-1 text-[#94a3b8]">1. DataListStateQuery.ToQuery(state, schema, prefix) → URL Query String</p>
+                        <code class="break-all text-(--blux-primary)">@_uQueryString</code>
+                    </div>
+                    <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3 font-mono text-xs">
+                        <p class="text-(--blux-text-muted)">2. DataListStateQuery.FromQuery(pairs, schema, prefix) → Restored DataListState</p>
+                        <p class="mt-1 text-(--blux-text-highlighted)">
+                            Search=<strong>"@_uRestored.Search"</strong> · Page=<strong>@_uRestored.Page</strong> · Layout=<strong>@_uRestored.Layout</strong> · Filters=<strong>@_uRestored.Filters.Count</strong> · Equals Original: <strong>@_uRoundTripOk</strong>
+                        </p>
+                    </div>
+                </div>
+                break;
+
             case "table-basic":
                 <BxDataList TItem="TableDemoRow" Schema="@TableSchema" Items="@TableRows" UrlSync="false">
                     <BxDataListTable TItem="TableDemoRow" HeaderMenu="true" ShowProgressLine="true" Summaries="@(new DataListSummaries<TableDemoRow>())">
@@ -429,6 +494,52 @@
             new DataListPaging.Offset((_qPage - 1) * _qPageSize, _qPageSize), [], DataListFilterGroup.Empty, null));
     }
 
+    private FacetMode _qFacetMode = FacetMode.ExcludeSelf;
+    private string? _qFacetCat;
+    private string? _qCursor;
+    private DataListResult<QueryItem> _qCursorResult = default!;
+    private void SetFacetMode(FacetMode mode) { _qFacetMode = mode; RunFacetsCursor(); }
+    private void ToggleFacetCat(string cat) { _qFacetCat = _qFacetCat == cat ? null : cat; _qCursor = null; RunFacetsCursor(); }
+    private void NextCursorPage() { if (_qCursorResult.NextCursor is { } next) { _qCursor = next; RunFacetsCursor(); } }
+    private void ResetCursorPage() { _qCursor = null; RunFacetsCursor(); }
+    private void RunFacetsCursor()
+    {
+        var filter = _qFacetCat is null
+            ? DataListFilterGroup.Empty
+            : DataListFilterGroup.And(new FilterRule("category", FilterOperator.Is, new FilterValue.Text(_qFacetCat)));
+        _qCursorResult = QuerySchema.ExecuteInMemory(QueryItems, new DataListRequest(
+            new DataListPaging.Cursor(_qCursor, Take: 2, Count: true),
+            [new DataListSort("price", Descending: true)],
+            filter,
+            null,
+            facets: [new DataListFacetRequest("category", Mode: _qFacetMode)]));
+    }
+
+    private string _uSearch = "studio";
+    private string? _uPrefix = "cat";
+    private DataListLayout _uLayout = DataListLayout.Grid;
+    private int _uPage = 2;
+    private bool _uOnlyAudio = true;
+    private string _uQueryString = "";
+    private DataListState _uRestored = DataListState.Initial;
+    private bool _uRoundTripOk;
+    private void OnUrlSearch(string v) { _uSearch = v; RunUrlCodecDemo(); }
+    private void ToggleUrlPrefix() { _uPrefix = _uPrefix is null ? "cat" : null; RunUrlCodecDemo(); }
+    private void ToggleUrlLayout() { _uLayout = _uLayout == DataListLayout.Table ? DataListLayout.Grid : DataListLayout.Table; RunUrlCodecDemo(); }
+    private void NextUrlPage() { _uPage = _uPage >= 5 ? 1 : _uPage + 1; RunUrlCodecDemo(); }
+    private void ToggleUrlAudio() { _uOnlyAudio = !_uOnlyAudio; RunUrlCodecDemo(); }
+    private void RunUrlCodecDemo()
+    {
+        IReadOnlyList<FilterRule> filters = _uOnlyAudio
+            ? [new FilterRule("category", FilterOperator.IsAnyOf, new FilterValue.List(["Audio"])), new FilterRule("price", FilterOperator.Between, new FilterValue.Range(new FilterValue.Number(50m), new FilterValue.Number(900m)))]
+            : [new FilterRule("price", FilterOperator.Between, new FilterValue.Range(new FilterValue.Number(50m), new FilterValue.Number(900m)))];
+        var state = new DataListState(_uSearch, filters, [new DataListSort("price", Descending: true)], _uPage, 25, _uLayout);
+        var pairs = DataListStateQuery.ToQuery(state, QuerySchema, _uPrefix);
+        _uQueryString = pairs.Count == 0 ? "(empty — all values match schema defaults)" : "?" + string.Join("&", pairs.Select(kv => $"{kv.Key}={kv.Value}"));
+        _uRestored = DataListStateQuery.FromQuery(pairs.Select(kv => new KeyValuePair<string, string?>(kv.Key, kv.Value)), QuerySchema, _uPrefix);
+        _uRoundTripOk = _uRestored.Equals(state);
+    }
+
     // ---- Table Demos ----
     private sealed record TableDemoRow(int Id, string Name, string Dept, decimal Salary);
     private static readonly DataListSchema<TableDemoRow> TableSchema = DataListSchema.For<TableDemoRow>(s => s
@@ -661,6 +772,8 @@
         RunQuery();
         RunFilterAst();
         RunPaging();
+        RunFacetsCursor();
+        RunUrlCodecDemo();
 
         _waveEssential = _waveController.RegisterResource(new DashboardResource<int?>("kpis", async _ => { await Task.Delay(80); return 42; }, DashboardQueryStage.Essential));
         _waveBackground = _waveController.RegisterResource(new DashboardResource<string>("chart", async _ => { await Task.Delay(120); return "12 months loaded"; }, DashboardQueryStage.Background));
