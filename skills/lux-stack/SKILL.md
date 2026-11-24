@@ -7,7 +7,7 @@ description: Master router skill for the 8-repository LuxStack ecosystem (UI, Qu
 
 Use this hub to jump directly to the specialized repository and skill for your task:
 
-1. **Design System & Primitives (`lux-ui`)**: [SKILL.md](file:///home/gpoumarat/blux-ui/skills/blux-ui/SKILL.md)
+1. **Design System & Primitives (`lux-ui`)**: [SKILL.md](file:///home/gpoumarat/lux-ui/skills/lux-ui/SKILL.md)
 2. **Query & URL Search Params (`lux-query`)**: [SKILL.md](file:///home/gpoumarat/lux-query/skills/lux-query/SKILL.md)
 3. **DataList Table, Grid, Tree & Grouping (`lux-table`)**: [SKILL.md](file:///home/gpoumarat/lux-table/skills/lux-table/SKILL.md)
 4. **Schema-Driven Form Engine (`lux-form`)**: [SKILL.md](file:///home/gpoumarat/lux-form/skills/lux-form/SKILL.md)

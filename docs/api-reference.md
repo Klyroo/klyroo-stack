@@ -25,5 +25,5 @@ Central registry and router for the 8 repositories of the LuxStack ecosystem. Re
 | :--- | :--- | :--- |
 | `AddLuxStack(
         this IServiceCollection services,
-        Action<BluxOptions>? configureUi = null,
-        Action<BluxToolsOptions>? configureTable = null)` | `IServiceCollection` | Registers the entire LuxStack ecosystem in one call: `Lux.UI`, `Lux.Query`, `Lux.Table`, `Lux.Form`, `Lux.Dashboard`, `Lux.Display`, `Lux.Spreadsheet`, and `Lux.Agent`. Works in Blazor Web App (SSR / Interactive Server / WebAssembly) and .NET MAUI Blazor Hybrid. |
+        Action<LuxOptions>? configureUi = null,
+        Action<LuxTableOptions>? configureTable = null)` | `IServiceCollection` | Registers the entire LuxStack ecosystem in one call: `Lux.UI`, `Lux.Query`, `Lux.Table`, `Lux.Form`, `Lux.Dashboard`, `Lux.Display`, `Lux.Spreadsheet`, and `Lux.Agent`. Works in Blazor Web App (SSR / Interactive Server / WebAssembly) and .NET MAUI Blazor Hybrid. |

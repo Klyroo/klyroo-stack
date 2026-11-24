@@ -2,8 +2,21 @@
   <Folder Name="/src/">
     <Project Path="src/Lux.Stack.Core/Lux.Stack.Core.csproj" />
     <Project Path="src/Lux.Stack/Lux.Stack.csproj" />
+    <Project Path="src/Lux.Stack.Mcp.Model/Lux.Stack.Mcp.Model.csproj" />
+    <Project Path="src/Lux.Stack.Mcp.Core/Lux.Stack.Mcp.Core.csproj" />
+    <Project Path="src/Lux.Stack.Mcp/Lux.Stack.Mcp.csproj" />
+  </Folder>
+  <Folder Name="/site/">
+    <Project Path="site/Lux.Stack.Site/Lux.Stack.Site.csproj" />
+    <Project Path="site/Lux.Stack.Site.Client/Lux.Stack.Site.Client.csproj" />
+    <Project Path="site/Lux.Stack.Site.DemoWatchdog/Lux.Stack.Site.DemoWatchdog.csproj" />
+  </Folder>
+  <Folder Name="/build/">
+    <Project Path="build/Lux.Stack.DocsBundle/Lux.Stack.DocsBundle.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Lux.Stack.Tests/Lux.Stack.Tests.csproj" />
+    <Project Path="tests/Lux.Stack.Mcp.Tests/Lux.Stack.Mcp.Tests.csproj" />
+    <Project Path="tests/Lux.Stack.Site.Tests/Lux.Stack.Site.Tests.csproj" />
   </Folder>
 </Solution>

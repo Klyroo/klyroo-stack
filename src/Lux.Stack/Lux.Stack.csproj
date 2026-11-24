@@ -10,7 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lux.Stack.Core\Lux.Stack.Core.csproj" />
-    <ProjectReference Include="..\..\..\blux-ui\src\Blux.UI\Blux.UI.csproj" />
+    <ProjectReference Include="..\..\..\lux-ui\src\Lux.UI\Lux.UI.csproj" />
     <ProjectReference Include="..\..\..\lux-query\src\Lux.Query\Lux.Query.csproj" />
     <ProjectReference Include="..\..\..\lux-table\src\Lux.Table\Lux.Table.csproj" />
     <ProjectReference Include="..\..\..\lux-form\src\Lux.Form\Lux.Form.csproj" />

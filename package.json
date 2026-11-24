@@ -1,0 +1,8 @@
+{
+  "name": "lux-stack-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "site:css": "../lux-ui/node_modules/.bin/tailwindcss -i site/Lux.Stack.Site/Styles/site.css -o site/Lux.Stack.Site/wwwroot/site.css --minify"
+  }
+}

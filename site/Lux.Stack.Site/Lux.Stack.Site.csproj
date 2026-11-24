@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Lux.Stack.Site</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <NoDefaultLaunchSettingsFile>True</NoDefaultLaunchSettingsFile>
+    <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lux.Stack.Site.Client\Lux.Stack.Site.Client.csproj" />
+    <ProjectReference Include="..\..\..\lux-ui\src\Lux.UI.Images.Local\Lux.UI.Images.Local.csproj" />
+    <ProjectReference Include="..\..\..\lux-ui\src\Lux.UI.Server\Lux.UI.Server.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" />
+    <ProjectReference Include="..\..\src\Lux.Stack.Mcp.Core\Lux.Stack.Mcp.Core.csproj" />
+    <PackageReference Include="ModelContextProtocol.AspNetCore" />
+    <PackageReference Include="Yarp.ReverseProxy" />
+    <ProjectReference Include="..\Lux.Stack.Site.DemoWatchdog\Lux.Stack.Site.DemoWatchdog.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\lux-ui\src\Lux.UI.Build.Tasks\Lux.UI.Build.Tasks.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+  <PropertyGroup>
+    <LuxBuildTasksAssembly>$(MSBuildThisFileDirectory)..\..\..\lux-ui\src\Lux.UI.Build.Tasks\bin\$(Configuration)\netstandard2.0\Lux.UI.Build.Tasks.dll</LuxBuildTasksAssembly>
+    <LuxFontsCacheDir Condition="'$(LuxFontsCacheDir)' == ''">$(MSBuildThisFileDirectory)obj\lux\fonts-cache\</LuxFontsCacheDir>
+  </PropertyGroup>
+  <Import Project="..\..\..\lux-ui\src\Lux.UI\buildTransitive\Lux.UI.Tasks.targets" />
+  <Import Project="..\..\..\lux-ui\src\Lux.UI\buildTransitive\Lux.UI.Fonts.targets" />
+  <Import Project="..\..\..\lux-ui\src\Lux.UI\buildTransitive\Lux.UI.Icons.targets" />
+
+  <ItemGroup>
+    <LuxFont Include="Geist" Role="sans" Weights="400..700" Subsets="latin;latin-ext" />
+    <LuxFont Include="Geist Mono" Role="mono" Weights="400..600" Subsets="latin;latin-ext" />
+    <LuxFont Include="Doto" Weights="700;900" Subsets="latin" Preload="false" Category="mono" />
+  </ItemGroup>
+
+</Project>

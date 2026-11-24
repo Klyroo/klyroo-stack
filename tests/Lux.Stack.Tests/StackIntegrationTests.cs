@@ -1,4 +1,10 @@
-using Blux.UI.Tools;
+using Lux.Query;
+using Lux.Table;
+using Lux.Form;
+using Lux.Dashboard;
+using Lux.Display;
+using Lux.Spreadsheet;
+using Lux.Agent;
 using Bunit;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;

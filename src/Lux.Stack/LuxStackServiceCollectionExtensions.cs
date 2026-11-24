@@ -1,5 +1,11 @@
-using Blux.UI;
-using Blux.UI.Tools;
+using Lux.UI;
+using Lux.Query;
+using Lux.Table;
+using Lux.Form;
+using Lux.Dashboard;
+using Lux.Display;
+using Lux.Spreadsheet;
+using Lux.Agent;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Lux.Stack;
@@ -14,11 +20,11 @@ public static class LuxStackServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddLuxStack(
         this IServiceCollection services,
-        Action<BluxOptions>? configureUi = null,
-        Action<BluxToolsOptions>? configureTable = null)
+        Action<LuxOptions>? configureUi = null,
+        Action<LuxTableOptions>? configureTable = null)
     {
         ArgumentNullException.ThrowIfNull(services);
-        services.AddBluxUi(configureUi);
+        services.AddLuxUi(configureUi);
         services.AddLuxQuery();
         services.AddLuxTable(configureTable);
         services.AddLuxForm();
