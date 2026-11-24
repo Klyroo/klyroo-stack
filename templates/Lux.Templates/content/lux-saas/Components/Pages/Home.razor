@@ -1,0 +1,28 @@
+@page "/"
+@inject FormService Forms
+
+<div class="mx-auto max-w-4xl space-y-6 p-8">
+    <LxDisplay Kind="DisplayKind.Heading"
+               Title="LuxSaaSApp"
+               Description="Scaffolded with dotnet new lux-saas — powered by LuxStack v0.1.0-preview.1." />
+
+    <div class="grid gap-4 md:grid-cols-2">
+        <LxDashboardStat Label="Active Accounts" Value="128" Compare="112" />
+        <LxDashboardStat Label="Monthly Recurring Revenue" Value="148900" Compare="132000" Format="DashboardFormatPreset.Compact" />
+    </div>
+
+    <LxButton Label="Open Quick Account Drawer" Color="LxColor.Primary" OnClick="OpenQuickFormAsync" />
+</div>
+
+@code {
+    private async Task OpenQuickFormAsync()
+    {
+        var schema = new FormSchema
+        {
+            FormKey = "quick-account",
+            Title = "New Account",
+            Fields = [new FormFieldSchema { Key = "name", Label = "Company Name", Required = true }]
+        };
+        await Forms.CreateFormAsync(schema, mode: FormShellMode.Drawer);
+    }
+}
