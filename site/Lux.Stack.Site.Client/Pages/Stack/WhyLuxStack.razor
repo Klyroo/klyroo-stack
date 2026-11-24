@@ -1,0 +1,126 @@
+@page "/why"
+@using Lux.UI
+
+<PageTitle>Why LuxStack? · LuxStack</PageTitle>
+
+<div class="mx-auto max-w-(--breakpoint-2xl) px-4 py-14 sm:px-6 lg:px-8">
+    <div class="max-w-3xl">
+        <p class="pg-eyebrow-mono">Architecture &amp; Comparison</p>
+        <h1 class="mt-3 text-4xl font-semibold tracking-tight text-(--blux-text-highlighted) sm:text-6xl">
+            Why <span class="pg-accent">LuxStack?</span>
+        </h1>
+        <p class="mt-4 text-lg leading-relaxed text-(--blux-text-muted)">
+            Most Blazor libraries tie business logic to UI components, depend on heavy JS runtimes or proprietary CSS, and break in Static SSR or NativeAOT.
+            LuxStack is engineered from first principles for <strong>.NET 10, Headless NativeAOT, Blazor Web (SSR/Server/WASM/Auto), .NET MAUI Blazor Hybrid, and AI Agents</strong>.
+        </p>
+        <div class="mt-6 flex flex-wrap gap-3">
+            <BxButton Label="Try Live 8-Library Showcase" Href="/showcase" Size="BxSize.Lg" />
+            <BxButton Label="Explore All 8 Libraries" Href="/#libraries" Size="BxSize.Lg" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" />
+        </div>
+    </div>
+
+    @* Feature Comparison Matrix *@
+    <section class="mt-14">
+        <h2 class="text-2xl font-semibold tracking-tight text-(--blux-text-highlighted)">Honest Technical Comparison</h2>
+        <p class="mt-2 text-sm text-(--blux-text-muted)">How LuxStack compares against established Blazor component suites.</p>
+
+        <div class="mt-6 overflow-x-auto rounded-2xl border border-(--blux-border)">
+            <table class="w-full min-w-[780px] text-start text-sm">
+                <thead class="bg-(--blux-bg-muted)/70 font-mono text-xs uppercase text-(--blux-text-highlighted)">
+                    <tr>
+                        <th class="px-4 py-3 text-start">Capability</th>
+                        <th class="px-4 py-3 text-start text-(--blux-primary-text)">LuxStack (MIT)</th>
+                        <th class="px-4 py-3 text-start">MudBlazor / Radzen</th>
+                        <th class="px-4 py-3 text-start">FluentUI Blazor</th>
+                        <th class="px-4 py-3 text-start">QuickGrid</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-(--blux-border)">
+                    <tr>
+                        <th class="px-4 py-3 text-start font-medium text-(--blux-text-highlighted)">Headless NativeAOT Core (<code>*.Core</code>)</th>
+                        <td class="px-4 py-3 font-medium text-(--blux-text-highlighted)">Yes — all 7 engines run in APIs, CLI, &amp; MAUI ViewModels</td>
+                        <td class="px-4 py-3 text-(--blux-text-muted)">No (UI-coupled)</td>
+                        <td class="px-4 py-3 text-(--blux-text-muted)">No (UI-coupled)</td>
+                        <td class="px-4 py-3 text-(--blux-text-muted)">No</td>
+                    </tr>
+                    <tr>
+                        <th class="px-4 py-3 text-start font-medium text-(--blux-text-highlighted)">Static SSR (Zero JS fallback)</th>
+                        <td class="px-4 py-3 font-medium text-(--blux-text-highlighted)">First-class (URL links, Popover API, cookies)</td>
+                        <td class="px-4 py-3 text-(--blux-text-muted)">Limited / Interactive required</td>
+                        <td class="px-4 py-3 text-(--blux-text-muted)">Partial (Web Components)</td>
+                        <td class="px-4 py-3 text-(--blux-text-muted)">Basic</td>
+                    </tr>
+                    <tr>
+                        <th class="px-4 py-3 text-start font-medium text-(--blux-text-highlighted)">Styling &amp; Theming</th>
+                        <td class="px-4 py-3 font-medium text-(--blux-text-highlighted)">Native Tailwind CSS v4 + WCAG contrast solver</td>
+                        <td class="px-4 py-3 text-(--blux-text-muted)">Material / Custom SCSS</td>
+                        <td class="px-4 py-3 text-(--blux-text-muted)">Fluent Design tokens</td>
+                        <td class="px-4 py-3 text-(--blux-text-muted)">Minimal CSS</td>
+                    </tr>
+                    <tr>
+                        <th class="px-4 py-3 text-start font-medium text-(--blux-text-highlighted)">Shared URL State + EF Core SQL AST</th>
+                        <td class="px-4 py-3 font-medium text-(--blux-text-highlighted)">Built-in (Lux.Query: keyset cursors, facets, codecs)</td>
+                        <td class="px-4 py-3 text-(--blux-text-muted)">Manual wiring</td>
+                        <td class="px-4 py-3 text-(--blux-text-muted)">Manual wiring</td>
+                        <td class="px-4 py-3 text-(--blux-text-muted)">IQueryable only (no URL/facets)</td>
+                    </tr>
+                    <tr>
+                        <th class="px-4 py-3 text-start font-medium text-(--blux-text-highlighted)">5-Step Spreadsheet CSV Importer</th>
+                        <td class="px-4 py-3 font-medium text-(--blux-text-highlighted)">Built-in (Lux.Spreadsheet: NFD, 80% score, retry)</td>
+                        <td class="px-4 py-3 text-(--blux-text-muted)">Not included</td>
+                        <td class="px-4 py-3 text-(--blux-text-muted)">Not included</td>
+                        <td class="px-4 py-3 text-(--blux-text-muted)">Not included</td>
+                    </tr>
+                    <tr>
+                        <th class="px-4 py-3 text-start font-medium text-(--blux-text-highlighted)">3-Wave Staged Dashboard Orchestrator</th>
+                        <td class="px-4 py-3 font-medium text-(--blux-text-highlighted)">Built-in (Lux.Dashboard: Essential / Background / Deferred)</td>
+                        <td class="px-4 py-3 text-(--blux-text-muted)">Not included</td>
+                        <td class="px-4 py-3 text-(--blux-text-muted)">Not included</td>
+                        <td class="px-4 py-3 text-(--blux-text-muted)">Not included</td>
+                    </tr>
+                    <tr>
+                        <th class="px-4 py-3 text-start font-medium text-(--blux-text-highlighted)">AI Agent Semantic Bridge &amp; MCP Server</th>
+                        <td class="px-4 py-3 font-medium text-(--blux-text-highlighted)">Built-in (Lux.Agent + Lux.Stack.Mcp + llms.txt)</td>
+                        <td class="px-4 py-3 text-(--blux-text-muted)">Not included</td>
+                        <td class="px-4 py-3 text-(--blux-text-muted)">Not included</td>
+                        <td class="px-4 py-3 text-(--blux-text-muted)">Not included</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    @* AI-First Workflow *@
+    <section class="mt-14 grid gap-6 lg:grid-cols-3">
+        <div class="rounded-2xl border border-(--blux-border) bg-(--blux-bg) p-6">
+            <p class="font-mono text-xs uppercase text-(--blux-primary-text)">1 · Zero-Hallucination AI Coding</p>
+            <h3 class="mt-2 text-xl font-semibold text-(--blux-text-highlighted)">Built-in MCP Server &amp; llms.txt</h3>
+            <p class="mt-2 text-sm text-(--blux-text-muted)">
+                Install <code>Lux.Stack.Mcp</code> as a global .NET tool so Cursor, Claude Code, and Copilot query exact APIs, parameters, and examples locally over stdio.
+            </p>
+            <pre class="mt-4 overflow-x-auto rounded-xl bg-(--pg-code-bg) p-3 font-mono text-xs text-[#d7dcde]">dotnet tool install -g Lux.Stack.Mcp --prerelease
+lux-stack-mcp</pre>
+        </div>
+
+        <div class="rounded-2xl border border-(--blux-border) bg-(--blux-bg) p-6">
+            <p class="font-mono text-xs uppercase text-(--blux-primary-text)">2 · 30-Second Start</p>
+            <h3 class="mt-2 text-xl font-semibold text-(--blux-text-highlighted)">Official <code>dotnet new</code> Templates</h3>
+            <p class="mt-2 text-sm text-(--blux-text-muted)">
+                Scaffold a complete Blazor Web App or headless NativeAOT service pre-wired with <code>Lux.Stack</code> in two commands.
+            </p>
+            <pre class="mt-4 overflow-x-auto rounded-xl bg-(--pg-code-bg) p-3 font-mono text-xs text-[#d7dcde]">dotnet new install Lux.Templates::0.1.0-preview.1
+dotnet new lux-saas -n MyApp</pre>
+        </div>
+
+        <div class="rounded-2xl border border-(--blux-border) bg-(--blux-bg) p-6">
+            <p class="font-mono text-xs uppercase text-(--blux-primary-text)">3 · Adopt Incrementally</p>
+            <h3 class="mt-2 text-xl font-semibold text-(--blux-text-highlighted)">Zero Lock-In · 100% MIT</h3>
+            <p class="mt-2 text-sm text-(--blux-text-muted)">
+                Use only <code>Lux.Query.Core</code> in a Minimal API, drop <code>Lux.Spreadsheet</code> into an existing app, or adopt all 8 libraries via <code>Lux.Stack</code>.
+            </p>
+            <pre class="mt-4 overflow-x-auto rounded-xl bg-(--pg-code-bg) p-3 font-mono text-xs text-[#d7dcde]">dotnet add package Lux.Query.Core
+# or the entire stack:
+dotnet add package Lux.Stack</pre>
+        </div>
+    </section>
+</div>

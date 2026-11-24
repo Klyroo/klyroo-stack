@@ -1,0 +1,488 @@
+@page "/showcase"
+@using System.Globalization
+@using System.Text.Json
+@using Lux.UI
+@using Lux.Query
+@using Lux.Table
+@using Lux.Form
+@using Lux.Dashboard
+@using Lux.Display
+@using Lux.Spreadsheet
+@using Lux.Agent
+@inject FormService FormService
+@inject FilePreviewService FilePreview
+@implements IDisposable
+
+<PageTitle>Live 8-Library Showcase · LuxStack</PageTitle>
+
+<div class="mx-auto max-w-(--breakpoint-2xl) px-4 py-10 sm:px-6 lg:px-8">
+    @* Header *@
+    <div class="flex flex-col gap-4 border-b border-(--blux-border) pb-6 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+            <p class="pg-eyebrow-mono">Live Full-Stack Showcase · All 8 LuxStack Libraries Working Together</p>
+            <h1 class="mt-2 text-3xl font-semibold tracking-tight text-(--blux-text-highlighted) sm:text-5xl">
+                Revenue Ops <span class="pg-accent">Backoffice.</span>
+            </h1>
+            <p class="mt-2 max-w-2xl text-sm text-(--blux-text-muted)">
+                One unified interactive app combining <strong>Lux.Dashboard</strong> (3-wave KPIs), <strong>Lux.Query</strong> + <strong>Lux.Table</strong> (schema-driven grid),
+                <strong>Lux.Form</strong> (reactive drawer CRUD), <strong>Lux.Spreadsheet</strong> (CSV bulk import), <strong>Lux.Display</strong> (inspector &amp; lightbox),
+                <strong>Lux.Agent</strong> (AI copilot with AllowPolicy &amp; UndoStack), and <strong>Lux.UI</strong>.
+            </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+            <BxButton Label="New Account (Lux.Form Drawer)" Size="BxSize.Md" OnClick="@OpenCreateAccountDrawerAsync" />
+            <BxButton Label="Preview CSV (Lux.Display)" Size="BxSize.Md" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@OpenCsvLightbox" />
+            <BxButton Label="@(_showAgent ? "Hide AI Copilot" : "Open AI Copilot (Lux.Agent)")" Size="BxSize.Md" Color="BxColor.Primary" Variant="ButtonVariant.Soft" OnClick="@(() => _showAgent = !_showAgent)" />
+        </div>
+    </div>
+
+    @* Active View Tabs *@
+    <div class="mt-6 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex flex-wrap items-center gap-2">
+            @foreach (var tab in new[] { ("overview", "1. Overview (Dashboard)"), ("accounts", "2. Accounts (Query + Table)"), ("import", "3. Bulk Import (Spreadsheet)"), ("inspector", "4. Inspector (Display)") })
+            {
+                <BxButton Label="@tab.Item2"
+                          Size="BxSize.Sm"
+                          Color="@(_activeTab == tab.Item1 ? BxColor.Primary : BxColor.Neutral)"
+                          Variant="@(_activeTab == tab.Item1 ? ButtonVariant.Solid : ButtonVariant.Outline)"
+                          OnClick="@(() => SwitchTab(tab.Item1))" />
+            }
+        </div>
+        <div class="flex flex-wrap items-center gap-2 font-mono text-xs">
+            <span class="text-(--blux-text-muted)">Region Filter:</span>
+            @foreach (var r in new[] { "EU", "US", "APAC" })
+            {
+                var active = _regionFilter.Values.Contains(r);
+                <BxButton Label="@r" Size="BxSize.Xs" Color="@(active ? BxColor.Primary : BxColor.Neutral)" Variant="@(active ? ButtonVariant.Solid : ButtonVariant.Soft)" OnClick="@(() => ToggleRegion(r))" />
+            }
+            @if (_dashboard.Filtered)
+            {
+                <BxButton Label="Reset" Size="BxSize.Xs" Color="BxColor.Neutral" Variant="ButtonVariant.Ghost" OnClick="@ResetAllFilters" />
+            }
+            <BxBadge Label="@($"{FilteredAccounts.Count} accounts · €{FilteredAccounts.Sum(a => a.Arr):N0} ARR")" Color="BxColor.Neutral" Variant="BxVariant.Subtle" Size="BxSize.Sm" />
+        </div>
+    </div>
+
+    <div class="@(_showAgent ? "mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]" : "mt-6")">
+        @* Main Workspace *@
+        <div class="min-w-0 space-y-6">
+            @if (_activeTab == "overview")
+            {
+                <BxDashboardStats Title="Executive Metrics (Live from Filtered Accounts)" Items="@BuildStats()" />
+
+                <div class="grid gap-6 lg:grid-cols-2">
+                    <BxDashboardGauge Title="Annual Target Attainment"
+                                      Value="@Math.Min(100, Math.Round((double)FilteredAccounts.Sum(a => a.Arr) / 750_000.0 * 100.0, 1))"
+                                      Max="100" Target="85"
+                                      Format="DashboardFormatPreset.Percent"
+                                      Caption="@($"€{FilteredAccounts.Sum(a => a.Arr):N0} / €750,000 target")" />
+                    <BxDashboardBars Title="ARR by Region" Items="@BuildRegionBars()" Format="DashboardFormatPreset.Compact" />
+                </div>
+
+                <div class="grid gap-6 lg:grid-cols-2">
+                    <BxDashboardAlerts Title="Actionable Operational Alerts" Items="@([
+                        new DashboardAlertItem(DashboardAlertSeverity.Warning, $"{_accounts.Count(a => a.Status == "At Risk")} accounts flagged At Risk", "Click 'Accounts' tab to filter and inspect churn risk."),
+                        new DashboardAlertItem(DashboardAlertSeverity.Success, $"3-Wave DashboardController · Essential: {_kpiWave.State}", "Filters synchronize across Dashboard, Table, and AgentBridge.")
+                    ])" />
+                    <div class="rounded-2xl border border-(--blux-border) bg-(--blux-bg-muted)/30 p-5">
+                        <p class="font-mono text-xs uppercase text-(--blux-text-muted)">Lux.Query Live URL Codec Output (DataListStateQuery.ToQuery)</p>
+                        <code class="mt-2 block break-all rounded-lg bg-(--pg-code-bg) p-3 font-mono text-xs text-(--blux-primary)">@BuildLiveQueryUrl()</code>
+                        <div class="mt-4 flex flex-wrap gap-2">
+                            <BxButton Label="Drill Down into Accounts →" Size="BxSize.Sm" OnClick="@(() => SwitchTab("accounts"))" />
+                            <BxButton Label="Run 3-Wave RefreshAsync()" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => _dashboard.RefreshAsync())" />
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (_activeTab == "accounts")
+            {
+                <div class="rounded-2xl border border-(--blux-border) bg-(--blux-bg) p-5 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <div class="w-60">
+                                <BxInput Value="@_search" ValueChanged="@(v => _search = v)" Placeholder="Search accounts (Lux.Query)..." aria-label="Search accounts" />
+                            </div>
+                            <BxButton Label="@(_groupByRegion ? "GroupBy Region: ON" : "GroupBy Region: OFF")" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => _groupByRegion = !_groupByRegion)" />
+                            <BxButton Label="Undo Last Edit" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Soft" Disabled="@(!_history.CanUndo)" OnClick="@UndoAccounts" />
+                            <BxButton Label="Redo" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Ghost" Disabled="@(!_history.CanRedo)" OnClick="@RedoAccounts" />
+                        </div>
+                        <span class="font-mono text-xs text-(--blux-text-muted)">Showing @FilteredAccounts.Count / @_accounts.Count</span>
+                    </div>
+
+                    <BxDataList TItem="AccountRecord" Schema="@AccountSchema" Items="@FilteredAccounts" UrlSync="false">
+                        <BxDataListTable TItem="AccountRecord"
+                                         HeaderMenu="true"
+                                         ShowProgressLine="true"
+                                         GroupBy="@(_groupByRegion ? AccountGroupBy : null)"
+                                         Summaries="@(new DataListSummaries<AccountRecord>())">
+                            <BxDataListColumn TItem="AccountRecord" Field="name" Title="Account" />
+                            <BxDataListColumn TItem="AccountRecord" Field="region" Title="Region" />
+                            <BxDataListColumn TItem="AccountRecord" Field="plan" Title="Plan" />
+                            <BxDataListColumn TItem="AccountRecord" Field="status" Title="Status" />
+                            <BxDataListColumn TItem="AccountRecord" Field="arr" Title="ARR (€)" Summary="DataListSummaryKind.Sum" />
+                        </BxDataListTable>
+                    </BxDataList>
+                </div>
+            }
+            else if (_activeTab == "import")
+            {
+                <div class="rounded-2xl border border-(--blux-border) bg-(--blux-bg) p-5 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <p class="text-sm text-(--blux-text-muted)">
+                            Preloaded with European semicolon CSV &amp; accented headers (<code>Nom;Région;Offre;Revenu</code>). Complete the wizard to append new accounts directly into the live Backoffice!
+                        </p>
+                        @if (_importedNotice is not null)
+                        {
+                            <BxBadge Label="@_importedNotice" Color="BxColor.Success" Variant="BxVariant.Soft" Size="BxSize.Sm" />
+                        }
+                    </div>
+                    <BxSpreadsheetImport Importer="@_importer" Title="Import New Accounts (Lux.Spreadsheet)" Wizard="true" />
+                </div>
+            }
+            else if (_activeTab == "inspector")
+            {
+                var selected = FilteredAccounts.FirstOrDefault() ?? _accounts[0];
+                <div class="grid gap-6 lg:grid-cols-2">
+                    <BxDisplay Kind="DisplayKind.Facts" Surface="DisplaySurface.Bordered" Title="@($"Account Dossier · {selected.Name}")" Facts="@([
+                        new DisplayFact { Label = "Account ID", Value = $"ACC-{selected.Id:D4}", Copy = true, Mono = true },
+                        new DisplayFact { Label = "Region", Value = selected.Region, Chip = new DisplayChip(selected.Status, selected.Status == "Active" ? BxColor.Success : BxColor.Warning) },
+                        new DisplayFact { Label = "Plan", Value = selected.Plan },
+                        new DisplayFact { Label = "Annual Recurring Revenue", Value = $"€{selected.Arr:N0}" }
+                    ])" />
+                    <BxDisplay Kind="DisplayKind.Meter" Surface="DisplaySurface.Bordered" Title="Seat Quota Utilization"
+                               MeterValue="@selected.SeatUsagePct" MeterMax="100" WarningThreshold="75" ErrorThreshold="90" />
+                    <BxDisplay Kind="DisplayKind.Code" Surface="DisplaySurface.Bordered" Variant="secret"
+                               Title="Webhook Signing Key (Redacted in Lux.Agent)" Value="@($"sk_live_lux_{selected.Id:D4}_9921")" VisibleChars="4" Copy="true" />
+                    <BxDisplay Kind="DisplayKind.Timeline" Surface="DisplaySurface.Bordered" Title="Lifecycle Audit" TimelineItems="@([
+                        new DisplayTimelineItem("Account Provisioned", Time: "Q1 2026", State: DisplayTimelineState.Done),
+                        new DisplayTimelineItem("Enterprise Upgrade", Time: "Q3 2026", State: DisplayTimelineState.Done),
+                        new DisplayTimelineItem("Annual Renewal Review", Time: "Active", State: DisplayTimelineState.Current)
+                    ])" />
+                </div>
+            }
+        </div>
+
+        @* Live Lux.Agent AI Copilot Side Panel *@
+        @if (_showAgent)
+        {
+            <aside class="flex flex-col gap-4 rounded-2xl border border-(--blux-border) bg-(--blux-bg-muted)/30 p-4">
+                <div class="flex items-center justify-between">
+                    <span class="font-mono text-xs font-semibold uppercase tracking-widest text-(--blux-text-highlighted)">Lux.Agent Copilot</span>
+                    <BxBadge Label="@($"{_agent.Snapshot().Count} controls")" Color="BxColor.Primary" Variant="BxVariant.Soft" Size="BxSize.Xs" />
+                </div>
+                <p class="text-xs text-(--blux-text-muted)">
+                    Connected to <code>DashboardController</code>, <code>FormController</code>, and <code>SpreadsheetImporter</code> via <code>AgentBridgeService</code>.
+                </p>
+
+                <div class="flex flex-col gap-2">
+                    <BxButton Label="AI: Filter Region -> EU Only" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@AgentFilterEuAsync" />
+                    <BxButton Label="AI: Reset Dashboard Filters" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@AgentResetDashAsync" />
+                    <BxButton Label="AI: Prefill Quick Deal Form" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@AgentPrefillDealAsync" />
+                    <BxButton Label="AI: Submit Deal (Triggers AllowPolicy!)" Size="BxSize.Sm" Color="BxColor.Warning" Variant="ButtonVariant.Soft" OnClick="@AgentSubmitDealAsync" />
+                </div>
+
+                <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg) p-3">
+                    <p class="mb-2 font-mono text-[11px] uppercase text-(--blux-text-muted)">Quick Deal Form (Watched by Agent)</p>
+                    <BxFormEngine Form="@_quickDealForm" SubmitLabel="Add Deal" ShowReset="false" OnSubmit="@HandleQuickDealSubmit" />
+                </div>
+
+                <div class="rounded-xl border border-(--blux-border) bg-(--pg-code-bg) p-3 font-mono text-[11px] text-[#d7dcde]">
+                    <p class="mb-1 text-[#94a3b8]">Observe() Audit &amp; Agent Status</p>
+                    <pre class="max-h-36 overflow-auto whitespace-pre-wrap">@_agentLog</pre>
+                </div>
+            </aside>
+        }
+    </div>
+</div>
+
+@* Human-in-the-loop AllowPolicy Modal (Lux.UI + Lux.Agent) *@
+<BxModal @bind-Open="_confirmModalOpen" Title="Approve Consequential AI Action?">
+    <p class="text-sm text-(--blux-text-muted)">
+        <strong>Lux.Agent</strong> requested to execute <code>@_pendingStep?.Action</code> on <strong>@_pendingStep?.Ref</strong>.
+        Because <code>confirmSubmit: true</code> is enabled, <code>AllowPolicy</code> paused execution for your approval.
+    </p>
+    <div class="mt-5 flex justify-end gap-2">
+        <BxButton Label="Refuse" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => ResolvePolicy(false))" />
+        <BxButton Label="Approve & Execute" Color="BxColor.Primary" OnClick="@(() => ResolvePolicy(true))" />
+    </div>
+</BxModal>
+
+@code {
+    private sealed record AccountRecord(int Id, string Name, string Region, string Plan, string Status, decimal Arr, double SeatUsagePct);
+
+    private static readonly DataListSchema<AccountRecord> AccountSchema = DataListSchema.For<AccountRecord>(s => s
+        .RowKey(a => a.Id)
+        .RowLabel(a => a.Name)
+        .Search(a => a.Name, a => a.Plan, a => a.Region)
+        .Field(a => a.Name, f => f.Key("name").Sortable())
+        .Field(a => a.Region, f => f.Key("region").Sortable().Filter(DataListFilter.Option()))
+        .Field(a => a.Plan, f => f.Key("plan").Sortable().Filter(DataListFilter.Option()))
+        .Field(a => a.Status, f => f.Key("status").Sortable().Filter(DataListFilter.Option()))
+        .Field(a => a.Arr, f => f.Key("arr").Sortable().Filter(DataListFilter.Number(min: 0))));
+
+    private static readonly DataListGroupBy<AccountRecord> AccountGroupBy = new() { Key = a => a.Region };
+
+    private List<AccountRecord> _accounts =
+    [
+        new(1, "Helios Cloud SAS", "EU", "Enterprise", "Active", 148_000m, 86),
+        new(2, "Northwind Robotics", "US", "Enterprise", "Active", 192_000m, 92),
+        new(3, "Kestrel FinTech", "EU", "Pro", "Active", 64_000m, 68),
+        new(4, "Sakura BioLabs", "APAC", "Enterprise", "At Risk", 118_000m, 41),
+        new(5, "Lumen Logistics", "US", "Pro", "Active", 52_000m, 77),
+        new(6, "Alpine Energy GmbH", "EU", "Starter", "At Risk", 24_000m, 95)
+    ];
+
+    private readonly UndoStack<AccountRecord[]> _history;
+    private readonly DashboardController _dashboard = new("revops");
+    private readonly DashboardFilterControl _regionFilter;
+    private readonly DashboardResource<int> _kpiWave;
+    private readonly AgentBridgeService _agent = new();
+    private readonly FormController _quickDealForm;
+    private readonly SpreadsheetImporter _importer;
+    private IDisposable? _observeSub;
+
+    private string _activeTab = "overview";
+    private string _search = "";
+    private bool _groupByRegion;
+    private bool _showAgent = true;
+    private string? _importedNotice;
+    private string _agentLog = "Ready. Try any AI action above to see Snapshot/Act/Observe in action.";
+
+    private bool _confirmModalOpen;
+    private AgentActStep? _pendingStep;
+    private TaskCompletionSource<bool>? _policyTcs;
+
+    private IReadOnlyList<AccountRecord> FilteredAccounts
+    {
+        get
+        {
+            var rules = new List<DataListFilterNode>();
+            if (_regionFilter.Values.Count > 0 && _regionFilter.Values.Count < 3)
+                rules.Add(new FilterRule("region", FilterOperator.IsAnyOf, new FilterValue.List(_regionFilter.Values)));
+
+            var req = new DataListRequest(
+                paging: DataListPaging.None.Instance,
+                sort: [new DataListSort("arr", Descending: true)],
+                filter: rules.Count == 0 ? DataListFilterGroup.Empty : new DataListFilterGroup(FilterCombinator.And, rules),
+                search: string.IsNullOrWhiteSpace(_search) ? null : new DataListSearch(_search));
+
+            return AccountSchema.ExecuteInMemory(_accounts, req).Items;
+        }
+    }
+
+    public LuxShowcase()
+    {
+        _history = new UndoStack<AccountRecord[]>([.. _accounts], limit: 25);
+
+        _dashboard.AddView("overview", "Overview");
+        _dashboard.AddView("accounts", "Accounts");
+        _regionFilter = _dashboard.AddFilter(new DashboardFilterControl(
+            "region", "Region",
+            items: [new("EU", "Europe"), new("US", "North America"), new("APAC", "Asia-Pacific")],
+            defaultValues: ["EU", "US", "APAC"],
+            multiple: true));
+
+        _kpiWave = _dashboard.RegisterResource(new DashboardResource<int>(
+            "kpis", _ => Task.FromResult(_accounts.Count), DashboardQueryStage.Essential));
+
+        _quickDealForm = new FormController(new FormSchema
+        {
+            FormKey = "quick-deal",
+            Title = "Quick Deal",
+            Fields =
+            [
+                new FormFieldSchema { Key = "name", Label = "Account Name", Required = true, DefaultValue = "Aether Dynamics" },
+                new FormFieldSchema { Key = "region", Label = "Region", Kind = FormFieldKind.Select, DefaultValue = "EU", Options = [new("EU", "Europe"), new("US", "US"), new("APAC", "APAC")] },
+                new FormFieldSchema { Key = "arr", Label = "ARR (€)", Kind = FormFieldKind.Number, Min = 1000, DefaultValue = 85000.0 },
+                new FormFieldSchema { Key = "apiKey", Label = "Webhook Secret", Kind = FormFieldKind.Password, DefaultValue = "sk_live_hidden_9999" }
+            ]
+        });
+
+        _importer = new SpreadsheetImporter(new SpreadsheetSchema
+        {
+            Key = "accounts-import",
+            BatchSize = 50,
+            Columns =
+            [
+                new SpreadsheetColumnSchema { Key = "name", Label = "Account Name", Headers = ["Nom", "Account"], Required = true },
+                new SpreadsheetColumnSchema { Key = "region", Label = "Region", Headers = ["Région"], Kind = SpreadsheetColumnKind.Select, Required = true, Options = [new("EU", "Europe", ["eu", "europe"]), new("US", "US", ["us"]), new("APAC", "APAC", ["apac"])] },
+                new SpreadsheetColumnSchema { Key = "plan", Label = "Plan", Headers = ["Offre"], Required = true },
+                new SpreadsheetColumnSchema { Key = "arr", Label = "ARR", Headers = ["Revenu"], Kind = SpreadsheetColumnKind.Number, DecimalSeparator = ',', Required = true, Rules = [SpreadsheetRule.Min(0)] }
+            ],
+            OnSubmit = batch =>
+            {
+                var nextId = _accounts.Max(a => a.Id) + 1;
+                foreach (var row in batch)
+                {
+                    var name = row.Data.GetValueOrDefault("name")?.ToString() ?? "Imported";
+                    var region = row.Data.GetValueOrDefault("region")?.ToString() ?? "EU";
+                    var plan = row.Data.GetValueOrDefault("plan")?.ToString() ?? "Pro";
+                    var arr = Convert.ToDecimal(row.Data.GetValueOrDefault("arr") ?? 25000m, CultureInfo.InvariantCulture);
+                    _accounts.Add(new AccountRecord(nextId++, name, region, plan, "Active", arr, 50));
+                }
+                _history.Record([.. _accounts]);
+                _importedNotice = $"Imported {batch.Count} accounts into live backoffice!";
+                InvokeAsync(StateHasChanged);
+                return Task.FromResult<IReadOnlyList<SpreadsheetRejectedRow>?>(null);
+            }
+        });
+        _importer.LoadText("Nom;Région;Offre;Revenu\nSolaris AI;EU;Enterprise;132000,00\nPacific Data;APAC;Pro;48500,00", "new-accounts.csv");
+
+        _agent.RegisterForm(_quickDealForm, confirmSubmit: true);
+        _agent.RegisterDashboard(_dashboard);
+        _agent.RegisterSpreadsheet(_importer);
+        _agent.AllowPolicy = async (step, confirmRequired) =>
+        {
+            if (!confirmRequired) return true;
+            _pendingStep = step;
+            _confirmModalOpen = true;
+            _policyTcs = new TaskCompletionSource<bool>();
+            await InvokeAsync(StateHasChanged);
+            return await _policyTcs.Task;
+        };
+        _observeSub = _agent.Observe(c =>
+        {
+            _agentLog = $"[{c.Source}] {c.Label}: {c.Previous} -> {c.Value}\n" + _agentLog;
+            InvokeAsync(StateHasChanged);
+        });
+    }
+
+    protected override async Task OnInitializedAsync() => await _dashboard.RefreshAsync();
+
+    private void SwitchTab(string tab) => _activeTab = tab;
+    private void ToggleRegion(string r) => _regionFilter.Toggle(r);
+    private void ResetAllFilters() { _dashboard.ResetFilters(); _search = ""; }
+
+    private void UndoAccounts() { _accounts = [.. _history.Undo()]; }
+    private void RedoAccounts() { _accounts = [.. _history.Redo()]; }
+
+    private IReadOnlyList<DashboardStatsItem> BuildStats()
+    {
+        var items = FilteredAccounts;
+        var arr = (double)items.Sum(a => a.Arr);
+        var avg = items.Count > 0 ? arr / items.Count : 0;
+        var atRiskPct = items.Count > 0 ? Math.Round(items.Count(a => a.Status == "At Risk") * 100.0 / items.Count, 1) : 0;
+        return
+        [
+            new("arr", "Total ARR", arr, DashboardFormatPreset.Compact, Delta: 16.4, Progress: Math.Min(1.0, arr / 750_000.0)),
+            new("avg", "Avg Contract", avg, DashboardFormatPreset.Compact, Delta: 8.2),
+            new("risk", "At-Risk Share", atRiskPct, DashboardFormatPreset.Percent, Delta: -1.5, InvertDelta: true)
+        ];
+    }
+
+    private IReadOnlyList<DashboardBarItem> BuildRegionBars() =>
+        [.. FilteredAccounts
+            .GroupBy(a => a.Region)
+            .OrderByDescending(g => g.Sum(x => x.Arr))
+            .Select(g => new DashboardBarItem(g.Key, (double)g.Sum(x => x.Arr), Tag: $"{g.Count()} accts"))];
+
+    private string BuildLiveQueryUrl()
+    {
+        var rules = _regionFilter.Values.Count is > 0 and < 3
+            ? (IReadOnlyList<FilterRule>)[new FilterRule("region", FilterOperator.IsAnyOf, new FilterValue.List(_regionFilter.Values))]
+            : [];
+        var state = new DataListState(_search, rules, [new DataListSort("arr", Descending: true)], 1, 25, DataListLayout.Table);
+        var pairs = DataListStateQuery.ToQuery(state, AccountSchema, prefix: "acc");
+        return pairs.Count == 0 ? "/showcase" : "/showcase?" + string.Join("&", pairs.Select(kv => $"{kv.Key}={kv.Value}"));
+    }
+
+    private async Task OpenCreateAccountDrawerAsync()
+    {
+        var schema = new FormSchema
+        {
+            FormKey = "create-account",
+            Title = "New Customer Account",
+            Fields =
+            [
+                new FormFieldSchema { Key = "name", Label = "Company Name", Required = true },
+                new FormFieldSchema { Key = "region", Label = "Region", Kind = FormFieldKind.Select, DefaultValue = "EU", Options = [new("EU", "Europe"), new("US", "North America"), new("APAC", "Asia-Pacific")] },
+                new FormFieldSchema { Key = "plan", Label = "Plan", Kind = FormFieldKind.Select, DefaultValue = "Enterprise", Options = [new("Starter", "Starter"), new("Pro", "Pro"), new("Enterprise", "Enterprise")] },
+                new FormFieldSchema { Key = "arr", Label = "Annual Contract (€)", Kind = FormFieldKind.Number, Min = 1000, DefaultValue = 75000.0 },
+                new FormFieldSchema { Key = "vat", Label = "EU VAT ID (visible for EU)", Condition = f => f.GetValue<string>("region") == "EU", RequiredWhen = f => f.GetValue<string>("region") == "EU" }
+            ]
+        };
+
+        var outcome = await FormService.CreateFormAsync(schema, mode: FormShellMode.Drawer);
+        if (outcome.IsCompleted)
+        {
+            var nextId = _accounts.Max(a => a.Id) + 1;
+            _accounts.Add(new AccountRecord(
+                nextId,
+                outcome.FormData.GetValueOrDefault("name")?.ToString() ?? "New Account",
+                outcome.FormData.GetValueOrDefault("region")?.ToString() ?? "EU",
+                outcome.FormData.GetValueOrDefault("plan")?.ToString() ?? "Enterprise",
+                "Active",
+                Convert.ToDecimal(outcome.FormData.GetValueOrDefault("arr") ?? 75000m, CultureInfo.InvariantCulture),
+                45));
+            _history.Record([.. _accounts]);
+            _activeTab = "accounts";
+        }
+    }
+
+    private void OpenCsvLightbox()
+    {
+        var table = new DashboardDataTable(
+            [new("name", "Account"), new("region", "Region"), new("plan", "Plan"), new("arr", "ARR", Numeric: true)],
+            [.. FilteredAccounts.Select(a => (IReadOnlyDictionary<string, string?>)new Dictionary<string, string?>
+            {
+                ["name"] = a.Name, ["region"] = a.Region, ["plan"] = a.Plan, ["arr"] = a.Arr.ToString(CultureInfo.InvariantCulture)
+            })]);
+
+        var fileName = DashboardFormat.ResolveFileName("LuxStack Revenue Accounts");
+        FilePreview.Open(new FilePreviewFile
+        {
+            Src = fileName,
+            Name = fileName,
+            Mime = "text/csv",
+            Content = DashboardFormat.ExportCsv(table, CultureInfo.InvariantCulture)
+        });
+    }
+
+    private void HandleQuickDealSubmit(IReadOnlyDictionary<string, object?> data)
+    {
+        var nextId = _accounts.Max(a => a.Id) + 1;
+        _accounts.Add(new AccountRecord(
+            nextId,
+            data.GetValueOrDefault("name")?.ToString() ?? "AI Deal",
+            data.GetValueOrDefault("region")?.ToString() ?? "EU",
+            "Enterprise",
+            "Active",
+            Convert.ToDecimal(data.GetValueOrDefault("arr") ?? 85000m, CultureInfo.InvariantCulture),
+            55));
+        _history.Record([.. _accounts]);
+        _agentLog = $"[Deal Added] {data.GetValueOrDefault("name")} -> €{data.GetValueOrDefault("arr")}\n" + _agentLog;
+    }
+
+    private async Task AgentFilterEuAsync()
+    {
+        var res = await _agent.ActAsync([new AgentActStep("Region", "setValue", ["EU"])]);
+        _agentLog = $"Act(Region=EU) Ok={res.Ok}\n" + _agentLog;
+    }
+    private async Task AgentResetDashAsync()
+    {
+        var res = await _agent.ActAsync([new AgentActStep("revops", "resetFilters")]);
+        _agentLog = $"Act(resetFilters) Ok={res.Ok}\n" + _agentLog;
+    }
+    private async Task AgentPrefillDealAsync()
+    {
+        var res = await _agent.ActAsync([
+            new AgentActStep("Account Name", "setValue", ["Nebula Systems"]),
+            new AgentActStep("ARR (€)", "setValue", [165000.0])
+        ]);
+        var secretSnap = _agent.Snapshot().FirstOrDefault(s => s.Label == "Webhook Secret")?.Value;
+        _agentLog = $"Act(Prefill) Ok={res.Ok} · Secret in Snapshot = \"{secretSnap}\"\n" + _agentLog;
+    }
+    private async Task AgentSubmitDealAsync()
+    {
+        var res = await _agent.ActAsync([new AgentActStep("Quick Deal", "submit")]);
+        if (res.Ok) HandleQuickDealSubmit(_quickDealForm.BuildOutput());
+        _agentLog = res.Ok ? "Policy APPROVED -> Deal submitted!\n" + _agentLog : $"Policy REFUSED: {res.Error}\n" + _agentLog;
+    }
+    private void ResolvePolicy(bool allow)
+    {
+        _confirmModalOpen = false;
+        _policyTcs?.TrySetResult(allow);
+    }
+
+    public void Dispose() => _observeSub?.Dispose();
+}

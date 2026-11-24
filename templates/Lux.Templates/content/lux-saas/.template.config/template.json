@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "LuxStack Contributors",
+  "classifications": ["Web", "Blazor", "LuxStack"],
+  "identity": "Lux.Templates.SaaS",
+  "name": "LuxStack SaaS Web App",
+  "shortName": "lux-saas",
+  "sourceName": "LuxSaaSApp",
+  "tags": { "language": "C#", "type": "project" },
+  "preferNameDirectory": true
+}

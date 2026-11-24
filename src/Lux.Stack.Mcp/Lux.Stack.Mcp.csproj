@@ -11,9 +11,9 @@
     <RootNamespace>Lux.Stack.Mcp.Tool</RootNamespace>
     <AssemblyName>Lux.Stack.Mcp</AssemblyName>
     <PackAsTool>true</PackAsTool>
-    <ToolCommandName>lux-ui-mcp</ToolCommandName>
+    <ToolCommandName>lux-stack-mcp</ToolCommandName>
     <PackageId>Lux.Stack.Mcp</PackageId>
-    <Description>MCP server for Lux.UI: component search, API, examples and guides for AI coding agents, over stdio.</Description>
+    <Description>MCP server for LuxStack (Lux.UI + all 7 Lux.* libraries): component search, API, examples and guides for AI coding agents, over stdio.</Description>
     <PackageTags>blazor;ui;mcp;model-context-protocol;ai;tailwind</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
