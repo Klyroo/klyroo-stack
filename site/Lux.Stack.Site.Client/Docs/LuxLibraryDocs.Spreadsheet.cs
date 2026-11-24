@@ -1,4 +1,4 @@
-using Lux.Table;
+using Lux.Spreadsheet;
 
 namespace Lux.Stack.Site.Client.Docs;
 
@@ -7,7 +7,10 @@ public static partial class LuxLibraryDocs
     private static LibraryDocTree BuildSpreadsheet() => new(
         "spreadsheet", "Lux.Spreadsheet", "#14b8a6",
         [
-            new("", "Introduction", "Getting Started",
+            // =========================================================================
+            // GROUP 1: GETTING STARTED
+            // =========================================================================
+            new("", "Introduction & How It Works", "Getting Started",
                 "Headless NativeAOT CSV/TSV/workbook importer with 20-row header layout detection, NFD normalization, >=80% pass-rate column suggestions, unknown value questions, duplicate/upsert reconciliation, inline cell editing, CSV template/error exports, and batched submission with rejected-row retry.",
                 [
                     new("overview", "What is Lux.Spreadsheet?",
@@ -18,18 +21,25 @@ public static partial class LuxLibraryDocs
                         ],
                         LiveDemoKey: "spreadsheet-wizard",
                         LiveDemoTitle: "Lux.Spreadsheet · Live 5-Step Import Wizard"),
-                    new("pipeline", "5-Step Import Pipeline Overview",
-                        TableHeaders: ["Step", "Capabilities", "Key Importer Members"],
+                    new("pipeline", "How Lux.Spreadsheet Works End-to-End (The 5-Step State Machine)",
+                        TableHeaders: ["Step", "Capabilities", "Key SpreadsheetImporter Members"],
                         TableRows:
                         [
-                            new("1. Source & Layout", "CSV, TSV, Excel clipboard Paste, multi-sheet Workbook, 20-row header detection", "LoadText, Paste, LoadWorkbook, SetSheet, SetHeaderRow, HeaderRowNumber"),
-                            new("2. Column Mapping", "NFD normalization, alias matching, >=80% sample-validated Suggestions", "Fields, MissingFields, AssignColumn, IgnoreColumn, ResetColumn"),
-                            new("3. Unknown Values", "Collect unrecognized select values and apply Map/LeaveEmpty/SkipRows/Create", "Questions, OpenQuestions, AnswerValue, ClearAnswer"),
-                            new("4. Review & Edit", "Duplicates, ExistingRecords upsert, tabs/filters, row inspector & EditCell", "AllRows, ImportableRows, VisibleReviewRows, EditCell, RevertCell, DiscardRows"),
-                            new("5. Batch Submit", "Chunked async OnSubmit, progress tracking, RetryRejectedAsync & CSV exports", "SubmitAsync, RetryRejectedAsync, ExportTemplateCsv, ExportInvalidRowsCsv")
+                            new("1. Source & Layout", "CSV, TSV, clipboard Paste, multi-sheet Workbook, 20-row header & delimiter detection", "LoadText, Paste, LoadWorkbook, SetSheet, SetHeaderRow, HeaderRowNumber"),
+                            new("2. Column Mapping", "Unicode NFD normalization, alias matching, >=80% sample-validated Suggestions", "Fields, MissingFields, AssignColumn, IgnoreColumn, ResetColumn"),
+                            new("3. Unknown Values", "Collect distinct unrecognized Select strings and answer globally (Map/LeaveEmpty/SkipRows/Create)", "Questions, OpenQuestions, AnswerValue, ClearAnswer"),
+                            new("4. Review & Edit", "Intra-file duplicates, ExistingRecords upsert detection, review tabs/levels, inline EditCell & Discard", "AllRows, ImportableRows, InvalidRows, VisibleReviewRows, EditCell, RevertCell, DiscardRows"),
+                            new("5. Batch Submit", "Chunked async OnSubmit, progress tracking, targeted RetryRejectedAsync & CSV exports", "SubmitAsync, RetryRejectedAsync, ExportTemplateCsv, ExportInvalidRowsCsv")
+                        ]),
+                    new("layers", "Two-Layer Architecture",
+                        TableHeaders: ["Package", "Primary Exports", "Compatibility"],
+                        TableRows:
+                        [
+                            new("Lux.Spreadsheet.Core", "SpreadsheetImporter, SpreadsheetSchema, SpreadsheetColumnSchema, SpreadsheetRule, SpreadsheetOption, SpreadsheetRow", "Headless C# · IsAotCompatible=true"),
+                            new("Lux.Spreadsheet", "BxSpreadsheetImport, AddLuxSpreadsheet()", "browser, ios, android, maccatalyst, windows")
                         ])
                 ]),
-            new("installation", "Installation", "Getting Started",
+            new("installation", "Installation & Setup", "Getting Started",
                 "Install Lux.Spreadsheet and register services.",
                 [
                     new("nuget", "1. Install Packages",
@@ -40,10 +50,18 @@ public static partial class LuxLibraryDocs
                                 dotnet add package Lux.Spreadsheet        # 5-step Blazor Web & .NET MAUI wizard
                                 """)
                         ]),
-                    new("di", "2. Register Services",
-                        CodeSamples: [new("Program.cs / MauiProgram.cs", "builder.Services.AddLuxSpreadsheet();")])
+                    new("di", "2. Register Services & Imports",
+                        CodeSamples:
+                        [
+                            new("Program.cs / MauiProgram.cs", "builder.Services.AddLuxSpreadsheet();"),
+                            new("_Imports.razor", "@using Lux.Spreadsheet")
+                        ])
                 ]),
-            new("schema", "Schema, Columns & Rules", "Import Pipeline",
+
+            // =========================================================================
+            // GROUP 2: IMPORT PIPELINE DEEP DIVE
+            // =========================================================================
+            new("schema", "Schema, Columns & Validation Rules", "Import Pipeline",
                 "Configure column kinds, header aliases, decimal separators, date formats, built-in validation rules, custom parsers, and cross-field row validators.",
                 [
                     new("kinds", "All 5 SpreadsheetColumnKind Values & Built-In SpreadsheetRule Factories",
@@ -56,7 +74,7 @@ public static partial class LuxLibraryDocs
                             new("SpreadsheetColumnKind.Boolean", "DefaultValue / HasDefault", "Parses true/false, yes/no, 1/0"),
                             new("SpreadsheetColumnKind.Select", "Options, UnknownPolicy, OnCreateOption", "Matches Value, Label, or Aliases case/accent-insensitively")
                         ]),
-                    new("example", "Full SpreadsheetSchema with Custom Row Validation & Batch Handler",
+                    new("example", "Full SpreadsheetSchema with Cross-Field ValidateRow & Batch OnSubmit",
                         CodeSamples:
                         [
                             new("RatesSchema.cs", """
@@ -73,20 +91,14 @@ public static partial class LuxLibraryDocs
                                         new SpreadsheetColumnSchema { Key = "code", Label = "Code", Headers = ["SKU", "Item Code"], Required = true },
                                         new SpreadsheetColumnSchema
                                         {
-                                            Key = "price",
-                                            Label = "Unit Price",
-                                            Kind = SpreadsheetColumnKind.Number,
-                                            DecimalSeparator = ',',
-                                            Required = true,
+                                            Key = "price", Label = "Unit Price", Kind = SpreadsheetColumnKind.Number,
+                                            DecimalSeparator = ',', Required = true,
                                             Rules = [SpreadsheetRule.Between(0, 100_000, "Price must be between 0 and 100,000")]
                                         },
                                         new SpreadsheetColumnSchema
                                         {
-                                            Key = "currency",
-                                            Label = "Currency",
-                                            Kind = SpreadsheetColumnKind.Select,
-                                            Required = true,
-                                            UnknownPolicy = SpreadsheetUnknownValuePolicy.Ask,
+                                            Key = "currency", Label = "Currency", Kind = SpreadsheetColumnKind.Select,
+                                            Required = true, UnknownPolicy = SpreadsheetUnknownValuePolicy.Ask,
                                             Options =
                                             [
                                                 new SpreadsheetOption("EUR", "Euro", ["€", "EUR"]),
@@ -96,44 +108,21 @@ public static partial class LuxLibraryDocs
                                     ],
                                     ValidateRow = data =>
                                         (double?)data.GetValueOrDefault("price") == 0
-                                            ? [new SpreadsheetRowIssue("price", "Zero-price item will be marked promotional", SpreadsheetIssueLevel.Warning)]
+                                            ? [new SpreadsheetRowIssue("price", "Zero-price item marked promotional", SpreadsheetIssueLevel.Warning)]
                                             : [],
                                     OnSubmit = async batch => await api.UpsertRatesBatchAsync(batch)
                                 };
                                 """)
                         ])
                 ]),
-            new("layout-detection", "20-Row Header & Delimiter Detection", "Import Pipeline",
-                "Parse CSV, TSV, clipboard pastes, or multi-sheet workbooks and locate the true header row automatically.",
+            new("detection-and-mapping", "Header Detection, NFD & 80% Suggestions", "Import Pipeline",
+                "Scan the first 20 rows for the real header line, match multilingual accented headers via Unicode NFD, and propose missing mappings at >=80% sample pass rate.",
                 [
-                    new("detect", "Heuristic Scanner, Multi-Sheet Workbooks & Manual Override",
+                    new("nfd", "Unicode NFD Header Normalization & Column Statuses",
                         Paragraphs:
                         [
-                            "LoadText(csv, fileName) and Paste(tsv, fileName) use ParseDelimitedSheet() to auto-detect comma, semicolon, or tab delimiters and score the first 20 rows against your schema's column keys, labels, and Headers aliases.",
-                            "If two rows tie, AmbiguousDetection becomes true and users can pick the exact header row via SetHeaderRow(rowIndex) or switch sheets on a SpreadsheetWorkbook via SetSheet(sheetName). You can also lock detection upfront using Schema.ForcedSheet and Schema.ForcedHeaderRow."
-                        ],
-                        CodeSamples:
-                        [
-                            new("LayoutDetection.cs", """
-                                var importer = new SpreadsheetImporter(schema);
-                                importer.LoadText("Export Report 2026;;\nCode;Amount;Currency\nA1;12,50;€\nA2;45,00;USD", "rates.csv");
-
-                                Assert.True(importer.FileLoaded);
-                                Assert.Equal(2, importer.HeaderRowNumber); // 1-based line number
-
-                                // Generate a ready-to-fill CSV template matching the schema:
-                                string templateCsv = importer.ExportTemplateCsv();
-                                """)
-                        ])
-                ]),
-            new("column-mapping", "NFD Normalization & 80% Suggestions", "Import Pipeline",
-                "Match headers accent-insensitively and propose missing mappings only when >= 80% of sample values pass validation.",
-                [
-                    new("nfd", "NFD Header Normalization & Column Statuses",
-                        Paragraphs:
-                        [
-                            "SpreadsheetImporter.NormalizeText() decomposes Unicode text (FormD), removes diacritics, strips '*' and '(required)' suffixes, and collapses whitespace (e.g. \"Secure Code * (required)\" -> \"secure code\", \"Prénom\" -> \"prenom\").",
-                            "For any column still in MissingFields, the scorer evaluates every unused source column against sample data rows. Only columns where >= 80% of non-empty samples parse and pass validation rules are proposed as a Suggestion — never auto-applied silently."
+                            "LoadText() and Paste() auto-detect comma, semicolon, or tab delimiters and score the first 20 rows against column keys, labels, and Headers aliases.",
+                            "SpreadsheetImporter.NormalizeText() decomposes Unicode (FormD), strips diacritics, removes '*' and '(required)' markers, and collapses whitespace. Any still-unmapped column gets a Suggestion ONLY when >=80% of non-empty sample cells parse and pass validation rules."
                         ],
                         TableHeaders: ["SpreadsheetColumnStatus", "Meaning", "Importer Method"],
                         TableRows:
@@ -143,170 +132,224 @@ public static partial class LuxLibraryDocs
                             new("Missing", "Required column still unmapped (check .Suggestion)", "AssignColumn(key, suggestion.HeaderIndex)"),
                             new("Unmatched", "Optional unmapped or explicitly ignored column", "IgnoreColumn(key)")
                         ],
-                        CodeSamples:
-                        [
-                            new("ApplySuggestion.cs", """
-                                // "Amount" passes 100% (>= 80%) of Number + Min(0) checks for "price"
-                                var suggestion = importer.MissingFields[0].Suggestion;
-                                Assert.Equal("Amount", suggestion?.HeaderText);
-
-                                importer.AssignColumn("price", suggestion!.HeaderIndex);
-                                Assert.Empty(importer.MissingFields);
-                                """)
-                        ])
+                        LiveDemoKey: "spreadsheet-nfd",
+                        LiveDemoTitle: "Interactive Unicode NFD NormalizeText & ExportTemplateCsv()")
                 ]),
-            new("unknown-values", "Unknown Value Questions", "Import Pipeline",
-                "Resolve unrecognized Select values globally before validation and submission.",
+            new("reconciliation-and-retry", "Unknown Values, Reconciliation, Editing & Batch Retry", "Import Pipeline",
+                "Resolve unknown Select strings globally, reconcile duplicates & existing records, edit cells inline, export invalid rows, and retry only server-rejected rows.",
                 [
-                    new("policies", "All 5 SpreadsheetUnknownValuePolicy & 4 Answer Actions",
-                        TableHeaders: ["UnknownPolicy", "Behavior", "Resolution Actions"],
-                        TableRows:
-                        [
-                            new("Ask", "Surfaces each distinct unknown string in OpenQuestions", "Answer with Map, LeaveEmpty, SkipRows, or Create"),
-                            new("Error", "Marks affected rows as Blocking immediately", "Fix inline with EditCell"),
-                            new("SkipRows", "Automatically discards affected rows (DiscardReason.Value)", "Restore via RestoreRows"),
-                            new("LeaveEmpty", "Replaces unknown values with null", "Valid if column is optional"),
-                            new("Create", "Accepts unknown strings and calls OnCreateOption if configured", "Creates new vocabulary items")
-                        ],
-                        CodeSamples:
-                        [
-                            new("ResolveQuestion.cs", """
-                                // Map every occurrence of "C1-Advanced" to canonical option "B2"
-                                importer.AnswerValue("level", "C1-Advanced",
-                                    new SpreadsheetValueAnswer(SpreadsheetValueAnswerAction.Map, "B2", "B2"));
-
-                                // Clear a previous answer to re-open the question:
-                                importer.ClearAnswer("level", "C1-Advanced");
-                                """)
-                        ])
-                ]),
-            new("reconciliation", "Duplicates, Upsert & Inline Edits", "Import Pipeline",
-                "Reconcile intra-file duplicates, existing database records, review filters, row inspection, and inline cell edits.",
-                [
-                    new("policies", "Reconciliation & Review Grid Enums",
+                    new("reconcile", "Reconciliation Policies & Unknown Value Questions",
                         TableHeaders: ["Enum", "Exact Values", "Purpose"],
                         TableRows:
                         [
+                            new("SpreadsheetUnknownValuePolicy", "Ask, Error, SkipRows, LeaveEmpty, Create", "How unrecognized Select cell values are handled"),
                             new("SpreadsheetDuplicatesPolicy", "Error, KeepFirst, KeepLast", "Handles repeated RowKeyField keys inside the uploaded file"),
-                            new("SpreadsheetExistingAction", "Update, Skip, Error", "Handles rows whose RowKeyField already exists in Schema.ExistingRecords"),
-                            new("SpreadsheetRowStatus", "Valid, Warning, Blocking, Discarded", "Computed row validation state"),
-                            new("SpreadsheetRowMode", "Create, Update, Skip", "Persistence operation for each importable row"),
-                            new("SpreadsheetDiscardReason", "Manual, Value, Limit, Duplicate, Existing", "Exact reason a row was excluded from ImportableRows"),
-                            new("SpreadsheetReviewTab / Level", "All, Importable, Invalid, Discarded / All, Blocking, Warnings", "Built-in review grid filtering via VisibleReviewRows")
-                        ]),
-                    new("editing", "Inline Edits, Revert, Discard & Row Inspector",
-                        CodeSamples:
-                        [
-                            new("ReviewAndEdit.cs", """
-                                // Filter review grid to invalid rows only and jump between issue rows
-                                importer.SetReviewTab(SpreadsheetReviewTab.Invalid);
-                                importer.SetReviewLevel(SpreadsheetReviewLevel.Blocking);
-                                importer.InspectNextIssueRow();
-
-                                // Edit a cell inline or revert it back to the original uploaded text
-                                importer.EditCell(rowIndex: 1, fieldKey: "email", rawText: "alice.fixed@example.com");
-                                importer.RevertCell(rowIndex: 1, fieldKey: "email");
-
-                                // Bulk discard or restore rows, or export invalid rows for offline cleanup
-                                importer.DiscardRows([4, 5]);
-                                importer.RestoreRows([4]);
-                                string invalidCsv = importer.ExportInvalidRowsCsv();
-                                """)
-                        ])
-                ]),
-            new("batch-submit", "Batch Submit & Retry Rejected", "Import Pipeline",
-                "Execute chunked async submissions with progress counters and targeted retry for server-rejected rows.",
-                [
-                    new("submit", "SubmitAsync, Progress Tracking & RetryRejectedAsync",
-                        Paragraphs:
-                        [
-                            "SubmitAsync() chunks ImportableRows by Schema.BatchSize and invokes Schema.OnSubmit for each batch. Monitor SubmitStatus (Idle, Running, Done, Error), SubmitDone, SubmitTotal, ImportedCount, RejectedCount, and SubmitError.",
-                            "When a backend rejects specific rows by returning SpreadsheetRejectedRow(RowIndex, Message, Field), those rows are attached with server error messages while already-imported batches remain committed. Fix those rows with EditCell() and call RetryRejectedAsync()."
+                            new("SpreadsheetExistingAction", "Update, Skip, Error", "Handles rows matching Schema.ExistingRecords (sets Mode = Create/Update/Skip)"),
+                            new("SpreadsheetRowStatus", "Valid, Warning, Blocking, Discarded", "Computed validation state per row"),
+                            new("SpreadsheetDiscardReason", "Manual, Value, Limit, Duplicate, Existing", "Why a row was excluded from ImportableRows")
                         ],
-                        CodeSamples:
-                        [
-                            new("BatchRetry.cs", """
-                                await importer.SubmitAsync();
+                        LiveDemoKey: "spreadsheet-reconcile",
+                        LiveDemoTitle: "Interactive Unknown Value Answer, Duplicate Fix & Upsert Detection"),
+                    new("edit-retry", "Inline Cell Repair, Invalid CSV Export & Targeted Batch Retry",
+                        Paragraphs: ["When a backend rejects specific rows via SpreadsheetRejectedRow(RowIndex, Message, Field), already-succeeded batches stay committed. Edit only the rejected cells and call RetryRejectedAsync()."],
+                        LiveDemoKey: "spreadsheet-batch-submit",
+                        LiveDemoTitle: "Interactive Chunked SubmitAsync() & RetryRejectedAsync()")
+                ]),
 
-                                if (importer.RejectedCount > 0)
-                                {
-                                    // Fix only the rejected rows and retry them without re-sending succeeded batches
-                                    importer.EditCell(rowIndex: 2, fieldKey: "code", rawText: "UNIQUE-CODE-2");
-                                    await importer.RetryRejectedAsync();
-                                }
-                                Assert.Equal(SpreadsheetSubmitStatus.Done, importer.SubmitStatus);
-                                """)
-                        ])
-                ]),
-            new("wizard", "BxSpreadsheetImport Wizard", "Import Pipeline",
-                "Drop-in 5-step Blazor Web & .NET MAUI Blazor Hybrid import wizard wired to SpreadsheetImporter.",
+            // =========================================================================
+            // GROUP 3: INTEGRATIONS WITH OTHER LUXSTACK LIBRARIES
+            // =========================================================================
+            new("integrations-table-query", "Integration: Lux.Query & Lux.Table", "Integrations",
+                "Filter 10,000+ parsed rows before commit with Lux.Query and refresh your Lux.Table catalog immediately after bulk import completion.",
                 [
-                    new("component", "Interactive 5-Step Wizard",
-                        LiveDemoKey: "spreadsheet-wizard",
-                        LiveDemoTitle: "BxSpreadsheetImport Live Demo",
+                    new("query-filter-rows", "1. Lux.Spreadsheet + Lux.Query (Search & Filter Parsed Rows)",
                         CodeSamples:
                         [
-                            new("ImportPage.razor", """
-                                <BxSpreadsheetImport Importer="@_importer"
-                                                     Title="Import Product Rates"
-                                                     Wizard="true" />
+                            new("QueryImportedRows.cs", """
+                                using Lux.Query;
+                                using Lux.Spreadsheet;
+
+                                var rowSchema = DataListSchema.For<SpreadsheetRow>(s => s
+                                    .RowKey(r => r.Index)
+                                    .Field(r => r.Status, f => f.Key("status").Sortable().Filter(DataListFilter.Option()))
+                                    .Field(r => r.Mode, f => f.Key("mode").Filter(DataListFilter.Option())));
+
+                                var blockingOnly = rowSchema.ExecuteInMemory(
+                                    importer.AllRows,
+                                    new DataListRequest(
+                                        paging: DataListPaging.Offset.ForPage(1, 50),
+                                        sort: [],
+                                        filter: DataListFilterGroup.And(
+                                            new FilterRule("status", FilterOperator.Is, new FilterValue.Text("Blocking")))));
+                                """)
+                        ]),
+                    new("table-refresh", "2. Lux.Spreadsheet + Lux.Table (Import Modal -> Reload DataList)",
+                        CodeSamples:
+                        [
+                            new("ImportIntoTable.razor", """
+                                <BxModal @bind-Open="_showImport" Title="Import Rates CSV">
+                                    <BxSpreadsheetImport Importer="@_importer" Wizard="true" />
+                                </BxModal>
+
+                                <BxDataList @ref="_tableRef" TItem="ProductRate" Schema="@RateSchema" Provider="@LoadRatesAsync">
+                                    <BxDataListTable TItem="ProductRate" ShowProgressLine="true" />
+                                </BxDataList>
                                 """)
                         ])
                 ]),
+            new("integrations-agent-display", "Integration: Lux.Agent & Lux.Display", "Integrations",
+                "Let AI copilots inspect and repair spreadsheet import errors via Lux.Agent (RegisterSpreadsheet) and preview exported CSVs in Lux.Display lightboxes.",
+                [
+                    new("agent-spreadsheet", "1. Lux.Spreadsheet + Lux.Agent (AI-Assisted Error Repair)",
+                        Paragraphs: ["Call agent.RegisterSpreadsheet(importer) to expose editCell(rowIndex, fieldKey, text), nextStep, previousStep, submit, and clearFile to AgentBridgeService with full AllowPolicy confirmation gating on submit."],
+                        CodeSamples:
+                        [
+                            new("AgentSpreadsheet.cs", """
+                                using Lux.Agent;
+                                using Lux.Spreadsheet;
+
+                                agent.RegisterSpreadsheet(ratesImporter);
+
+                                // AI assistant repairs an invalid cell and advances the wizard
+                                await agent.ActAsync([
+                                    new AgentActStep("rates", "editCell", [0, "price", "49,90"]),
+                                    new AgentActStep("rates", "nextStep")
+                                ]);
+                                """)
+                        ]),
+                    new("display-preview", "2. Lux.Spreadsheet + Lux.Display (Preview Template or Invalid CSV)",
+                        CodeSamples:
+                        [
+                            new("PreviewExportedCsv.cs", """
+                                filePreview.Open(new FilePreviewFile
+                                {
+                                    Name = "invalid-rows.csv",
+                                    Mime = "text/csv",
+                                    Content = importer.ExportInvalidRowsCsv()
+                                });
+                                """)
+                        ])
+                ]),
+            new("integrations-ef-maui", "Integration: EF Core Batch Upsert & .NET MAUI", "Integrations",
+                "Persist validated batches idempotently with EF Core returning per-row SpreadsheetRejectedRow diagnostics, and feed native MAUI FilePicker streams directly into LoadText.",
+                [
+                    new("ef-upsert", "1. EF Core Chunked Upsert Handler Returning SpreadsheetRejectedRow",
+                        CodeSamples:
+                        [
+                            new("EfBatchUpsert.cs", """
+                                OnSubmit = async batch =>
+                                {
+                                    var rejected = new List<SpreadsheetRejectedRow>();
+                                    foreach (var row in batch)
+                                    {
+                                        var code = row.Data["code"]!.ToString()!;
+                                        if (await db.Products.AnyAsync(p => p.Code == code && p.Locked))
+                                        {
+                                            rejected.Add(new SpreadsheetRejectedRow(row.Index, "SKU is locked in ERP", "code"));
+                                            continue;
+                                        }
+                                        await UpsertProductAsync(db, row.Data);
+                                    }
+                                    await db.SaveChangesAsync();
+                                    return rejected;
+                                }
+                                """)
+                        ]),
+                    new("maui-picker", "2. .NET MAUI FilePicker -> SpreadsheetImporter.LoadText",
+                        CodeSamples:
+                        [
+                            new("MauiCsvPicker.cs", """
+                                var file = await FilePicker.Default.PickAsync();
+                                if (file is not null)
+                                {
+                                    using var reader = new StreamReader(await file.OpenReadAsync());
+                                    importer.LoadText(await reader.ReadToEndAsync(), file.FileName);
+                                }
+                                """)
+                        ])
+                ]),
+
+            // =========================================================================
+            // GROUP 4: PLATFORMS
+            // =========================================================================
             MauiAndAotPage("Lux.Spreadsheet", "Lux.Spreadsheet.Core", "Lux.Spreadsheet", "builder.Services.AddLuxSpreadsheet();",
                 "var importer = new SpreadsheetImporter(schema); importer.LoadText(csvText, \"rates.csv\");"),
+
+            // =========================================================================
+            // GROUP 5: LIVE EXAMPLES (5 INTERACTIVE DEMOS)
+            // =========================================================================
             new("examples", "Live Examples", "Examples",
-                "Interactive spreadsheet import pipelines demonstrating the 5-step BxSpreadsheetImport wizard, reference reconciliation, and Unicode NFD header matching.",
+                "5 interactive spreadsheet import playgrounds covering the full 5-step wizard, unknown value & duplicate reconciliation, Unicode NFD normalization, inline cell editing & invalid CSV export, and chunked batch submit with targeted retry.",
                 [
                     new("import-wizard", "1. Full 5-Step BxSpreadsheetImport Wizard",
-                        Paragraphs: ["Walk through Upload, Column Mapping, Inline Validation & Cell Editing, Dry-Run Preview, and Batched Commit directly in the browser with preloaded sample CSV data."],
+                        Paragraphs: ["Walk through Source/Layout detection, Column Mapping, Unknown Values, Review & Inline Editing, and Batch Submit with preloaded CSV data."],
                         LiveDemoKey: "spreadsheet-wizard",
                         LiveDemoTitle: "BxSpreadsheetImport · 5-Step Import Wizard",
                         CodeSamples:
                         [
                             new("RatesImporter.razor", """
-                                <BxSpreadsheetImport Importer="@_importer"
-                                                     Title="Import Product Rates"
-                                                     Wizard="true" />
+                                <BxSpreadsheetImport Importer="@_importer" Title="Import Product Rates" Wizard="true" />
                                 """)
                         ]),
-                    new("reference-reconcile", "2. Reference Lookup Reconciliation & Unresolved Row Repair",
-                        Paragraphs: ["Automatically reconcile incoming supplier or category labels against your canonical lookup list, surface unresolved rows, and repair them inline before commit."],
+                    new("reference-reconcile", "2. Unknown Value Questions, Duplicates & ExistingRecords Upsert",
+                        Paragraphs: ["Answer an open unknown Select question ('C1-Advanced' -> 'B2'), fix a duplicate email row inline, and watch ExistingRecords mark Row 2 as Mode = Update."],
                         LiveDemoKey: "spreadsheet-reconcile",
-                        LiveDemoTitle: "SpreadsheetImporter · Reference Reconciliation",
+                        LiveDemoTitle: "SpreadsheetImporter · Unknown Values, Duplicates & Upsert",
                         CodeSamples:
                         [
                             new("ReconcileLookup.cs", """
                                 new SpreadsheetColumnSchema
                                 {
-                                    Key = "country",
-                                    Label = "Country",
-                                    Aliases = ["pays", "country_code"],
-                                    ReferenceOptions =
-                                    [
-                                        new SpreadsheetReferenceOption("FR", "France", ["fr", "république française"]),
-                                        new SpreadsheetReferenceOption("DE", "Germany", ["de", "deutschland"])
-                                    ]
-                                }
+                                    Key = "level", Label = "Level", Kind = SpreadsheetColumnKind.Select,
+                                    UnknownPolicy = SpreadsheetUnknownValuePolicy.Ask,
+                                    Options = [new SpreadsheetOption("B2", "B2", ["b2", "upper-intermediate"])]
+                                };
+                                importer.AnswerValue("level", "C1-Advanced", new SpreadsheetValueAnswer(SpreadsheetValueAnswerAction.Map, "B2", "B2"));
                                 """)
                         ]),
-                    new("unicode-nfd", "3. Accent-Insensitive (Unicode NFD) Header Auto-Mapping",
-                        Paragraphs: ["Paste accented, snake_case, or localized French/Spanish/German CSV headers and watch SpreadsheetImporter auto-map every column deterministically via NFD normalization."],
+                    new("unicode-nfd", "3. Accent-Insensitive (Unicode NFD) Normalization & Template Export",
+                        Paragraphs: ["Type any messy localized header (e.g. 'Prénom * (required)' or 'Référence Produit') to inspect SpreadsheetImporter.NormalizeText() live alongside ExportTemplateCsv()."],
                         LiveDemoKey: "spreadsheet-nfd",
-                        LiveDemoTitle: "Unicode NFD · Multilingual Header Auto-Mapping",
+                        LiveDemoTitle: "Unicode NFD · NormalizeText & ExportTemplateCsv()",
                         CodeSamples:
                         [
                             new("NfdMapping.cs", """
-                                // Automatically matches "Référence Produit" -> "sku" and "Prix Unitaire (€)" -> "price"
-                                var importer = new SpreadsheetImporter(schema);
-                                importer.LoadText("Référence Produit;Désignation;Prix Unitaire (€)\nSKU-101;Clavier Mécanique;149.00", "tarifs.csv");
-                                // importer.ColumnMappings["sku"] == 0, importer.ColumnMappings["price"] == 2
+                                string normalized = SpreadsheetImporter.NormalizeText("Prénom * (required)"); // "prenom"
+                                string template   = importer.ExportTemplateCsv();
+                                """)
+                        ]),
+                    new("inline-edit-export", "4. Inline EditCell, RevertCell, DiscardRows & ExportInvalidRowsCsv",
+                        Paragraphs: ["Repair an invalid negative price cell with EditCell(), revert it with RevertCell(), discard/restore rows, and inspect the live ExportInvalidRowsCsv() output."],
+                        LiveDemoKey: "spreadsheet-edit-retry",
+                        LiveDemoTitle: "EditCell, RevertCell, DiscardRows & Invalid CSV Export",
+                        CodeSamples:
+                        [
+                            new("InlineEdit.cs", """
+                                importer.EditCell(rowIndex: 0, fieldKey: "price", rawText: "49,90");
+                                importer.RevertCell(rowIndex: 0, fieldKey: "price");
+                                importer.DiscardRows([1]);
+                                string invalidCsv = importer.ExportInvalidRowsCsv();
+                                """)
+                        ]),
+                    new("batch-retry", "5. Chunked SubmitAsync() & Targeted RetryRejectedAsync()",
+                        Paragraphs: ["Run SubmitAsync() against a simulated server that rejects Row 1 ('Duplicate SKU'), observe already-succeeded rows stay imported, then repair Row 1 and call RetryRejectedAsync()."],
+                        LiveDemoKey: "spreadsheet-batch-submit",
+                        LiveDemoTitle: "Chunked SubmitAsync() & RetryRejectedAsync()",
+                        CodeSamples:
+                        [
+                            new("BatchRetry.cs", """
+                                await importer.SubmitAsync();
+                                if (importer.RejectedCount > 0)
+                                {
+                                    importer.EditCell(rowIndex: 1, fieldKey: "code", rawText: "SKU-200-FIXED");
+                                    await importer.RetryRejectedAsync();
+                                }
                                 """)
                         ])
                 ]),
             new("api", "API Reference", "Reference",
                 "Complete public API reference for Lux.Spreadsheet.Core and Lux.Spreadsheet.",
                 [],
-                ApiTypes: [typeof(BxSpreadsheetImport), typeof(SpreadsheetImporter), typeof(SpreadsheetSchema), typeof(SpreadsheetColumnSchema), typeof(SpreadsheetRule)])
+                ApiTypes: [typeof(BxSpreadsheetImport), typeof(SpreadsheetImporter), typeof(SpreadsheetSchema), typeof(SpreadsheetColumnSchema), typeof(SpreadsheetRule), typeof(SpreadsheetRow)])
         ]);
 }

@@ -195,6 +195,49 @@
                 </div>
                 break;
 
+            case "table-density-summary":
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="font-mono text-xs text-(--blux-text-muted)">Summary Kind:</span>
+                        @foreach (var kind in new[] { DataListSummaryKind.Sum, DataListSummaryKind.Average, DataListSummaryKind.Min, DataListSummaryKind.Max, DataListSummaryKind.Count })
+                        {
+                            <BxButton Label="@kind.ToString()" Size="BxSize.Sm" Color="@(_tableSummaryKind == kind ? BxColor.Primary : BxColor.Neutral)" Variant="ButtonVariant.Soft" OnClick="@(() => _tableSummaryKind = kind)" />
+                        }
+                        <BxButton Label="@(_tableMobileSummary ? "View: Compact Mobile Summary" : "View: Standard Table")" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => _tableMobileSummary = !_tableMobileSummary)" />
+                    </div>
+                    <BxDataList TItem="TableDemoRow" Schema="@TableSchema" Items="@TableRows" UrlSync="false">
+                        <BxDataListTable TItem="TableDemoRow"
+                                         RowSummary="@(_tableMobileSummary ? TablePhoneSummary : null)"
+                                         Summaries="@(new DataListSummaries<TableDemoRow>())">
+                            <BxDataListColumn TItem="TableDemoRow" Field="name" Title="Employee" />
+                            <BxDataListColumn TItem="TableDemoRow" Field="dept" Title="Department" />
+                            <BxDataListColumn TItem="TableDemoRow" Field="salary" Title="Salary (€)" Summary="@_tableSummaryKind" />
+                        </BxDataListTable>
+                    </BxDataList>
+                </div>
+                break;
+
+            case "table-selection-actions":
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <BxButton Label="Inspect Headless BuildTree()" Size="BxSize.Sm" OnClick="@InspectHeadlessTree" />
+                        <BxButton Label="@($"Expand Depth: {_treeDepth}")" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@CycleTreeDepth" />
+                    </div>
+                    <div class="grid gap-2 sm:grid-cols-2 font-mono text-xs">
+                        @foreach (var node in _headlessNodes)
+                        {
+                            <div class="flex items-center justify-between rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 px-3 py-2" style="@($"padding-left:{12 + node.Depth * 18}px")">
+                                <span>@(node.HasChildren ? "▸" : "•") @node.Item.Name <span class="text-(--blux-text-muted)">(@node.Item.Role)</span></span>
+                                <span class="text-(--blux-text-muted)">Depth @node.Depth</span>
+                            </div>
+                        }
+                    </div>
+                    <p class="font-mono text-xs text-(--blux-text-muted)">
+                        <code>DataListTree&lt;T&gt;.BuildTree()</code> runs 100% headless in <code>Lux.Table.Core</code> (NativeAOT): <strong>@_headlessNodes.Count</strong> nodes, cycle-guarded.
+                    </p>
+                </div>
+                break;
+
             case "form-reactive":
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-(--blux-border) bg-(--blux-bg-muted)/40 px-3 py-2 font-mono text-xs">
@@ -222,6 +265,50 @@
                     <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3 font-mono text-xs">
                         Line items count: <strong>@_arrayCtrl.GetArrayItems("items").Count</strong>
                     </div>
+                </div>
+                break;
+
+            case "form-dirty-diff":
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <BxButton Label="Mutate Name -> 'Claire'" Size="BxSize.Sm" OnClick="@(() => { _dirtyCtrl.SetValue("name", "Claire", markTouched: true); RefreshDirtyJson(); })" />
+                        <BxButton Label="Mutate Plan -> 'enterprise'" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => { _dirtyCtrl.SetValue("plan", "enterprise", markTouched: true); RefreshDirtyJson(); })" />
+                        <BxButton Label="ResetField('name')" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Soft" OnClick="@(() => { _dirtyCtrl.ResetField("name"); RefreshDirtyJson(); })" />
+                        <BxButton Label="SubmitAsync() (Re-baseline)" Size="BxSize.Sm" Color="BxColor.Success" Variant="ButtonVariant.Soft" OnClick="@SubmitDirtyDemoAsync" />
+                    </div>
+                    <div class="grid gap-3 lg:grid-cols-2 font-mono text-xs">
+                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3 space-y-1">
+                            <p>IsDirty: <strong class="text-(--blux-text-highlighted)">@_dirtyCtrl.IsDirty</strong></p>
+                            <p>DirtyPaths: <strong class="text-(--blux-text-highlighted)">@(_dirtyCtrl.DirtyPaths.Count == 0 ? "(clean)" : string.Join(", ", _dirtyCtrl.DirtyPaths))</strong></p>
+                            <p>Value(name): <strong>@(_dirtyCtrl.GetValue<string>("name"))</strong> · Value(plan): <strong>@(_dirtyCtrl.GetValue<string>("plan"))</strong></p>
+                        </div>
+                        <div class="rounded-xl border border-(--blux-border) bg-(--pg-code-bg) p-3 text-[#d7dcde]">
+                            <p class="mb-1 text-[#94a3b8]">BuildOutput() (trimmed &amp; transformed)</p>
+                            <pre class="overflow-x-auto">@_dirtyOutputJson</pre>
+                        </div>
+                    </div>
+                </div>
+                break;
+
+            case "form-sections-errors":
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <BxButton Label="Inject Server Blocking Error on 'email'" Size="BxSize.Sm" Color="BxColor.Error" Variant="ButtonVariant.Soft" OnClick="@(() => _sectionCtrl.SetError("email", "Email already registered on server", blocking: true))" />
+                        <BxButton Label="ClearError('email')" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => _sectionCtrl.ClearError("email"))" />
+                        <BxButton Label="Fill All Required" Size="BxSize.Sm" Color="BxColor.Success" Variant="ButtonVariant.Soft" OnClick="@(() => { _sectionCtrl.SetValue("email", "team@luxstack.dev"); _sectionCtrl.SetValue("vat", "FR99123456789"); _sectionCtrl.ClearError("email"); })" />
+                    </div>
+                    <div class="grid gap-3 sm:grid-cols-3 font-mono text-xs">
+                        @foreach (var sec in _sectionCtrl.GetSectionStates())
+                        {
+                            <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">
+                                <p class="text-(--blux-text-muted)">@sec.Label</p>
+                                <p class="mt-1 text-sm font-semibold text-(--blux-text-highlighted)">@sec.Status</p>
+                            </div>
+                        }
+                    </div>
+                    <p class="font-mono text-xs text-(--blux-text-muted)">
+                        HasBlockingErrors: <strong class="text-(--blux-text-highlighted)">@_sectionCtrl.HasBlockingErrors</strong> · Email error: <strong>@(_sectionCtrl.GetError("email") ?? "none")</strong>
+                    </p>
                 </div>
                 break;
 
@@ -277,6 +364,59 @@
                 </div>
                 break;
 
+            case "dashboard-filters-views":
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="font-mono text-xs text-(--blux-text-muted)">Views:</span>
+                        @foreach (var v in _dashFilterCtrl.Views)
+                        {
+                            <BxButton Label="@(v.Badge is null ? v.Label : $"{v.Label} ({v.Badge})")" Size="BxSize.Sm" Color="@(_dashFilterCtrl.CurrentView == v.Key ? BxColor.Primary : BxColor.Neutral)" Variant="ButtonVariant.Soft" OnClick="@(() => _dashFilterCtrl.CurrentView = v.Key)" />
+                        }
+                        <span class="ms-2 font-mono text-xs text-(--blux-text-muted)">Regions:</span>
+                        @foreach (var r in new[] { "eu", "us", "ap" })
+                        {
+                            var active = _dashRegionFilter.Values.Contains(r);
+                            <BxButton Label="@r.ToUpperInvariant()" Size="BxSize.Sm" Color="@(active ? BxColor.Primary : BxColor.Neutral)" Variant="@(active ? ButtonVariant.Solid : ButtonVariant.Outline)" OnClick="@(() => _dashRegionFilter.Toggle(r))" />
+                        }
+                        <BxButton Label="ResetFilters()" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Ghost" Disabled="@(!_dashFilterCtrl.Filtered)" OnClick="@(() => _dashFilterCtrl.ResetFilters())" />
+                    </div>
+                    <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3 font-mono text-xs">
+                        CurrentView: <strong>@_dashFilterCtrl.CurrentView</strong> ·
+                        Selected Regions: <strong>@string.Join(", ", _dashRegionFilter.Values)</strong> ·
+                        Controller.Filtered: <strong>@_dashFilterCtrl.Filtered</strong>
+                    </div>
+                </div>
+                break;
+
+            case "dashboard-format-compare":
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-wrap items-center gap-2">
+                        @foreach (var mode in new[] { DashboardComparisonMode.Previous, DashboardComparisonMode.Year })
+                        {
+                            <BxButton Label="@($"Compare: {mode}")" Size="BxSize.Sm" Color="@(_dashCompMode == mode ? BxColor.Primary : BxColor.Neutral)" Variant="ButtonVariant.Soft" OnClick="@(() => _dashCompMode = mode)" />
+                        }
+                    </div>
+                    <div class="grid gap-3 lg:grid-cols-2 font-mono text-xs">
+                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3 space-y-1">
+                            <p class="text-(--blux-text-muted)">DashboardFormat Presets (InvariantCulture)</p>
+                            <p>Compact(2_400_000) = <strong>@DashboardFormat.Format(2_400_000, DashboardFormatPreset.Compact, CultureInfo.InvariantCulture)</strong></p>
+                            <p>Delta(14.2) = <strong>@DashboardFormat.Format(14.2, DashboardFormatPreset.Delta, CultureInfo.InvariantCulture)</strong> · Ratio(0.57) = <strong>@DashboardFormat.Format(0.57, DashboardFormatPreset.Ratio, CultureInfo.InvariantCulture)</strong></p>
+                            <p>Null/NaN guard = <strong>@DashboardFormat.Format(double.NaN, DashboardFormatPreset.Number, CultureInfo.InvariantCulture)</strong></p>
+                        </div>
+                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3 space-y-1">
+                            @{
+                                var range = DashboardFormat.ResolveComparisonRange(
+                                    (new DateTimeOffset(2024, 2, 1, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2024, 2, 29, 0, 0, 0, TimeSpan.Zero)),
+                                    _dashCompMode);
+                            }
+                            <p class="text-(--blux-text-muted)">Leap-Year Comparison (2024-02-01 → 2024-02-29)</p>
+                            <p>Resolved Start: <strong>@range?.Start.ToString("yyyy-MM-dd")</strong></p>
+                            <p>Resolved End: <strong>@range?.End.ToString("yyyy-MM-dd")</strong> (clamped safely on leap years)</p>
+                        </div>
+                    </div>
+                </div>
+                break;
+
             case "display-blocks":
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-wrap items-center gap-3 font-mono text-xs">
@@ -321,6 +461,55 @@
                 </div>
                 break;
 
+            case "display-accordion-list":
+                <div class="grid gap-4 lg:grid-cols-2">
+                    <BxDisplay Kind="DisplayKind.Accordion" Surface="DisplaySurface.Bordered" Title="Platform FAQs" Multiple="true" AccordionItems="@([
+                        new DisplayAccordionItem("NativeAOT Support", "Lux.Display.Core ships with IsAotCompatible=true and zero UI dependencies."),
+                        new DisplayAccordionItem("Secret Masking", "DisplayKind.Code with Variant='secret' masks characters and lets users toggle visibility in place."),
+                        new DisplayAccordionItem("Exam Media Quotas", "BxAudioPlayer and BxVideoPlayer enforce Start/End clip bounds, Seekable=false, and MaxPlays.")
+                    ])" />
+                    <BxDisplay Kind="DisplayKind.List" Surface="DisplaySurface.Bordered" Title="Release Checklist (Progressive Reveal)" Max="2" Step="2" ListItems="@([
+                        new DisplayListItem { Text = "1. Compile NativeAOT core assemblies" },
+                        new DisplayListItem { Text = "2. Run xUnit + bUnit verification suites" },
+                        new DisplayListItem { Text = "3. Verify WCAG AA contrast ratios" },
+                        new DisplayListItem { Text = "4. Publish signed NuGet packages" }
+                    ])" />
+                </div>
+                break;
+
+            case "display-csv-inspector":
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <div class="w-60"><BxInput @bind-Value="_previewFileName" Placeholder="Filename (e.g. spec.pdf)" aria-label="Filename" /></div>
+                        <span class="font-mono text-xs text-(--blux-text-muted)">
+                            DetectKind → <strong class="text-(--blux-text-highlighted)">@FilePreviewService.DetectKind(_previewFileName)</strong> ·
+                            DefaultContainer → <strong class="text-(--blux-text-highlighted)">@FilePreviewService.DefaultContainerForKind(FilePreviewService.DetectKind(_previewFileName))</strong>
+                        </span>
+                    </div>
+                    @{ var parsedCsv = FilePreviewService.ParseCsv(_previewCsvText, maxRows: 50); }
+                    <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3 font-mono text-xs">
+                        <p class="text-(--blux-text-muted)">FilePreviewService.ParseCsv (Headers: @parsedCsv.Headers.Count · Rows: @parsedCsv.Rows.Count)</p>
+                        <div class="mt-2 overflow-x-auto">
+                            <table class="w-full text-start">
+                                <thead>
+                                    <tr class="border-b border-(--blux-border)">
+                                        @foreach (var h in parsedCsv.Headers) { <th class="px-2 py-1 text-start">@h</th> }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var row in parsedCsv.Rows)
+                                    {
+                                        <tr class="border-b border-(--blux-border)/50">
+                                            @foreach (var cell in row) { <td class="px-2 py-1">@cell</td> }
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                break;
+
             case "spreadsheet-wizard":
                 <BxSpreadsheetImport Importer="@_importer" Title="Import Product Rates" Wizard="true" />
                 break;
@@ -355,6 +544,42 @@
                     <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3 font-mono text-xs">
                         <p class="text-(--blux-text-muted)">ExportTemplateCsv():</p>
                         <pre class="mt-1 overflow-x-auto text-(--blux-text-highlighted)">@_importer.ExportTemplateCsv()</pre>
+                    </div>
+                </div>
+                break;
+
+            case "spreadsheet-edit-retry":
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <BxButton Label="EditCell(Row 0, 'price', '49,90')" Size="BxSize.Sm" OnClick="@(() => _editImporter.EditCell(0, "price", "49,90"))" />
+                        <BxButton Label="RevertCell(Row 0, 'price')" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => _editImporter.RevertCell(0, "price"))" />
+                        <BxButton Label="DiscardRow(1)" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Soft" OnClick="@(() => _editImporter.DiscardRows([1]))" />
+                        <BxButton Label="RestoreRow(1)" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Ghost" OnClick="@(() => _editImporter.RestoreRows([1]))" />
+                    </div>
+                    <div class="grid gap-3 sm:grid-cols-3 font-mono text-xs">
+                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">InvalidRows: <strong>@_editImporter.InvalidRows.Count</strong></div>
+                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">ImportableRows: <strong>@_editImporter.ImportableRows.Count</strong></div>
+                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">DiscardedRows: <strong>@_editImporter.DiscardedRows.Count</strong></div>
+                    </div>
+                    <div class="rounded-xl border border-(--blux-border) bg-(--pg-code-bg) p-3 font-mono text-xs text-[#d7dcde]">
+                        <p class="mb-1 text-[#94a3b8]">ExportInvalidRowsCsv()</p>
+                        <pre class="overflow-x-auto">@(string.IsNullOrWhiteSpace(_editImporter.ExportInvalidRowsCsv()) ? "(no invalid rows — all clean!)" : _editImporter.ExportInvalidRowsCsv())</pre>
+                    </div>
+                </div>
+                break;
+
+            case "spreadsheet-batch-submit":
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <BxButton Label="1. SubmitAsync() (Row 1 rejected by API)" Size="BxSize.Sm" OnClick="@RunBatchSubmitDemoAsync" />
+                        <BxButton Label="2. Fix Row 1 & RetryRejectedAsync()" Size="BxSize.Sm" Color="BxColor.Success" Variant="ButtonVariant.Soft" Disabled="@(_batchImporter.RejectedCount == 0)" OnClick="@RetryRejectedDemoAsync" />
+                        <BxButton Label="Reset" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Ghost" OnClick="@InitBatchImporter" />
+                    </div>
+                    <div class="grid gap-3 sm:grid-cols-4 font-mono text-xs">
+                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">Status: <strong>@_batchImporter.SubmitStatus</strong></div>
+                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">Imported: <strong>@_batchImporter.ImportedCount</strong></div>
+                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">Rejected: <strong>@_batchImporter.RejectedCount</strong></div>
+                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">Progress: <strong>@_batchImporter.SubmitDone / @_batchImporter.SubmitTotal</strong></div>
                     </div>
                 </div>
                 break;
@@ -411,6 +636,51 @@
                     </div>
                     <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3 font-mono text-xs">
                         Current: <strong class="text-(--blux-text-highlighted)">"@_undo.Current"</strong> · CanUndo: <strong>@_undo.CanUndo</strong> · CanRedo: <strong>@_undo.CanRedo</strong>
+                    </div>
+                </div>
+                break;
+
+            case "agent-multi-controller":
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <BxButton Label="Run Cross-Controller Plan (Form + Dashboard)" Size="BxSize.Sm" OnClick="@RunMultiControllerPlanAsync" />
+                        <BxButton Label="Reset Dashboard Filters via Agent" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@ResetMultiDashboardAsync" />
+                    </div>
+                    <div class="grid gap-3 lg:grid-cols-2 font-mono text-xs">
+                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3 space-y-1">
+                            <p class="text-(--blux-text-muted)">Unified Snapshot (@_multiAgent.Snapshot().Count controls)</p>
+                            @foreach (var s in _multiAgent.Snapshot())
+                            {
+                                <p><code>@s.Ref</code> [@s.Component] <strong>@s.Label</strong> = <code>@s.Value</code></p>
+                            }
+                        </div>
+                        <div class="rounded-xl border border-(--blux-border) bg-(--pg-code-bg) p-3 text-[#d7dcde]">
+                            <p class="mb-1 text-[#94a3b8]">Last Cross-Controller Result</p>
+                            <pre class="overflow-x-auto whitespace-pre-wrap">@_multiAgentStatus</pre>
+                        </div>
+                    </div>
+                </div>
+                break;
+
+            case "agent-tools-diagnostics":
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <BxButton Label="Trigger: Not Found" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => RunDiagStepAsync("unknown-control", "setValue", ["x"]))" />
+                        <BxButton Label="Trigger: Unsupported Action" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => RunDiagStepAsync("Project", "submit", null))" />
+                        <BxButton Label="Trigger: Policy Refusal" Size="BxSize.Sm" Color="BxColor.Error" Variant="ButtonVariant.Soft" OnClick="@(() => RunDiagStepAsync("Project Settings", "submit", null))" />
+                    </div>
+                    <div class="grid gap-3 lg:grid-cols-2 font-mono text-xs">
+                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3 space-y-1">
+                            <p class="text-(--blux-text-muted)">AgentBridgeService.GetToolDefinitions()</p>
+                            @foreach (var tool in AgentBridgeService.GetToolDefinitions())
+                            {
+                                <p><strong>@tool.Name</strong> — ReadOnly:@tool.ReadOnlyHint · Consequential:@tool.ConsequentialHint</p>
+                            }
+                        </div>
+                        <div class="rounded-xl border border-(--blux-border) bg-(--pg-code-bg) p-3 text-[#d7dcde]">
+                            <p class="mb-1 text-[#94a3b8]">Deterministic AgentActResult</p>
+                            <pre class="overflow-x-auto whitespace-pre-wrap">@_diagResult</pre>
+                        </div>
                     </div>
                 </div>
                 break;
@@ -555,6 +825,22 @@
         new(4, "David Kim", "Product", 105000m)
     ];
     private DataListDensity _tableDensity = DataListDensity.Default;
+    private DataListSummaryKind _tableSummaryKind = DataListSummaryKind.Sum;
+    private bool _tableMobileSummary;
+    private static readonly DataListRowSummary<TableDemoRow> TablePhoneSummary = new()
+    {
+        Title = r => r.Name,
+        Details = r => [r.Dept, $"€{r.Salary:N0}"],
+        DefaultActive = true
+    };
+    private int _treeDepth = 2;
+    private IReadOnlyList<DataListTreeNode<OrgRow>> _headlessNodes = [];
+    private void InspectHeadlessTree()
+    {
+        var (_, all) = new DataListTree<OrgRow> { Children = r => r.Reports, DefaultExpandedDepth = _treeDepth }.BuildTree(OrgRoots, OrgSchema);
+        _headlessNodes = all;
+    }
+    private void CycleTreeDepth() { _treeDepth = _treeDepth >= 3 ? 1 : _treeDepth + 1; InspectHeadlessTree(); }
     private static readonly DataListGroupBy<TableDemoRow> TableGroupBy = new() { Key = r => r.Dept };
 
     private sealed record OrgRow(int Id, string Name, string Role, IReadOnlyList<OrgRow>? Reports = null);
@@ -774,6 +1060,16 @@
         RunPaging();
         RunFacetsCursor();
         RunUrlCodecDemo();
+        InspectHeadlessTree();
+        RefreshDirtyJson();
+
+        _dashFilterCtrl.AddView("overview", "Overview", badge: "3");
+        _dashFilterCtrl.AddView("cohorts", "Cohorts");
+        _dashRegionFilter = _dashFilterCtrl.AddFilter(new DashboardFilterControl(
+            "region", "Region",
+            items: [new("eu", "Europe"), new("us", "North America"), new("ap", "Asia-Pacific")],
+            defaultValues: ["eu"],
+            multiple: true));
 
         _waveEssential = _waveController.RegisterResource(new DashboardResource<int?>("kpis", async _ => { await Task.Delay(80); return 42; }, DashboardQueryStage.Essential));
         _waveBackground = _waveController.RegisterResource(new DashboardResource<string>("chart", async _ => { await Task.Delay(120); return "12 months loaded"; }, DashboardQueryStage.Background));
@@ -781,6 +1077,12 @@
 
         _agent.RegisterForm(_agentForm, confirmSubmit: true);
         _agent.Observe(c => _lastObserved = $"[{c.Source}] {c.Label}: {c.Previous} -> {c.Value}");
+
+        _multiDash.AddView("overview", "Overview");
+        _multiDash.AddView("cohorts", "Cohorts");
+        _multiDash.AddFilter(new DashboardFilterControl("region", "Region", items: [new("eu", "Europe"), new("us", "US")], defaultValues: ["eu"]));
+        _multiAgent.RegisterForm(_multiForm, confirmSubmit: false);
+        _multiAgent.RegisterDashboard(_multiDash);
 
         _importer = new SpreadsheetImporter(new SpreadsheetSchema
         {
@@ -794,5 +1096,122 @@
         });
         _importer.LoadText("Export 2026;;\nCode;Amount;Currency\nA1;12,50;€\nA2;45,00;USD", "rates.csv");
         InitReconcileImporter();
+        InitEditAndBatchImporters();
+    }
+
+    // ---- Extra Form Demos ----
+    private readonly FormController _dirtyCtrl = new(new FormSchema
+    {
+        FormKey = "dirty-demo",
+        Title = "Workspace Settings",
+        Fields =
+        [
+            new FormFieldSchema { Key = "name", Label = "Name", Required = true, TransformOutput = v => v?.ToString()?.Trim() },
+            new FormFieldSchema { Key = "plan", Label = "Plan", DefaultValue = "pro" }
+        ]
+    }, new Dictionary<string, object?> { ["name"] = "Alice", ["plan"] = "pro" });
+    private string _dirtyOutputJson = "{}";
+    private void RefreshDirtyJson() => _dirtyOutputJson = JsonSerializer.Serialize(_dirtyCtrl.BuildOutput());
+    private async Task SubmitDirtyDemoAsync() { await _dirtyCtrl.SubmitAsync(); RefreshDirtyJson(); }
+
+    private readonly FormController _sectionCtrl = new(new FormSchema
+    {
+        FormKey = "sections-demo",
+        Title = "Account Setup",
+        Sections =
+        [
+            new FormPageSectionSchema { Key = "account", Label = "1. Account", Fields = [new FormFieldSchema { Key = "email", Label = "Email", Required = true }] },
+            new FormPageSectionSchema { Key = "billing", Label = "2. Billing", Fields = [new FormFieldSchema { Key = "vat", Label = "VAT ID", Required = true }] },
+            new FormPageSectionSchema { Key = "notes", Label = "3. Notes (Optional)", Optional = true, Fields = [new FormFieldSchema { Key = "note", Label = "Note" }] }
+        ]
+    });
+
+    // ---- Extra Dashboard Demos ----
+    private readonly DashboardController _dashFilterCtrl = new("filters-demo");
+    private readonly DashboardFilterControl _dashRegionFilter;
+    private DashboardComparisonMode _dashCompMode = DashboardComparisonMode.Year;
+
+    // ---- Extra Display Demos ----
+    private string _previewFileName = "quarterly-report.pdf";
+    private readonly string _previewCsvText = "Region,MRR,Growth\nEU,148900,+14.2%\nUS,192400,+19.8%\nAPAC,84200,+11.4%";
+
+    // ---- Extra Spreadsheet Demos ----
+    private SpreadsheetImporter _editImporter = default!;
+    private SpreadsheetImporter _batchImporter = default!;
+    private bool _rejectRow1 = true;
+    private void InitEditAndBatchImporters()
+    {
+        _editImporter = new SpreadsheetImporter(new SpreadsheetSchema
+        {
+            Key = "edit-demo",
+            Columns =
+            [
+                new SpreadsheetColumnSchema { Key = "code", Label = "Code", Required = true },
+                new SpreadsheetColumnSchema { Key = "price", Label = "Price", Kind = SpreadsheetColumnKind.Number, DecimalSeparator = ',', Required = true, Rules = [SpreadsheetRule.Min(0)] }
+            ]
+        });
+        _editImporter.LoadText("Code;Price\nSKU-1;-15,00\nSKU-2;29,00", "prices.csv");
+        InitBatchImporter();
+    }
+    private void InitBatchImporter()
+    {
+        _rejectRow1 = true;
+        _batchImporter = new SpreadsheetImporter(new SpreadsheetSchema
+        {
+            Key = "batch-demo",
+            BatchSize = 2,
+            Columns = [new SpreadsheetColumnSchema { Key = "code", Label = "Code", Required = true }],
+            OnSubmit = batch =>
+            {
+                var rejected = new List<SpreadsheetRejectedRow>();
+                if (_rejectRow1)
+                {
+                    var dup = batch.FirstOrDefault(r => r.Index == 1);
+                    if (dup is not null) rejected.Add(new SpreadsheetRejectedRow(1, "Duplicate SKU on server", "code"));
+                }
+                return Task.FromResult<IReadOnlyList<SpreadsheetRejectedRow>?>(rejected);
+            }
+        });
+        _batchImporter.LoadText("Code\nSKU-100\nSKU-DUP\nSKU-300", "batch.csv");
+    }
+    private async Task RunBatchSubmitDemoAsync() => await _batchImporter.SubmitAsync();
+    private async Task RetryRejectedDemoAsync()
+    {
+        _rejectRow1 = false;
+        _batchImporter.EditCell(1, "code", "SKU-200-FIXED");
+        await _batchImporter.RetryRejectedAsync();
+    }
+
+    // ---- Extra Agent Demos ----
+    private readonly AgentBridgeService _multiAgent = new();
+    private readonly FormController _multiForm = new(new FormSchema
+    {
+        FormKey = "multi-form",
+        Title = "Campaign",
+        Fields = [new FormFieldSchema { Key = "title", Label = "Campaign Title", DefaultValue = "Q4 Launch" }]
+    });
+    private readonly DashboardController _multiDash = new("multi-dash");
+    private string _multiAgentStatus = "Click 'Run Cross-Controller Plan' to mutate Form + Dashboard in one AgentActStep[] batch.";
+    private async Task RunMultiControllerPlanAsync()
+    {
+        var res = await _multiAgent.ActAsync([
+            new AgentActStep("Campaign Title", "setValue", ["Enterprise Launch 2026"]),
+            new AgentActStep("multi-dash", "setView", ["cohorts"])
+        ]);
+        _multiAgentStatus = $"Ok={res.Ok} | Steps={res.Steps.Count} | CurrentView={_multiDash.CurrentView} | Title={_multiForm.GetValue<string>("title")}";
+    }
+    private async Task ResetMultiDashboardAsync()
+    {
+        var res = await _multiAgent.ActAsync([new AgentActStep("multi-dash", "resetFilters")]);
+        _multiAgentStatus = $"Ok={res.Ok} | Dashboard filters reset via AgentBridgeService.";
+    }
+
+    private string _diagResult = "Trigger any failure case above to inspect the deterministic AgentActResult.Error returned to an LLM.";
+    private async Task RunDiagStepAsync(string target, string action, object?[]? args)
+    {
+        var res = await _agent.ActAsync(
+            [new AgentActStep(target, action, args)],
+            allow: (_, confirmRequired) => Task.FromResult(!confirmRequired));
+        _diagResult = $"Ok = {res.Ok}\nError = \"{res.Error}\"";
     }
 }

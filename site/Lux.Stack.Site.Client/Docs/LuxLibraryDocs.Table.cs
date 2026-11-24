@@ -8,62 +8,84 @@ public static partial class LuxLibraryDocs
     private static LibraryDocTree BuildTable() => new(
         "table", "Lux.Table", "#00d8ff",
         [
-            new("", "Introduction", "Getting Started",
-                "Enterprise DataList and NativeAOT headless tree hierarchy engine for Blazor Web and .NET MAUI Blazor Hybrid.",
+            // =========================================================================
+            // GROUP 1: GETTING STARTED
+            // =========================================================================
+            new("", "Introduction & How It Works", "Getting Started",
+                "Enterprise DataList, card grids, visual grouping, footer aggregations, and NativeAOT headless tree hierarchy engine for Blazor Web and .NET MAUI Blazor Hybrid.",
                 [
                     new("overview", "What is Lux.Table?",
                         Paragraphs:
                         [
-                            "Lux.Table pairs a zero-UI, NativeAOT tree-hierarchy engine (Lux.Table.Core) with high-density Blazor & .NET MAUI Blazor Hybrid table and card-grid components.",
-                            "It supports declarative columns, automatic Sort/Hide HeaderMenu dropdowns, left/right sticky column pinning, interactive column resizing with cookie/localStorage persistence, hierarchical tree expansion with continuation rails, visual row grouping, footer aggregations, bulk selection bars, saved views, 2px loading progress lines, 9 typed cell skeleton shapes, and automatic phone summary rows."
+                            "Lux.Table separates headless tree/hierarchy modeling (Lux.Table.Core, 100% NativeAOT C#) from high-density Blazor Web & .NET MAUI Blazor Hybrid table and card-grid components (Lux.Table).",
+                            "Every table is powered by a DataListSchema<T> from Lux.Query.Core: columns, sorting, filtering, facets, URL synchronization, sticky column pinning, keyboard/pointer column resizing with cookie/localStorage persistence, hierarchical tree expansion with continuation rails, visual row grouping, footer summaries, bulk selection bars, 2px loading progress lines, 9 cell skeleton shapes, and automatic phone summary rows work seamlessly together."
                         ],
                         LiveDemoKey: "table-basic",
                         LiveDemoTitle: "Lux.Table · Live BxDataList with HeaderMenu & Footer Sum"),
+                    new("pipeline", "How Lux.Table Works End-to-End (The 5-Stage Lifecycle)",
+                        Paragraphs: ["BxDataList<TItem> acts as a headless coordinator that cascades a DataListContext<TItem> to every child slot (Toolbar, FilterBar, FilterPanel, SelectionBar, Table, Grid, Pagination, LoadMore)."],
+                        TableHeaders: ["Stage", "Component / Type", "What Happens"],
+                        TableRows:
+                        [
+                            new("1. Schema & Source", "DataListSchema<T> + Items or Provider", "Declares sortable/filterable columns, RowKey, and either local Items (InMemoryProvider) or an async server DataListProvider<T>."),
+                            new("2. URL & Preferences", "QueryState (UrlSync) + Lux.Table.lib.module.js", "Reads query state (?q=&p=&s=&f.*) via DataListStateQuery and restores pinned/hidden/resized column widths from cookie (Web) or localStorage (MAUI)."),
+                            new("3. Execute Query", "DataListController<TItem>", "Coalesces filter/sort/page edits, shows a 2px progress line during background reloads, and cancels stale in-flight requests via CancellationToken."),
+                            new("4. Shape Rows", "DataListTree<T> · DataListGroupBy<T> · DataListSummaries<T>", "Builds cycle-guarded tree nodes, collapsible group headers, or footer Sum/Average/Count/Min/Max aggregations."),
+                            new("5. Responsive Render", "BxDataListTable · BxDataListGrid · DataListRowSummary", "Renders full desktop columns, switches to Card Grid via layout toggle, or auto-switches to 2-line mobile summary rows under 768px.")
+                        ]),
                     new("layers", "Two-Layer Architecture",
                         TableHeaders: ["Package", "Primary Exports", "Compatibility"],
                         TableRows:
                         [
                             new("Lux.Table.Core", "DataListTree<TItem>, DataListTreeNode<TItem>, DataListTreeSelectionMode", "Headless C# · IsAotCompatible=true"),
-                            new("Lux.Table", "BxDataList, BxDataListTable, BxDataListGrid, BxDataListColumn, Toolbar, FilterBar, Pagination, GroupBy, Summaries, RowSummary, Lux.Table.lib.module.js", "browser, ios, android, maccatalyst, windows")
+                            new("Lux.Table", "BxDataList, BxDataListTable, BxDataListGrid, BxDataListColumn, Toolbar, FilterBar, FilterPanel, SelectionBar, Pagination, LoadMore, GroupBy, Summaries, RowSummary, Lux.Table.lib.module.js", "browser, ios, android, maccatalyst, windows")
                         ])
                 ]),
-            new("installation", "Installation", "Getting Started",
-                "Install Lux.Table, register services, and understand the bundled JS initializer.",
+            new("installation", "Installation & Setup", "Getting Started",
+                "Install Lux.Table, register services, and understand the automatic Blazor JS initializer.",
                 [
                     new("nuget", "1. Install Packages",
                         CodeSamples:
                         [
                             new("Terminal", """
-                                dotnet add package Lux.Table.Core   # Headless NativeAOT tree hierarchy models
+                                dotnet add package Lux.Table.Core   # Headless NativeAOT tree hierarchy engine
                                 dotnet add package Lux.Table        # Full Blazor Web & .NET MAUI DataList
                                 """)
                         ]),
                     new("di", "2. Register Services",
-                        Paragraphs: ["AddLuxTable() registers the default synchronous query executor (overrideable with EF Core on servers), URL state services, and optional LuxTableOptions defaults."],
+                        Paragraphs: ["AddLuxTable() registers Lux.UI, Lux.Query, and optional LuxTableOptions theme/default overrides. When using Lux.Stack, AddLuxStack() already registers Lux.Table."],
                         CodeSamples:
                         [
                             new("Program.cs / MauiProgram.cs", """
-                                builder.Services.AddLuxTable(options =>
-                                {
-                                    options.DefaultPageSize = 25;
-                                });
+                                using Lux.Table;
+
+                                builder.Services.AddLuxTable();
+                                """),
+                            new("_Imports.razor", """
+                                @using Lux.UI
+                                @using Lux.Query
+                                @using Lux.Table
                                 """)
                         ]),
                     new("js", "3. Automatic JS Initializer (Lux.Table.lib.module.js)",
-                        Paragraphs: ["Lux.Table automatically registers Lux.Table.lib.module.js as a Blazor JS module initializer. Zero manual <script> tags are required. It provides column resize handles, persisted column width/visibility cookies (or localStorage inside MAUI WebView), virtualized focus preservation across re-renders, sticky actions-column width measurement, and 768px phone viewport detection."])
+                        Paragraphs: ["Lux.Table automatically ships Lux.Table.lib.module.js as a Blazor JS module initializer — no manual <script> tag required. It handles pointer/keyboard column resize handles, persisted column width/visibility cookies (or localStorage inside MAUI BlazorWebView), sticky actions-column width measurement, focus preservation across virtualized renders, and 768px mobile viewport detection."])
                 ]),
-            new("data-list", "BxDataList & Layouts", "Components",
-                "Coordinate Table and Grid views, Toolbars, FilterBars, Bulk Selection Bars, and Pagination inside one BxDataList<TItem> root.",
+
+            // =========================================================================
+            // GROUP 2: CORE COMPONENTS & FEATURES
+            // =========================================================================
+            new("data-list", "BxDataList, Toolbar & Layouts", "Components",
+                "Coordinate Table and Card Grid views, Toolbars, FilterBars, FilterPanels, Bulk Selection Bars, and Pagination inside one BxDataList<TItem> root.",
                 [
                     new("composition", "Full Enterprise Composition",
-                        Paragraphs: ["BxDataList<TItem> cascades its controller state to child blocks so you can place Toolbars, FilterBars, SelectionBars, Tables, Grids, and Paginators in any layout order."],
+                        Paragraphs: ["BxDataList<TItem> cascades DataListContext<TItem> to every descendant so you can compose Toolbars, FilterBars, FilterPanels, SelectionBars, Tables, Grids, LayoutSwitches, ViewToggles, and Paginators in any layout order."],
                         LiveDemoKey: "table-basic",
                         LiveDemoTitle: "BxDataList with HeaderMenu & Footer Sum",
                         CodeSamples:
                         [
                             new("DirectoryPage.razor", """
                                 <BxDataList TItem="Employee"
-                                            Schema="@_schema"
+                                            Schema="@EmployeeSchemas.Directory"
                                             Items="@_employees"
                                             UrlSync="true"
                                             ApplyMode="DataListApplyMode.Live">
@@ -75,7 +97,7 @@ public static partial class LuxLibraryDocs
                                                      Density="DataListDensity.Default"
                                                      Summaries="@(new DataListSummaries<Employee>())">
                                         <BxDataListColumn TItem="Employee" Field="name" Title="Employee" Pin="DataListPin.Start" />
-                                        <BxDataListColumn TItem="Employee" Field="department" Title="Department" />
+                                        <BxDataListColumn TItem="Employee" Field="dept" Title="Department" />
                                         <BxDataListColumn TItem="Employee" Field="salary" Title="Salary"
                                                           Align="DataListAlign.End"
                                                           Summary="DataListSummaryKind.Sum" />
@@ -96,14 +118,14 @@ public static partial class LuxLibraryDocs
                             new("DataListSelectionBarPosition", "Sticky, Fixed", "Sticky bar above table vs floating fixed bar at viewport bottom")
                         ])
                 ]),
-            new("columns", "Columns & HeaderMenu", "Components",
-                "Configure sortable, hideable, resizable, and pinned columns with automatic HeaderMenu actions and keyboard resizing.",
+            new("columns", "Columns, Pinning & HeaderMenu", "Components",
+                "Configure sortable, hideable, resizable, and sticky-pinned columns with automatic HeaderMenu actions and keyboard resizing.",
                 [
-                    new("header-menu", "HeaderMenu & Column Persistence",
+                    new("header-menu", "HeaderMenu, Pinning & Keyboard Resizing",
                         Paragraphs:
                         [
-                            "Set HeaderMenu=\"true\" on BxDataListTable so clicking any sortable or hideable column header opens an accessible menu offering Sort Ascending, Sort Descending, Clear Sort, and Hide Column.",
-                            "When column resizing is enabled, resize handles support both pointer drag and keyboard navigation (ArrowRight/ArrowLeft in 16px steps, Shift+Arrow in 64px steps, Home/End for min/max width, Delete/Backspace to reset to default width)."
+                            "Set HeaderMenu=\"true\" on BxDataListTable so clicking any sortable or hideable column header opens an accessible popover menu offering Sort Ascending, Sort Descending, Clear Sort, Pin Start/End, and Hide Column.",
+                            "When column resizing is enabled, resize handles support both pointer drag and keyboard navigation (ArrowRight/ArrowLeft in 16px steps, Shift+Arrow in 64px steps, Home/End for min/max width, Delete/Backspace to reset). Set PreferencesKey on BxDataList to persist column order, visibility, pins, and widths automatically."
                         ],
                         TableHeaders: ["DataListPin", "Behavior", "Typical Column"],
                         TableRows:
@@ -117,7 +139,7 @@ public static partial class LuxLibraryDocs
                             new("PinnedColumns.razor", """
                                 <BxDataListTable TItem="Employee" HeaderMenu="true">
                                     <BxDataListColumn TItem="Employee" Field="name" Title="Employee" Pin="DataListPin.Start" SkeletonKind="DataListSkeletonKind.Avatar" />
-                                    <BxDataListColumn TItem="Employee" Field="department" Title="Department" SkeletonKind="DataListSkeletonKind.Badge" />
+                                    <BxDataListColumn TItem="Employee" Field="dept" Title="Department" SkeletonKind="DataListSkeletonKind.Badge" />
                                     <BxDataListColumn TItem="Employee" Field="salary" Title="Salary" Align="DataListAlign.End" SkeletonKind="DataListSkeletonKind.Number" Summary="DataListSummaryKind.Sum" />
                                 </BxDataListTable>
                                 """)
@@ -129,7 +151,7 @@ public static partial class LuxLibraryDocs
                     new("headless-tree", "DataListTree<TItem> in Lux.Table.Core (NativeAOT)",
                         Paragraphs:
                         [
-                            "DataListTree<TItem> is 100% headless in Lux.Table.Core. BuildTree(rootItems, schema) skips null entries and duplicate keys (preventing infinite cycles), builds DataListTreeNode<TItem> objects carrying Key, Item, Depth, Parent, RootIndex, Children, HasChildren, IsLast, and AncestorContinuations (boolean rail array for drawing vertical tree lines).",
+                            "DataListTree<TItem> is 100% headless in Lux.Table.Core. BuildTree(rootItems, schema) skips null entries and duplicate keys (preventing infinite cycles) and builds flat DataListTreeNode<TItem> descriptors carrying Key, Item, Depth, Parent, RootIndex, Children, HasChildren, IsLast, and AncestorContinuations.",
                             "DefaultExpandedDepth (e.g., 1 expands roots only, 2 expands roots and children) overrides DefaultExpanded when specified."
                         ],
                         TableHeaders: ["Selection Mode", "Behavior", "Best For"],
@@ -138,118 +160,217 @@ public static partial class LuxLibraryDocs
                             new("DataListTreeSelectionMode.All", "Every root and descendant row renders its own checkbox", "Folder trees, org charts, permissions"),
                             new("DataListTreeSelectionMode.Roots", "Only depth-0 root rows show checkboxes; descendants reserve alignment width", "Invoices with nested line items")
                         ],
+                        LiveDemoKey: "table-tree",
+                        LiveDemoTitle: "Interactive DataListTree<TItem> Org Hierarchy",
                         CodeSamples:
                         [
                             new("OrgTree.cs", """
-                                var tree = new DataListTree<Employee>
+                                var tree = new DataListTree<OrgRow>
                                 {
                                     Children = e => e.Reports,
-                                    DefaultExpandedDepth = 1,
+                                    DefaultExpandedDepth = 2,
                                     Selectable = DataListTreeSelectionMode.All
                                 };
 
-                                var (roots, allNodes) = tree.BuildTree(employees, schema);
-                                """),
-                            new("OrgTreeTable.razor", """
-                                <BxDataListTable TItem="Employee" Tree="@_orgTree">
-                                    <BxDataListColumn TItem="Employee" Field="name" Title="Name" />
-                                    <BxDataListColumn TItem="Employee" Field="department" Title="Department" />
-                                </BxDataListTable>
+                                var (roots, allNodes) = tree.BuildTree(orgRoots, orgSchema);
                                 """)
                         ],
-                        Callout: "Keyboard support: press Enter/Space or ArrowRight to expand a focused branch node, and ArrowLeft to collapse it. When Tree is set, visual grouping and phone summary rows are disabled automatically.")
+                        Callout: "Keyboard support: press Enter/Space or ArrowRight to expand a focused branch node, and ArrowLeft to collapse it.")
                 ]),
-            new("grouping-and-summaries", "Grouping & Footer Summaries", "Components",
-                "Group rows under collapsible headers and calculate automatic footer totals across numeric columns.",
+            new("grouping-and-summaries", "Grouping, Summaries & Row Actions", "Components",
+                "Group rows under collapsible headers, calculate footer totals across 6 aggregation modes, and attach row/bulk actions with confirmation dialogs.",
                 [
                     new("grouping", "Visual Row Grouping (DataListGroupBy<TItem>)",
-                        Paragraphs: ["DataListGroupBy<TItem> groups loaded rows by any key selector, renders collapsible group headers with item counts, and preserves stable group ordering."],
+                        Paragraphs: ["DataListGroupBy<TItem> groups loaded rows by any key selector (Key = e => e.Dept), renders collapsible group headers with item counts and tri-state group checkboxes, and persists fold state when PreferencesKey is set."],
+                        LiveDemoKey: "table-grouped",
+                        LiveDemoTitle: "Interactive GroupBy & Density Switcher",
                         CodeSamples:
                         [
                             new("Grouping.cs", """
                                 var groupBy = new DataListGroupBy<Employee>
                                 {
-                                    Key = e => e.Department
+                                    Key = e => e.Dept
                                 };
                                 """)
                         ]),
-                    new("summaries", "All 6 DataListSummaryKind Aggregations",
+                    new("summaries", "All 6 DataListSummaryKind Aggregations & Scopes",
                         TableHeaders: ["Kind", "Computation", "Example Use"],
                         TableRows:
                         [
                             new("DataListSummaryKind.Sum", "Arithmetic sum of numeric values", "Total Payroll, Revenue, Quantity"),
                             new("DataListSummaryKind.Average", "Mean across non-null numeric rows", "Average Rating, Margin %, Latency"),
                             new("DataListSummaryKind.Count", "Count of non-empty values", "Active Records, Assigned Tasks"),
-                            new("DataListSummaryKind.Min", "Minimum value in column", "Lowest Cost, Earliest Due Date"),
-                            new("DataListSummaryKind.Max", "Maximum value in column", "Peak Throughput, Latest Update"),
+                            new("DataListSummaryKind.Min / Max", "Minimum or maximum value in column", "Lowest Cost, Peak Throughput"),
                             new("DataListSummaryKind.None", "No summary calculation (default)", "Free-text or action columns")
-                        ],
-                        CodeSamples:
-                        [
-                            new("FooterSummaries.razor", """
-                                <BxDataListTable TItem="Employee" Summaries="@(new DataListSummaries<Employee>())">
-                                    <BxDataListColumn TItem="Employee" Field="name" Title="Employee" Summary="DataListSummaryKind.Count" />
-                                    <BxDataListColumn TItem="Employee" Field="salary" Title="Salary" Summary="DataListSummaryKind.Sum" />
-                                </BxDataListTable>
-                                """)
-                        ])
+                        ]),
+                    new("actions", "Row Actions & Bulk Selection Actions",
+                        Paragraphs: ["Attach DataListRowAction<TItem> to individual rows (moving focus safely to the next row when an action deletes a record) and DataListAction<TItem> to the bulk selection bar with built-in confirmation dialogs (DataListActionConfirm<TItem>)."])
                 ]),
-            new("mobile-summary", "Mobile Summary Rows", "Components",
-                "Switch wide tables automatically into scannable two-line mobile rows below 768px.",
+            new("mobile-and-polish", "Mobile Summary Rows, Skeletons & Progress", "Components",
+                "Switch wide tables automatically into scannable two-line mobile rows below 768px and keep reloads silky smooth with 9 cell skeleton shapes and a 2px progress line.",
                 [
-                    new("row-summary", "DataListRowSummary<TItem> Properties",
-                        Paragraphs:
-                        [
-                            "DataListRowSummary<TItem> eliminates awkward horizontal scrolling on smartphones. Below the md breakpoint (768px), AutoPhone = true automatically displays each item with a leading visual, primary title (plain text, Href link, or OnSelect button), status badge, secondary details joined with ' · ', selection checkbox, and row actions."
-                        ],
-                        TableHeaders: ["Property", "Type", "Purpose"],
-                        TableRows:
-                        [
-                            new("Title", "Func<TItem, string?>?", "Primary one-line title (falls back to Schema.GetRowLabel or first column)"),
-                            new("Leading / Status", "RenderFragment<TItem>?", "Optional 32px avatar/icon before title and status pill on line 2"),
-                            new("Details", "Func<TItem, IEnumerable<string?>>?", "Secondary metadata items joined with ' · ' (blank entries skipped)"),
-                            new("Href / OnSelect", "Func<TItem, string?>? / EventCallback<TItem>", "Navigates or triggers row selection on title tap"),
-                            new("Template", "RenderFragment<TItem>?", "Replaces the entire body layout when custom markup is needed"),
-                            new("AutoPhone / DefaultActive", "bool (true / false)", "AutoPhone activates under 768px; DefaultActive forces summary view on all widths")
-                        ],
+                    new("row-summary", "DataListRowSummary<TItem> & Responsive View Toggle",
+                        Paragraphs: ["DataListRowSummary<TItem> eliminates awkward horizontal scrolling on phones. Below 768px, AutoPhone = true automatically displays a Leading 32px visual, primary Title, Status pill, Details joined with ' · ', selection checkbox, and row actions."],
+                        LiveDemoKey: "table-density-summary",
+                        LiveDemoTitle: "Interactive Summary Aggregation & Mobile RowSummary Toggle",
                         CodeSamples:
                         [
                             new("PhoneSummary.cs", """
                                 private static readonly DataListRowSummary<Employee> PhoneSummary = new()
                                 {
                                     Title = e => e.Name,
-                                    Details = e => [e.Department, $"€{e.Salary:N0}"],
+                                    Details = e => [e.Dept, $"€{e.Salary:N0}"],
                                     Href = e => $"/employees/{e.Id}",
                                     AutoPhone = true
                                 };
                                 """)
-                        ])
-                ]),
-            new("ux-polish", "Empty States, Skeletons & Progress", "Components",
-                "Keep tables responsive and informative during initial load, background refreshes, and zero-row states.",
-                [
+                        ]),
                     new("skeletons", "All 9 DataListSkeletonKind Cell Shapes",
                         TableHeaders: ["SkeletonKind", "Rendered Placeholder", "Recommended Column"],
                         TableRows:
                         [
                             new("Text / Number", "Horizontal pill (start-aligned for Text, end-aligned for Number)", "Titles, names, prices, quantities"),
-                            new("Avatar / Icon / Dot", "32px circle, 20px icon square, or 10px status dot", "User profiles, file type icons, online indicators"),
+                            new("Avatar / Icon / Dot", "32px circle, 20px icon square, or 10px status dot", "User profiles, file type icons, status dots"),
                             new("Badge / Check / Progress", "Status pill, checkbox square, or thin progress bar", "Statuses, booleans, goal completion %"),
-                            new("None", "Leaves cell empty while loading", "Row action columns or spacers")
-                        ]),
-                    new("progress-empty", "Progress Line & Differentiated Empty States",
-                        Bullets:
-                        [
-                            "ShowProgressLine=\"true\" renders an unobtrusive 2px indeterminate progress bar along the top border during background reloads without hiding existing data.",
-                            "DataListEmptyState differentiates an empty dataset (first-use onboarding copy + primary CTA) from a filtered-empty result (helpful message + one-click Clear Filters button)."
+                            new("None", "Leaves cell empty while loading", "Action columns or spacers")
                         ])
                 ]),
+
+            // =========================================================================
+            // GROUP 3: INTEGRATIONS WITH OTHER LUXSTACK LIBRARIES
+            // =========================================================================
+            new("integrations-query", "Integration: Lux.Query & EF Core", "Integrations",
+                "Wire BxDataList directly to Lux.Query schemas, remote EF Core Minimal APIs, facets, URL synchronization, and keyset cursor infinite scroll.",
+                [
+                    new("query-provider", "1. Connecting BxDataList to an EF Core Minimal API via DataListProvider<T>",
+                        Paragraphs: ["Share one DataListSchema<T> from Lux.Query.Core between your server API and your Blazor/MAUI client. BxDataList invokes your DataListProvider<T> whenever search, filters, sorts, or paging change, cancelling stale requests automatically."],
+                        CodeSamples:
+                        [
+                            new("ServerBackedTable.razor", """
+                                @using Lux.Query
+                                @using Lux.Table
+                                @inject HttpClient Http
+
+                                <BxDataList TItem="EmployeeDto"
+                                            Schema="@EmployeeSchemas.Directory"
+                                            Provider="@LoadAsync"
+                                            UrlSync="true"
+                                            UrlPrefix="emp"
+                                            PreferencesKey="emp-directory">
+                                    <BxDataListToolbar TItem="EmployeeDto" />
+                                    <BxDataListFilterPanel TItem="EmployeeDto" />
+                                    <BxDataListTable TItem="EmployeeDto" HeaderMenu="true" ShowProgressLine="true">
+                                        <BxDataListColumn TItem="EmployeeDto" Field="name" Title="Employee" Pin="DataListPin.Start" />
+                                        <BxDataListColumn TItem="EmployeeDto" Field="dept" Title="Department" />
+                                        <BxDataListColumn TItem="EmployeeDto" Field="salary" Title="Salary" Summary="DataListSummaryKind.Sum" />
+                                    </BxDataListTable>
+                                    <BxDataListPagination TItem="EmployeeDto" />
+                                </BxDataList>
+
+                                @code {
+                                    private async ValueTask<DataListResult<EmployeeDto>> LoadAsync(DataListRequest req, CancellationToken ct)
+                                    {
+                                        using var resp = await Http.PostAsJsonAsync(
+                                            "/api/employees/query", req, DataListJsonContext.Default.DataListRequest, ct);
+                                        resp.EnsureSuccessStatusCode();
+                                        return (await resp.Content.ReadFromJsonAsync<DataListResult<EmployeeDto>>(ct))!;
+                                    }
+                                }
+                                """)
+                        ]),
+                    new("ssr-cookies", "2. Zero-Flicker Column Persistence in Static SSR (Lux.UI.Server)",
+                        Paragraphs: ["Register builder.Services.AddLuxServer() on the ASP.NET Core server so hidden columns, column order, pins, and widths saved in the PreferencesKey cookie are applied on the very first SSR HTML frame with zero layout shift."])
+                ]),
+            new("integrations-form-display", "Integration: Lux.Form & Lux.Display", "Integrations",
+                "Launch row edit drawers with Lux.Form (FormService.CreateFormAsync) and preview row attachments or detail modals with Lux.Display (FilePreviewService & BxDisplay).",
+                [
+                    new("row-edit-form", "1. Row Action -> Lux.Form Drawer (Edit & Reload Table)",
+                        Paragraphs: ["Wire a DataListRowAction<TItem> to FormService.CreateFormAsync(editSchema, initialData, FormShellMode.Drawer). When outcome.Submitted is true, persist the record and reload the table cleanly."],
+                        CodeSamples:
+                        [
+                            new("EditRowDrawer.cs", """
+                                using Lux.Form;
+                                using Lux.Table;
+
+                                var editAction = new DataListRowAction<Employee>("edit", "Edit Employee", async ctx =>
+                                {
+                                    var outcome = await formService.CreateFormAsync(
+                                        EmployeeFormSchemas.Edit,
+                                        input: new Dictionary<string, object?>
+                                        {
+                                            ["name"] = ctx.Item.Name,
+                                            ["dept"] = ctx.Item.Dept,
+                                            ["salary"] = (double)ctx.Item.Salary
+                                        },
+                                        mode: FormShellMode.Drawer);
+
+                                    if (outcome.Submitted)
+                                    {
+                                        await api.UpdateEmployeeAsync(ctx.Item.Id, outcome.Data);
+                                        await _dataListRef.ReloadAsync();
+                                    }
+                                });
+                                """)
+                        ]),
+                    new("row-preview-display", "2. Row Action -> Lux.Display FilePreviewService Lightbox",
+                        Paragraphs: ["Open PDF invoices, contracts, or photos directly from any table row using FilePreviewService.Open(...) without leaving the table's scroll or filter state."],
+                        CodeSamples:
+                        [
+                            new("PreviewRowFile.cs", """
+                                using Lux.Display;
+                                using Lux.Table;
+
+                                var previewAction = new DataListRowAction<DocumentRow>("preview", "Preview File", ctx =>
+                                {
+                                    filePreview.Open(new FilePreviewFile
+                                    {
+                                        Src = ctx.Item.Url,
+                                        Name = ctx.Item.FileName,
+                                        Size = ctx.Item.SizeBytes
+                                    });
+                                    return Task.CompletedTask;
+                                });
+                                """)
+                        ])
+                ]),
+            new("integrations-spreadsheet-dashboard", "Integration: Lux.Spreadsheet, Lux.Dashboard & Lux.Agent", "Integrations",
+                "Pair bulk CSV imports (Lux.Spreadsheet) with live data tables, drill down from Lux.Dashboard cards into filtered BxDataList views, and test everything in xUnit/bUnit.",
+                [
+                    new("import-to-table", "1. Lux.Spreadsheet Bulk Import -> Refresh Lux.Table",
+                        CodeSamples:
+                        [
+                            new("ImportAndRefresh.razor", """
+                                @* After BxSpreadsheetImport finishes SubmitAsync(), refresh your BxDataList immediately *@
+                                <BxSpreadsheetImport Importer="@_importer" OnCompleted="@(() => _listRef.ReloadAsync())" />
+                                <BxDataList @ref="_listRef" TItem="ProductRate" Schema="@RateSchema" Provider="@LoadRatesAsync">
+                                    <BxDataListTable TItem="ProductRate" ShowProgressLine="true" />
+                                </BxDataList>
+                                """)
+                        ]),
+                    new("dashboard-drilldown", "2. Lux.Dashboard KPI Click -> Pre-Filtered Lux.Table URL",
+                        Paragraphs: ["Generate deep-links from any Lux.Dashboard card or alert using DataListStateQuery.ToQuery(...) so clicking 'Pending Invoices (12)' lands directly on your Lux.Table page with ?f.status=Pending already active."],
+                        CodeSamples:
+                        [
+                            new("DrilldownLink.cs", """
+                                var state = DataListState.Initial with
+                                {
+                                    Filters = [new FilterRule("status", FilterOperator.Is, new FilterValue.Text("Pending"))]
+                                };
+                                var qs = string.Join("&", DataListStateQuery.ToQuery(state, InvoiceSchemas.All).Select(kv => $"{kv.Key}={kv.Value}"));
+                                string href = $"/invoices?{qs}"; // Pass to BxDashboardStat / DashboardAlertItem.ActionHref
+                                """)
+                        ])
+                ]),
+
+            // =========================================================================
+            // GROUP 4: PLATFORMS & TESTING
+            // =========================================================================
             MauiAndAotPage("Lux.Table", "Lux.Table.Core", "Lux.Table", "builder.Services.AddLuxTable();",
                 "var (roots, allNodes) = new DataListTree<Employee> { Children = e => e.Reports }.BuildTree(employees);"),
             new("recipes", "Testing & Recipes", "Platforms",
                 "Unit testing DataListTree in xUnit and rendering BxDataList in bUnit.",
                 [
-                    new("xunit", "Headless Tree & GroupBy Tests",
+                    new("xunit", "Headless Tree Tests",
                         CodeSamples:
                         [
                             new("TableCoreTests.cs", """
@@ -276,11 +397,15 @@ public static partial class LuxLibraryDocs
                         ],
                         Callout: "Always invoke Services.AddLuxTable() BEFORE SetRendererInfo(...) in bUnit tests; SetRendererInfo resolves the renderer and locks DI.")
                 ]),
+
+            // =========================================================================
+            // GROUP 5: LIVE EXAMPLES (5 INTERACTIVE DEMOS)
+            // =========================================================================
             new("examples", "Live Examples", "Examples",
-                "Interactive BxDataList grids demonstrating header menus, summary footers, hierarchical trees, and client-side GroupBy aggregations.",
+                "5 interactive BxDataList playgrounds demonstrating HeaderMenu, Sum/Average/Min/Max footers, hierarchical trees, GroupBy density switching, mobile RowSummary, and headless BuildTree.",
                 [
-                    new("basic-summary", "1. Interactive Grid with Header Menu & Sum Footer",
-                        Paragraphs: ["Render a typed BxDataList with built-in column sorting, header dropdown menus, progress indicator, and an automatic Sum aggregation row in <tfoot>."],
+                    new("basic-summary", "1. Interactive Grid with HeaderMenu & Sum Footer",
+                        Paragraphs: ["Click column headers to sort or open the HeaderMenu, and inspect the live Sum aggregation in <tfoot>."],
                         LiveDemoKey: "table-basic",
                         LiveDemoTitle: "BxDataList · Sorting, HeaderMenu & Sum Footer",
                         CodeSamples:
@@ -297,46 +422,72 @@ public static partial class LuxLibraryDocs
                                 </BxDataList>
                                 """)
                         ]),
-                    new("tree-hierarchy", "2. Hierarchical Tree Grid with Depth & Expand/Collapse",
-                        Paragraphs: ["Build a parent/child org chart using DataListTree<TItem> in Lux.Table.Core, tracking Depth, HasChildren, and interactive expand/collapse state."],
+                    new("tree-hierarchy", "2. Hierarchical Tree Grid with Expand/Collapse Rails",
+                        Paragraphs: ["Render parent-child hierarchies using DataListTree<TItem> with DefaultExpandedDepth and keyboard navigation."],
                         LiveDemoKey: "table-tree",
                         LiveDemoTitle: "DataListTree<TItem> · Expandable Org Chart",
                         CodeSamples:
                         [
                             new("OrgTree.razor", """
-                                <BxDataList TItem="OrgMember" Schema="@OrgSchema" Items="@_roots" UrlSync="false">
-                                    <BxDataListTable TItem="OrgMember"
-                                                     Tree="@(new DataListTree<OrgMember> { Children = m => m.Reports, DefaultExpanded = true })">
-                                        <BxDataListColumn TItem="OrgMember" Field="name" Title="Name" />
-                                        <BxDataListColumn TItem="OrgMember" Field="role" Title="Role" />
-                                        <BxDataListColumn TItem="OrgMember" Field="budget" Title="Budget (€)" />
+                                <BxDataList TItem="OrgRow" Schema="@OrgSchema" Items="@_roots" UrlSync="false">
+                                    <BxDataListTable TItem="OrgRow"
+                                                     Tree="@(new DataListTree<OrgRow> { Children = m => m.Reports, DefaultExpandedDepth = 2 })">
+                                        <BxDataListColumn TItem="OrgRow" Field="name" Title="Organization Hierarchy" />
+                                        <BxDataListColumn TItem="OrgRow" Field="role" Title="Role" />
                                     </BxDataListTable>
                                 </BxDataList>
                                 """)
                         ]),
-                    new("grouped-rows", "3. Grouped Table with Per-Group Summaries",
-                        Paragraphs: ["Group rows by department using DataListGroupBy<TItem> with collapsible group headers, item counts, and automatic per-group salary subtotals."],
+                    new("grouped-rows", "3. Visual Grouping & Live Density Switcher",
+                        Paragraphs: ["Switch between Default, Compact, and Comfortable density while grouping rows by department with Average salary summaries."],
                         LiveDemoKey: "table-grouped",
-                        LiveDemoTitle: "DataListGroupBy<TItem> · Department Grouping",
+                        LiveDemoTitle: "DataListGroupBy<TItem> · Department Grouping & Density",
                         CodeSamples:
                         [
                             new("DepartmentGrid.razor", """
                                 <BxDataList TItem="Employee" Schema="@EmployeeSchema" Items="@_employees" UrlSync="false">
                                     <BxDataListTable TItem="Employee"
-                                                     GroupBy="@(new DataListGroupBy<Employee> { KeySelector = e => e.Dept, DefaultExpanded = true })"
+                                                     Density="@_density"
+                                                     GroupBy="@(new DataListGroupBy<Employee> { Key = e => e.Dept })"
                                                      Summaries="@(new DataListSummaries<Employee>())">
                                         <BxDataListColumn TItem="Employee" Field="name" Title="Employee" />
                                         <BxDataListColumn TItem="Employee" Field="dept" Title="Department" />
                                         <BxDataListColumn TItem="Employee" Field="salary" Title="Salary (€)"
-                                                          Summary="DataListSummaryKind.Sum" />
+                                                          Summary="DataListSummaryKind.Average" />
                                     </BxDataListTable>
                                 </BxDataList>
+                                """)
+                        ]),
+                    new("summary-and-mobile", "4. Dynamic Summary Aggregations & Mobile RowSummary Mode",
+                        Paragraphs: ["Switch the footer summary function live across Sum, Average, Min, Max, and Count, and toggle the compact mobile DataListRowSummary presentation."],
+                        LiveDemoKey: "table-density-summary",
+                        LiveDemoTitle: "DataListSummaryKind & DataListRowSummary Live",
+                        CodeSamples:
+                        [
+                            new("SummaryAndMobile.razor", """
+                                <BxDataListTable TItem="Employee"
+                                                 RowSummary="@_phoneSummary"
+                                                 Summaries="@(new DataListSummaries<Employee>())">
+                                    <BxDataListColumn TItem="Employee" Field="salary" Title="Salary (€)" Summary="@_summaryKind" />
+                                </BxDataListTable>
+                                """)
+                        ]),
+                    new("headless-tree-core", "5. Headless Lux.Table.Core BuildTree() Inspector (NativeAOT)",
+                        Paragraphs: ["Inspect the flat DataListTreeNode<TItem> output produced by DataListTree<TItem>.BuildTree() with zero Blazor dependency — usable in CLI tools, APIs, and MAUI ViewModels."],
+                        LiveDemoKey: "table-selection-actions",
+                        LiveDemoTitle: "Lux.Table.Core · Headless BuildTree() Output",
+                        CodeSamples:
+                        [
+                            new("HeadlessTree.cs", """
+                                var tree = new DataListTree<OrgRow> { Children = r => r.Reports, DefaultExpandedDepth = 2 };
+                                var (roots, allNodes) = tree.BuildTree(orgRoots, orgSchema);
+                                // Each node exposes: Key, Item, Depth, Parent, HasChildren, IsLast, AncestorContinuations
                                 """)
                         ])
                 ]),
             new("api", "API Reference", "Reference",
                 "Complete public API reference for Lux.Table.Core and Lux.Table.",
                 [],
-                ApiTypes: [typeof(BxDataList<object>), typeof(BxDataListTable<object>), typeof(BxDataListColumn<object>), typeof(DataListTree<object>), typeof(DataListRowSummary<object>)])
+                ApiTypes: [typeof(BxDataList<object>), typeof(BxDataListTable<object>), typeof(BxDataListColumn<object>), typeof(DataListTree<object>), typeof(DataListGroupBy<object>), typeof(DataListSummaries<object>), typeof(DataListRowSummary<object>)])
         ]);
 }
