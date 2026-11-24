@@ -39,7 +39,7 @@
                     <a href="/ui/docs" aria-current="@(_currentPath.StartsWith("/ui/docs", StringComparison.OrdinalIgnoreCase) ? "page" : null)" class="@NavClass("/ui/docs")">Docs</a>
                     <a href="@($"{_prefix}/components/button")" class="inline-flex min-h-7 items-center text-(--lux-text-muted) transition-colors hover:text-(--lux-text-highlighted)">Components</a>
                     <a href="/docs/theming" aria-current="@(_currentPath == "/docs/theming" ? "page" : null)" class="@NavClass("/docs/theming")">Theming</a>
-                    <a href="templates" aria-current="@(_currentPath == "/templates" ? "page" : null)" class="@NavClass("/templates")">Templates</a>
+                    <a href="/templates" aria-current="@(_currentPath == "/templates" ? "page" : null)" class="@NavClass("/templates")">Templates</a>
                 }
                 else
                 {
@@ -70,7 +70,7 @@
                 <a href="/ui" class="@($"shrink-0 {NavClass("/ui")}")">Overview</a>
                 <a href="/ui/docs" class="@($"shrink-0 {NavClass("/ui/docs")}")">Docs</a>
                 <a href="@($"{_prefix}/components/button")" class="inline-flex min-h-7 shrink-0 items-center text-(--lux-text-muted) hover:text-(--lux-text-highlighted)">Components</a>
-                <a href="templates" class="@($"shrink-0 {NavClass("/templates")}")">Templates</a>
+                <a href="/templates" class="@($"shrink-0 {NavClass("/templates")}")">Templates</a>
             }
             else
             {

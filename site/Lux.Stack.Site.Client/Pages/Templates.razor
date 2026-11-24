@@ -1,190 +1,366 @@
 @page "/templates"
-@attribute [ExcludeFromInteractiveRouting]
 @using Lux.Stack.Site.Client.Templates
 @inject TemplateSettings Settings
 @inject ITemplateDemoState Demos
 
-<PageTitle>Templates · Lux.UI</PageTitle>
+<PageTitle>Templates · LuxStack &amp; Lux.UI</PageTitle>
 
-@* Static page: the server reads the repository address (Lux:Templates:RepositoryBase) and nothing here needs a circuit. *@
+<div data-lib="ui">
+    @* Hero + Interactive Live Template Theater *@
+    <section class="relative isolate overflow-hidden border-b border-(--lux-border)">
+        <div class="pg-dots absolute inset-0 -z-10 [mask-image:linear-gradient(to_bottom,black,transparent_85%)]" aria-hidden="true"></div>
+        <div class="lib-hero-glow absolute inset-0 -z-10" aria-hidden="true"></div>
+        <Rain />
 
-@* Hero *@
-<section class="relative isolate overflow-hidden border-b border-(--lux-border)">
-    <div class="pg-dots absolute inset-0 -z-10 [mask-image:linear-gradient(to_bottom,black,transparent_85%)]" aria-hidden="true"></div>
-    <div class="pg-glow absolute inset-0 -z-10" aria-hidden="true"></div>
-    <div class="mx-auto grid max-w-(--breakpoint-2xl) gap-10 px-4 pt-20 pb-16 sm:px-6 sm:pt-28 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)] lg:items-end lg:px-8 lg:pb-20">
-        <div>
-            <p class="pg-eyebrow-mono">lux/ui <span aria-hidden="true">·</span> <span class="text-(--lux-primary-text)">templates</span></p>
-            <h1 class="mt-5 text-5xl font-semibold leading-[0.95] tracking-[-0.055em] text-(--lux-text-highlighted) sm:text-7xl xl:text-[4.75rem]">
-                Start from<br />
-                <span class="pg-accent">a working app.</span>
-            </h1>
+        <div class="mx-auto grid max-w-(--breakpoint-2xl) gap-10 px-4 pt-14 pb-12 sm:px-6 sm:pt-20 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)] lg:items-end lg:px-8">
+            <div>
+                <h1 class="text-5xl font-semibold leading-[0.98] tracking-[-0.03em] text-(--lux-text-highlighted) sm:text-7xl">
+                    Start from<br />
+                    <span class="pg-accent">a working app.</span>
+                </h1>
+                <p class="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-(--lux-text-muted)" data-testid="templates-summary">
+                    <span><strong class="font-pixel text-lg font-bold text-(--lux-text-highlighted)">@TemplateRegistry.All.Count</strong> live apps</span>
+                    <span aria-hidden="true">·</span>
+                    <span><strong class="font-pixel text-lg font-bold text-(--lux-text-highlighted)">@TemplateRegistry.OfficialDotnetTemplates.Count</strong> <code class="font-mono">dotnet new</code> templates</span>
+                    <span aria-hidden="true">·</span>
+                    <span>Static SSR, Auto &amp; MAUI Hybrid</span>
+                </p>
+            </div>
+
+            <div class="lg:pb-1">
+                <p class="max-w-prose text-lg leading-relaxed text-(--lux-text-muted) text-pretty">
+                    Every demo below is the template's own .NET 10 app running live behind this site. Preview any app across desktop, tablet, or mobile viewports, then scaffold it in seconds.
+                </p>
+
+                <div class="mt-6 flex flex-wrap items-center gap-3">
+                    <LxButton Label="Install dotnet new templates" Href="#dotnet-new" Size="LxSize.Lg" Class="rounded-lg px-5">
+                        <TrailingIcon><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14m-6-6 6 6-6 6" /></svg></TrailingIcon>
+                    </LxButton>
+                    <LxButton Label="Browse all 9 templates" Href="#gallery" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" Size="LxSize.Lg" Class="rounded-lg" />
+                </div>
+
+                <div class="mt-4">
+                    <button type="button" data-copy-text="dotnet new install Lux.Templates::0.1.0-preview.1"
+                            class="group flex min-h-10 w-full items-center justify-between gap-3 rounded-xl border border-(--lux-border-accented) bg-(--lux-bg) px-4 py-2 font-mono text-xs text-(--lux-text-highlighted) transition-colors hover:border-(--lux-primary-text)">
+                        <span class="truncate"><span class="text-(--lux-text-muted)">$</span> dotnet new install Lux.Templates::0.1.0-preview.1</span>
+                        <span class="shrink-0 uppercase tracking-wider text-(--lux-text-muted) group-hover:text-(--lux-primary-text)" data-copy-label>Copy</span>
+                    </button>
+                </div>
+            </div>
         </div>
-        <p class="text-lg leading-relaxed text-(--lux-text-muted) text-pretty lg:pb-2" data-testid="templates-summary">
-            @_available.Count template@(_available.Count == 1 ? "" : "s") to try now, @_planned.Count more planned. Each demo is the template's own app,
-            running behind this site: the code you preview is the code you start from.
-        </p>
-    </div>
-</section>
 
-@* Gallery *@
-<section aria-labelledby="gallery" class="border-b border-(--lux-border)">
-    <div class="mx-auto max-w-(--breakpoint-2xl) px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-        <div class="grid gap-6 lg:grid-cols-2 lg:items-end">
-            <h2 id="gallery" class="text-4xl font-semibold leading-none tracking-[-0.045em] text-(--lux-text-highlighted) sm:text-6xl">
-                Pick one,<br /><span class="pg-accent">run it live.</span>
-            </h2>
-            <p class="text-lg text-(--lux-text-muted) lg:max-w-xl lg:justify-self-end">
-                A live demo is a separate app behind this site, under its own path, on the same origin as the docs. The language you chose on the docs applies to the demo too, through the one culture cookie of the site.
-            </p>
-        </div>
+        @* Interactive Live Template Theater *@
+        <div id="theater" class="scroll-mt-24 mx-auto max-w-(--breakpoint-2xl) px-4 pb-16 sm:px-6 lg:px-8 lg:pb-20">
+            <h2 class="sr-only">Interactive Template Theater</h2>
 
-        <ul class="mt-14 grid gap-5 sm:grid-cols-2 xl:grid-cols-3" aria-label="Templates">
-            @foreach (var template in TemplateRegistry.All)
-            {
-                var source = Settings.SourceUrl(template);
-                // The demo is shown as live only while this host can reach it: switched off, not built or not published, or stopped, it is offline.
-                var state = template.HasDemo ? Demos.StateOf(template.Name) : null;
-                var offline = template.HasDemo && state is null or "unavailable" or "stopped";
-                <li class="flex" data-testid="template-card" data-template="@template.Name">
-                    <article class="flex w-full flex-col overflow-hidden rounded-2xl border border-(--lux-border) bg-(--lux-bg)" aria-labelledby="@($"template-{template.Name}")">
-                        <div class="aspect-[16/10] overflow-hidden border-b border-(--lux-border) bg-(--lux-bg-muted)">
-                            @if (template.HasDemo)
+            @* Template Switcher Pills *@
+            <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex flex-wrap items-center gap-1.5" role="tablist" aria-label="Select template to inspect">
+                    @foreach (var tpl in TemplateRegistry.All)
+                    {
+                        var isSelected = _selected.Name == tpl.Name;
+                        var isLive = IsReady(tpl);
+                        <button type="button"
+                                role="tab"
+                                aria-selected="@isSelected"
+                                class="@($"inline-flex min-h-8 items-center gap-2 rounded-lg border px-3 py-1 font-mono text-xs transition-colors {(isSelected ? "font-semibold" : "border-(--lux-border) bg-(--lux-bg) text-(--lux-text-muted) hover:border-(--lux-border-accented) hover:text-(--lux-text-highlighted)")}")"
+                                style="@(isSelected ? "background:var(--lib-pill-bg);border-color:var(--lib-pill-bg);color:#ffffff" : null)"
+                                @onclick="@(() => SelectTemplate(tpl, activateLive: _liveFrame))">
+                            <span class="size-1.5 rounded-full @(isLive ? (isSelected ? "bg-white" : "bg-emerald-500") : "bg-amber-500")" aria-hidden="true"></span>
+                            <span>@tpl.Title</span>
+                        </button>
+                    }
+                </div>
+
+                <span class="font-mono text-xs text-(--lux-text-muted)">@_selected.RenderMode</span>
+            </div>
+
+            @* Browser Stage Frame *@
+            <div class="overflow-hidden rounded-2xl border border-(--lux-border) bg-(--lux-bg)">
+                @* Browser Chrome Toolbar *@
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-(--lux-border) bg-(--lux-bg-muted)/60 px-4 py-2.5">
+                    <div class="flex min-w-0 items-center gap-3">
+                        <div class="flex items-center gap-1.5" aria-hidden="true">
+                            <span class="size-2.5 rounded-full bg-(--lux-border-accented)/70"></span>
+                            <span class="size-2.5 rounded-full bg-(--lux-border-accented)/70"></span>
+                            <span class="size-2.5 rounded-full bg-(--lux-border-accented)/70"></span>
+                        </div>
+                        <span class="truncate rounded-md border border-(--lux-border) bg-(--lux-bg) px-2.5 py-1 font-mono text-[11px] text-(--lux-text-muted)">
+                            /@_selected.DemoPath
+                        </span>
+                    </div>
+
+                    @* Responsive Viewport Switcher + Live App Toggle *@
+                    <div class="flex flex-wrap items-center gap-2">
+                        <div class="hidden items-center rounded-lg border border-(--lux-border) bg-(--lux-bg) p-0.5 font-mono text-[11px] sm:inline-flex" role="group" aria-label="Preview viewport width">
+                            @foreach (var vp in Viewports)
                             {
-                                <LxImage Src="@template.Screenshot("light")" Provider="none" Alt="@($"The {template.Title} template, light mode")" Width="1280" Height="800" Loading="LxImageLoading.Lazy" Class="block h-full w-full object-cover object-top dark:hidden" data-testid="template-screenshot-light" />
-                                <LxImage Src="@template.Screenshot("dark")" Provider="none" Alt="@($"The {template.Title} template, dark mode")" Width="1280" Height="800" Loading="LxImageLoading.Lazy" Class="hidden h-full w-full object-cover object-top dark:block" data-testid="template-screenshot-dark" />
-                            }
-                            else
-                            {
-                                <div class="pg-dots grid h-full place-items-center" aria-hidden="true">
-                                    <span class="pg-eyebrow-mono">No screenshot yet</span>
-                                </div>
+                                var active = _viewport == vp.Key;
+                                <button type="button"
+                                        class="@($"inline-flex min-h-6 items-center rounded-md px-2.5 py-0.5 transition-colors {(active ? "font-semibold" : "text-(--lux-text-muted) hover:text-(--lux-text-highlighted)")}")"
+                                        style="@(active ? "background:var(--lib-pill-bg);color:#ffffff" : null)"
+                                        @onclick="@(() => _viewport = vp.Key)">
+                                    @vp.Label
+                                </button>
                             }
                         </div>
-                        <div class="flex flex-1 flex-col p-5 sm:p-6">
-                            <div class="flex items-start justify-between gap-3">
-                                <h3 id="@($"template-{template.Name}")" class="text-xl font-semibold tracking-tight text-(--lux-text-highlighted)">@template.Title</h3>
-                                @if (template.HasDemo && offline)
+
+                        <button type="button"
+                                class="@($"inline-flex min-h-7 items-center gap-1.5 rounded-lg border px-3 py-1 font-mono text-xs transition-colors {(_liveFrame ? "font-semibold" : "border-(--lux-border-accented) bg-(--lux-bg) text-(--lux-text-highlighted) hover:border-(--lux-primary-text)")}")"
+                                style="@(_liveFrame ? "background:var(--lib-pill-bg);border-color:var(--lib-pill-bg);color:#ffffff" : null)"
+                                @onclick="ToggleLiveFrame">
+                            <span class="size-1.5 rounded-full @(_liveFrame ? "bg-white lib-pulse-dot" : "bg-emerald-500 lib-pulse-dot")" aria-hidden="true"></span>
+                            <span>@(_liveFrame ? "Live App Active" : "Interact Live")</span>
+                        </button>
+
+                        <a href="@_selected.DemoPath"
+                           data-enhance-nav="false"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="inline-flex min-h-7 items-center gap-1 rounded-lg border border-(--lux-border) bg-(--lux-bg) px-3 py-1 font-mono text-xs text-(--lux-text-highlighted) transition-colors hover:border-(--lux-border-accented)">
+                            <span>Fullscreen</span>
+                            <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10" /></svg>
+                        </a>
+                    </div>
+                </div>
+
+                @* Viewport Canvas *@
+                <div class="bg-(--lux-bg-muted)/35 p-3 sm:p-5">
+                    <div class="@($"mx-auto overflow-hidden rounded-xl border border-(--lux-border) bg-(--lux-bg) transition-[max-width] duration-300 ease-out {ViewportMaxWidth}")">
+                        @if (_liveFrame && IsReady(_selected))
+                        {
+                            <iframe @key="_selected.Name"
+                                    src="@_selected.DemoPath"
+                                    title="@($"Live interactive preview of {_selected.Title} template")"
+                                    class="block h-[540px] w-full bg-(--lux-bg) sm:h-[620px]"
+                                    loading="lazy"></iframe>
+                        }
+                        else
+                        {
+                            <div class="group relative aspect-[16/10] w-full overflow-hidden bg-(--lux-bg-muted)">
+                                <LxImage Src="@_selected.Screenshot("light")" Provider="none" Alt="@($"The {_selected.Title} template, light mode")" Width="1280" Height="800" Class="block h-full w-full object-cover object-top dark:hidden" />
+                                <LxImage Src="@_selected.Screenshot("dark")" Provider="none" Alt="@($"The {_selected.Title} template, dark mode")" Width="1280" Height="800" Class="hidden h-full w-full object-cover object-top dark:block" />
+                                @if (IsReady(_selected))
                                 {
-                                    <LxBadge Label="Demo offline" Color="LxColor.Warning" Variant="LxVariant.Subtle" Size="LxSize.Sm" data-testid="template-state" />
-                                }
-                                else if (template.HasDemo && state == "ready")
-                                {
-                                    <LxBadge Label="Live demo" Color="LxColor.Success" Variant="LxVariant.Subtle" Size="LxSize.Sm" data-testid="template-state" />
-                                }
-                                else if (template.HasDemo)
-                                {
-                                    <LxBadge Label="Demo starting" Color="LxColor.Warning" Variant="LxVariant.Subtle" Size="LxSize.Sm" data-testid="template-state" />
-                                }
-                                else
-                                {
-                                    <LxBadge Label="Coming soon" Color="LxColor.Neutral" Variant="LxVariant.Subtle" Size="LxSize.Sm" />
+                                    <div class="absolute inset-x-0 bottom-0 flex items-center justify-between gap-3 bg-gradient-to-t from-black/80 via-black/45 to-transparent px-5 pt-12 pb-4 text-white">
+                                        <div class="min-w-0">
+                                            <p class="font-mono text-xs font-semibold text-white">@_selected.Title · @_selected.RenderMode</p>
+                                            <p class="truncate text-xs text-white/80">@_selected.Description</p>
+                                        </div>
+                                        <button type="button"
+                                                class="inline-flex min-h-9 shrink-0 items-center gap-2 rounded-lg bg-(--lux-primary) px-4 py-2 font-mono text-xs font-semibold text-(--lux-primary-contrast) transition-opacity hover:opacity-90"
+                                                @onclick="@(() => _liveFrame = true)">
+                                            <span>Launch Live Preview</span>
+                                            <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg>
+                                        </button>
+                                    </div>
                                 }
                             </div>
-                            <p class="mt-2 text-sm text-(--lux-text-muted) text-pretty">@template.Description</p>
-                            <ul class="mt-4 flex flex-col gap-2 text-sm text-(--lux-text)" aria-label="@($"{template.Title} features")">
-                                @foreach (var feature in template.Features)
-                                {
-                                    <li class="flex gap-2">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 size-4 shrink-0 text-(--lux-primary-text)" aria-hidden="true"><path d="m5 12 5 5L20 7" /></svg>
-                                        <span>@feature</span>
-                                    </li>
-                                }
-                            </ul>
-                            <div class="mt-auto flex flex-wrap items-center gap-x-4 gap-y-3 pt-6">
-                                @if (template.HasDemo && !offline)
-                                {
-                                    @* A plain navigation: the demo is another app, so neither the enhanced navigation nor the router of this site may handle the click. *@
-                                    <LxButton Label="@($"Preview {template.Title}")" Href="@template.DemoPath" data-enhance-nav="false" data-testid="template-preview" Class="rounded-lg">
-                                        <TrailingIcon><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14m-6-6 6 6-6 6" /></svg></TrailingIcon>
+                        }
+                    </div>
+                </div>
+
+                @* Active Template Metadata & Copy Bar *@
+                <div class="grid gap-4 border-t border-(--lux-border) bg-(--lux-bg) px-5 py-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:items-center">
+                    <div class="min-w-0">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="font-semibold text-(--lux-text-highlighted)">@_selected.Title</span>
+                            <LxBadge Label="@_selected.Category" Color="LxColor.Neutral" Variant="LxVariant.Subtle" Size="LxSize.Sm" />
+                            <LxBadge Label="@(IsReady(_selected) ? "Live ready" : "Starting")" Color="@(IsReady(_selected) ? LxColor.Success : LxColor.Warning)" Variant="LxVariant.Subtle" Size="LxSize.Sm" />
+                        </div>
+                        <p class="mt-1 text-sm text-(--lux-text-muted)">@_selected.Description</p>
+                    </div>
+
+                    <button type="button" data-copy-text="@_selected.RunCommand"
+                            class="group flex min-h-10 min-w-0 items-center justify-between gap-3 rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/50 px-3.5 py-2 font-mono text-xs text-(--lux-text-highlighted) transition-colors hover:border-(--lux-border-accented)">
+                        <span class="truncate"><span class="text-(--lux-text-muted)">$</span> @_selected.RunCommand</span>
+                        <span class="shrink-0 uppercase tracking-wider text-(--lux-text-muted) group-hover:text-(--lux-primary-text)" data-copy-label>Copy</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @* Curated 3x3 Template Gallery *@
+    <section id="gallery" aria-labelledby="gallery-heading" class="scroll-mt-24 border-b border-(--lux-border)">
+        <div class="mx-auto max-w-(--breakpoint-2xl) px-4 py-20 sm:px-6 lg:px-8">
+            <div class="flex flex-wrap items-end justify-between gap-6">
+                <div>
+                    <h2 id="gallery-heading" class="text-4xl font-semibold leading-none tracking-[-0.03em] text-(--lux-text-highlighted) sm:text-5xl">
+                        All 9 live templates.
+                    </h2>
+                    <p class="mt-3 max-w-xl text-base text-(--lux-text-muted)">
+                        Each demo shares your chosen locale cookie and runs in its own isolated .NET 10 process behind this site.
+                    </p>
+                </div>
+
+                @* Category Filter *@
+                <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Filter templates by category">
+                    @foreach (var cat in Categories)
+                    {
+                        var active = _category == cat.Key;
+                        <button type="button"
+                                class="@($"inline-flex min-h-8 items-center rounded-lg border px-3 py-1 font-mono text-xs transition-colors {(active ? "font-semibold" : "border-(--lux-border) bg-(--lux-bg) text-(--lux-text-muted) hover:text-(--lux-text-highlighted)")}")"
+                                style="@(active ? "background:var(--lib-pill-bg);border-color:var(--lib-pill-bg);color:#ffffff" : null)"
+                                @onclick="@(() => _category = cat.Key)">
+                            @cat.Label
+                        </button>
+                    }
+                </div>
+            </div>
+
+            <ul class="mt-10 grid gap-6 sm:grid-cols-2 xl:grid-cols-3" aria-label="Templates">
+                @foreach (var template in FilteredTemplates)
+                {
+                    var state = Demos.StateOf(template.Name);
+                    var ready = state == "ready";
+                    var source = Settings.SourceUrl(template);
+                    <li class="flex" data-testid="template-card" data-template="@template.Name">
+                        <article class="group flex w-full flex-col overflow-hidden rounded-2xl border border-(--lux-border) bg-(--lux-bg) transition-colors hover:border-(--lux-border-accented)"
+                                 aria-labelledby="@($"template-{template.Name}")">
+                            <a href="@template.DemoPath" data-enhance-nav="false" class="relative block aspect-[16/10] overflow-hidden border-b border-(--lux-border) bg-(--lux-bg-muted)">
+                                <LxImage Src="@template.Screenshot("light")" Provider="none" Alt="@($"The {template.Title} template, light mode")" Width="1280" Height="800" Loading="LxImageLoading.Lazy" Class="block h-full w-full object-cover object-top transition-transform duration-300 ease-out group-hover:scale-[1.02] dark:hidden" data-testid="template-screenshot-light" />
+                                <LxImage Src="@template.Screenshot("dark")" Provider="none" Alt="@($"The {template.Title} template, dark mode")" Width="1280" Height="800" Loading="LxImageLoading.Lazy" Class="hidden h-full w-full object-cover object-top transition-transform duration-300 ease-out group-hover:scale-[1.02] dark:block" data-testid="template-screenshot-dark" />
+                            </a>
+
+                            <div class="flex flex-1 flex-col p-5 sm:p-6">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div>
+                                        <h3 id="@($"template-{template.Name}")" class="text-xl font-semibold tracking-tight text-(--lux-text-highlighted)">@template.Title</h3>
+                                        <p class="mt-0.5 font-mono text-[11px] text-(--lux-text-muted)">@template.RenderMode</p>
+                                    </div>
+                                    <LxBadge Label="@(ready ? "Live demo" : "Starting")"
+                                             Color="@(ready ? LxColor.Success : LxColor.Warning)"
+                                             Variant="LxVariant.Subtle"
+                                             Size="LxSize.Sm"
+                                             data-testid="template-state" />
+                                </div>
+
+                                <p class="mt-3 text-sm leading-relaxed text-(--lux-text-muted) text-pretty">@template.Description</p>
+
+                                <ul class="mt-4 flex flex-col gap-1.5 border-t border-(--lux-border) pt-4 text-xs text-(--lux-text)" aria-label="@($"{template.Title} features")">
+                                    @foreach (var feature in template.Features)
+                                    {
+                                        <li class="flex gap-2">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 size-3.5 shrink-0" style="color:var(--lib-accent)" aria-hidden="true"><path d="m5 12 5 5L20 7" /></svg>
+                                            <span>@feature</span>
+                                        </li>
+                                    }
+                                </ul>
+
+                                <div class="mt-auto flex flex-wrap items-center gap-2 pt-5">
+                                    <LxButton Label="Preview Live" Href="@template.DemoPath" data-enhance-nav="false" data-testid="template-preview" Size="LxSize.Sm" Class="rounded-lg">
+                                        <TrailingIcon><svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14m-6-6 6 6-6 6" /></svg></TrailingIcon>
                                     </LxButton>
+                                    <LxButton Label="Inspect Here" Href="#theater" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" Size="LxSize.Sm" Class="rounded-lg" OnClick="@(() => SelectTemplate(template, activateLive: true))" />
                                     @if (source is not null)
                                     {
-                                        <LxButton Label="@($"Source of {template.Title}")" Href="@source" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" data-testid="template-source" Class="rounded-lg" />
+                                        <LxButton Label="Source" Href="@source" Color="LxColor.Neutral" Variant="ButtonVariant.Ghost" Size="LxSize.Sm" data-testid="template-source" Class="rounded-lg" />
                                     }
-                                    else
-                                    {
-                                        <span class="text-sm text-(--lux-text-muted)" data-testid="template-source-missing">Repository not published yet</span>
-                                    }
-                                }
-                                else if (template.HasDemo)
-                                {
-                                    <span class="text-sm text-(--lux-text-muted)" data-testid="template-offline">This demo is not running on this server</span>
-                                }
-                                else
-                                {
-                                    <span class="text-sm text-(--lux-text-muted)" data-testid="template-planned">No demo or source yet</span>
-                                }
+                                </div>
                             </div>
-                        </div>
-                    </article>
-                </li>
-            }
-        </ul>
-    </div>
-</section>
-
-@* How to start *@
-<section aria-labelledby="start" class="border-b border-(--lux-border)">
-    <div class="mx-auto grid max-w-(--breakpoint-2xl) gap-10 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:px-8 lg:py-28">
-        <div>
-            <h2 id="start" class="text-4xl font-semibold leading-none tracking-[-0.045em] text-(--lux-text-highlighted) sm:text-6xl">
-                Make it<br /><span class="pg-accent">your own.</span>
-            </h2>
-            <p class="mt-6 text-lg text-(--lux-text-muted) text-pretty">
-                Each template is meant to be a GitHub template repository: create your repository from it, then run <code class="font-mono text-base">rename.cs</code> once
-                to replace the template name with yours. It renames the solution, the projects, the namespaces and the native app id, then deletes itself.
-            </p>
-            <p class="mt-4 text-sm text-(--lux-text-muted)" data-testid="templates-repository-status">
-                @if (Settings.IsPublished)
-                {
-                    <text>The repositories are published: use the Source button of a template, or the commands on the right.</text>
+                        </article>
+                    </li>
                 }
-                else
-                {
-                    <text>The repositories are not published yet, so the commands on the right name a placeholder owner.</text>
-                }
-            </p>
+            </ul>
         </div>
-        <div class="flex flex-col gap-4">
-            <CodeBlock Title="Terminal" Code="@_startCommands" Class="rounded-2xl" />
-            <p class="text-sm text-(--lux-text-muted)">
-                Without the GitHub CLI, open the repository and press <strong class="font-semibold text-(--lux-text)">Use this template</strong>, clone the new repository, then run the last command.
-            </p>
-        </div>
-    </div>
-</section>
+    </section>
 
-@* Contribute *@
-<section aria-labelledby="contribute">
-    <div class="mx-auto max-w-(--breakpoint-2xl) px-4 py-16 sm:px-6 lg:px-8">
-        <details class="rounded-2xl border border-(--lux-border) p-5 sm:p-6" data-testid="templates-contribute">
-            <summary class="cursor-pointer text-lg font-semibold text-(--lux-text-highlighted)"><span id="contribute">Contribute: run a template from this repository</span></summary>
-            <div class="mt-4 flex flex-col gap-4 text-(--lux-text-muted)">
-                <p>
-                    The templates live in <code class="font-mono text-sm">templates/</code> of the lux-ui repository. Run one in place, or export it as a repository of its own,
-                    with a fresh git history, the way it will be published:
+    @* Official Lux.Templates (dotnet new) *@
+    <section id="dotnet-new" aria-labelledby="dotnet-new-heading" class="scroll-mt-24 border-b border-(--lux-border)">
+        <div class="mx-auto max-w-(--breakpoint-2xl) px-4 py-20 sm:px-6 lg:px-8">
+            <div class="grid gap-6 lg:grid-cols-2 lg:items-end">
+                <h2 id="dotnet-new-heading" class="text-4xl font-semibold leading-none tracking-[-0.03em] text-(--lux-text-highlighted) sm:text-5xl">
+                    Scaffold with<br /><span class="pg-accent">dotnet new.</span>
+                </h2>
+                <p class="max-w-prose text-base text-(--lux-text-muted) lg:justify-self-end">
+                    Install the official <code class="font-mono text-sm text-(--lux-text-highlighted)">Lux.Templates</code> package once to generate pre-wired Blazor Web, Enterprise Backoffice, NativeAOT API, or .NET MAUI Blazor Hybrid solutions with zero CSS setup.
                 </p>
-                <CodeBlock Title="Terminal" Code="@_contributeCommands" Class="rounded-xl" />
             </div>
-        </details>
-    </div>
-</section>
+
+            <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                @foreach (var tpl in TemplateRegistry.OfficialDotnetTemplates)
+                {
+                    <div class="flex min-w-0 flex-col border-t border-(--lux-border) pt-5">
+                        <span class="font-mono text-xs font-semibold" style="color:var(--lib-accent)">@tpl.ShortName</span>
+                        <h3 class="mt-2 text-lg font-semibold text-(--lux-text-highlighted)">@tpl.Title</h3>
+                        <p class="mt-1 flex-1 text-sm text-(--lux-text-muted)">@tpl.Target</p>
+                        <button type="button" data-copy-text="@tpl.Command"
+                                class="group mt-4 flex min-h-9 min-w-0 items-center justify-between gap-2 rounded-lg border border-(--lux-border) bg-(--pg-code-bg) px-3 py-2 font-mono text-[11px] text-[#d7dcde] hover:border-(--lux-border-accented)">
+                            <span class="truncate">$ @tpl.Command</span>
+                            <span class="shrink-0 uppercase text-[#9ca3af] group-hover:text-white" data-copy-label>Copy</span>
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+
+    @* Export & Contribute *@
+    <section aria-labelledby="start">
+        <div class="mx-auto grid max-w-(--breakpoint-2xl) gap-10 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:px-8">
+            <div>
+                <h2 id="start" class="text-3xl font-semibold leading-none tracking-[-0.025em] text-(--lux-text-highlighted) sm:text-5xl">
+                    Make it <span class="pg-accent">your own.</span>
+                </h2>
+                <p class="mt-5 max-w-prose text-base text-(--lux-text-muted) text-pretty">
+                    Every <code class="font-mono text-sm text-(--lux-text-highlighted)">lux-ui/templates/</code> app includes <code class="font-mono text-sm text-(--lux-text-highlighted)">rename.cs</code>: run it once to replace the template name across the solution, projects, namespaces, and native MAUI app ID, then delete itself.
+                </p>
+            </div>
+            <div class="min-w-0">
+                <CodeBlock Title="Run or export locally" Code="@_contributeCommands" Class="rounded-2xl border border-(--lux-border)" />
+            </div>
+        </div>
+    </section>
+</div>
 
 @code {
-    private IReadOnlyList<TemplateInfo> _available = [];
-    private IReadOnlyList<TemplateInfo> _planned = [];
-    private string _startCommands = "";
+    private static readonly (string Key, string Label)[] Categories =
+    [
+        ("All", "All (9)"),
+        ("Apps", "Apps & AI (4)"),
+        ("Marketing", "Marketing & SaaS (3)"),
+        ("Content", "Content & Docs (2)"),
+    ];
+
+    private static readonly (string Key, string Label)[] Viewports =
+    [
+        ("desktop", "Desktop"),
+        ("tablet", "768px"),
+        ("mobile", "390px"),
+    ];
 
     private const string _contributeCommands =
-        "dotnet run --project templates/starter/src/Starter.Web\nnode build/export-template.mjs starter ../my-app";
+        "dotnet new install Lux.Templates::0.1.0-preview.1\ndotnet run --project templates/dashboard/src/Dashboard.Web\nnode build/export-template.mjs dashboard ../my-app";
 
-    protected override void OnInitialized()
+    private TemplateInfo _selected = TemplateRegistry.All[0];
+    private string _category = "All";
+    private string _viewport = "desktop";
+    private bool _liveFrame;
+
+    private IEnumerable<TemplateInfo> FilteredTemplates =>
+        _category == "All"
+            ? TemplateRegistry.All
+            : TemplateRegistry.All.Where(t => t.Category == _category);
+
+    private string ViewportMaxWidth => _viewport switch
     {
-        _available = [.. TemplateRegistry.All.Where(t => t.HasDemo)];
-        _planned = [.. TemplateRegistry.All.Where(t => !t.HasDemo)];
-        var first = _available.FirstOrDefault();
-        var repository = first is null ? "<owner>/<repository>" : Settings.GitHubTemplate(first) ?? $"<owner>/{first.RepositoryName}";
-        _startCommands = $"gh repo create my-app --template {repository} --clone\ncd my-app\ndotnet run rename.cs MyApp";
+        "tablet" => "max-w-[768px]",
+        "mobile" => "max-w-[390px]",
+        _ => "max-w-full"
+    };
+
+    private bool IsReady(TemplateInfo template)
+    {
+        var state = Demos.StateOf(template.Name);
+        return state is not null and not "unavailable" and not "stopped";
     }
+
+    private void SelectTemplate(TemplateInfo template, bool activateLive)
+    {
+        _selected = template;
+        if (activateLive) _liveFrame = true;
+    }
+
+    private void ToggleLiveFrame() => _liveFrame = !_liveFrame;
 }
