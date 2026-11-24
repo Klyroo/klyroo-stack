@@ -1,9 +1,9 @@
 <div class="flex w-full flex-col items-center gap-4">
-    <BxAuthForm FormName="auth-verify" Title="Check your email" Description="We sent a 6-digit code to you@example.com."
+    <LxAuthForm FormName="auth-verify" Title="Check your email" Description="We sent a 6-digit code to you@example.com."
                 Fields="Fields" SubmitLabel="Verify" OnValidSubmit="VerifyAsync" FieldErrors="_fieldErrors" Enhance />
     @if (_verified)
     {
-        <p role="status" class="text-sm text-(--blux-success-text)" data-testid="auth-verified">Email verified.</p>
+        <p role="status" class="text-sm text-(--lux-success-text)" data-testid="auth-verified">Email verified.</p>
     }
 </div>
 
@@ -11,7 +11,7 @@
     private bool _verified;
     private IReadOnlyDictionary<string, string>? _fieldErrors;
 
-    private static readonly BxAuthField[] Fields =
+    private static readonly LxAuthField[] Fields =
     [
         new("code", "otp") { Label = "Verification code", Length = 6, Required = true, Help = "The code expires in 10 minutes." },
     ];

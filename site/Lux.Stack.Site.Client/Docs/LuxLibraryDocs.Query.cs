@@ -462,7 +462,7 @@ public static partial class LuxLibraryDocs
                         Paragraphs:
                         [
                             "schema.ExecuteInMemory(items, request) evaluates search, nested filter trees, natural text sorting, nulls-last ordering, facets, and offset/cursor paging in one deterministic pass.",
-                            "For components expecting an async DataListProvider<T> delegate (like Lux.Table's BxDataList), call schema.InMemoryProvider(items) to get a ready-to-use provider."
+                            "For components expecting an async DataListProvider<T> delegate (like Lux.Table's LxDataList), call schema.InMemoryProvider(items) to get a ready-to-use provider."
                         ],
                         CodeSamples:
                         [
@@ -594,7 +594,7 @@ public static partial class LuxLibraryDocs
                                 @implements IDisposable
 
                                 <div class="flex flex-wrap items-center gap-3">
-                                    <BxInput Value="@_filters.Value.Search"
+                                    <LxInput Value="@_filters.Value.Search"
                                              ValueChanged="@(v => _filters.Update(f => f with { Search = v, Page = 1 }, QueryHistory.Replace))"
                                              Placeholder="Search..." />
 
@@ -639,13 +639,13 @@ public static partial class LuxLibraryDocs
             // GROUP 4: INTEGRATIONS WITH OTHER LUXSTACK LIBRARIES
             // =========================================================================
             new("integrations-table", "Integration: Lux.Table", "Integrations",
-                "Lux.Table (BxDataList<TItem>) is built directly on top of Lux.Query — sharing DataListSchema<T>, DataListProvider<T>, QueryState URL synchronization, facets, and cursor infinite scroll.",
+                "Lux.Table (LxDataList<TItem>) is built directly on top of Lux.Query — sharing DataListSchema<T>, DataListProvider<T>, QueryState URL synchronization, facets, and cursor infinite scroll.",
                 [
-                    new("table-shared-schema", "1. How BxDataList<T> Uses DataListSchema & DataListProvider",
+                    new("table-shared-schema", "1. How LxDataList<T> Uses DataListSchema & DataListProvider",
                         Paragraphs:
                         [
-                            "Pass any DataListSchema<T> from Lux.Query.Core directly to <BxDataList>. You can feed it either an in-memory collection via Items=\"@_rows\" (internally backed by schema.InMemoryProvider) OR an async server/HTTP DataListProvider<T> delegate via Provider=\"@LoadPageAsync\".",
-                            "When UrlSync=\"true\" (the default), BxDataList automatically claims a URL prefix in QueryState, reads/writes DataListStateQuery parameters (?q=&p=&s=&f.*=), handles Browser Back/Forward, and renders SSR-safe links."
+                            "Pass any DataListSchema<T> from Lux.Query.Core directly to <LxDataList>. You can feed it either an in-memory collection via Items=\"@_rows\" (internally backed by schema.InMemoryProvider) OR an async server/HTTP DataListProvider<T> delegate via Provider=\"@LoadPageAsync\".",
+                            "When UrlSync=\"true\" (the default), LxDataList automatically claims a URL prefix in QueryState, reads/writes DataListStateQuery parameters (?q=&p=&s=&f.*=), handles Browser Back/Forward, and renders SSR-safe links."
                         ],
                         CodeSamples:
                         [
@@ -654,22 +654,22 @@ public static partial class LuxLibraryDocs
                                 @using Lux.Table
                                 @inject HttpClient Http
 
-                                <BxDataList TItem="Employee"
+                                <LxDataList TItem="Employee"
                                             Schema="@EmployeeSchemas.Directory"
                                             Provider="@LoadEmployeesAsync"
                                             UrlSync="true"
                                             UrlPrefix="emp">
-                                    <BxDataListToolbar TItem="Employee" />
-                                    <BxDataListFilterPanel TItem="Employee" />
+                                    <LxDataListToolbar TItem="Employee" />
+                                    <LxDataListFilterPanel TItem="Employee" />
 
-                                    <BxDataListTable TItem="Employee" HeaderMenu="true" ShowProgressLine="true">
-                                        <BxDataListColumn TItem="Employee" Field="name" Title="Name" />
-                                        <BxDataListColumn TItem="Employee" Field="dept" Title="Department" />
-                                        <BxDataListColumn TItem="Employee" Field="salary" Title="Salary" Summary="DataListSummaryKind.Sum" />
-                                    </BxDataListTable>
+                                    <LxDataListTable TItem="Employee" HeaderMenu="true" ShowProgressLine="true">
+                                        <LxDataListColumn TItem="Employee" Field="name" Title="Name" />
+                                        <LxDataListColumn TItem="Employee" Field="dept" Title="Department" />
+                                        <LxDataListColumn TItem="Employee" Field="salary" Title="Salary" Summary="DataListSummaryKind.Sum" />
+                                    </LxDataListTable>
 
-                                    <BxDataListPagination TItem="Employee" />
-                                </BxDataList>
+                                    <LxDataListPagination TItem="Employee" />
+                                </LxDataList>
 
                                 @code {
                                     private async ValueTask<DataListResult<Employee>> LoadEmployeesAsync(
@@ -684,33 +684,33 @@ public static partial class LuxLibraryDocs
                                 """)
                         ]),
                     new("table-multi-prefix", "2. Hosting Two Independent Tables on One Page (UrlPrefix)",
-                        Paragraphs: ["Because BxDataList registers a QueryClaim via QueryState, placing two lists on the same page without distinct UrlPrefix values throws an immediate conflict diagnostic instead of silently corrupting each other's URL keys."],
+                        Paragraphs: ["Because LxDataList registers a QueryClaim via QueryState, placing two lists on the same page without distinct UrlPrefix values throws an immediate conflict diagnostic instead of silently corrupting each other's URL keys."],
                         CodeSamples:
                         [
                             new("DualTables.razor", """
                                 @* URL stays cleanly isolated: ?active.p=2&active.s=-salary&pending.q=alice *@
-                                <BxDataList TItem="Employee" Schema="@EmployeeSchemas.Directory" Items="@_active" UrlPrefix="active">
-                                    <BxDataListTable TItem="Employee" />
-                                </BxDataList>
+                                <LxDataList TItem="Employee" Schema="@EmployeeSchemas.Directory" Items="@_active" UrlPrefix="active">
+                                    <LxDataListTable TItem="Employee" />
+                                </LxDataList>
 
-                                <BxDataList TItem="Employee" Schema="@EmployeeSchemas.Directory" Items="@_pending" UrlPrefix="pending">
-                                    <BxDataListTable TItem="Employee" />
-                                </BxDataList>
+                                <LxDataList TItem="Employee" Schema="@EmployeeSchemas.Directory" Items="@_pending" UrlPrefix="pending">
+                                    <LxDataListTable TItem="Employee" />
+                                </LxDataList>
                                 """)
                         ]),
                     new("table-cursor-facets", "3. Keyset Cursor Infinite Scroll & Facet Sidebars",
-                        Paragraphs: ["Set CursorPaging=\"true\" on BxDataList and swap <BxDataListPagination> for <BxDataListLoadMore> — Lux.Query automatically passes DataListPaging.Cursor(After, Take) and populates NextCursor. Any field configured with .WithFacets() in DataListSchema automatically renders live bucket counts inside <BxDataListFilterPanel>."],
+                        Paragraphs: ["Set CursorPaging=\"true\" on LxDataList and swap <LxDataListPagination> for <LxDataListLoadMore> — Lux.Query automatically passes DataListPaging.Cursor(After, Take) and populates NextCursor. Any field configured with .WithFacets() in DataListSchema automatically renders live bucket counts inside <LxDataListFilterPanel>."],
                         CodeSamples:
                         [
                             new("InfiniteFeed.razor", """
-                                <BxDataList TItem="Employee"
+                                <LxDataList TItem="Employee"
                                             Schema="@EmployeeSchemas.Directory"
                                             Provider="@LoadEmployeesAsync"
                                             CursorPaging="true">
-                                    <BxDataListFilterPanel TItem="Employee" />
-                                    <BxDataListGrid TItem="Employee" />
-                                    <BxDataListLoadMore TItem="Employee" />
-                                </BxDataList>
+                                    <LxDataListFilterPanel TItem="Employee" />
+                                    <LxDataListGrid TItem="Employee" />
+                                    <LxDataListLoadMore TItem="Employee" />
+                                </LxDataList>
                                 """)
                         ])
                 ]),
@@ -731,10 +731,10 @@ public static partial class LuxLibraryDocs
                                 @inject QueryState Query
                                 @implements IDisposable
 
-                                <BxDashboardPage Controller="@_dashboard" Title="Revenue Analytics">
-                                    <BxDashboardStats Columns="3" Items="@_kpis.Data" />
-                                    <BxDashboardTable Title="Top Accounts" Columns="@_cols" Rows="@_topRows.Data" />
-                                </BxDashboardPage>
+                                <LxDashboardPage Controller="@_dashboard" Title="Revenue Analytics">
+                                    <LxDashboardStats Columns="3" Items="@_kpis.Data" />
+                                    <LxDashboardTable Title="Top Accounts" Columns="@_cols" Rows="@_topRows.Data" />
+                                </LxDashboardPage>
 
                                 @code {
                                     private sealed record DashFilter(string Period, string Region, bool ActiveOnly);
@@ -777,7 +777,7 @@ public static partial class LuxLibraryDocs
                     new("form-integration", "2. Lux.Query + Lux.Form (Advanced Search Drawer → Filter AST)",
                         Paragraphs:
                         [
-                            "For complex multi-criteria search dialogs (min/max budgets, date ranges, multi-select tags, conditional fields), render a Lux.Form schema inside a Drawer via FormService.CreateFormAsync or <BxFormEngine>, then translate the validated dictionary into FilterRule[] and write it cleanly to QueryState via DataListStateQuery.ToQuery."
+                            "For complex multi-criteria search dialogs (min/max budgets, date ranges, multi-select tags, conditional fields), render a Lux.Form schema inside a Drawer via FormService.CreateFormAsync or <LxFormEngine>, then translate the validated dictionary into FilterRule[] and write it cleanly to QueryState via DataListStateQuery.ToQuery."
                         ],
                         CodeSamples:
                         [
@@ -825,7 +825,7 @@ public static partial class LuxLibraryDocs
                     new("ui-integration", "1. Lux.Query + Lux.UI (Tabs, Inputs, Pagination & Zero-JS SSR Links)",
                         Paragraphs:
                         [
-                            "Any Lux.UI component — BxTabs, BxInput, BxSelectMenu, BxSwitch, BxPagination — binds cleanly to QueryValue<T> or QueryGroup<TRecord>. Because QueryValue<T>.HrefWith(...) builds valid query URLs without JS, your navigation works identically in Static SSR, Server, WASM, and MAUI."
+                            "Any Lux.UI component — LxTabs, LxInput, LxSelectMenu, LxSwitch, LxPagination — binds cleanly to QueryValue<T> or QueryGroup<TRecord>. Because QueryValue<T>.HrefWith(...) builds valid query URLs without JS, your navigation works identically in Static SSR, Server, WASM, and MAUI."
                         ],
                         CodeSamples:
                         [
@@ -835,7 +835,7 @@ public static partial class LuxLibraryDocs
                                 @inject QueryState Query
                                 @implements IDisposable
 
-                                <BxTabs Value="@_tab.Value"
+                                <LxTabs Value="@_tab.Value"
                                         ValueChanged="@(v => _tab.Set(v, QueryHistory.Push))"
                                         Items="@([
                                             new TabItem("overview", "Overview"),
@@ -845,7 +845,7 @@ public static partial class LuxLibraryDocs
 
                                 <div class="mt-4 flex gap-2">
                                     @* Works with zero JavaScript in Static SSR too *@
-                                    <BxButton Label="Go to Billing" Href="@_tab.HrefWith("billing")" Variant="ButtonVariant.Outline" />
+                                    <LxButton Label="Go to Billing" Href="@_tab.HrefWith("billing")" Variant="ButtonVariant.Outline" />
                                 </div>
 
                                 @code {
@@ -863,7 +863,7 @@ public static partial class LuxLibraryDocs
                                 """)
                         ]),
                     new("display-integration", "2. Lux.Query + Lux.Display (Live Result & Facet Summary Cards)",
-                        Paragraphs: ["Feed DataListResult<T>.TotalCount and DataListResult<T>.Facets directly into BxDisplay Stat and Facts blocks so summary ribbons stay synchronized with the active query."],
+                        Paragraphs: ["Feed DataListResult<T>.TotalCount and DataListResult<T>.Facets directly into LxDisplay Stat and Facts blocks so summary ribbons stay synchronized with the active query."],
                         CodeSamples:
                         [
                             new("DisplayFromQuery.razor", """
@@ -871,11 +871,11 @@ public static partial class LuxLibraryDocs
                                 @using Lux.Display
 
                                 <div class="grid gap-4 sm:grid-cols-2">
-                                    <BxDisplay Kind="DisplayKind.Stat"
+                                    <LxDisplay Kind="DisplayKind.Stat"
                                                Title="Matching Employees"
                                                Value="@(_result.TotalCount?.ToString("N0") ?? "—")" />
 
-                                    <BxDisplay Kind="DisplayKind.Facts"
+                                    <LxDisplay Kind="DisplayKind.Facts"
                                                Title="Breakdown by Department"
                                                Facts="@([.. (_result.Facets?.FirstOrDefault()?.Options ?? [])
                                                    .Select(o => new DisplayFact { Label = o.Value, Value = $"{o.Count} people" })])" />
@@ -939,7 +939,7 @@ public static partial class LuxLibraryDocs
                         [
                             new("MyApp.Shared", "Lux.Query.Core", "DTO records (EmployeeDto) and static DataListSchema<EmployeeDto> definitions."),
                             new("MyApp.Server", "MyApp.Shared, Lux.Query.EntityFrameworkCore", "EF Core DbContext + Minimal API POST /api/employees/query using schema.Apply + EfAsyncQueryExecutor + DataListJsonContext."),
-                            new("MyApp.Client / MyApp.Maui", "MyApp.Shared, Lux.Query, Lux.Table", "Typed HttpClient DataListProvider<EmployeeDto> wired into <BxDataList> or custom UI with QueryState URL sync.")
+                            new("MyApp.Client / MyApp.Maui", "MyApp.Shared, Lux.Query, Lux.Table", "Typed HttpClient DataListProvider<EmployeeDto> wired into <LxDataList> or custom UI with QueryState URL sync.")
                         ]),
                     new("fullstack-code", "End-to-End Shared Schema, Server Endpoint & Client Provider",
                         CodeSamples:

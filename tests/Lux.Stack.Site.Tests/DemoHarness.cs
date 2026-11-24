@@ -41,7 +41,7 @@ public sealed class DemoHarness : IAsyncDisposable
 
     public static async Task<DemoHarness> StartAsync(double livenessSeconds = 1, bool waitReady = true, bool populate = true)
     {
-        var root = Path.Combine(Path.GetTempPath(), "blux-demo-tests-" + Guid.NewGuid().ToString("N"));
+        var root = Path.Combine(Path.GetTempPath(), "lux-demo-tests-" + Guid.NewGuid().ToString("N"));
         var fakeOutput = FakeDemoOutput();
         var port = FreePort();
         var url = $"http://127.0.0.1:{port}";
@@ -51,9 +51,9 @@ public sealed class DemoHarness : IAsyncDisposable
         builder.Logging.ClearProviders();
         builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["Blux:Templates:PublishRoot"] = root,
-            ["Blux:Templates:StartupTimeoutSeconds"] = "60",
-            ["Blux:Templates:LivenessIntervalSeconds"] = livenessSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture),
+            ["Lux:Templates:PublishRoot"] = root,
+            ["Lux:Templates:StartupTimeoutSeconds"] = "60",
+            ["Lux:Templates:LivenessIntervalSeconds"] = livenessSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture),
         });
         var template = new TemplateInfo(Name, "Fake", "A fake demo.", [], TemplateStatus.Available, WebProject: "unused", WebAssembly: "FakeDemo");
         builder.Services.AddTemplateDemos(builder.Configuration, [template]);

@@ -11,7 +11,7 @@ public class DataListCursorTests(PlaygroundServer server) : PlaygroundTest(serve
     private async Task OpenPage(string mode, string query = "")
     {
         await Page.GotoAsync($"/{mode}/components/data-list-cursor{query}");
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-infinite-scroll')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-infinite-scroll')");
         if (mode != "ssr")
         {
             await Assertions.Expect(Page.GetByTestId("renderer")).ToHaveAttributeAsync("data-interactive", "true", new() { Timeout = 30_000 });

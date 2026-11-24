@@ -18,13 +18,13 @@ public sealed class StackIntegrationTests : BunitContext
     {
         Assert.Equal(8, LuxStackCatalog.Modules.Count);
 
-        Assert.Equal("lux-ui", LuxStackCatalog.ResolveComponentModule("BxButton")?.Id);
+        Assert.Equal("lux-ui", LuxStackCatalog.ResolveComponentModule("LxButton")?.Id);
         Assert.Equal("lux-query", LuxStackCatalog.ResolveComponentModule("QueryState")?.Id);
-        Assert.Equal("lux-table", LuxStackCatalog.ResolveComponentModule("BxDataList<Person>")?.Id);
-        Assert.Equal("lux-form", LuxStackCatalog.ResolveComponentModule("BxFormEngine")?.Id);
-        Assert.Equal("lux-dashboard", LuxStackCatalog.ResolveComponentModule("BxDashboardPage")?.Id);
-        Assert.Equal("lux-display", LuxStackCatalog.ResolveComponentModule("BxDisplay")?.Id);
-        Assert.Equal("lux-spreadsheet", LuxStackCatalog.ResolveComponentModule("BxSpreadsheetImport")?.Id);
+        Assert.Equal("lux-table", LuxStackCatalog.ResolveComponentModule("LxDataList<Person>")?.Id);
+        Assert.Equal("lux-form", LuxStackCatalog.ResolveComponentModule("LxFormEngine")?.Id);
+        Assert.Equal("lux-dashboard", LuxStackCatalog.ResolveComponentModule("LxDashboardPage")?.Id);
+        Assert.Equal("lux-display", LuxStackCatalog.ResolveComponentModule("LxDisplay")?.Id);
+        Assert.Equal("lux-spreadsheet", LuxStackCatalog.ResolveComponentModule("LxSpreadsheetImport")?.Id);
         Assert.Equal("lux-agent", LuxStackCatalog.ResolveComponentModule("AgentBridgeService")?.Id);
     }
 
@@ -45,7 +45,7 @@ public sealed class StackIntegrationTests : BunitContext
         var form = new FormController(new FormSchema
         {
             Title = "Quick Setup",
-            Fields = [new FormFieldSchema { Key = "org", Label = "Organization", DefaultValue = "Blux" }]
+            Fields = [new FormFieldSchema { Key = "org", Label = "Organization", DefaultValue = "Lux" }]
         });
         var dashboard = new DashboardController("metrics");
         var importer = new SpreadsheetImporter(new SpreadsheetSchema

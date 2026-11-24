@@ -2,10 +2,10 @@ using System.Text.RegularExpressions;
 
 namespace Lux.Stack.E2E;
 
-/// <summary>BxInputMenu with an OptionsProvider: debounced search while typing, paging, a strict value restored by ResolveSelected, error and short-text states.</summary>
+/// <summary>LxInputMenu with an OptionsProvider: debounced search while typing, paging, a strict value restored by ResolveSelected, error and short-text states.</summary>
 public class RemoteInputMenuTests(PlaygroundServer server) : PlaygroundTest(server)
 {
-    private ILocator Menu(string testId) => Page.Locator($"bx-input-menu:has([data-testid={testId}])");
+    private ILocator Menu(string testId) => Page.Locator($"lx-input-menu:has([data-testid={testId}])");
     private ILocator Input(string testId) => Page.GetByTestId(testId);
     private static ILocator Options(ILocator menu) => menu.GetByRole(AriaRole.Option);
 
@@ -203,7 +203,7 @@ public class RemoteInputMenuTests(PlaygroundServer server) : PlaygroundTest(serv
         await Input("remote-free").ClickAsync();
         await Input("remote-free").PressSequentiallyAsync("Par");
         await Page.WaitForTimeoutAsync(300);
-        await Assertions.Expect(Page.Locator("bx-input-menu [data-slot=content]:popover-open")).ToHaveCountAsync(0);
+        await Assertions.Expect(Page.Locator("lx-input-menu [data-slot=content]:popover-open")).ToHaveCountAsync(0);
 
         await EnhancedReload();
 

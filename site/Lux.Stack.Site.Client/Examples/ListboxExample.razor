@@ -1,14 +1,14 @@
 <div class="flex w-full flex-col gap-6 sm:flex-row sm:gap-12">
     <div class="w-full max-w-xs">
-        <BxFormField Label="Fruit">
-            <BxListbox Items="Fruits" @bind-Value="_fruit" />
-        </BxFormField>
-        <p class="mt-2 text-sm text-(--blux-text-muted)" data-testid="listbox-state">Fruit: @(_fruit.Count > 0 ? _fruit[0] : "none")</p>
+        <LxFormField Label="Fruit">
+            <LxListbox Items="Fruits" @bind-Value="_fruit" />
+        </LxFormField>
+        <p class="mt-2 text-sm text-(--lux-text-muted)" data-testid="listbox-state">Fruit: @(_fruit.Count > 0 ? _fruit[0] : "none")</p>
     </div>
     <div class="w-full max-w-xs">
-        <BxFormField Label="Toppings">
-            <BxListbox Items="Toppings" Multiple @bind-Value="_toppings" />
-        </BxFormField>
+        <LxFormField Label="Toppings">
+            <LxListbox Items="Toppings" Multiple @bind-Value="_toppings" />
+        </LxFormField>
     </div>
 </div>
 
@@ -16,6 +16,6 @@
     private IReadOnlyList<string> _fruit = [];
     private IReadOnlyList<string> _toppings = ["cheese"];
 
-    private static readonly BxSelectItem[] Fruits = [new("apple", "Apple"), new("banana", "Banana"), new("cherry", "Cherry"), new("grape", "Grape")];
-    private static readonly BxSelectItem[] Toppings = [new("cheese", "Cheese"), new("ham", "Ham"), new("olives", "Olives"), new("pepper", "Pepper")];
+    private static readonly LxSelectItem[] Fruits = [new("apple", "Apple"), new("banana", "Banana"), new("cherry", "Cherry"), new("grape", "Grape")];
+    private static readonly LxSelectItem[] Toppings = [new("cheese", "Cheese"), new("ham", "Ham"), new("olives", "Olives"), new("pepper", "Pepper")];
 }

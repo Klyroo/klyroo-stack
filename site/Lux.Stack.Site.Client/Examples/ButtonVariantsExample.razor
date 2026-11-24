@@ -4,13 +4,13 @@
         <div class="flex flex-wrap gap-2">
             @foreach (var variant in Enum.GetValues<ButtonVariant>())
             {
-                <BxButton Color="color" Variant="variant" Label="@($"{color} {variant}")" />
+                <LxButton Color="color" Variant="variant" Label="@($"{color} {variant}")" />
             }
         </div>
     }
 </div>
 
 @code {
-    private static readonly BxColor[] Colors =
-        [BxColor.Primary, BxColor.Secondary, BxColor.Success, BxColor.Info, BxColor.Warning, BxColor.Error, BxColor.Neutral];
+    private static readonly LxColor[] Colors =
+        [LxColor.Primary, LxColor.Secondary, LxColor.Success, LxColor.Info, LxColor.Warning, LxColor.Error, LxColor.Neutral];
 }

@@ -1,10 +1,10 @@
 @using Lux.UI.Theming
 <div class="flex flex-wrap items-center gap-3">
-    <BxButton Label="Default" data-testid="theme-default" />
-    <BxTheme For="typeof(BxButton)" Ui="_bold">
-        <BxButton Label="Themed" data-testid="theme-button" />
-        <BxButton Label="Instance wins" Ui='new ButtonUi { Base = "font-normal normal-case tracking-normal" }' data-testid="theme-instance" />
-    </BxTheme>
+    <LxButton Label="Default" data-testid="theme-default" />
+    <LxTheme For="typeof(LxButton)" Ui="_bold">
+        <LxButton Label="Themed" data-testid="theme-button" />
+        <LxButton Label="Instance wins" Ui='new ButtonUi { Base = "font-normal normal-case tracking-normal" }' data-testid="theme-instance" />
+    </LxTheme>
 </div>
 
 @code {

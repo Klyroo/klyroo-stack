@@ -54,7 +54,7 @@ public static class ApiReader
             Enum e => $"{e.GetType().Name}.{e}",
             TimeSpan t => t.ToString(),
             int or double => value.ToString(),
-            Lux.UI.BxColor c => $"\"{c.Value}\"",
+            Lux.UI.LxColor c => $"\"{c.Value}\"",
             _ => null,
         };
     }

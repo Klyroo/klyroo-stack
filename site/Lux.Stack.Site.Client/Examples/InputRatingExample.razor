@@ -1,12 +1,12 @@
 <div class="flex flex-col items-start gap-4">
-    <BxFormField Label="Your rating">
-        <BxInputRating @bind-Value="_rating" />
-    </BxFormField>
-    <BxFormField Label="With halves">
-        <BxInputRating AllowHalf Value="3.5" Color="BxColor.Warning" />
-    </BxFormField>
-    <BxInputRating ReadOnly Value="4" AriaLabel="Average rating" Size="BxSize.Sm" />
-    <p class="text-sm text-(--blux-text-muted)" data-testid="rating-state">Rating: @_rating</p>
+    <LxFormField Label="Your rating">
+        <LxInputRating @bind-Value="_rating" />
+    </LxFormField>
+    <LxFormField Label="With halves">
+        <LxInputRating AllowHalf Value="3.5" Color="LxColor.Warning" />
+    </LxFormField>
+    <LxInputRating ReadOnly Value="4" AriaLabel="Average rating" Size="LxSize.Sm" />
+    <p class="text-sm text-(--lux-text-muted)" data-testid="rating-state">Rating: @_rating</p>
 </div>
 
 @code {

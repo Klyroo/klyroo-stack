@@ -106,7 +106,7 @@ public class TemplateWatchdogTests
         try
         {
             using var http = new HttpClient();
-            using var status = JsonDocument.Parse(await http.GetStringAsync(baseUrl + "/_blux/templates/status", TestContext.Current.CancellationToken));
+            using var status = JsonDocument.Parse(await http.GetStringAsync(baseUrl + "/_lux/templates/status", TestContext.Current.CancellationToken));
             var pids = status.RootElement.EnumerateArray().Where(e => e.TryGetProperty("pid", out var pid) && pid.ValueKind == JsonValueKind.Number).Select(e => e.GetProperty("pid").GetInt32()).ToList();
             if (pids.Count == 0)
             {

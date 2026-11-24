@@ -41,7 +41,7 @@ public class DashboardTests(PlaygroundServer server) : PlaygroundTest(server)
     private async Task Reload(string mode)
     {
         await Page.ReloadAsync();
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-dashboard-group')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-dashboard-group')");
         if (mode != "ssr")
         {
             await Assertions.Expect(Page.GetByTestId("renderer")).ToHaveAttributeAsync("data-interactive", "true", new() { Timeout = 30_000 });
@@ -70,7 +70,7 @@ public class DashboardTests(PlaygroundServer server) : PlaygroundTest(server)
         await Assertions.Expect(sidebar).ToHaveAttributeAsync("data-state", "collapsed");
         await Assertions.Expect(collapse).ToHaveAttributeAsync("aria-expanded", "false");
         await Assertions.Expect(sidebar).ToHaveCSSAsync("width", "64px");
-        await ExpectCookie("blux-sidebar-playground-dashboard", "1");
+        await ExpectCookie("lux-sidebar-playground-dashboard", "1");
         // Collapsed to icons, the links and the search button keep their names.
         await Assertions.Expect(sidebar.GetByRole(AriaRole.Link, new() { Name = "Inbox" })).ToBeVisibleAsync();
         await Assertions.Expect(sidebar.GetByRole(AriaRole.Button, new() { Name = "Search" })).ToBeVisibleAsync();
@@ -84,7 +84,7 @@ public class DashboardTests(PlaygroundServer server) : PlaygroundTest(server)
         await collapse.ClickAsync();
         await Assertions.Expect(sidebar).ToHaveAttributeAsync("data-state", "expanded");
         await Assertions.Expect(collapse).ToHaveAttributeAsync("aria-expanded", "true");
-        await ExpectCookie("blux-sidebar-playground-dashboard", "0");
+        await ExpectCookie("lux-sidebar-playground-dashboard", "0");
     }
 
     [Fact]
@@ -124,7 +124,7 @@ public class DashboardTests(PlaygroundServer server) : PlaygroundTest(server)
         await Page.Keyboard.PressAsync("ArrowRight");
 
         await Assertions.Expect(sidebar).ToHaveCSSAsync("width", "240px");
-        await ExpectCookie("blux-sidebar-playground-dashboard-sidebar-width", "240");
+        await ExpectCookie("lux-sidebar-playground-dashboard-sidebar-width", "240");
 
         await Reload(mode);
 
@@ -205,7 +205,7 @@ public class DashboardTests(PlaygroundServer server) : PlaygroundTest(server)
         await Assertions.Expect(detail).ToHaveAttributeAsync("aria-valuenow", "55");
         await Assertions.Expect(Page.GetByTestId("dashboard-panel-list")).ToHaveCSSAsync("flex-grow", "20");
         await Assertions.Expect(Page.GetByTestId("dashboard-panel-detail")).ToHaveCSSAsync("flex-grow", "55");
-        Assert.Equal("20,55,25", await Stored("blux:dashboard:playground-dashboard-panels:panels"));
+        Assert.Equal("20,55,25", await Stored("lux:dashboard:playground-dashboard-panels:panels"));
 
         // The second handle stops at the minimum of the panel it resizes.
         await detail.FocusAsync();
@@ -233,7 +233,7 @@ public class DashboardTests(PlaygroundServer server) : PlaygroundTest(server)
 
         var value = int.Parse((await handle.GetAttributeAsync("aria-valuenow"))!);
         Assert.InRange(value, 26, 40);
-        Assert.NotNull(await Stored("blux:dashboard:playground-dashboard-panels:panels"));
+        Assert.NotNull(await Stored("lux:dashboard:playground-dashboard-panels:panels"));
     }
 
     [Theory]
@@ -270,7 +270,7 @@ public class DashboardTests(PlaygroundServer server) : PlaygroundTest(server)
         await Page.GetByTestId("dashboard-bound-set").ClickAsync();
         await Assertions.Expect(sizes).ToHaveTextAsync("Sizes: 25,75");
         await Assertions.Expect(handle).ToHaveAttributeAsync("aria-valuenow", "25");
-        await Assertions.Expect(Page.GetByTestId("dashboard-bound").Locator("[data-bx-dash-panel]").First).ToHaveCSSAsync("flex-grow", "25");
+        await Assertions.Expect(Page.GetByTestId("dashboard-bound").Locator("[data-lx-dash-panel]").First).ToHaveCSSAsync("flex-grow", "25");
 
         await Page.GetByTestId("dashboard-bound-collapse").ClickAsync();
         await Assertions.Expect(collapsed).ToHaveTextAsync("Collapsed: true");
@@ -355,14 +355,14 @@ public class DashboardTests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task Search_button_hint_says_Ctrl_on_other_platforms_and_the_command_key_on_Apple()
     {
         await Open("ssr", "dashboard-search-button");
-        var kbd = Page.GetByTestId("dashboard-search-example-button").Locator("kbd[data-bx-mod]");
+        var kbd = Page.GetByTestId("dashboard-search-example-button").Locator("kbd[data-lx-mod]");
         Assert.Equal("\"Ctrl\"", await kbd.EvaluateAsync<string>("e => getComputedStyle(e, '::before').content"));
         await Assertions.Expect(Page.GetByTestId("dashboard-search-example-button")).ToHaveAttributeAsync("aria-keyshortcuts", "Control+K Meta+K");
 
         var apple = await NewApplePage();
         await apple.GotoAsync("/ssr/components/dashboard-search-button");
-        await apple.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
-        var appleKbd = apple.GetByTestId("dashboard-search-example-button").Locator("kbd[data-bx-mod]");
+        await apple.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
+        var appleKbd = apple.GetByTestId("dashboard-search-example-button").Locator("kbd[data-lx-mod]");
 
         Assert.Equal("\"⌘\"", await appleKbd.EvaluateAsync<string>("e => getComputedStyle(e, '::before').content"));
     }
@@ -370,7 +370,7 @@ public class DashboardTests(PlaygroundServer server) : PlaygroundTest(server)
     // ---- Review findings (second review of waves C and D)
 
     private Task<string[]> FirstGroupFlex() =>
-        Page.EvaluateAsync<string[]>("() => [...document.querySelector('bx-dashboard-group').querySelectorAll('[data-bx-dash-panel]')].map((p) => p.style.flex)");
+        Page.EvaluateAsync<string[]>("() => [...document.querySelector('lx-dashboard-group').querySelectorAll('[data-lx-dash-panel]')].map((p) => p.style.flex)");
 
     [Fact]
     public async Task Group_takes_the_sizes_of_the_dashboard_it_becomes_after_an_enhanced_navigation()
@@ -395,9 +395,9 @@ public class DashboardTests(PlaygroundServer server) : PlaygroundTest(server)
         var sizes = Page.GetByTestId("dashboard-bound-sizes");
         await Assertions.Expect(sizes).ToHaveTextAsync("Sizes: 40,60");
 
-        // Any component inside the group may report a bx-change: its value is not the sizes of the panels.
+        // Any component inside the group may report a lx-change: its value is not the sizes of the panels.
         await Page.GetByTestId("dashboard-bound-sidebar").EvaluateAsync(
-            "e => e.dispatchEvent(new CustomEvent('bx-change', { bubbles: true, detail: { value: '10,90', sequence: 99 } }))");
+            "e => e.dispatchEvent(new CustomEvent('lx-change', { bubbles: true, detail: { value: '10,90', sequence: 99 } }))");
         await Page.WaitForTimeoutAsync(500);
 
         await Assertions.Expect(sizes).ToHaveTextAsync("Sizes: 40,60");

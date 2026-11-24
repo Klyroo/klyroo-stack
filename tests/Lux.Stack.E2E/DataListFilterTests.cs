@@ -12,7 +12,7 @@ public class DataListFilterTests(PlaygroundServer server) : PlaygroundTest(serve
     private async Task OpenList(string mode, string query = "")
     {
         await Page.GotoAsync($"/{mode}/components/data-list-filters{query}");
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
         if (mode != "ssr")
         {
             await Assertions.Expect(Page.GetByTestId("renderer")).ToHaveAttributeAsync("data-interactive", "true", new() { Timeout = 30_000 });

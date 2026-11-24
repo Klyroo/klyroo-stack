@@ -61,20 +61,20 @@ internal static class DashboardChecks
         if (!string.IsNullOrEmpty(pathBase)) Assert.All(cookies, c => Assert.Contains("~~", c.Name));
 
         // The response of the server, before any script: it has the style of the chosen colors (the same as the live page has after the choice).
-        var live = await page.EvaluateAsync<string>("() => [...document.querySelectorAll('style[data-bx-theme]')].map(e => e.textContent).join('')");
+        var live = await page.EvaluateAsync<string>("() => [...document.querySelectorAll('style[data-lx-theme]')].map(e => e.textContent).join('')");
         var html = await (await page.Context.APIRequest.GetAsync("customers")).TextAsync();
-        Assert.Contains("data-bx-theme", html);
-        var themed = System.Text.RegularExpressions.Regex.Matches(html, "<style data-bx-theme[^>]*>(.*?)</style>", RegexOptions.Singleline).Select(m => m.Groups[1].Value).ToArray();
+        Assert.Contains("data-lx-theme", html);
+        var themed = System.Text.RegularExpressions.Regex.Matches(html, "<style data-lx-theme[^>]*>(.*?)</style>", RegexOptions.Singleline).Select(m => m.Groups[1].Value).ToArray();
         Assert.Contains(live, themed);
 
         // The interactive render that follows the prerender keeps the colors (the prerender hands them over), and so does a reload.
-        var primary = () => page.EvaluateAsync<string>("() => getComputedStyle(document.documentElement).getPropertyValue('--blux-primary').trim()");
+        var primary = () => page.EvaluateAsync<string>("() => getComputedStyle(document.documentElement).getPropertyValue('--lux-primary').trim()");
         var chosen = await primary();
         await page.ReloadAsync();
         Assert.Equal(chosen, await primary());
         await WaitInteractive(page);
         Assert.Equal(chosen, await primary());
-        Assert.Equal(live, await page.EvaluateAsync<string>("() => [...document.querySelectorAll('style[data-bx-theme]')].map(e => e.textContent).join('')"));
+        Assert.Equal(live, await page.EvaluateAsync<string>("() => [...document.querySelectorAll('style[data-lx-theme]')].map(e => e.textContent).join('')"));
 
         // A visitor with no cookie, and one with an edited cookie, get the default colors.
         foreach (var value in new[] { null, "<script>", "red" })
@@ -85,7 +85,7 @@ internal static class DashboardChecks
                 await plain.AddCookiesAsync(cookies.Select(c => new Microsoft.Playwright.Cookie { Name = c.Name, Value = value, Domain = c.Domain, Path = c.Path }));
             }
             var defaults = await (await plain.APIRequest.GetAsync("customers")).TextAsync();
-            Assert.DoesNotContain(live, System.Text.RegularExpressions.Regex.Matches(defaults, "<style data-bx-theme[^>]*>(.*?)</style>", RegexOptions.Singleline).Select(m => m.Groups[1].Value));
+            Assert.DoesNotContain(live, System.Text.RegularExpressions.Regex.Matches(defaults, "<style data-lx-theme[^>]*>(.*?)</style>", RegexOptions.Singleline).Select(m => m.Groups[1].Value));
         }
     }
 
@@ -116,7 +116,7 @@ internal static class DashboardChecks
         await Assertions.Expect(notifications).Not.ToBeVisibleAsync();
 
         // Appearance: the user menu opens the dialog and the primary color follows the choice (and is remembered).
-        var primary = () => page.EvaluateAsync<string>("() => getComputedStyle(document.documentElement).getPropertyValue('--blux-primary').trim()");
+        var primary = () => page.EvaluateAsync<string>("() => getComputedStyle(document.documentElement).getPropertyValue('--lux-primary').trim()");
         var before = await primary();
         await page.GetByTestId("sidebar").GetByTestId("user-menu").ClickAsync();
         await page.GetByRole(AriaRole.Menuitem, new() { Name = "Appearance" }).ClickAsync();
@@ -125,7 +125,7 @@ internal static class DashboardChecks
         Assert.NotEqual(before, await primary());
         Assert.Equal("emerald", await CookieValue(page, "dashboard-primary"));
         // The neutral color drives the gray of the text, the backgrounds and the borders.
-        var grays = () => page.EvaluateAsync<string>("() => ['--blux-text', '--blux-bg-muted', '--blux-border'].map(n => getComputedStyle(document.documentElement).getPropertyValue(n).trim()).join('|')");
+        var grays = () => page.EvaluateAsync<string>("() => ['--lux-text', '--lux-bg-muted', '--lux-border'].map(n => getComputedStyle(document.documentElement).getPropertyValue(n).trim()).join('|')");
         var grayBefore = await grays();
         await page.GetByTestId("neutral-zinc").ClickAsync();
         await Assertions.Expect(page.GetByTestId("neutral-zinc")).ToHaveAttributeAsync("aria-pressed", "true");
@@ -137,7 +137,7 @@ internal static class DashboardChecks
 
         // Color mode.
         var dark = (await page.Locator("html").GetAttributeAsync("class") ?? "").Contains("dark");
-        await page.Locator("[data-bx-color-mode=toggle]").First.ClickAsync();
+        await page.Locator("[data-lx-color-mode=toggle]").First.ClickAsync();
         await Assertions.Expect(page.Locator("html")).ToHaveClassAsync(dark ? new Regex("^((?!dark).)*$") : new Regex("dark"));
     }
 
@@ -589,21 +589,21 @@ internal static class DashboardChecks
 
 /// <summary>
 /// The Dashboard template as a user ships it: <c>dotnet publish -c Release</c>, run in Production at the root and below a path base. Started by
-/// <c>build/verify-templates.mjs</c> with <c>BLUX_TEMPLATE_PUBLISHED</c>, <c>BLUX_TEMPLATE_ASSEMBLY</c> and <c>BLUX_TEMPLATE_PROBE</c>; without them
+/// <c>build/verify-templates.mjs</c> with <c>LUX_TEMPLATE_PUBLISHED</c>, <c>LUX_TEMPLATE_ASSEMBLY</c> and <c>LUX_TEMPLATE_PROBE</c>; without them
 /// the tests are skipped. Every page is checked in the browser; no request may fail and the console stays free of errors.
 /// </summary>
 public class DashboardTemplateTests(PlaygroundServer server)
 {
-    private static string? Published => Environment.GetEnvironmentVariable("BLUX_TEMPLATE_PUBLISHED");
-    private static string? AssemblyName => Environment.GetEnvironmentVariable("BLUX_TEMPLATE_ASSEMBLY");
-    private static string? Probe => Environment.GetEnvironmentVariable("BLUX_TEMPLATE_PROBE");
+    private static string? Published => Environment.GetEnvironmentVariable("LUX_TEMPLATE_PUBLISHED");
+    private static string? AssemblyName => Environment.GetEnvironmentVariable("LUX_TEMPLATE_ASSEMBLY");
+    private static string? Probe => Environment.GetEnvironmentVariable("LUX_TEMPLATE_PROBE");
 
     [Theory]
     [InlineData(null)]
     [InlineData("/demo/dashboard")]
     public async Task Published_app_works_page_by_page(string? pathBase)
     {
-        Assert.SkipWhen(string.IsNullOrEmpty(Published) || string.IsNullOrEmpty(AssemblyName), "BLUX_TEMPLATE_PUBLISHED and BLUX_TEMPLATE_ASSEMBLY are not set.");
+        Assert.SkipWhen(string.IsNullOrEmpty(Published) || string.IsNullOrEmpty(AssemblyName), "LUX_TEMPLATE_PUBLISHED and LUX_TEMPLATE_ASSEMBLY are not set.");
 
         var port = FreePort();
         var host = $"http://127.0.0.1:{port}";
@@ -673,7 +673,7 @@ public class DashboardTemplateTests(PlaygroundServer server)
             await DashboardChecks.AssertAccessible(page, await mode());
             await page.GotoAsync("");
             await DashboardChecks.WaitInteractive(page);
-            await page.Locator("[data-bx-color-mode=toggle]").First.ClickAsync();
+            await page.Locator("[data-lx-color-mode=toggle]").First.ClickAsync();
             await page.WaitForFunctionAsync("() => document.getAnimations().length === 0");
             await DashboardChecks.AssertAccessible(page, await mode());
 

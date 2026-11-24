@@ -2,12 +2,12 @@
 
 <EditForm Model="Model" FormName="terms" OnValidSubmit="Save" class="flex flex-col items-start gap-3">
     <DataAnnotationsValidator />
-    <BxSwitch @bind-Value="Model!.AcceptTerms" Label="I accept the terms" data-testid="terms" />
-    <ValidationMessage For="() => Model!.AcceptTerms" class="text-sm text-(--blux-error-text)" />
-    <BxButton Type="submit" Label="Save" />
+    <LxSwitch @bind-Value="Model!.AcceptTerms" Label="I accept the terms" data-testid="terms" />
+    <ValidationMessage For="() => Model!.AcceptTerms" class="text-sm text-(--lux-error-text)" />
+    <LxButton Type="submit" Label="Save" />
     @if (_saved)
     {
-        <p role="status" class="text-sm text-(--blux-success-text)" data-testid="saved">Saved, terms accepted.</p>
+        <p role="status" class="text-sm text-(--lux-success-text)" data-testid="saved">Saved, terms accepted.</p>
     }
 </EditForm>
 

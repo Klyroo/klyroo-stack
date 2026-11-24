@@ -400,7 +400,7 @@ public class ContentTests(PlaygroundServer server) : PlaygroundTest(server)
             if (request.Url.EndsWith("/lazy-search-index.json", StringComparison.Ordinal)) lock (requests) requests.Add(request.Url);
         };
         await Open(mode, "content-search");
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
         // Nothing is fetched while the search is closed.
         lock (requests) Assert.Empty(requests);
 
@@ -441,7 +441,7 @@ public class ContentTests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task Lazy_search_says_when_its_index_cannot_be_fetched_and_tries_again()
     {
         await Open("ssr", "content-search");
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
         await Page.RouteAsync("**/lazy-search-index.json", route => route.AbortAsync());
 
         await Page.GetByTestId("content-search-lazy-button").ClickAsync();
@@ -627,16 +627,16 @@ public class ContentTests(PlaygroundServer server) : PlaygroundTest(server)
     {
         await Open("ssr", "content-search-button");
         var header = Page.Locator("header").GetByRole(AriaRole.Button, new() { Name = "Search" });
-        Assert.Equal("\"Ctrl\"", await ModLabel(header.Locator("kbd[data-bx-mod]")));
+        Assert.Equal("\"Ctrl\"", await ModLabel(header.Locator("kbd[data-lx-mod]")));
         await Assertions.Expect(header).ToHaveAttributeAsync("aria-keyshortcuts", "Control+K Meta+K");
 
         var apple = await NewApplePage();
         await apple.GotoAsync("/ssr/components/content-search-button");
-        await apple.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await apple.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
         var appleHeader = apple.Locator("header").GetByRole(AriaRole.Button, new() { Name = "Search" });
 
-        Assert.Equal("\"⌘\"", await ModLabel(appleHeader.Locator("kbd[data-bx-mod]")));
-        await Assertions.Expect(appleHeader.Locator("kbd[data-bx-mod]")).ToHaveTextAsync("");
+        Assert.Equal("\"⌘\"", await ModLabel(appleHeader.Locator("kbd[data-lx-mod]")));
+        await Assertions.Expect(appleHeader.Locator("kbd[data-lx-mod]")).ToHaveTextAsync("");
     }
 
     [Fact]
@@ -675,9 +675,9 @@ public class ContentTests(PlaygroundServer server) : PlaygroundTest(server)
                     button.addEventListener('click', () => window.__hits.push(name));
                     document.body.append(button);
                 };
-                add('plain', { 'data-bx-hotkey': 'ctrl+1' });
-                add('always', { 'data-bx-hotkey': 'ctrl+2', 'data-bx-hotkey-always': '' });
-                add('content', { 'data-bx-content-hotkey': 'ctrl+3' });
+                add('plain', { 'data-lx-hotkey': 'ctrl+1' });
+                add('always', { 'data-lx-hotkey': 'ctrl+2', 'data-lx-hotkey-always': '' });
+                add('content', { 'data-lx-content-hotkey': 'ctrl+3' });
             }
             """);
         await Page.Keyboard.PressAsync("Control+1");

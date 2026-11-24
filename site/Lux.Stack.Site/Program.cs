@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddLuxSite();
-// The server reads the time zone cookie in static renders and prerenders (IBxRequestCookies), so the data list cuts days like the interactive render.
+// The server reads the time zone cookie in static renders and prerenders (ILxRequestCookies), so the data list cuts days like the interactive render.
 builder.Services.AddLuxServer();
 builder.Services.AddLuxAi(builder.Configuration);
 // The live demos of the templates: child processes behind /templates/{name}/demo/ (Templates/TemplateDemos.cs).
@@ -43,10 +43,10 @@ else
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 // Not for /templates/{name}/demo/: a demo answers its own 404s.
 app.UseTemplateDemoResponsesAsIs();
-// Reads the query string, the culture cookie that BxLocaleSelect writes and Accept-Language (the default provider list).
-// Blux components follow the UI culture on their own: the supported UI cultures are the codes of the built-in locales.
+// Reads the query string, the culture cookie that LxLocaleSelect writes and Accept-Language (the default provider list).
+// Lux components follow the UI culture on their own: the supported UI cultures are the codes of the built-in locales.
 // The supported cultures add two regional ones, so that dates and clocks keep the format of an en-GB or fr-CA user.
-var uiCultures = BxLocales.All.Select(locale => locale.Code).ToArray();
+var uiCultures = LxLocales.All.Select(locale => locale.Code).ToArray();
 app.UseRequestLocalization(new RequestLocalizationOptions()
     .SetDefaultCulture("en")
     .AddSupportedCultures([.. uiCultures, "en-GB", "fr-CA"])

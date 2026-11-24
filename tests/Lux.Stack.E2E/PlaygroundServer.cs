@@ -7,7 +7,7 @@ using System.Net.Sockets;
 namespace Lux.Stack.E2E;
 
 /// <summary>
-/// Starts the playground once for the whole test run, and one browser chosen by BLUX_BROWSER
+/// Starts the playground once for the whole test run, and one browser chosen by LUX_BROWSER
 /// (chromium, firefox or webkit; chromium by default).
 /// </summary>
 public sealed class PlaygroundServer : IAsyncLifetime
@@ -27,7 +27,7 @@ public sealed class PlaygroundServer : IAsyncLifetime
         TemplatesReady = await WaitForTemplateDemosAsync(BaseUrl);
 
         _playwright = await Playwright.CreateAsync();
-        var browserType = (Environment.GetEnvironmentVariable("BLUX_BROWSER") ?? "chromium") switch
+        var browserType = (Environment.GetEnvironmentVariable("LUX_BROWSER") ?? "chromium") switch
         {
             "firefox" => _playwright.Firefox,
             "webkit" => _playwright.Webkit,
@@ -56,9 +56,9 @@ public sealed class PlaygroundServer : IAsyncLifetime
     {
         var port = FreePort();
         var baseUrl = $"http://127.0.0.1:{port}";
-        // BLUX_PLAYGROUND_PUBLISHED points to a "dotnet publish" output: the trimmed WebAssembly build is what apps ship,
+        // LUX_PLAYGROUND_PUBLISHED points to a "dotnet publish" output: the trimmed WebAssembly build is what apps ship,
         // and trimming can remove members only reached through reflection.
-        var published = Environment.GetEnvironmentVariable("BLUX_PLAYGROUND_PUBLISHED");
+        var published = Environment.GetEnvironmentVariable("LUX_PLAYGROUND_PUBLISHED");
         ProcessStartInfo start;
         if (string.IsNullOrEmpty(published))
         {
@@ -89,18 +89,18 @@ public sealed class PlaygroundServer : IAsyncLifetime
         {
             start.Environment["PathBase"] = pathBase;
             // The instance below a path base is for the path base tests: it does not start its own copy of the template demos, unless asked to.
-            if (!demos) start.Environment["Blux__Templates__Enabled"] = "false";
+            if (!demos) start.Environment["Lux__Templates__Enabled"] = "false";
         }
         // The Changelog demo reads the sample releases of the template, never GitHub: the E2E run needs no network (the production setting is in
-        // the appsettings.json of the docs host: Blux:Templates:Demos:changelog).
+        // the appsettings.json of the docs host: Lux:Templates:Demos:changelog).
         // The Chat demo answers from canned replies, never from a service (also the production setting, in the appsettings.json of the docs host).
-        start.Environment["Blux__Templates__Demos__chat__Assistant__Provider"] = "Simulated";
-        start.Environment["Blux__Templates__Demos__changelog__Changelog__Source"] = "File";
-        start.Environment["Blux__Templates__Demos__changelog__Changelog__Repository"] = "tern-cli/tern";
-        // BLUX_TEMPLATES_PUBLISHED: a folder with one "dotnet publish" output per template ({name}/), run in Production instead of the build output.
-        if (Environment.GetEnvironmentVariable("BLUX_TEMPLATES_PUBLISHED") is { Length: > 0 } templates)
+        start.Environment["Lux__Templates__Demos__chat__Assistant__Provider"] = "Simulated";
+        start.Environment["Lux__Templates__Demos__changelog__Changelog__Source"] = "File";
+        start.Environment["Lux__Templates__Demos__changelog__Changelog__Repository"] = "tern-cli/tern";
+        // LUX_TEMPLATES_PUBLISHED: a folder with one "dotnet publish" output per template ({name}/), run in Production instead of the build output.
+        if (Environment.GetEnvironmentVariable("LUX_TEMPLATES_PUBLISHED") is { Length: > 0 } templates)
         {
-            start.Environment["Blux__Templates__PublishRoot"] = Path.GetFullPath(templates);
+            start.Environment["Lux__Templates__PublishRoot"] = Path.GetFullPath(templates);
         }
         start.RedirectStandardOutput = true;
         start.RedirectStandardError = true;
@@ -133,7 +133,7 @@ public sealed class PlaygroundServer : IAsyncLifetime
         var body = "";
         while (DateTime.UtcNow < deadline)
         {
-            var response = await http.GetAsync(baseUrl + "/_blux/templates/ready");
+            var response = await http.GetAsync(baseUrl + "/_lux/templates/ready");
             body = await response.Content.ReadAsStringAsync();
             // Not found: the demos are switched off.
             if (response.StatusCode == HttpStatusCode.NotFound) return false;
@@ -142,8 +142,8 @@ public sealed class PlaygroundServer : IAsyncLifetime
                 // Ready means every demo that can be started answers. One that is neither built nor published (the docs run published with no folder of
                 // templates) is no reason to wait, but locally and in CI the tests of the demos must not pass by skipping.
                 if (!body.Contains("\"unavailable\"")) return true;
-                var publishedDocs = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("BLUX_PLAYGROUND_PUBLISHED"));
-                if (publishedDocs && string.IsNullOrEmpty(Environment.GetEnvironmentVariable("BLUX_TEMPLATES_PUBLISHED")) && string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CI"))) return false;
+                var publishedDocs = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("LUX_PLAYGROUND_PUBLISHED"));
+                if (publishedDocs && string.IsNullOrEmpty(Environment.GetEnvironmentVariable("LUX_TEMPLATES_PUBLISHED")) && string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CI"))) return false;
                 break;
             }
             if (!body.Contains("\"starting\"") && !body.Contains("\"restarting\"")) break;

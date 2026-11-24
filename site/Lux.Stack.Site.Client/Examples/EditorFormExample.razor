@@ -2,15 +2,15 @@
 
 <EditForm Model="Model" FormName="editor-notes" OnValidSubmit="Save" class="flex w-full max-w-2xl flex-col items-start gap-3">
     <DataAnnotationsValidator />
-    <BxFormField Label="Notes" Description="Posted as HTML, also without interactivity." For="() => Model!.Notes" class="w-full">
-        <BxEditor @bind-Value="Model!.Notes" Placeholder="Write a note..." data-testid="editor-form">
-            <BxEditorToolbar />
-        </BxEditor>
-    </BxFormField>
-    <BxButton Type="submit" Label="Save" />
+    <LxFormField Label="Notes" Description="Posted as HTML, also without interactivity." For="() => Model!.Notes" class="w-full">
+        <LxEditor @bind-Value="Model!.Notes" Placeholder="Write a note..." data-testid="editor-form">
+            <LxEditorToolbar />
+        </LxEditor>
+    </LxFormField>
+    <LxButton Type="submit" Label="Save" />
     @if (_saved is not null)
     {
-        <p role="status" class="break-all font-mono text-xs text-(--blux-text-muted)" data-testid="saved">Saved: @_saved</p>
+        <p role="status" class="break-all font-mono text-xs text-(--lux-text-muted)" data-testid="saved">Saved: @_saved</p>
     }
 </EditForm>
 

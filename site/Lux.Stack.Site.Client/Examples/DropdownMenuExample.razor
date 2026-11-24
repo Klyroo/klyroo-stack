@@ -1,23 +1,23 @@
 <div class="flex flex-col items-center gap-3">
-    <BxDropdownMenu Items="Items" OnSelect="item => _last = item.Label">
-        <BxButton Label="Options" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" data-testid="menu-trigger">
-            <TrailingIcon>@BxIcons.Named("chevron-down")</TrailingIcon>
-        </BxButton>
-    </BxDropdownMenu>
-    <p class="text-sm text-(--blux-text-muted)" data-testid="menu-state">Last action: @(_last ?? "none")</p>
+    <LxDropdownMenu Items="Items" OnSelect="item => _last = item.Label">
+        <LxButton Label="Options" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" data-testid="menu-trigger">
+            <TrailingIcon>@LxIcons.Named("chevron-down")</TrailingIcon>
+        </LxButton>
+    </LxDropdownMenu>
+    <p class="text-sm text-(--lux-text-muted)" data-testid="menu-state">Last action: @(_last ?? "none")</p>
 </div>
 
 @code {
     private string? _last;
 
-    private static readonly BxMenuItem[] Items =
+    private static readonly LxMenuItem[] Items =
     [
-        BxMenuItem.Heading("My account"),
+        LxMenuItem.Heading("My account"),
         new() { Label = "Profile", Shortcut = "⌘P" },
         new() { Label = "Billing", Shortcut = "⌘B" },
         new() { Label = "Documentation", Href = "/docs" },
-        BxMenuItem.Separator(),
+        LxMenuItem.Separator(),
         new() { Label = "Archive", Disabled = true },
-        new() { Label = "Delete account", Color = BxColor.Error },
+        new() { Label = "Delete account", Color = LxColor.Error },
     ];
 }

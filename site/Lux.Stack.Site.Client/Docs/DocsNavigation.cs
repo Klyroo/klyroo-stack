@@ -17,7 +17,7 @@ public static class DocsNavigation
     /// component links keep it, so the reader stays in the mode they chose and the current page is found by address
     /// (the guides exist only in the default mode).
     /// </summary>
-    public static IReadOnlyList<BxContentNavigationItem> Sidebar(string prefix, string? activeLibrarySlug = null)
+    public static IReadOnlyList<LxContentNavigationItem> Sidebar(string prefix, string? activeLibrarySlug = null)
     {
         // Every non-UI LuxStack library gets its own 100% independent multi-page documentation sidebar
         // (Getting Started, Guides, Reference) with zero cross-library clutter.
@@ -31,14 +31,14 @@ public static class DocsNavigation
                     .. tree.Pages
                         .Select(p => p.Group)
                         .Distinct()
-                        .Select(group => new BxContentNavigationItem(group)
+                        .Select(group => new LxContentNavigationItem(group)
                         {
                             Open = true,
                             Children =
                             [
                                 .. tree.Pages
                                     .Where(p => p.Group == group)
-                                    .Select(p => new BxContentNavigationItem(p.Title)
+                                    .Select(p => new LxContentNavigationItem(p.Title)
                                     {
                                         Href = LuxLibraryDocs.PageHref(tree.LibrarySlug, p.Slug),
                                         Exact = true,
@@ -50,31 +50,31 @@ public static class DocsNavigation
         }
 
         // Lux.UI independent documentation sidebar: full Lux.UI guides + all 125+ components.
-        var items = new List<BxContentNavigationItem>();
+        var items = new List<LxContentNavigationItem>();
         items.AddRange(Catalog.Guides
             .Select(g => g.Section)
             .Distinct()
-            .Select(section => new BxContentNavigationItem(section)
+            .Select(section => new LxContentNavigationItem(section)
             {
                 Open = true,
-                Children = [.. Catalog.Guides.Where(g => g.Section == section).Select(g => new BxContentNavigationItem(g.Title) { Href = g.Href, Exact = true })],
+                Children = [.. Catalog.Guides.Where(g => g.Section == section).Select(g => new LxContentNavigationItem(g.Title) { Href = g.Href, Exact = true })],
             }));
-        items.AddRange(Catalog.Groups.Where(group => Catalog.Components.Any(c => c.Group == group)).Select(group => new BxContentNavigationItem(group)
+        items.AddRange(Catalog.Groups.Where(group => Catalog.Components.Any(c => c.Group == group)).Select(group => new LxContentNavigationItem(group)
         {
             Open = true,
             Children = [.. Catalog.Components.Where(c => c.Group == group)
-                .Select(c => new BxContentNavigationItem(c.Name) { Href = $"{prefix}/components/{c.Slug}", Exact = true })],
+                .Select(c => new LxContentNavigationItem(c.Name) { Href = $"{prefix}/components/{c.Slug}", Exact = true })],
         }));
         return items;
     }
 
-    private static readonly Dictionary<string, IReadOnlyList<BxContentSearchPage>> SearchPagesByKey = [];
+    private static readonly Dictionary<string, IReadOnlyList<LxContentSearchPage>> SearchPagesByKey = [];
 
     /// <summary>
     /// Header search pages. When browsing a specific LuxStack library, search is strictly scoped to that library
     /// (zero leakage of Lux.UI components into Lux.Query, Lux.Table, Lux.Form, etc.).
     /// </summary>
-    public static IReadOnlyList<BxContentSearchPage> SearchPages(string prefix, string? activeLibrarySlug = null)
+    public static IReadOnlyList<LxContentSearchPage> SearchPages(string prefix, string? activeLibrarySlug = null)
     {
         var cacheKey = $"{prefix}|{activeLibrarySlug ?? "hub"}";
         lock (SearchPagesByKey)
@@ -87,8 +87,8 @@ public static class DocsNavigation
                     pages = lib is null
                         ? []
                         : [
-                            new BxContentSearchPage($"{lib.LibraryName} Overview", $"/{lib.LibrarySlug}") { Group = lib.LibraryName, Icon = "" },
-                            .. lib.Pages.Select(p => new BxContentSearchPage(p.Title, LuxLibraryDocs.PageHref(lib.LibrarySlug, p.Slug))
+                            new LxContentSearchPage($"{lib.LibraryName} Overview", $"/{lib.LibrarySlug}") { Group = lib.LibraryName, Icon = "" },
+                            .. lib.Pages.Select(p => new LxContentSearchPage(p.Title, LuxLibraryDocs.PageHref(lib.LibrarySlug, p.Slug))
                             {
                                 Group = p.Group,
                                 Icon = "",
@@ -100,10 +100,10 @@ public static class DocsNavigation
                 {
                     pages =
                     [
-                        new BxContentSearchPage("Lux.UI Overview", "/ui") { Group = "Lux.UI", Icon = "" },
-                        .. Catalog.Guides.Select(g => new BxContentSearchPage(g.Title, g.Href) { Group = g.Section, Icon = "" }),
-                        new BxContentSearchPage("Templates", "templates") { Group = "Gallery", Icon = "", Keywords = "starter dashboard landing live demo" },
-                        .. InSidebarOrder.Select(c => new BxContentSearchPage(c.Name, $"{prefix}/components/{c.Slug}")
+                        new LxContentSearchPage("Lux.UI Overview", "/ui") { Group = "Lux.UI", Icon = "" },
+                        .. Catalog.Guides.Select(g => new LxContentSearchPage(g.Title, g.Href) { Group = g.Section, Icon = "" }),
+                        new LxContentSearchPage("Templates", "templates") { Group = "Gallery", Icon = "", Keywords = "starter dashboard landing live demo" },
+                        .. InSidebarOrder.Select(c => new LxContentSearchPage(c.Name, $"{prefix}/components/{c.Slug}")
                         {
                             Group = c.Group,
                             Icon = "",
@@ -115,9 +115,9 @@ public static class DocsNavigation
                 {
                     pages =
                     [
-                        new BxContentSearchPage("LuxStack Hub", "/") { Group = "LuxStack", Icon = "", Keywords = "luxstack hub libraries" },
-                        .. LuxStackProducts.All.Select(p => new BxContentSearchPage($"{p.Name} Overview", $"/{p.Slug}") { Group = "Libraries", Icon = "", Keywords = $"{p.RepoName} {p.CorePackage} {p.UiPackage} {p.Tagline}" }),
-                        .. LuxStackProducts.All.Select(p => new BxContentSearchPage($"{p.Name} Documentation", p.DocsHref) { Group = "Documentation", Icon = "", Keywords = $"{p.Slug} docs reference" }),
+                        new LxContentSearchPage("LuxStack Hub", "/") { Group = "LuxStack", Icon = "", Keywords = "luxstack hub libraries" },
+                        .. LuxStackProducts.All.Select(p => new LxContentSearchPage($"{p.Name} Overview", $"/{p.Slug}") { Group = "Libraries", Icon = "", Keywords = $"{p.RepoName} {p.CorePackage} {p.UiPackage} {p.Tagline}" }),
+                        .. LuxStackProducts.All.Select(p => new LxContentSearchPage($"{p.Name} Documentation", p.DocsHref) { Group = "Documentation", Icon = "", Keywords = $"{p.Slug} docs reference" }),
                     ];
                 }
 
@@ -128,7 +128,7 @@ public static class DocsNavigation
     }
 
     /// <summary>The links to the components before and after <paramref name="slug"/>, in sidebar order.</summary>
-    public static (BxContentSurroundLink? Previous, BxContentSurroundLink? Next) Surround(string slug, string prefix)
+    public static (LxContentSurroundLink? Previous, LxContentSurroundLink? Next) Surround(string slug, string prefix)
     {
         var index = -1;
         for (var i = 0; i < InSidebarOrder.Count; i++)
@@ -136,7 +136,7 @@ public static class DocsNavigation
             if (InSidebarOrder[i].Slug == slug) index = i;
         }
         if (index < 0) return (null, null);
-        BxContentSurroundLink Link(ComponentDoc doc) => new(doc.Name, $"{prefix}/components/{doc.Slug}") { Description = doc.Description };
+        LxContentSurroundLink Link(ComponentDoc doc) => new(doc.Name, $"{prefix}/components/{doc.Slug}") { Description = doc.Description };
         return (index > 0 ? Link(InSidebarOrder[index - 1]) : null, index < InSidebarOrder.Count - 1 ? Link(InSidebarOrder[index + 1]) : null);
     }
 
@@ -144,9 +144,9 @@ public static class DocsNavigation
     public static string ExampleAnchor(string title) => title.ToLowerInvariant().Replace(' ', '-');
 
     /// <summary>The table of contents of a component page: its examples, then the API.</summary>
-    public static IReadOnlyList<BxContentTocLink> Toc(ComponentDoc doc) =>
+    public static IReadOnlyList<LxContentTocLink> Toc(ComponentDoc doc) =>
     [
-        .. doc.Examples.Select(e => new BxContentTocLink(ExampleAnchor(e.Title), e.Title)),
-        new BxContentTocLink("api", "API"),
+        .. doc.Examples.Select(e => new LxContentTocLink(ExampleAnchor(e.Title), e.Title)),
+        new LxContentTocLink("api", "API"),
     ];
 }

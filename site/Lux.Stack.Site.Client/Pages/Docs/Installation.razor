@@ -17,7 +17,7 @@
     <h2>3. Load the styles</h2>
     <p>Without Tailwind in your app, load the precompiled stylesheet and its reset:</p>
     <CodeBlock Title="App.razor" Code="@AppRazor" />
-    <p>With Tailwind v4 in your app, each build copies the Lux.UI theme to <code>obj/blux/lux.theme.css</code>. Import it after Tailwind:</p>
+    <p>With Tailwind v4 in your app, each build copies the Lux.UI theme to <code>obj/lux/lux.theme.css</code>. Import it after Tailwind:</p>
     <CodeBlock Title="app.css" Code="@AppCss" />
     <p>No Node needed: <code>&lt;LuxTailwind&gt;true&lt;/LuxTailwind&gt;</code> compiles that stylesheet at build time with the Tailwind standalone CLI. See the <a href="/docs/tailwind">Tailwind</a> guide.</p>
 
@@ -29,7 +29,7 @@
     <p>
         <code>Lux.Table</code> (and the packages after it) <strong>require Tailwind compiled by your app</strong>. Their stylesheet is not precompiled: a second precompiled sheet would repeat utilities after
         <code>lux.css</code> and override its responsive and dark variants. Add the package and turn on <code>&lt;LuxTailwind&gt;true&lt;/LuxTailwind&gt;</code>, and the build imports the package's classes for you.
-        With your own Tailwind, import <code>obj/blux/lux-table.theme.css</code> after the Lux.UI theme and set <code>BluxToolsOwnTailwind</code> to <code>true</code> to silence the warning <code>BLUXTOOLS001</code>.
+        With your own Tailwind, import <code>obj/lux/lux-table.theme.css</code> after the Lux.UI theme and set <code>LuxToolsOwnTailwind</code> to <code>true</code> to silence the warning <code>LUXTOOLS001</code>.
         See the <a href="/docs/tailwind">Tailwind</a> guide.
     </p>
     <CodeBlock Title="app.css (your own Tailwind)" Code="@ToolsCss" />
@@ -38,7 +38,7 @@
     <h2>Server rendering: Lux.UI.Server</h2>
     <p>
         A component that renders without a browser, in a static render or a prerender, can read what the browser left in a cookie: the data list uses the time zone cookie so its date filters cut the days of the user.
-        <code>Lux.UI</code> is also loaded by WebAssembly and MAUI apps, where there is no ASP.NET Core request, so it only knows <code>IBxRequestCookies</code>; the package <code>Lux.UI.Server</code> implements it.
+        <code>Lux.UI</code> is also loaded by WebAssembly and MAUI apps, where there is no ASP.NET Core request, so it only knows <code>ILxRequestCookies</code>; the package <code>Lux.UI.Server</code> implements it.
         Add it to the <strong>server</strong> project and call <code>AddLuxServer()</code> in its <code>Program.cs</code> (never in a WebAssembly client). Without it a static or prerendered data list cuts days in UTC until the
         browser is interactive, and Development logs one warning that says so.
     </p>
@@ -49,7 +49,7 @@
     <p>
         In a MAUI app the package and the stylesheets are the same, but there are no render modes and no server. Call <code>AddLuxUi</code>
         from <code>MauiProgram.cs</code> (after <code>AddMauiBlazorWebView</code>), link <code>_content/Lux.UI/lux.preflight.css</code> and
-        <code>lux.css</code> from <code>wwwroot/index.html</code>, and add <code>HeadOutlet</code> as a root component so <code>BxHead</code> can
+        <code>lux.css</code> from <code>wwwroot/index.html</code>, and add <code>HeadOutlet</code> as a root component so <code>LxHead</code> can
         write the theme and fonts into the head. The <a href="/docs/maui">MAUI and Blazor Hybrid</a> guide has the details and the status of each platform.
     </p>
 </div>
@@ -64,7 +64,7 @@
 
     private const string AppRazor = """
         <head>
-            <BxColorModeScript />
+            <LxColorModeScript />
             <link rel="stylesheet" href="@Assets["_content/Lux.UI/lux.preflight.css"]" />
             <link rel="stylesheet" href="@Assets["_content/Lux.UI/lux.css"]" />
         </head>
@@ -74,17 +74,17 @@
         // dotnet add package Lux.UI.Server --prerelease
         builder.Services.AddLuxUi();
         builder.Services.AddLuxTable();
-        builder.Services.AddLuxServer();   // calls AddHttpContextAccessor and registers IBxRequestCookies
+        builder.Services.AddLuxServer();   // calls AddHttpContextAccessor and registers ILxRequestCookies
         """;
 
     private const string ToolsCss = """
         @import "tailwindcss";
-        @import "../obj/blux/lux.theme.css";
-        @import "../obj/blux/lux-table.theme.css";
+        @import "../obj/lux/lux.theme.css";
+        @import "../obj/lux/lux-table.theme.css";
         """;
 
     private const string AppCss = """
         @import "tailwindcss";
-        @import "../obj/blux/lux.theme.css";
+        @import "../obj/lux/lux.theme.css";
         """;
 }

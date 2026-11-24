@@ -48,12 +48,12 @@ public abstract class PlaygroundTest(PlaygroundServer server) : IAsyncLifetime
     private readonly System.Diagnostics.Stopwatch _clock = System.Diagnostics.Stopwatch.StartNew();
 
     /// <summary>
-    /// BLUX_E2E_TRACE=folder keeps, for each failed test, what its page did (navigations, console, errors, failed requests, circuit frames)
+    /// LUX_E2E_TRACE=folder keeps, for each failed test, what its page did (navigations, console, errors, failed requests, circuit frames)
     /// in a file of that folder: the first thing to read when a timeout shows up once in a full run.
     /// </summary>
     private void Trace(IPage page)
     {
-        if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("BLUX_E2E_TRACE"))) return;
+        if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("LUX_E2E_TRACE"))) return;
         void Add(string what) { lock (_trace) _trace.Add($"{_clock.ElapsedMilliseconds,7} {what}"); }
         page.FrameNavigated += (_, f) => { if (f == page.MainFrame) Add("navigated " + f.Url); };
         page.Console += (_, m) => Add($"console.{m.Type} {m.Text}");
@@ -74,7 +74,7 @@ public abstract class PlaygroundTest(PlaygroundServer server) : IAsyncLifetime
 
     private void SaveTrace()
     {
-        var folder = Environment.GetEnvironmentVariable("BLUX_E2E_TRACE");
+        var folder = Environment.GetEnvironmentVariable("LUX_E2E_TRACE");
         if (string.IsNullOrEmpty(folder) || TestContext.Current.TestState?.Result != TestResult.Failed) return;
         Directory.CreateDirectory(folder);
         var name = string.Concat(TestContext.Current.Test?.TestDisplayName.Select(c => char.IsLetterOrDigit(c) ? c : '_') ?? "test");
@@ -82,12 +82,12 @@ public abstract class PlaygroundTest(PlaygroundServer server) : IAsyncLifetime
     }
 
     /// <summary>
-    /// BLUX_E2E_CPU_THROTTLE=4 slows the page's CPU (Chromium only) by that factor, the way a loaded CI machine does: a timing
+    /// LUX_E2E_CPU_THROTTLE=4 slows the page's CPU (Chromium only) by that factor, the way a loaded CI machine does: a timing
     /// assumption of a test shows up deterministically instead of once in a full run.
     /// </summary>
     protected static async Task ThrottleCpu(IPage page)
     {
-        if (!double.TryParse(Environment.GetEnvironmentVariable("BLUX_E2E_CPU_THROTTLE"), System.Globalization.CultureInfo.InvariantCulture, out var rate) || rate <= 1) return;
+        if (!double.TryParse(Environment.GetEnvironmentVariable("LUX_E2E_CPU_THROTTLE"), System.Globalization.CultureInfo.InvariantCulture, out var rate) || rate <= 1) return;
         var session = await page.Context.NewCDPSessionAsync(page);
         await session.SendAsync("Emulation.setCPUThrottlingRate", new Dictionary<string, object> { ["rate"] = rate });
     }
@@ -219,8 +219,8 @@ public abstract class PlaygroundTest(PlaygroundServer server) : IAsyncLifetime
     protected static async Task Open(IPage page, string mode, string component)
     {
         await page.GotoAsync($"/{mode}/components/{component}");
-        // Blux's browser side is loaded by blazor.web.js in every mode, static included.
-        await page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        // Lux's browser side is loaded by blazor.web.js in every mode, static included.
+        await page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
         if (mode != "ssr")
         {
             await Assertions.Expect(page.GetByTestId("renderer")).ToHaveAttributeAsync("data-interactive", "true", new() { Timeout = 30_000 });
@@ -239,7 +239,7 @@ public abstract class PlaygroundTest(PlaygroundServer server) : IAsyncLifetime
     {
         await Page.GotoAsync(path);
         await Assertions.Expect(Page.Locator("main#main")).ToHaveAttributeAsync("data-interactive", "true", new() { Timeout = 30_000 });
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover') && document.title.length > 0");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover') && document.title.length > 0");
     }
 
     protected async Task AssertNoAccessibilityViolations()

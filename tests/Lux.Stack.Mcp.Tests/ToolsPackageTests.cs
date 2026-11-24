@@ -16,7 +16,7 @@ public class ToolsPackageTests
         Assert.Equal("AddLuxTable", Empty.RegistrationMethod());
 
         var api = Assert.Single(Empty.Api);
-        Assert.Equal("BxDataListEmpty", api.Name);
+        Assert.Equal("LxDataListEmpty", api.Name);
         Assert.Contains(api.Parameters, p => p.Name == "Title" && p.Description is not null);
         Assert.Contains(api.Slots, s => s.Name == "Actions");
         Assert.Equal("DataListEmpty", api.Theme!.Property);
@@ -25,7 +25,7 @@ public class ToolsPackageTests
     }
 
     [Fact]
-    public void Components_of_Blux_UI_have_no_package()
+    public void Components_of_Lux_UI_have_no_package()
     {
         Assert.All(TestSupport.Bundle.Components.Where(c => !c.Slug.StartsWith("data-list", StringComparison.Ordinal)), c => Assert.Null(c.Package));
     }
@@ -43,7 +43,7 @@ public class ToolsPackageTests
         var list = TestSupport.Service.FindComponent("data-list")!;
 
         Assert.Equal("Lux.Table", list.Package);
-        Assert.Equal(["BxDataList<TItem>", "BxDataListTable<TItem>", "BxDataListColumn<TItem>", "BxDataListPagination<TItem>", "BxDataListResultCount<TItem>", "BxDataListRefresh<TItem>", "BxDataListErrorState<TItem>", "BxDataListSearch<TItem>"], list.Api.Select(a => a.Name));
+        Assert.Equal(["LxDataList<TItem>", "LxDataListTable<TItem>", "LxDataListColumn<TItem>", "LxDataListPagination<TItem>", "LxDataListResultCount<TItem>", "LxDataListRefresh<TItem>", "LxDataListErrorState<TItem>", "LxDataListSearch<TItem>"], list.Api.Select(a => a.Name));
         var root = list.Api[0];
         Assert.Contains(root.Parameters, p => p.Name == "UrlSync" && p.Description is not null);
         Assert.Contains(root.Parameters, p => p.Name == "ResultJson" && p.Description is not null);
@@ -57,12 +57,12 @@ public class ToolsPackageTests
     {
         var pages = new Dictionary<string, string[]>
         {
-            ["data-list-filters"] = ["BxDataListFilterTags<TItem>", "BxDataListAddFilter<TItem>", "BxDataListClearFilters<TItem>"],
-            ["data-list-filter-panel"] = ["BxDataListFilterPanel<TItem>"],
-            ["data-list-facets"] = ["BxDataListFilterEditor<TItem>"],
-            ["data-list-selection"] = ["BxDataListSelectionActions<TItem>", "BxDataListActionsDropdown<TItem>", "BxDataListRowActions<TItem>"],
-            ["data-list-cursor"] = ["BxDataListInfiniteLoader<TItem>"],
-            ["data-list-columns"] = ["BxDataListColumnPanel<TItem>"],
+            ["data-list-filters"] = ["LxDataListFilterTags<TItem>", "LxDataListAddFilter<TItem>", "LxDataListClearFilters<TItem>"],
+            ["data-list-filter-panel"] = ["LxDataListFilterPanel<TItem>"],
+            ["data-list-facets"] = ["LxDataListFilterEditor<TItem>"],
+            ["data-list-selection"] = ["LxDataListSelectionActions<TItem>", "LxDataListActionsDropdown<TItem>", "LxDataListRowActions<TItem>"],
+            ["data-list-cursor"] = ["LxDataListInfiniteLoader<TItem>"],
+            ["data-list-columns"] = ["LxDataListColumnPanel<TItem>"],
         };
         foreach (var (slug, api) in pages)
         {
@@ -81,7 +81,7 @@ public class ToolsPackageTests
     public void The_component_tools_name_the_package()
     {
         Assert.Contains("dotnet add package Lux.Table --prerelease", TestSupport.Tools.GetComponent("DataListEmpty"));
-        Assert.Contains("AddLuxTable()", TestSupport.Tools.GetComponent("BxDataListEmpty"));
+        Assert.Contains("AddLuxTable()", TestSupport.Tools.GetComponent("LxDataListEmpty"));
         Assert.Contains("AddLuxTable(o => o.<Property>", TestSupport.Tools.GetComponent("data-list-empty", "theme"));
         Assert.Contains("Package Lux.Table", TestSupport.Tools.SearchComponents("data list empty"));
         Assert.Contains("\"package\":\"Lux.Table\"", TestSupport.Tools.GetComponentMetadata("data-list-empty"));

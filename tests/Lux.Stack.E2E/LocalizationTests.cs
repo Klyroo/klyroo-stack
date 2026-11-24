@@ -13,7 +13,7 @@ public class LocalizationTests(PlaygroundServer server) : PlaygroundTest(server)
 
     [Theory]
     [MemberData(nameof(AllModes))]
-    public async Task Each_BxApp_applies_its_own_texts_direction_and_formats(string mode)
+    public async Task Each_LxApp_applies_its_own_texts_direction_and_formats(string mode)
     {
         await Open(mode, "locale-select");
 
@@ -38,7 +38,7 @@ public class LocalizationTests(PlaygroundServer server) : PlaygroundTest(server)
 
     [Theory]
     [MemberData(nameof(InteractiveModes))]
-    public async Task Changing_the_Locale_of_a_BxApp_switches_texts_and_direction(string mode)
+    public async Task Changing_the_Locale_of_a_LxApp_switches_texts_and_direction(string mode)
     {
         await Open(mode, "locale-select");
         var panel = Page.GetByTestId("locale-switch-panel");
@@ -87,7 +87,7 @@ public class LocalizationTests(PlaygroundServer server) : PlaygroundTest(server)
         await Assertions.Expect(Page.Locator("html")).ToHaveAttributeAsync("lang", "ar");
         await Assertions.Expect(Page.Locator("html")).ToHaveAttributeAsync("dir", "rtl");
         await Assertions.Expect(Page.GetByTestId("locale-select").GetByRole(AriaRole.Combobox, new() { Name = "اللغة" })).ToBeVisibleAsync();
-        await Assertions.Expect(Page.GetByTestId("locale-select").Locator("bx-select")).ToHaveAttributeAsync("value", "ar");
+        await Assertions.Expect(Page.GetByTestId("locale-select").Locator("lx-select")).ToHaveAttributeAsync("value", "ar");
     }
 
     [Theory]
@@ -149,7 +149,7 @@ public class LocalizationTests(PlaygroundServer server) : PlaygroundTest(server)
         await Assertions.Expect(page.GetByTestId("locale-current")).ToHaveTextAsync("es");
         await Assertions.Expect(page.GetByTestId("locale-resolved")).ToHaveTextAsync("es");
         await Assertions.Expect(page.Locator("html")).ToHaveAttributeAsync("lang", "es");
-        await Assertions.Expect(page.GetByTestId("locale-select").Locator("bx-select")).ToHaveAttributeAsync("value", "es");
+        await Assertions.Expect(page.GetByTestId("locale-select").Locator("lx-select")).ToHaveAttributeAsync("value", "es");
     }
 
     [Theory]

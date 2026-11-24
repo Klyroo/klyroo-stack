@@ -21,7 +21,7 @@ internal static class SaasChecks
         await Assertions.Expect(page.GetByTestId("step")).ToHaveCountAsync(3);
         await Assertions.Expect(page.GetByTestId("latest-post")).ToHaveCountAsync(3);
         await Assertions.Expect(page.Locator("#how-it-works .code-block[data-language=bash]")).ToHaveCountAsync(1);
-        await page.WaitForFunctionAsync("() => !!customElements.get('bx-popover') && !!customElements.get('bx-accordion')");
+        await page.WaitForFunctionAsync("() => !!customElements.get('lx-popover') && !!customElements.get('lx-accordion')");
         // The newest post leads the three.
         await Assertions.Expect(page.GetByTestId("latest-post").First).ToContainTextAsync("Tideline 2");
 
@@ -117,7 +117,7 @@ internal static class SaasChecks
 
         // Search: one index for the docs, the blog and the changelog, fetched the first time the search opens.
         await Go(page, "");
-        await page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
         await page.GetByRole(AriaRole.Button, new() { Name = "Search" }).Locator("visible=true").First.ClickAsync();
         var search = page.GetByRole(AriaRole.Dialog);
         await Assertions.Expect(search).ToBeVisibleAsync();
@@ -158,7 +158,7 @@ internal static class SaasChecks
         await Assertions.Expect(result).ToContainTextAsync("nothing was checked and nothing was stored");
         // Nothing was stored: no cookie but the antiforgery one, and the password is not in the page.
         Assert.DoesNotContain("hunter2hunter2", await page.ContentAsync());
-        Assert.All(await page.Context.CookiesAsync(), c => Assert.Matches("Antiforgery|Culture|blux-", c.Name));
+        Assert.All(await page.Context.CookiesAsync(), c => Assert.Matches("Antiforgery|Culture|lux-", c.Name));
 
         // Forgot password: reached from the sign-in page, checks the email, sends nothing.
         await Go(page, "login");
@@ -210,7 +210,7 @@ internal static class SaasChecks
     public static async Task AssertColorMode(IPage page)
     {
         var dark = (await page.Locator("html").GetAttributeAsync("class") ?? "").Contains("dark");
-        await page.Locator("[data-bx-color-mode=toggle]").Locator("visible=true").First.ClickAsync();
+        await page.Locator("[data-lx-color-mode=toggle]").Locator("visible=true").First.ClickAsync();
         await Assertions.Expect(page.Locator("html")).ToHaveClassAsync(dark ? new Regex("^((?!dark).)*$") : new Regex("dark"));
     }
 
@@ -221,7 +221,7 @@ internal static class SaasChecks
         foreach (var path in paths)
         {
             await Go(page, path);
-            await page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+            await page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
             var sizes = await page.EvaluateAsync<int[]>("() => [document.documentElement.scrollWidth, document.documentElement.clientWidth]");
             Assert.True(sizes[0] <= sizes[1], $"horizontal scroll at 375px on '{path}': scrollWidth {sizes[0]} > clientWidth {sizes[1]}");
         }
@@ -237,21 +237,21 @@ internal static class SaasChecks
 
 /// <summary>
 /// The SaaS template as a user ships it: <c>dotnet publish -c Release</c>, run in Production at the root and below a path base. Started by
-/// <c>build/verify-templates.mjs</c> with <c>BLUX_TEMPLATE_PUBLISHED</c>, <c>BLUX_TEMPLATE_ASSEMBLY</c> and <c>BLUX_TEMPLATE_PROBE</c>; without them
+/// <c>build/verify-templates.mjs</c> with <c>LUX_TEMPLATE_PUBLISHED</c>, <c>LUX_TEMPLATE_ASSEMBLY</c> and <c>LUX_TEMPLATE_PROBE</c>; without them
 /// the tests are skipped. The pages are static: the test fails if a WebSocket opens or a WebAssembly file is requested.
 /// </summary>
 public class SaasTemplateTests(PlaygroundServer server)
 {
-    private static string? Published => Environment.GetEnvironmentVariable("BLUX_TEMPLATE_PUBLISHED");
-    private static string? AssemblyName => Environment.GetEnvironmentVariable("BLUX_TEMPLATE_ASSEMBLY");
-    private static string? Probe => Environment.GetEnvironmentVariable("BLUX_TEMPLATE_PROBE");
+    private static string? Published => Environment.GetEnvironmentVariable("LUX_TEMPLATE_PUBLISHED");
+    private static string? AssemblyName => Environment.GetEnvironmentVariable("LUX_TEMPLATE_ASSEMBLY");
+    private static string? Probe => Environment.GetEnvironmentVariable("LUX_TEMPLATE_PROBE");
 
     [Theory]
     [InlineData(null)]
     [InlineData("/demo/saas")]
     public async Task Published_site_is_static_and_its_parts_work(string? pathBase)
     {
-        Assert.SkipWhen(string.IsNullOrEmpty(Published) || string.IsNullOrEmpty(AssemblyName), "BLUX_TEMPLATE_PUBLISHED and BLUX_TEMPLATE_ASSEMBLY are not set.");
+        Assert.SkipWhen(string.IsNullOrEmpty(Published) || string.IsNullOrEmpty(AssemblyName), "LUX_TEMPLATE_PUBLISHED and LUX_TEMPLATE_ASSEMBLY are not set.");
 
         var port = FreePort();
         var host = $"http://127.0.0.1:{port}";

@@ -2,7 +2,7 @@ namespace Lux.Stack.E2E;
 
 /// <summary>
 /// The docs site bundles the Iconify icons its examples name (ph:, mdi:, simple-icons:...) at build time, and a folder of SVG
-/// files as custom:blux. Components draw their icons from LuxOptions.Icons, in markup and in script.
+/// files as custom:lux. Components draw their icons from LuxOptions.Icons, in markup and in script.
 /// </summary>
 public class IconsTests(PlaygroundServer server) : PlaygroundTest(server)
 {
@@ -16,7 +16,7 @@ public class IconsTests(PlaygroundServer server) : PlaygroundTest(server)
 
     private async Task AssertNoMissingIcon(string where)
     {
-        var missing = await Page.EvaluateAsync<string[]>("() => [...document.querySelectorAll('[data-bx-missing-icon]')].map(e => e.getAttribute('data-bx-missing-icon'))");
+        var missing = await Page.EvaluateAsync<string[]>("() => [...document.querySelectorAll('[data-lx-missing-icon]')].map(e => e.getAttribute('data-lx-missing-icon'))");
         Assert.True(missing.Length == 0, $"{where} renders missing icons: {string.Join(", ", missing)}");
     }
 
@@ -46,7 +46,7 @@ public class IconsTests(PlaygroundServer server) : PlaygroundTest(server)
         await Open(mode, "icon");
 
         await Assertions.Expect(Page.Locator("[data-testid=icon-dynamic] svg")).ToHaveCountAsync(3);
-        await Assertions.Expect(Page.Locator("[data-testid=icon-dynamic] [data-bx-missing-icon]")).ToHaveCountAsync(0);
+        await Assertions.Expect(Page.Locator("[data-testid=icon-dynamic] [data-lx-missing-icon]")).ToHaveCountAsync(0);
         var labels = await Page.EvaluateAsync<string[]>("() => [...document.querySelectorAll('[data-testid=icon-dynamic] svg')].map(s => s.getAttribute('aria-label'))");
         Assert.Equal(["Cube", "Cube-fill", "Cube-bold"], labels);
     }
@@ -57,7 +57,7 @@ public class IconsTests(PlaygroundServer server) : PlaygroundTest(server)
     {
         await Open(mode, "content-navigation");
 
-        await Assertions.Expect(Page.Locator("[data-testid=content-navigation-example] [data-bx-missing-icon]")).ToHaveCountAsync(0);
+        await Assertions.Expect(Page.Locator("[data-testid=content-navigation-example] [data-lx-missing-icon]")).ToHaveCountAsync(0);
         await Assertions.Expect(Page.Locator("[data-testid=content-navigation-example] svg[data-icon], [data-testid=content-navigation-example] svg path").First).ToBeVisibleAsync();
     }
 

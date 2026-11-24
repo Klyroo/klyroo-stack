@@ -9,7 +9,7 @@ namespace Lux.Stack.Site.Client.Examples;
 /// </summary>
 public sealed class RemoteDirectory
 {
-    private static readonly BxSelectItem[] All =
+    private static readonly LxSelectItem[] All =
     [
         new("ar", "Argentina"), new("au", "Australia"), new("at", "Austria"), new("be", "Belgium"), new("br", "Brazil"), new("bg", "Bulgaria"),
         new("ca", "Canada"), new("cl", "Chile"), new("cn", "China"), new("co", "Colombia"), new("hr", "Croatia"), new("cz", "Czechia"),
@@ -46,7 +46,7 @@ public sealed class RemoteDirectory
     /// <summary>Called after each call so the page can show the counters.</summary>
     public Action? Changed { get; init; }
 
-    private List<BxSelectItem> Matches(string search) =>
+    private List<LxSelectItem> Matches(string search) =>
         [.. All.Where(c => search.Length == 0 || c.Label.Contains(search, StringComparison.OrdinalIgnoreCase))];
 
     private async Task Enter(string description, CancellationToken ct)
@@ -59,39 +59,39 @@ public sealed class RemoteDirectory
     }
 
     /// <summary>Pages with Skip and Take.</summary>
-    public async ValueTask<BxOptionsResult> ByPage(BxOptionsRequest request, CancellationToken ct)
+    public async ValueTask<LxOptionsResult> ByPage(LxOptionsRequest request, CancellationToken ct)
     {
         await Enter($"search \"{request.Search}\", skip {request.Skip}, take {request.Take}", ct);
         var matches = Matches(request.Search);
         var page = matches.Skip(request.Skip).Take(request.Take).ToList();
-        return new BxOptionsResult(page, HasMore: request.Skip + page.Count < matches.Count);
+        return new LxOptionsResult(page, HasMore: request.Skip + page.Count < matches.Count);
     }
 
     /// <summary>Pages with a cursor: the index of the next option, as text.</summary>
-    public async ValueTask<BxOptionsResult> ByCursor(BxOptionsRequest request, CancellationToken ct)
+    public async ValueTask<LxOptionsResult> ByCursor(LxOptionsRequest request, CancellationToken ct)
     {
         await Enter($"search \"{request.Search}\", cursor {request.Cursor ?? "none"}, take {request.Take}", ct);
         var matches = Matches(request.Search);
         var start = request.Cursor is null ? 0 : int.Parse(request.Cursor);
         var page = matches.Skip(start).Take(request.Take).ToList();
         var next = start + page.Count;
-        return new BxOptionsResult(page, NextCursor: next < matches.Count ? next.ToString() : null);
+        return new LxOptionsResult(page, NextCursor: next < matches.Count ? next.ToString() : null);
     }
 
     /// <summary>The options of values that were restored (from the address, a saved form) without ever being listed.</summary>
-    public async ValueTask<IReadOnlyList<BxSelectItem>> Resolve(IReadOnlyList<string> values, CancellationToken ct)
+    public async ValueTask<IReadOnlyList<LxSelectItem>> Resolve(IReadOnlyList<string> values, CancellationToken ct)
     {
         await Enter($"resolve {string.Join(", ", values)}", ct);
         return [.. All.Where(c => values.Contains(c.Value))];
     }
 
     /// <summary>The cities of one country, paged with Skip and Take: what a source whose options depend on another field looks like (see <c>OptionsKey</c>).</summary>
-    public async ValueTask<BxOptionsResult> CitiesOf(string? country, BxOptionsRequest request, CancellationToken ct)
+    public async ValueTask<LxOptionsResult> CitiesOf(string? country, LxOptionsRequest request, CancellationToken ct)
     {
         await Enter($"cities of {country ?? "nowhere"}, search \"{request.Search}\", skip {request.Skip}, take {request.Take}", ct);
         var cities = (country is not null && Cities.TryGetValue(country, out var list) ? list : [])
             .Where(c => request.Search.Length == 0 || c.Contains(request.Search, StringComparison.OrdinalIgnoreCase)).ToList();
-        var page = cities.Skip(request.Skip).Take(request.Take).Select(c => new BxSelectItem(c.ToLowerInvariant(), c)).ToList();
-        return new BxOptionsResult(page, HasMore: request.Skip + page.Count < cities.Count);
+        var page = cities.Skip(request.Skip).Take(request.Take).Select(c => new LxSelectItem(c.ToLowerInvariant(), c)).ToList();
+        return new LxOptionsResult(page, HasMore: request.Skip + page.Count < cities.Count);
     }
 }

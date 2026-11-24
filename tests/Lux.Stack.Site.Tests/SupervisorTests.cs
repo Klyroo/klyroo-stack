@@ -20,14 +20,14 @@ public class SupervisorTests
         Assert.Equal(200, (int)(await harness.Http.GetAsync("/Templates/FAKE/Demo", Ct)).StatusCode);
         // The demo's own 404 reaches the visitor untouched.
         Assert.Equal(404, (int)(await harness.Http.GetAsync("/templates/fake/demo/no-such-page", Ct)).StatusCode);
-        Assert.Equal("ok", await harness.Http.GetStringAsync("/_blux/health", Ct));
-        Assert.Equal(200, (int)(await harness.Http.GetAsync("/_blux/templates/ready", Ct)).StatusCode);
+        Assert.Equal("ok", await harness.Http.GetStringAsync("/_lux/health", Ct));
+        Assert.Equal(200, (int)(await harness.Http.GetAsync("/_lux/templates/ready", Ct)).StatusCode);
     }
 
     [Fact]
     public async Task The_demo_gets_a_minimal_environment_not_the_one_of_the_host()
     {
-        Environment.SetEnvironmentVariable("Blux__Templates__Secret", "do-not-leak");
+        Environment.SetEnvironmentVariable("Lux__Templates__Secret", "do-not-leak");
         Environment.SetEnvironmentVariable("Kestrel__Marker", "x");
         Environment.SetEnvironmentVariable("ASPNETCORE_Kestrel__Marker", "hunter2");
         Environment.SetEnvironmentVariable("ConnectionStrings__Main", "Server=secret");
@@ -37,18 +37,18 @@ public class SupervisorTests
 
             var json = await harness.Http.GetStringAsync("/templates/fake/demo/env", Ct);
             var env = JsonSerializer.Deserialize<Dictionary<string, string>>(json)!;
-            Assert.DoesNotContain(env.Keys, k => k.StartsWith("Blux__", StringComparison.Ordinal) || k.StartsWith("Kestrel__", StringComparison.Ordinal)
+            Assert.DoesNotContain(env.Keys, k => k.StartsWith("Lux__", StringComparison.Ordinal) || k.StartsWith("Kestrel__", StringComparison.Ordinal)
                 || k.StartsWith("ASPNETCORE_Kestrel__", StringComparison.Ordinal) || k.StartsWith("ConnectionStrings__", StringComparison.Ordinal));
             Assert.Contains("PATH", env.Keys);
             Assert.Equal("Production", env["ASPNETCORE_ENVIRONMENT"]);
             Assert.Equal("5", env["DOTNET_GCConserveMemory"]);
             Assert.Equal("20000000", env["DOTNET_GCHeapHardLimit"]);
             Assert.EndsWith("Lux.Stack.Site.DemoWatchdog.dll", env["DOTNET_STARTUP_HOOKS"]);
-            Assert.Equal(Environment.ProcessId.ToString(), env["BLUX_WATCHDOG_PARENT_PID"]);
+            Assert.Equal(Environment.ProcessId.ToString(), env["LUX_WATCHDOG_PARENT_PID"]);
         }
         finally
         {
-            foreach (var name in new[] { "Blux__Templates__Secret", "Kestrel__Marker", "ASPNETCORE_Kestrel__Marker", "ConnectionStrings__Main" })
+            foreach (var name in new[] { "Lux__Templates__Secret", "Kestrel__Marker", "ASPNETCORE_Kestrel__Marker", "ConnectionStrings__Main" })
             {
                 Environment.SetEnvironmentVariable(name, null);
             }
@@ -124,14 +124,14 @@ public class SupervisorTests
     {
         await using var harness = await DemoHarness.StartAsync();
 
-        var status = await harness.Http.GetStringAsync("/_blux/templates/status", Ct);
+        var status = await harness.Http.GetStringAsync("/_lux/templates/status", Ct);
         Assert.Contains("\"state\":\"ready\"", status);
         // A request that went through a proxy (it carries X-Forwarded-For the site did not trust) is a visitor's, not the operator's.
-        using var proxied = new HttpRequestMessage(HttpMethod.Get, "/_blux/templates/status");
+        using var proxied = new HttpRequestMessage(HttpMethod.Get, "/_lux/templates/status");
         proxied.Headers.Add("X-Forwarded-For", "203.0.113.9");
         Assert.Equal(404, (int)(await harness.Http.SendAsync(proxied, Ct)).StatusCode);
         // The health check of the host does not depend on it.
-        using var health = new HttpRequestMessage(HttpMethod.Get, "/_blux/health");
+        using var health = new HttpRequestMessage(HttpMethod.Get, "/_lux/health");
         health.Headers.Add("X-Forwarded-For", "203.0.113.9");
         Assert.Equal(200, (int)(await harness.Http.SendAsync(health, Ct)).StatusCode);
     }
@@ -147,7 +147,7 @@ public class SupervisorTests
         await using var empty = await DemoHarness.StartAsync(waitReady: false, populate: false);
         await empty.WaitForStateAsync("unavailable");
         Assert.True(empty.Supervisor.AllReady);
-        var response = await empty.Http.GetAsync("/_blux/templates/ready", Ct);
+        var response = await empty.Http.GetAsync("/_lux/templates/ready", Ct);
         Assert.Equal(200, (int)response.StatusCode);
         Assert.Contains("\"state\":\"unavailable\"", await response.Content.ReadAsStringAsync(Ct));
     }

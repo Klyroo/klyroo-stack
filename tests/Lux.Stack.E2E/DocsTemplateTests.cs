@@ -18,7 +18,7 @@ internal static class DocsChecks
         // Home: the intro and one card per section of the content.
         await Assertions.Expect(page.GetByRole(AriaRole.Heading, new() { Level = 1 })).ToContainTextAsync("Keep a folder in step");
         await Assertions.Expect(page.GetByTestId("sections").GetByRole(AriaRole.Listitem).Filter(new() { Has = page.GetByRole(AriaRole.Heading, new() { Level = 3 }) })).ToHaveCountAsync(3);
-        await page.WaitForFunctionAsync("() => !!customElements.get('bx-content-toc') && !!customElements.get('bx-popover')");
+        await page.WaitForFunctionAsync("() => !!customElements.get('lx-content-toc') && !!customElements.get('lx-popover')");
 
         // A page of the content, by its link on the home page.
         await page.GetByTestId("sections").GetByRole(AriaRole.Link, new() { Name = "Installation", Exact = true }).ClickAsync();
@@ -83,7 +83,7 @@ internal static class DocsChecks
         }
         page.Request += OnRequest;
         await Go(page, "");
-        await page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
         // The page has loaded and its script has run (the proxy of the docs host keeps a connection open, so the network never goes idle): give a fetch time to show.
         await Task.Delay(1000);
         lock (indexRequests) Assert.Empty(indexRequests);
@@ -109,7 +109,7 @@ internal static class DocsChecks
         var response = await page.APIRequest.GetAsync(new Uri(new Uri(baseUrl), "getting-started/quick-start").ToString());
         var html = await response.TextAsync();
         Assert.DoesNotContain("data-search=", html);
-        Assert.Contains("data-bx-content-search-index=\"search-index.json\"", html);
+        Assert.Contains("data-lx-content-search-index=\"search-index.json\"", html);
         Assert.True(System.Text.Encoding.UTF8.GetByteCount(html) < 100_000, $"the page is {System.Text.Encoding.UTF8.GetByteCount(html)} bytes: the search index is in it");
 
         var index = await page.APIRequest.GetAsync(new Uri(new Uri(baseUrl), "search-index.json").ToString());
@@ -144,7 +144,7 @@ internal static class DocsChecks
     public static async Task AssertColorMode(IPage page)
     {
         var dark = (await page.Locator("html").GetAttributeAsync("class") ?? "").Contains("dark");
-        await page.Locator("[data-bx-color-mode=toggle]").Locator("visible=true").First.ClickAsync();
+        await page.Locator("[data-lx-color-mode=toggle]").Locator("visible=true").First.ClickAsync();
         await Assertions.Expect(page.Locator("html")).ToHaveClassAsync(dark ? new Regex("^((?!dark).)*$") : new Regex("dark"));
     }
 
@@ -155,7 +155,7 @@ internal static class DocsChecks
         foreach (var path in paths)
         {
             await page.GotoAsync(path);
-            await page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+            await page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
             var sizes = await page.EvaluateAsync<int[]>("() => [document.documentElement.scrollWidth, document.documentElement.clientWidth]");
             Assert.True(sizes[0] <= sizes[1], $"horizontal scroll at 375px on '{path}': scrollWidth {sizes[0]} > clientWidth {sizes[1]}");
         }
@@ -164,21 +164,21 @@ internal static class DocsChecks
 
 /// <summary>
 /// The Docs template as a user ships it: <c>dotnet publish -c Release</c>, run in Production at the root and below a path base. Started by
-/// <c>build/verify-templates.mjs</c> with <c>BLUX_TEMPLATE_PUBLISHED</c>, <c>BLUX_TEMPLATE_ASSEMBLY</c> and <c>BLUX_TEMPLATE_PROBE</c>; without them
+/// <c>build/verify-templates.mjs</c> with <c>LUX_TEMPLATE_PUBLISHED</c>, <c>LUX_TEMPLATE_ASSEMBLY</c> and <c>LUX_TEMPLATE_PROBE</c>; without them
 /// the tests are skipped. The pages are static: the test fails if a WebSocket opens or a WebAssembly file is requested.
 /// </summary>
 public class DocsTemplateTests(PlaygroundServer server)
 {
-    private static string? Published => Environment.GetEnvironmentVariable("BLUX_TEMPLATE_PUBLISHED");
-    private static string? AssemblyName => Environment.GetEnvironmentVariable("BLUX_TEMPLATE_ASSEMBLY");
-    private static string? Probe => Environment.GetEnvironmentVariable("BLUX_TEMPLATE_PROBE");
+    private static string? Published => Environment.GetEnvironmentVariable("LUX_TEMPLATE_PUBLISHED");
+    private static string? AssemblyName => Environment.GetEnvironmentVariable("LUX_TEMPLATE_ASSEMBLY");
+    private static string? Probe => Environment.GetEnvironmentVariable("LUX_TEMPLATE_PROBE");
 
     [Theory]
     [InlineData(null)]
     [InlineData("/demo/docs")]
     public async Task Published_site_is_static_and_its_parts_work(string? pathBase)
     {
-        Assert.SkipWhen(string.IsNullOrEmpty(Published) || string.IsNullOrEmpty(AssemblyName), "BLUX_TEMPLATE_PUBLISHED and BLUX_TEMPLATE_ASSEMBLY are not set.");
+        Assert.SkipWhen(string.IsNullOrEmpty(Published) || string.IsNullOrEmpty(AssemblyName), "LUX_TEMPLATE_PUBLISHED and LUX_TEMPLATE_ASSEMBLY are not set.");
 
         var port = FreePort();
         var host = $"http://127.0.0.1:{port}";

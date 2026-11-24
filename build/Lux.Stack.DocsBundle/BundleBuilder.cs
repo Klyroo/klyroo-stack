@@ -40,12 +40,12 @@ public static class BundleBuilder
 
     /// <summary>The NuGet package of a component when it is not Lux.UI: the assembly of its first type from a sister package (<c>Lux.Table</c>).</summary>
     private static string? PackageOf(ComponentDoc component) =>
-        component.Api.Select(t => t.Assembly.GetName().Name).FirstOrDefault(name => name != typeof(BxButton).Assembly.GetName().Name);
+        component.Api.Select(t => t.Assembly.GetName().Name).FirstOrDefault(name => name != typeof(LxButton).Assembly.GetName().Name);
 
     private static string Version()
     {
-        var info = typeof(BxButton).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
-            ?? typeof(BxButton).Assembly.GetName().Version?.ToString() ?? "0.0.0";
+        var info = typeof(LxButton).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+            ?? typeof(LxButton).Assembly.GetName().Version?.ToString() ?? "0.0.0";
         var plus = info.IndexOf('+');
         return plus < 0 ? info : info[..plus];
     }
@@ -102,7 +102,7 @@ public static class BundleBuilder
             UiOf(definition), ThemeOf(definition, themes, repoRoot));
     }
 
-    /// <summary><c>BxTable&lt;TItem&gt;</c> for a generic component, its type name otherwise.</summary>
+    /// <summary><c>LxTable&lt;TItem&gt;</c> for a generic component, its type name otherwise.</summary>
     private static string DisplayName(Type type)
     {
         if (!type.IsGenericType) return type.Name;
@@ -114,10 +114,10 @@ public static class BundleBuilder
     {
         type = Nullable.GetUnderlyingType(type) ?? type;
         if (type.IsEnum) return Enum.GetNames(type);
-        if (type == typeof(BxColor))
+        if (type == typeof(LxColor))
         {
-            return [.. typeof(BxColor).GetProperties(BindingFlags.Public | BindingFlags.Static)
-                .Where(p => p.PropertyType == typeof(BxColor)).Select(p => ((BxColor)p.GetValue(null)!).Value)];
+            return [.. typeof(LxColor).GetProperties(BindingFlags.Public | BindingFlags.Static)
+                .Where(p => p.PropertyType == typeof(LxColor)).Select(p => ((LxColor)p.GetValue(null)!).Value)];
         }
         return null;
     }
@@ -136,11 +136,11 @@ public static class BundleBuilder
 
     private static BundleTheme? ThemeOf(Type component, IReadOnlyList<ThemeEntry> themes, string repoRoot)
     {
-        var name = component.Name.StartsWith("Bx", StringComparison.Ordinal) ? component.Name[2..] : component.Name;
+        var name = component.Name.StartsWith("Lx", StringComparison.Ordinal) ? component.Name[2..] : component.Name;
         if (name.Contains('`')) name = name[..name.IndexOf('`')];
 
         // A component of a sister package sees its own extension themes first, and a core theme of the same name never wins over them.
-        var fromExtension = component.Assembly != typeof(BxButton).Assembly;
+        var fromExtension = component.Assembly != typeof(LxButton).Assembly;
         var candidates = (fromExtension ? themes.OrderBy(t => t.Owner is null) : themes.Where(t => t.Owner is null)).ToList();
 
         // The component says which theme it resolves: the first "Options.X", "Options.Extension<T>().X" or "<Prefix>Options.X" (a property of the options of a sister package, like
@@ -217,7 +217,7 @@ public static class BundleBuilder
     private static IReadOnlyList<string> Icons(string repoRoot)
     {
         // The Lucide icons embedded in the library; the class is internal, so it is read by reflection.
-        var registry = typeof(BxButton).Assembly.GetType("Lux.UI.BuiltinIcons");
+        var registry = typeof(LxButton).Assembly.GetType("Lux.UI.BuiltinIcons");
         var builtin = registry?.GetField("Lucide", BindingFlags.Public | BindingFlags.Static)?.GetValue(null) as IReadOnlyDictionary<string, string>;
         // Plus the ones of the sister packages: their registrars add them at startup, so the list they are generated from is read (build/tools-icons.json).
         var tools = Path.Combine(repoRoot, "..", "lux-ui", "build", "tools-icons.json");

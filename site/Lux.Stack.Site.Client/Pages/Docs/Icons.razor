@@ -8,7 +8,7 @@
     <p class="pg-lead">Any icon of any Iconify collection works by name, and the icons components draw can be replaced by name. The build bundles the icons your app uses into the app via MSBuild, so nothing is requested from a third party when the page runs.</p>
 
     <h2>Names</h2>
-    <p>Three forms name an icon, and <code>BxIcon</code> accepts all of them wherever a name is expected (<code>Name</code>, <code>Icon</code>, <code>LeadingIcon</code> of items, <code>LuxOptions.Icons</code>):</p>
+    <p>Three forms name an icon, and <code>LxIcon</code> accepts all of them wherever a name is expected (<code>Name</code>, <code>Icon</code>, <code>LeadingIcon</code> of items, <code>LuxOptions.Icons</code>):</p>
     <ul>
         <li><code>i-{collection}-{name}</code> prefixed shorthand: <code>i-lucide-lightbulb</code>, <code>i-ph-house</code>, <code>i-simple-icons-github</code>.</li>
         <li><code>{collection}:{name}</code> is the form of Iconify itself: <code>lucide:lightbulb</code>, <code>ph:house</code>, <code>simple-icons:github</code>.</li>
@@ -21,11 +21,11 @@
     <p>The Lucide icons that components draw, and the ones earlier versions shipped, are embedded in the library (about 75), generated at build time from <code>@@iconify-json/lucide</code>. They work with no setup and no network. Every other icon, Lucide ones included, is bundled when the app is built.</p>
 
     <h2>Bundled at build time</h2>
-    <p>The <code>BluxResolveIcons</code> task runs when your project is compiled. It looks through the <code>.razor</code>, <code>.cshtml</code> and <code>.cs</code> files of the project for icon names written as literals, downloads the ones it does not have from the Iconify API (<code>https://api.iconify.design</code>), keeps them in a cache and generates a C# file, compiled into your assembly, that registers them with Lux.UI at startup. The app serves the icon data as part of its own code: no request, no client bundle to configure, and it works the same in static rendering, Server, WebAssembly and Auto, trimmed or not.</p>
+    <p>The <code>LuxResolveIcons</code> task runs when your project is compiled. It looks through the <code>.razor</code>, <code>.cshtml</code> and <code>.cs</code> files of the project for icon names written as literals, downloads the ones it does not have from the Iconify API (<code>https://api.iconify.design</code>), keeps them in a cache and generates a C# file, compiled into your assembly, that registers them with Lux.UI at startup. The app serves the icon data as part of its own code: no request, no client bundle to configure, and it works the same in static rendering, Server, WebAssembly and Auto, trimmed or not.</p>
     <p>What the scan recognizes is deliberately narrow, so a stray string never costs a download:</p>
     <ul>
         <li>The value of an attribute or property whose name ends in <code>Icon</code>, when it is a plain string literal: <code>Icon="ph:house"</code>, <code>LeadingIcon="i-mdi-home"</code>, <code>new("Home") &#123; Icon = "lucide:house" &#125;</code>.</li>
-        <li>The <code>Name</code> of a <code>&lt;BxIcon&gt;</code> and the argument of <code>BxIcons.Named("...")</code>.</li>
+        <li>The <code>Name</code> of a <code>&lt;LxIcon&gt;</code> and the argument of <code>LxIcons.Named("...")</code>.</li>
         <li>The assignment of an app icon: <code>o.Icons.Close = "ph:x"</code>.</li>
         <li>Any string that is, on its own, <code>i-prefix-name</code> with the prefix of an Iconify collection (<code>"i-mdi-home"</code>), anywhere in the code. The <code>prefix:name</code> form is read only in the places above, never as a standalone string: many collection prefixes are ordinary words (<code>token</code>, <code>memory</code>, <code>map</code>, <code>geo</code>), so a <code>"memory:cache"</code> in your code would otherwise be sent to the API.</li>
     </ul>
@@ -71,10 +71,10 @@
     <p>The ids inside an icon (gradients, clip paths, the animations that start after another) are global to the page, so every drawing of an icon gets its own: <code>id="a"</code> becomes <code>id="a-bx1"</code>, with each reference rewritten. An icon with no id is rendered exactly as it is.</p>
 
     <h2>Icons that are not found</h2>
-    <p>An icon that cannot be resolved at run time renders an empty icon carrying <code>data-bx-missing-icon="name"</code>, so it is easy to find in the page (<code>[data-bx-missing-icon]</code> in the browser's search). At build time, a name in one of the first three places above that does not exist in a known collection, and any <code>LuxIcon</code> item that does not exist, is a warning in a Debug build and an error in a Release build (<code>LuxIconsFailOnError</code> overrides either), with the file and line. A bare name or a standalone string that is not found is only mentioned in the detailed build log, because it may be an icon you register yourself.</p>
+    <p>An icon that cannot be resolved at run time renders an empty icon carrying <code>data-lx-missing-icon="name"</code>, so it is easy to find in the page (<code>[data-lx-missing-icon]</code> in the browser's search). At build time, a name in one of the first three places above that does not exist in a known collection, and any <code>LuxIcon</code> item that does not exist, is a warning in a Debug build and an error in a Release build (<code>LuxIconsFailOnError</code> overrides either), with the file and line. A bare name or a standalone string that is not found is only mentioned in the detailed build log, because it may be an icon you register yourself.</p>
 
     <h2>Cache, CI and offline builds</h2>
-    <p>Every icon is cached on its own in <code>obj/blux/icons-cache</code>, so a later build asks the API only for the icons it lacks, and an icon the API reports as not found is remembered too, as is a collection it does not have (a misspelled prefix is answered once per cache window, not at every build, and is reported as an unknown collection rather than as a network failure). An answer that neither has the icon nor lists it as not found is a failed download and is never remembered. A cached icon is trusted for 30 days (<code>LuxIconsCacheDays</code>); when the network fails the cached one is used whatever its age. The cache keeps what the API answered, with a format version: sanitizing happens when the file is generated, so an update of Lux.UI that tightens it also applies to icons already cached, and entries of an older format are asked again when the network is there. Several projects (and target frameworks) can share one cache folder, files are replaced atomically; a folder that cannot be written is a warning (<code>BLUXICON004</code>), never a lost icon. With <code>LuxOffline=true</code> the network is never touched and every icon must be in the cache, so keep <code>LuxCacheDir</code> between CI runs. The first build of a project needs network access to <code>api.iconify.design</code>, or a self-hosted API set with <code>LuxIconsApi</code> (an https address).</p>
+    <p>Every icon is cached on its own in <code>obj/lux/icons-cache</code>, so a later build asks the API only for the icons it lacks, and an icon the API reports as not found is remembered too, as is a collection it does not have (a misspelled prefix is answered once per cache window, not at every build, and is reported as an unknown collection rather than as a network failure). An answer that neither has the icon nor lists it as not found is a failed download and is never remembered. A cached icon is trusted for 30 days (<code>LuxIconsCacheDays</code>); when the network fails the cached one is used whatever its age. The cache keeps what the API answered, with a format version: sanitizing happens when the file is generated, so an update of Lux.UI that tightens it also applies to icons already cached, and entries of an older format are asked again when the network is there. Several projects (and target frameworks) can share one cache folder, files are replaced atomically; a folder that cannot be written is a warning (<code>LUXICON004</code>), never a lost icon. With <code>LuxOffline=true</code> the network is never touched and every icon must be in the cache, so keep <code>LuxCacheDir</code> between CI runs. The first build of a project needs network access to <code>api.iconify.design</code>, or a self-hosted API set with <code>LuxIconsApi</code> (an https address).</p>
     <CodeBlock Title="Site.csproj" Code="@Properties" />
 
     <h2>Auto render mode</h2>
@@ -84,7 +84,7 @@
     <p><code>LuxIcons=false</code> disables the feature: nothing is scanned, downloaded or generated (a file left by an earlier build is removed), and only the built-in Lucide icons and the icons registered in code are available. <code>LuxIconsScan=false</code> keeps the <code>LuxIcon</code> items and the custom collections but does not read your sources.</p>
 
     <h2>Migrating from the dictionary</h2>
-    <p><code>LuxOptions.Icons</code> was a dictionary from a name to the <code>d</code> of a single path, drawn as a round 2px stroke. It is now the object above. <code>BxIcons.Close()</code>, <code>Check()</code>, <code>ChevronDown()</code> and the other helpers are gone: use <code>BxIcons.Named("x")</code> or an <code>&lt;BxIcon&gt;</code>.</p>
+    <p><code>LuxOptions.Icons</code> was a dictionary from a name to the <code>d</code> of a single path, drawn as a round 2px stroke. It is now the object above. <code>LxIcons.Close()</code>, <code>Check()</code>, <code>ChevronDown()</code> and the other helpers are gone: use <code>LxIcons.Named("x")</code> or an <code>&lt;LxIcon&gt;</code>.</p>
     <CodeBlock Title="Before and after" Code="@Migration" />
     <p>The markup of an icon is now stored whole, so the stroke is part of the icon instead of part of the component: give a registered path its own <code>fill</code> or <code>stroke</code>.</p>
 
@@ -149,10 +149,10 @@
     ];
 
     private const string Names = """
-        <BxIcon Name="i-lucide-lightbulb" />
-        <BxIcon Name="ph:house" />
-        <BxIcon Name="simple-icons:github" />
-        <BxButton Label="Open" LeadingIcon="BxIcons.Named("i-mdi-folder-open")" />
+        <LxIcon Name="i-lucide-lightbulb" />
+        <LxIcon Name="ph:house" />
+        <LxIcon Name="simple-icons:github" />
+        <LxButton Label="Open" LeadingIcon="LxIcons.Named("i-mdi-folder-open")" />
         """;
 
     private const string Explicit = """
@@ -189,7 +189,7 @@
     private const string Properties = """
         <PropertyGroup>
           <LuxOffline>true</LuxOffline>
-          <LuxCacheDir>$(MSBuildProjectDirectory)/.blux-cache/</LuxCacheDir>
+          <LuxCacheDir>$(MSBuildProjectDirectory)/.lux-cache/</LuxCacheDir>
           <LuxIconsCacheDays>90</LuxIconsCacheDays>
           <LuxIconsFailOnError>false</LuxIconsFailOnError>
           <LuxIconsApi>https://icons.example.com</LuxIconsApi>
@@ -199,10 +199,10 @@
     private const string Migration = """
         // before
         o.Icons["brand"] = "M3 3h18v18H3z";
-        BxIcons.Close("size-4")
+        LxIcons.Close("size-4")
 
         // after
         o.Icons.Register("brand", "<path fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" d=\"M3 3h18v18H3z\" />");
-        BxIcons.Named("x", "size-4")
+        LxIcons.Named("x", "size-4")
         """;
 }

@@ -59,7 +59,7 @@ public class AiTests(PlaygroundServer server)
         Assert.StartsWith("# Lux.UI", text);
         Assert.Contains("## Button", text);
         Assert.Contains("`Variant`: `ButtonVariant`", text);
-        Assert.Contains("<BxButton", text);
+        Assert.Contains("<LxButton", text);
     }
 
     [Fact]

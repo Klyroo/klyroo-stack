@@ -8,22 +8,22 @@
     <p class="pg-lead">Compile your own Tailwind CSS, with the Lux.UI theme, when you run <code>dotnet build</code>. No Node, no npm: the build downloads the official Tailwind standalone CLI once and runs it.</p>
 
     <h2>Turn it on</h2>
-    <p>Set one property in the project that owns the stylesheet, and write the stylesheet. It is the usual Tailwind v4 entry: it imports Tailwind and the theme that every build copies to <code>obj/blux/lux.theme.css</code> (see <a href="/docs/installation">Installation</a>).</p>
+    <p>Set one property in the project that owns the stylesheet, and write the stylesheet. It is the usual Tailwind v4 entry: it imports Tailwind and the theme that every build copies to <code>obj/lux/lux.theme.css</code> (see <a href="/docs/installation">Installation</a>).</p>
     <CodeBlock Title="Site.csproj" Code="@Project" />
     <CodeBlock Title="Styles/app.css" Code="@Css" />
     <p>The theme also lists the classes the Lux.UI components use, so they are generated with yours: there is nothing to add for them. The CLI finds your <code>.razor</code>, <code>.cs</code> and <code>.html</code> files itself, starting from the project folder; <code>obj</code> and <code>bin</code> are left out. Use <code>@@source</code> in the stylesheet for any other folder (a shared project, say), and <code>@@import "tailwindcss" source(none)</code> if you want to list every source yourself.</p>
 
     <h2>Where the CSS goes</h2>
-    <p>The result is not written into your source tree. It is generated into <code>obj/&lt;configuration&gt;/&lt;framework&gt;/blux/tailwind/</code> and added to the static web assets, so it is served like any file of <code>wwwroot</code> and fingerprinted by <code>@@Assets[...]</code>. The route is <code>app.css</code> in a web project and <code>_content/&lt;Project&gt;/app.css</code> in a Razor class library, which is what a MAUI Blazor Hybrid host or a web host that references the library links to. That is why it is generated into <code>obj</code> and not <code>wwwroot</code>: the same setting works in both kinds of project, and a library does not need a generated file checked in.</p>
+    <p>The result is not written into your source tree. It is generated into <code>obj/&lt;configuration&gt;/&lt;framework&gt;/lux/tailwind/</code> and added to the static web assets, so it is served like any file of <code>wwwroot</code> and fingerprinted by <code>@@Assets[...]</code>. The route is <code>app.css</code> in a web project and <code>_content/&lt;Project&gt;/app.css</code> in a Razor class library, which is what a MAUI Blazor Hybrid host or a web host that references the library links to. That is why it is generated into <code>obj</code> and not <code>wwwroot</code>: the same setting works in both kinds of project, and a library does not need a generated file checked in.</p>
     <CodeBlock Title="App.razor" Code="@Link" />
     <p>In Release the CSS is minified. <code>dotnet watch</code> rebuilds when the stylesheet changes: it is declared as a watched file.</p>
 
     <h2>Sister packages</h2>
 <p>
     <code>Lux.Table</code> and the packages after it have no precompiled stylesheet, so they need Tailwind compiled by your app. With <code>LuxTailwind=true</code> nothing else is needed: when the package is
-    referenced, the generated entry also imports <code>obj/blux/lux-table.theme.css</code> (the classes of the package's components), so the single compiled sheet holds Lux.UI, Lux.Table and your own classes,
-    variants included. With your own Tailwind pipeline, add the import yourself and set <code>&lt;BluxToolsOwnTailwind&gt;true&lt;/BluxToolsOwnTailwind&gt;</code> in the project, which tells the build that you compile Tailwind;
-    without either, the build warns with <code>BLUXTOOLS001</code>.
+    referenced, the generated entry also imports <code>obj/lux/lux-table.theme.css</code> (the classes of the package's components), so the single compiled sheet holds Lux.UI, Lux.Table and your own classes,
+    variants included. With your own Tailwind pipeline, add the import yourself and set <code>&lt;LuxToolsOwnTailwind&gt;true&lt;/LuxToolsOwnTailwind&gt;</code> in the project, which tells the build that you compile Tailwind;
+    without either, the build warns with <code>LUXTOOLS001</code>.
 </p>
 
 <h2>The binary</h2>
@@ -37,7 +37,7 @@
         <li><code>LuxTailwindMinify</code>: default <code>true</code> in Release.</li>
         <li><code>LuxTailwindExecutable</code>: a Tailwind binary to use instead of the download, with no check. A path that does not exist is an error.</li>
         <li><code>LuxTailwindVersion</code>: the release to download. Only the default has embedded checksums; another version is refused, so use <code>LuxTailwindExecutable</code> for it.</li>
-        <li><code>LuxTailwindCacheDir</code>: the cache of binaries. Default: one folder per user, shared by every project and solution (<code>~/.blux/tailwind</code> on Linux and macOS, <code>%LOCALAPPDATA%\Lux.UI\tailwind</code> on Windows), so the binary is downloaded once per machine. Like the NuGet cache it is never pruned and can be deleted at any time: the next build downloads and verifies the binary again. The stamp is trusted as far as the folder is: someone who can rewrite the file while keeping its size and modification time can also replace the stamp. Keep it between CI runs to download once there too.</li>
+        <li><code>LuxTailwindCacheDir</code>: the cache of binaries. Default: one folder per user, shared by every project and solution (<code>~/.lux/tailwind</code> on Linux and macOS, <code>%LOCALAPPDATA%\Lux.UI\tailwind</code> on Windows), so the binary is downloaded once per machine. Like the NuGet cache it is never pruned and can be deleted at any time: the next build downloads and verifies the binary again. The stamp is trusted as far as the folder is: someone who can rewrite the file while keeping its size and modification time can also replace the stamp. Keep it between CI runs to download once there too.</li>
         <li><code>LuxTailwindAdditionalInput</code>: files outside the project that the stylesheet reads (items, globs allowed). See below.</li>
         <li><code>LuxOffline</code>: <code>true</code> never touches the network.</li>
     </ul>
@@ -48,7 +48,7 @@
     <CodeBlock Title="Styles/app.css" Code="@SharedCss" />
 
     <h2>Offline builds</h2>
-    <p>The download is the only network use. Fill the cache with one online build and set <code>LuxOffline=true</code> afterwards, or install Tailwind another way and give its path to <code>LuxTailwindExecutable</code>. When the download is impossible, the build fails with <code>BLUXTW001</code>, an error that names <code>LuxTailwindExecutable</code>, because without the CSS the app would run unstyled.</p>
+    <p>The download is the only network use. Fill the cache with one online build and set <code>LuxOffline=true</code> afterwards, or install Tailwind another way and give its path to <code>LuxTailwindExecutable</code>. When the download is impossible, the build fails with <code>LUXTW001</code>, an error that names <code>LuxTailwindExecutable</code>, because without the CSS the app would run unstyled.</p>
     <CodeBlock Title="Site.csproj" Code="@Offline" />
 
     <h2>Incremental builds</h2>
@@ -69,7 +69,7 @@
 
     private const string Css = """
         @import "tailwindcss";
-        @import "../obj/blux/lux.theme.css";
+        @import "../obj/lux/lux.theme.css";
 
         /* your own CSS, and @source for folders the scan does not reach */
         """;
@@ -90,7 +90,7 @@
 
     private const string SharedCss = """
         @import "tailwindcss";
-        @import "../obj/blux/lux.theme.css";
+        @import "../obj/lux/lux.theme.css";
         @source "../../Shared";
         """;
 

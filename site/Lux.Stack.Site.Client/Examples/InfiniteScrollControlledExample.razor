@@ -1,15 +1,15 @@
 <div class="flex w-full max-w-md flex-col gap-3">
     <div id="log-scroll" role="region" aria-label="Log" tabindex="0" data-testid="log-feed"
-         class="h-64 overflow-y-auto rounded-lg border border-(--blux-border) bg-(--blux-bg)">
+         class="h-64 overflow-y-auto rounded-lg border border-(--lux-border) bg-(--lux-bg)">
         <ul>
             @for (var i = 1; i <= _count; i++)
             {
-                <li class="border-b border-(--blux-border) px-3 py-2 font-mono text-xs">line @i</li>
+                <li class="border-b border-(--lux-border) px-3 py-2 font-mono text-xs">line @i</li>
             }
         </ul>
-        <BxInfiniteScroll Root="#log-scroll" RootMargin="0px" Loading="_loading" HasMore="_count < 45" OnLoadMore="Load" ShowEnd data-testid="log-more" />
+        <LxInfiniteScroll Root="#log-scroll" RootMargin="0px" Loading="_loading" HasMore="_count < 45" OnLoadMore="Load" ShowEnd data-testid="log-more" />
     </div>
-    <p class="text-sm text-(--blux-text-muted)" data-testid="log-count">Lines: @_count</p>
+    <p class="text-sm text-(--lux-text-muted)" data-testid="log-count">Lines: @_count</p>
 </div>
 
 @code {

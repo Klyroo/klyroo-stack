@@ -1,21 +1,21 @@
 @* The list follows new messages while you are at the bottom. Scroll up and it stops; "Jump to latest" brings you back.
    The buttons need interactivity, since they change the list from .NET. *@
 <div class="flex w-full max-w-xl flex-col gap-3">
-    <div class="flex h-72 flex-col overflow-hidden rounded-xl border border-(--blux-border)">
-        <BxChatMessages Status="_status" data-testid="chat-messages-demo">
+    <div class="flex h-72 flex-col overflow-hidden rounded-xl border border-(--lux-border)">
+        <LxChatMessages Status="_status" data-testid="chat-messages-demo">
             @foreach (var message in _messages)
             {
-                <BxChatMessage @key="message.Id" Role="message.Role" Text="@message.Text" />
+                <LxChatMessage @key="message.Id" Role="message.Role" Text="@message.Text" />
             }
-        </BxChatMessages>
+        </LxChatMessages>
     </div>
     <div class="flex flex-wrap items-center gap-2">
-        <BxButton Label="Add a message" Size="BxSize.Sm" OnClick="AddUser" data-testid="chat-messages-add" />
-        <BxButton Label="Add a reply" Size="BxSize.Sm" Variant="ButtonVariant.Outline" OnClick="AddAssistant" data-testid="chat-messages-reply" />
+        <LxButton Label="Add a message" Size="LxSize.Sm" OnClick="AddUser" data-testid="chat-messages-add" />
+        <LxButton Label="Add a reply" Size="LxSize.Sm" Variant="ButtonVariant.Outline" OnClick="AddAssistant" data-testid="chat-messages-reply" />
         @foreach (var status in Enum.GetValues<ChatStatus>())
         {
             var s = status;
-            <BxButton Label="@s.ToString()" Size="BxSize.Sm" Variant="ButtonVariant.Soft" Color="BxColor.Neutral" OnClick="() => _status = s"
+            <LxButton Label="@s.ToString()" Size="LxSize.Sm" Variant="ButtonVariant.Soft" Color="LxColor.Neutral" OnClick="() => _status = s"
                       data-testid="@($"chat-messages-status-{s.ToString().ToLowerInvariant()}")" />
         }
     </div>

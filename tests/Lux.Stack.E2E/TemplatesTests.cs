@@ -25,8 +25,8 @@ public class TemplatesTests(PlaygroundServer server) : PlaygroundTest(server)
     private void RequireDemos()
     {
         if (TemplatesReady) return;
-        Assert.False(Environment.GetEnvironmentVariable("CI") is { Length: > 0 }, "The template demos are not running (BLUX_PLAYGROUND_PUBLISHED is set without BLUX_TEMPLATES_PUBLISHED).");
-        Assert.SkipWhen(true, "The docs run published with no BLUX_TEMPLATES_PUBLISHED folder: there is no template demo to open.");
+        Assert.False(Environment.GetEnvironmentVariable("CI") is { Length: > 0 }, "The template demos are not running (LUX_PLAYGROUND_PUBLISHED is set without LUX_TEMPLATES_PUBLISHED).");
+        Assert.SkipWhen(true, "The docs run published with no LUX_TEMPLATES_PUBLISHED folder: there is no template demo to open.");
     }
 
     private async Task OpenGallery(ColorScheme scheme = ColorScheme.Light)
@@ -34,7 +34,7 @@ public class TemplatesTests(PlaygroundServer server) : PlaygroundTest(server)
         await Page.EmulateMediaAsync(new() { ColorScheme = scheme });
         await Page.GotoAsync("templates");
         await Assertions.Expect(Page.GetByRole(AriaRole.Heading, new() { Level = 1 })).ToContainTextAsync("working app");
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
     }
 
     [Theory]
@@ -217,7 +217,7 @@ public class TemplatesTests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task The_host_reports_every_demo_as_ready()
     {
         RequireDemos();
-        var response = await Page.APIRequest.GetAsync(BaseUrl + "/_blux/templates/ready");
+        var response = await Page.APIRequest.GetAsync(BaseUrl + "/_lux/templates/ready");
 
         Assert.True(response.Ok);
         using var status = System.Text.Json.JsonDocument.Parse(await response.TextAsync());
@@ -280,7 +280,7 @@ public class TemplatesTests(PlaygroundServer server) : PlaygroundTest(server)
         RequireDemos();
         await Page.EmulateMediaAsync(new() { ColorScheme = scheme });
         await Page.GotoAsync(LandingPath.TrimStart('/'));
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-accordion')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-accordion')");
         await Assertions.Expect(Page.Locator("html")).ToHaveClassAsync(scheme == ColorScheme.Dark ? new Regex("dark") : new Regex("^((?!dark).)*$"));
 
         await AssertNoAccessibilityViolations();
@@ -295,7 +295,7 @@ public class TemplatesTests(PlaygroundServer server) : PlaygroundTest(server)
     {
         RequireDemos();
         await Page.GotoAsync(LandingPath.TrimStart('/'));
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-accordion')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-accordion')");
 
         await LandingChecks.AssertNoHorizontalScroll(Page);
     }
@@ -306,7 +306,7 @@ public class TemplatesTests(PlaygroundServer server) : PlaygroundTest(server)
         RequireDemos();
         await Page.SetViewportSizeAsync(375, 800);
         await Page.GotoAsync(LandingPath.TrimStart('/'));
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-accordion')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-accordion')");
 
         await Page.GetByRole(AriaRole.Button, new() { Name = "Open menu" }).ClickAsync();
         var dialog = Page.GetByRole(AriaRole.Dialog);
@@ -366,7 +366,7 @@ public class TemplatesTests(PlaygroundServer server) : PlaygroundTest(server)
         foreach (var path in new[] { "", "pricing", "blog", "blog/how-we-keep-ping-latency-under-40-ms", "docs", "docs/guides/alert-channels", "changelog", "changelog/2-0", "login", "signup", "forgot-password", "legal/terms" })
         {
             await Page.GotoAsync(SaasPath.TrimStart('/') + path);
-            await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+            await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
             await Assertions.Expect(Page.Locator("html")).ToHaveClassAsync(scheme == ColorScheme.Dark ? new Regex("dark") : new Regex("^((?!dark).)*$"));
             // The lazy cover images are in the page when the scan runs.
             await Page.EvaluateAsync("() => document.querySelectorAll('img').forEach(i => i.loading = 'eager')");
@@ -380,7 +380,7 @@ public class TemplatesTests(PlaygroundServer server) : PlaygroundTest(server)
     {
         RequireDemos();
         await Page.GotoAsync(SaasPath.TrimStart('/') + "pricing");
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-accordion')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-accordion')");
         await Page.GetByText("Yearly, 2 months free").ClickAsync();
         await AssertNoAccessibilityViolations();
 
@@ -405,7 +405,7 @@ public class TemplatesTests(PlaygroundServer server) : PlaygroundTest(server)
         RequireDemos();
         await Page.SetViewportSizeAsync(375, 800);
         await Page.GotoAsync(SaasPath.TrimStart('/'));
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
 
         await Page.GetByRole(AriaRole.Button, new() { Name = "Open menu" }).ClickAsync();
         var dialog = Page.GetByRole(AriaRole.Dialog);
@@ -468,7 +468,7 @@ public class TemplatesTests(PlaygroundServer server) : PlaygroundTest(server)
         foreach (var path in new[] { "", "work", "work/quire", "about", "writing", "writing/a-focus-ring-you-can-see-on-every-background", "speaking", "contact", "uses" })
         {
             await Page.GotoAsync(PortfolioPath.TrimStart('/') + path);
-            await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+            await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
             await Assertions.Expect(Page.Locator("html")).ToHaveClassAsync(scheme == ColorScheme.Dark ? new Regex("dark") : new Regex("^((?!dark).)*$"));
             // The lazy cover images are in the page when the scan runs.
             await Page.EvaluateAsync("() => document.querySelectorAll('img').forEach(i => i.loading = 'eager')");
@@ -501,7 +501,7 @@ public class TemplatesTests(PlaygroundServer server) : PlaygroundTest(server)
         RequireDemos();
         await Page.SetViewportSizeAsync(375, 800);
         await Page.GotoAsync(PortfolioPath.TrimStart('/'));
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
 
         await Page.GetByRole(AriaRole.Button, new() { Name = "Open menu" }).ClickAsync();
         var dialog = Page.GetByRole(AriaRole.Dialog);
@@ -563,7 +563,7 @@ public class TemplatesTests(PlaygroundServer server) : PlaygroundTest(server)
         foreach (var path in new[] { "", "reference/commands", "getting-started/quick-start", "getting-started/installation", "guides/troubleshooting" })
         {
             await Page.GotoAsync(DocsPath.TrimStart('/') + path);
-            await Page.WaitForFunctionAsync("() => !!customElements.get('bx-content-toc')");
+            await Page.WaitForFunctionAsync("() => !!customElements.get('lx-content-toc')");
             await Assertions.Expect(Page.Locator("html")).ToHaveClassAsync(scheme == ColorScheme.Dark ? new Regex("dark") : new Regex("^((?!dark).)*$"));
 
             await AssertNoAccessibilityViolations();
@@ -575,7 +575,7 @@ public class TemplatesTests(PlaygroundServer server) : PlaygroundTest(server)
     {
         RequireDemos();
         await Page.GotoAsync(DocsPath.TrimStart('/') + "getting-started/installation");
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
         await Page.GetByRole(AriaRole.Button, new() { Name = "Search" }).Locator("visible=true").First.ClickAsync();
         await Assertions.Expect(Page.GetByRole(AriaRole.Dialog)).ToBeVisibleAsync();
 
@@ -595,7 +595,7 @@ public class TemplatesTests(PlaygroundServer server) : PlaygroundTest(server)
         RequireDemos();
         await Page.SetViewportSizeAsync(375, 800);
         await Page.GotoAsync(DocsPath.TrimStart('/') + "getting-started/installation");
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
 
         await Page.GetByRole(AriaRole.Button, new() { Name = "Open menu" }).ClickAsync();
         var dialog = Page.GetByRole(AriaRole.Dialog);
@@ -674,7 +674,7 @@ public class TemplatesTests(PlaygroundServer server) : PlaygroundTest(server)
         foreach (var path in new[] { "", "?page=2", "releases/v1.4.0", "releases/v1.3.1", "releases/v1.3.0", "releases/v0.8.0" })
         {
             await Page.GotoAsync(ChangelogPath.TrimStart('/') + path);
-            await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+            await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
             await Assertions.Expect(Page.Locator("html")).ToHaveClassAsync(scheme == ColorScheme.Dark ? new Regex("dark") : new Regex("^((?!dark).)*$"));
 
             await AssertNoAccessibilityViolations();

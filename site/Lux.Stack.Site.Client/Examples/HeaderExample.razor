@@ -1,14 +1,14 @@
-<div class="w-full overflow-hidden rounded-xl border border-(--blux-border)">
-    <BxHeader Title="Acme" Items="_items" Sticky="false" AriaLabel="Site" MenuTitle="Site menu" data-testid="header">
+<div class="w-full overflow-hidden rounded-xl border border-(--lux-border)">
+    <LxHeader Title="Acme" Items="_items" Sticky="false" AriaLabel="Site" MenuTitle="Site menu" data-testid="header">
         <Right>
-            <BxButton Label="Sign in" Size="BxSize.Sm" Variant="ButtonVariant.Outline" Color="BxColor.Neutral" />
+            <LxButton Label="Sign in" Size="LxSize.Sm" Variant="ButtonVariant.Outline" Color="LxColor.Neutral" />
         </Right>
-    </BxHeader>
-    <p class="p-6 text-sm text-(--blux-text-muted)">Page content. Narrow the window below the lg breakpoint to get the menu button.</p>
+    </LxHeader>
+    <p class="p-6 text-sm text-(--lux-text-muted)">Page content. Narrow the window below the lg breakpoint to get the menu button.</p>
 </div>
 
 @code {
-    private static readonly BxNavigationItem[] _items =
+    private static readonly LxNavigationItem[] _items =
     [
         new("Home") { Href = "/", Exact = true },
         new("Components")

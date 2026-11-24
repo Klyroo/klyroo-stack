@@ -1,12 +1,12 @@
-@* The ErrorContent of an ErrorBoundary hands over the exception: <BxError Exception="exception" />.
+@* The ErrorContent of an ErrorBoundary hands over the exception: <LxError Exception="exception" />.
    Its message stays hidden unless ShowDetails is set, because exception messages can leak internals. *@
-<div class="w-full overflow-hidden rounded-xl border border-(--blux-border)">
-    <BxError Exception="_exception" ShowDetails HeadingAs="h3" Clear="false" data-testid="error-boundary">
+<div class="w-full overflow-hidden rounded-xl border border-(--lux-border)">
+    <LxError Exception="_exception" ShowDetails HeadingAs="h3" Clear="false" data-testid="error-boundary">
         <Actions>
-            <BxButton Label="Try again" Href="/components/error" />
-            <BxButton Label="Contact support" Variant="ButtonVariant.Outline" Color="BxColor.Neutral" Href="/docs" />
+            <LxButton Label="Try again" Href="/components/error" />
+            <LxButton Label="Contact support" Variant="ButtonVariant.Outline" Color="LxColor.Neutral" Href="/docs" />
         </Actions>
-    </BxError>
+    </LxError>
 </div>
 
 @code {

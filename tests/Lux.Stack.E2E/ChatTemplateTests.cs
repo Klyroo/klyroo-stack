@@ -38,7 +38,7 @@ internal static class ChatChecks
     /// <summary>Waits for the answer to finish: nothing streams any more and the send button is back.</summary>
     public static async Task WaitIdle(IPage page, int timeout = 30_000)
     {
-        await Assertions.Expect(page.Locator("bx-chat-prompt[data-status=idle]")).ToHaveCountAsync(1, new() { Timeout = timeout });
+        await Assertions.Expect(page.Locator("lx-chat-prompt[data-status=idle]")).ToHaveCountAsync(1, new() { Timeout = timeout });
         await Assertions.Expect(page.GetByRole(AriaRole.Button, new() { Name = "Send" })).ToBeVisibleAsync(new() { Timeout = timeout });
         await Assertions.Expect(page.Locator("[data-testid=message-assistant][data-streaming=true]")).ToHaveCountAsync(0, new() { Timeout = timeout });
     }
@@ -339,21 +339,21 @@ internal static class ChatChecks
 
 /// <summary>
 /// The Chat template as a user ships it: <c>dotnet publish -c Release</c>, run in Production at the root and below a path base, with the simulated provider
-/// (<c>Assistant__Provider=Simulated</c>: no key, no network). Started by <c>build/verify-templates.mjs</c> with <c>BLUX_TEMPLATE_PUBLISHED</c>,
-/// <c>BLUX_TEMPLATE_ASSEMBLY</c> and <c>BLUX_TEMPLATE_PROBE</c>; without them the tests are skipped. No request may fail and the console stays free of errors.
+/// (<c>Assistant__Provider=Simulated</c>: no key, no network). Started by <c>build/verify-templates.mjs</c> with <c>LUX_TEMPLATE_PUBLISHED</c>,
+/// <c>LUX_TEMPLATE_ASSEMBLY</c> and <c>LUX_TEMPLATE_PROBE</c>; without them the tests are skipped. No request may fail and the console stays free of errors.
 /// </summary>
 public class ChatTemplateTests(PlaygroundServer server)
 {
-    private static string? Published => Environment.GetEnvironmentVariable("BLUX_TEMPLATE_PUBLISHED");
-    private static string? AssemblyName => Environment.GetEnvironmentVariable("BLUX_TEMPLATE_ASSEMBLY");
-    private static string? Probe => Environment.GetEnvironmentVariable("BLUX_TEMPLATE_PROBE");
+    private static string? Published => Environment.GetEnvironmentVariable("LUX_TEMPLATE_PUBLISHED");
+    private static string? AssemblyName => Environment.GetEnvironmentVariable("LUX_TEMPLATE_ASSEMBLY");
+    private static string? Probe => Environment.GetEnvironmentVariable("LUX_TEMPLATE_PROBE");
 
     [Theory]
     [InlineData(null)]
     [InlineData("/demo/chat")]
     public async Task Published_app_works_from_the_first_question_to_the_deleted_conversation(string? pathBase)
     {
-        Assert.SkipWhen(string.IsNullOrEmpty(Published) || string.IsNullOrEmpty(AssemblyName), "BLUX_TEMPLATE_PUBLISHED and BLUX_TEMPLATE_ASSEMBLY are not set.");
+        Assert.SkipWhen(string.IsNullOrEmpty(Published) || string.IsNullOrEmpty(AssemblyName), "LUX_TEMPLATE_PUBLISHED and LUX_TEMPLATE_ASSEMBLY are not set.");
 
         var port = FreePort();
         var host = $"http://127.0.0.1:{port}";
@@ -433,7 +433,7 @@ public class ChatTemplateTests(PlaygroundServer server)
             // Accessibility in the color mode of the run and in the other one.
             var mode = async () => ((await page.Locator("html").GetAttributeAsync("class") ?? "").Contains("dark") ? "dark" : "light");
             await ChatChecks.AssertAccessible(page, await mode());
-            await page.Locator("[data-bx-color-mode=toggle]").First.ClickAsync();
+            await page.Locator("[data-lx-color-mode=toggle]").First.ClickAsync();
             await page.WaitForFunctionAsync("() => document.getAnimations().length === 0");
             await ChatChecks.AssertAccessible(page, await mode());
 
@@ -476,7 +476,7 @@ public class ChatTemplateTests(PlaygroundServer server)
     [Fact]
     public async Task Circuits_of_one_address_share_their_limits()
     {
-        Assert.SkipWhen(string.IsNullOrEmpty(Published) || string.IsNullOrEmpty(AssemblyName), "BLUX_TEMPLATE_PUBLISHED and BLUX_TEMPLATE_ASSEMBLY are not set.");
+        Assert.SkipWhen(string.IsNullOrEmpty(Published) || string.IsNullOrEmpty(AssemblyName), "LUX_TEMPLATE_PUBLISHED and LUX_TEMPLATE_ASSEMBLY are not set.");
         var host = $"http://127.0.0.1:{FreePort()}";
         var directory = Path.GetFullPath(Published!);
         var start = new ProcessStartInfo("dotnet", [Path.Combine(directory, AssemblyName!), "--urls", host]) { WorkingDirectory = directory, RedirectStandardOutput = true, RedirectStandardError = true };
@@ -561,7 +561,7 @@ public class ChatDemoTests(PlaygroundServer server) : PlaygroundTest(server)
         if (!TemplatesReady)
         {
             Assert.False(Environment.GetEnvironmentVariable("CI") is { Length: > 0 }, "The template demos are not running.");
-            Assert.SkipWhen(true, "The docs run published with no BLUX_TEMPLATES_PUBLISHED folder: there is no template demo to open.");
+            Assert.SkipWhen(true, "The docs run published with no LUX_TEMPLATES_PUBLISHED folder: there is no template demo to open.");
         }
         await Page.Context.GrantPermissionsAsync(["clipboard-read", "clipboard-write"]);
         var requests = new List<string>();

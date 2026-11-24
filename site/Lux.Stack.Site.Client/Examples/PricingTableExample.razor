@@ -1,16 +1,16 @@
 <div class="w-full">
-    <BxPricingTable Caption="Compare the Starter, Pro and Team plans" Tiers="Tiers" Sections="Sections" />
+    <LxPricingTable Caption="Compare the Starter, Pro and Team plans" Tiers="Tiers" Sections="Sections" />
 </div>
 
 @code {
-    private static readonly BxPricingTier[] Tiers =
+    private static readonly LxPricingTier[] Tiers =
     [
         new("starter", "Starter") { Description = "For side projects.", Price = "$0", BillingCycle = "/month", ButtonLabel = "Start for free", ButtonHref = "/docs" },
         new("pro", "Pro") { Description = "For growing teams.", Price = "$29", BillingCycle = "/month", Badge = "Popular", Highlight = true, ButtonLabel = "Get Pro", ButtonHref = "/docs" },
         new("team", "Team") { Description = "For larger organizations.", Price = "$99", BillingCycle = "/month", ButtonLabel = "Contact sales", ButtonHref = "/docs" },
     ];
 
-    private static readonly BxPricingSection[] Sections =
+    private static readonly LxPricingSection[] Sections =
     [
         new("Usage",
         [

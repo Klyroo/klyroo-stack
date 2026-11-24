@@ -121,7 +121,7 @@ public class NavTests(PlaygroundServer server) : PlaygroundTest(server)
         await Open(mode, "splitter");
         var handle = Page.GetByTestId("splitter").GetByRole(AriaRole.Separator);
         await Assertions.Expect(handle).ToHaveAttributeAsync("aria-valuenow", "40");
-        var panel = Page.GetByTestId("splitter").Locator("[data-bx-panel]").First;
+        var panel = Page.GetByTestId("splitter").Locator("[data-lx-panel]").First;
         var before = (await panel.BoundingBoxAsync())!.Width;
 
         await handle.FocusAsync();
@@ -266,7 +266,7 @@ public class NavTests(PlaygroundServer server) : PlaygroundTest(server)
         await EnhancedReload();
 
         await Assertions.Expect(handle).ToHaveAttributeAsync("aria-valuenow", "45");
-        Assert.Contains("45", await splitter.Locator("[data-bx-panel]").First.GetAttributeAsync("style"));
+        Assert.Contains("45", await splitter.Locator("[data-lx-panel]").First.GetAttributeAsync("style"));
     }
 
     [Fact]
@@ -329,7 +329,7 @@ public class NavTests(PlaygroundServer server) : PlaygroundTest(server)
         await Open(mode, "marquee");
         var marquee = Page.GetByTestId("marquee");
 
-        await Assertions.Expect(marquee.Locator("[data-bx-marquee-group][aria-hidden=true]")).ToHaveCountAsync(1);
-        Assert.Equal("running", await marquee.Locator("[data-bx-marquee-group]").First.EvaluateAsync<string>("e => getComputedStyle(e).animationPlayState"));
+        await Assertions.Expect(marquee.Locator("[data-lx-marquee-group][aria-hidden=true]")).ToHaveCountAsync(1);
+        Assert.Equal("running", await marquee.Locator("[data-lx-marquee-group]").First.EvaluateAsync<string>("e => getComputedStyle(e).animationPlayState"));
     }
 }

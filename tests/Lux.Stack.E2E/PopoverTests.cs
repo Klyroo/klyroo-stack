@@ -70,12 +70,12 @@ public class PopoverTests(PlaygroundServer server) : PlaygroundTest(server)
         await Assertions.Expect(Page.GetByTestId("bound-state")).ToHaveTextAsync("State: open");
 
         var open = await Page.EvaluateAsync<bool>(@"() => {
-            const element = document.querySelector('[data-testid=bound-panel]').closest('bx-popover');
+            const element = document.querySelector('[data-testid=bound-panel]').closest('lx-popover');
             const content = element.querySelector(':scope > [popover]');
-            const seq = element.getAttribute('data-bx-seq');
+            const seq = element.getAttribute('data-lx-seq');
             content.hidePopover();
             element.removeAttribute('open');
-            element.setAttribute('data-bx-seq', seq);
+            element.setAttribute('data-lx-seq', seq);
             element.setAttribute('open', '');
             return content.matches(':popover-open');
         }");

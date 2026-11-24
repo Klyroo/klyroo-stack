@@ -1,14 +1,14 @@
 <div class="flex w-full max-w-xs flex-col gap-3">
-    <BxFormField Label="Assign to">
-        <BxInputMenu Items="People" Strict @bind-Value="_person" Placeholder="Pick a person or a team" />
-    </BxFormField>
-    <p class="text-sm text-(--blux-text-muted)" data-testid="assign-state">Assigned: @(_person ?? "nobody")</p>
+    <LxFormField Label="Assign to">
+        <LxInputMenu Items="People" Strict @bind-Value="_person" Placeholder="Pick a person or a team" />
+    </LxFormField>
+    <p class="text-sm text-(--lux-text-muted)" data-testid="assign-state">Assigned: @(_person ?? "nobody")</p>
 </div>
 
 @code {
     private string? _person;
 
-    private static readonly BxSelectItem[] People =
+    private static readonly LxSelectItem[] People =
     [
         new("ada", "Ada Lovelace") { Group = "People", Icon = "bell", Count = 4 },
         new("alan", "Alan Turing") { Group = "People", Icon = "bell", Count = 0 },

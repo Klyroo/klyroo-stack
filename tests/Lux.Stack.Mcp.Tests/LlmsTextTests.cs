@@ -4,7 +4,7 @@ namespace Lux.Stack.Mcp.Tests;
 
 public partial class LlmsTextTests
 {
-    private const string Origin = "https://blux.example";
+    private const string Origin = "https://lux.example";
 
     private static string Index => LlmsText.Index(TestSupport.Bundle, Origin);
 
@@ -19,7 +19,7 @@ public partial class LlmsTextTests
         Assert.Equal(1, lines.Count(l => l.StartsWith("# ")));
         Assert.All(lines.Where(l => l.StartsWith('#')), l => Assert.True(l.StartsWith("# ") || l.StartsWith("## "), l));
         // Every list item of a section is a link with a description.
-        Assert.All(lines.Where(l => l.StartsWith("- ")), l => Assert.Matches(@"^- \[[^\]]+\]\(https://blux\.example/[^)]*\)(: .+)?$", l));
+        Assert.All(lines.Where(l => l.StartsWith("- ")), l => Assert.Matches(@"^- \[[^\]]+\]\(https://lux\.example/[^)]*\)(: .+)?$", l));
     }
 
     [Fact]

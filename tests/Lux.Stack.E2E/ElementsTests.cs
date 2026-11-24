@@ -40,9 +40,9 @@ public class ElementsTests(PlaygroundServer server) : PlaygroundTest(server)
 
         await Assertions.Expect(banner).ToBeHiddenAsync();
         await Page.ReloadAsync();
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-banner')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-banner')");
         await Assertions.Expect(banner).ToBeHiddenAsync();
-        Assert.Equal("1", await Page.EvaluateAsync<string?>("() => localStorage.getItem('blux:banner:playground-launch')"));
+        Assert.Equal("1", await Page.EvaluateAsync<string?>("() => localStorage.getItem('lux:banner:playground-launch')"));
     }
 
     [Theory]

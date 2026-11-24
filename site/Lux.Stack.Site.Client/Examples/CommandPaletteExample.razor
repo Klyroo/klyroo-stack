@@ -1,14 +1,14 @@
 <div class="flex w-full max-w-lg flex-col items-center gap-3">
-    <div class="w-full overflow-hidden rounded-[calc(var(--blux-radius)*2)] border border-(--blux-border) bg-(--blux-bg-overlay)">
-        <BxCommandPalette Groups="Groups" OnSelect="item => _last = item.Label" Placeholder="Type a command or search..." data-testid="palette" />
+    <div class="w-full overflow-hidden rounded-[calc(var(--lux-radius)*2)] border border-(--lux-border) bg-(--lux-bg-overlay)">
+        <LxCommandPalette Groups="Groups" OnSelect="item => _last = item.Label" Placeholder="Type a command or search..." data-testid="palette" />
     </div>
-    <p class="text-sm text-(--blux-text-muted)" data-testid="palette-state">Last command: @(_last ?? "none")</p>
+    <p class="text-sm text-(--lux-text-muted)" data-testid="palette-state">Last command: @(_last ?? "none")</p>
 </div>
 
 @code {
     private string? _last;
 
-    private static readonly BxCommandGroup[] Groups =
+    private static readonly LxCommandGroup[] Groups =
     [
         new("Suggestions",
         [

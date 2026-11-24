@@ -21,7 +21,7 @@ public class FormControlTests(PlaygroundServer server) : PlaygroundTest(server)
 
         await Assertions.Expect(listbox).ToBeHiddenAsync();
         await Assertions.Expect(combobox.Locator("[data-slot=label]")).ToHaveAttributeAsync("data-label", "Italy");
-        await Assertions.Expect(combobox.Locator("xpath=ancestor::bx-select[1]").Locator("input[type=hidden]")).ToHaveValueAsync("it");
+        await Assertions.Expect(combobox.Locator("xpath=ancestor::lx-select[1]").Locator("input[type=hidden]")).ToHaveValueAsync("it");
     }
 
     [Theory]

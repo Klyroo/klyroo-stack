@@ -63,11 +63,11 @@ public static partial class LuxLibraryDocs
     public static string PageHref(string librarySlug, string pageSlug) =>
         string.IsNullOrEmpty(pageSlug) ? $"/{librarySlug}/docs" : $"/{librarySlug}/docs/{pageSlug}";
 
-    public static (BxContentSurroundLink? Previous, BxContentSurroundLink? Next) Surround(LibraryDocTree lib, string pageSlug)
+    public static (LxContentSurroundLink? Previous, LxContentSurroundLink? Next) Surround(LibraryDocTree lib, string pageSlug)
     {
         var idx = Array.FindIndex(lib.Pages, p => string.Equals(p.Slug, pageSlug, StringComparison.OrdinalIgnoreCase));
         if (idx < 0) return (null, null);
-        BxContentSurroundLink ToLink(DocPageSpec p) => new(p.Title, PageHref(lib.LibrarySlug, p.Slug)) { Description = p.Lead };
+        LxContentSurroundLink ToLink(DocPageSpec p) => new(p.Title, PageHref(lib.LibrarySlug, p.Slug)) { Description = p.Lead };
         return (
             idx > 0 ? ToLink(lib.Pages[idx - 1]) : null,
             idx < lib.Pages.Length - 1 ? ToLink(lib.Pages[idx + 1]) : null);

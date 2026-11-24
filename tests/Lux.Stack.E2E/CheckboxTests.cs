@@ -1,6 +1,6 @@
 namespace Lux.Stack.E2E;
 
-/// <summary>BxCheckbox: the indeterminate state, which HTML cannot render and a script of Blux sets on the DOM property.</summary>
+/// <summary>LxCheckbox: the indeterminate state, which HTML cannot render and a script of Lux sets on the DOM property.</summary>
 public class CheckboxTests(PlaygroundServer server) : PlaygroundTest(server)
 {
     private ILocator SelectAll => Page.GetByRole(AriaRole.Checkbox, new() { Name = "Select all" });

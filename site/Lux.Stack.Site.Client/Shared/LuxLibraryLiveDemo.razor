@@ -2,10 +2,10 @@
 @using System.Text.Json
 @using Lux.Query
 
-<div class="my-6 overflow-hidden rounded-2xl border border-(--blux-border) bg-(--blux-bg)">
-    <div class="flex items-center justify-between gap-2 border-b border-(--blux-border) bg-(--blux-bg-muted)/60 px-4 py-2 font-mono text-xs text-(--blux-text-muted)">
-        <span class="flex items-center gap-2 text-(--blux-text-highlighted)">
-            <span class="size-2 rounded-full bg-(--blux-primary)" aria-hidden="true"></span>
+<div class="my-6 overflow-hidden rounded-2xl border border-(--lux-border) bg-(--lux-bg)">
+    <div class="flex items-center justify-between gap-2 border-b border-(--lux-border) bg-(--lux-bg-muted)/60 px-4 py-2 font-mono text-xs text-(--lux-text-muted)">
+        <span class="flex items-center gap-2 text-(--lux-text-highlighted)">
+            <span class="size-2 rounded-full bg-(--lux-primary)" aria-hidden="true"></span>
             LIVE EXAMPLE · @Title
         </span>
         <span>Interactive</span>
@@ -17,20 +17,20 @@
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-wrap items-center gap-3">
                         <div class="w-60">
-                            <BxInput Value="@_qSearch" ValueChanged="@OnQuerySearch" Placeholder="Search products (e.g. M)..." aria-label="Search products" />
+                            <LxInput Value="@_qSearch" ValueChanged="@OnQuerySearch" Placeholder="Search products (e.g. M)..." aria-label="Search products" />
                         </div>
-                        <BxButton Label="@(_qDesc ? "Sort: Price DESC" : "Sort: Price ASC")" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@ToggleQuerySort" />
-                        <BxButton Label="@(_qActiveOnly ? "Active only: ON" : "Active only: OFF")" Size="BxSize.Sm" Color="@(_qActiveOnly ? BxColor.Success : BxColor.Neutral)" Variant="ButtonVariant.Soft" OnClick="@ToggleQueryActive" />
+                        <LxButton Label="@(_qDesc ? "Sort: Price DESC" : "Sort: Price ASC")" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@ToggleQuerySort" />
+                        <LxButton Label="@(_qActiveOnly ? "Active only: ON" : "Active only: OFF")" Size="LxSize.Sm" Color="@(_qActiveOnly ? LxColor.Success : LxColor.Neutral)" Variant="ButtonVariant.Soft" OnClick="@ToggleQueryActive" />
                     </div>
-                    <p class="font-mono text-xs text-(--blux-text-muted)">
-                        Matched <strong class="text-(--blux-text-highlighted)">@_qResult.TotalCount</strong> items via <code>DataListSchema.ExecuteInMemory</code>
+                    <p class="font-mono text-xs text-(--lux-text-muted)">
+                        Matched <strong class="text-(--lux-text-highlighted)">@_qResult.TotalCount</strong> items via <code>DataListSchema.ExecuteInMemory</code>
                     </p>
                     <div class="grid gap-2 sm:grid-cols-3">
                         @foreach (var item in _qResult.Items)
                         {
-                            <div class="flex items-center justify-between rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 px-3 py-2.5 font-mono text-xs">
+                            <div class="flex items-center justify-between rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 px-3 py-2.5 font-mono text-xs">
                                 <span>@item.Name</span>
-                                <span class="font-semibold text-(--blux-text-highlighted)">€@item.Price</span>
+                                <span class="font-semibold text-(--lux-text-highlighted)">€@item.Price</span>
                             </div>
                         }
                     </div>
@@ -40,19 +40,19 @@
             case "query-filters":
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-wrap items-center gap-3">
-                        <span class="font-mono text-xs text-(--blux-text-muted)">Min €:</span>
-                        <div class="w-24"><BxInput Value="@_qMin.ToString(CultureInfo.InvariantCulture)" ValueChanged="@OnMinPriceChanged" aria-label="Min price" /></div>
-                        <span class="font-mono text-xs text-(--blux-text-muted)">Max €:</span>
-                        <div class="w-24"><BxInput Value="@_qMax.ToString(CultureInfo.InvariantCulture)" ValueChanged="@OnMaxPriceChanged" aria-label="Max price" /></div>
+                        <span class="font-mono text-xs text-(--lux-text-muted)">Min €:</span>
+                        <div class="w-24"><LxInput Value="@_qMin.ToString(CultureInfo.InvariantCulture)" ValueChanged="@OnMinPriceChanged" aria-label="Min price" /></div>
+                        <span class="font-mono text-xs text-(--lux-text-muted)">Max €:</span>
+                        <div class="w-24"><LxInput Value="@_qMax.ToString(CultureInfo.InvariantCulture)" ValueChanged="@OnMaxPriceChanged" aria-label="Max price" /></div>
                         @foreach (var cat in new[] { "Displays", "Input", "Audio" })
                         {
                             var selected = _qCats.Contains(cat);
-                            <BxButton Label="@cat" Size="BxSize.Sm" Color="@(selected ? BxColor.Primary : BxColor.Neutral)" Variant="@(selected ? ButtonVariant.Solid : ButtonVariant.Outline)" OnClick="@(() => ToggleCategory(cat))" />
+                            <LxButton Label="@cat" Size="LxSize.Sm" Color="@(selected ? LxColor.Primary : LxColor.Neutral)" Variant="@(selected ? ButtonVariant.Solid : ButtonVariant.Outline)" OnClick="@(() => ToggleCategory(cat))" />
                         }
                     </div>
                     <div class="grid gap-3 lg:grid-cols-2">
-                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">
-                            <p class="font-mono text-xs uppercase text-(--blux-text-muted)">Filtered Results (@_qFilterResult.TotalCount)</p>
+                        <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3">
+                            <p class="font-mono text-xs uppercase text-(--lux-text-muted)">Filtered Results (@_qFilterResult.TotalCount)</p>
                             <ul class="mt-2 space-y-1 font-mono text-xs">
                                 @foreach (var item in _qFilterResult.Items)
                                 {
@@ -60,7 +60,7 @@
                                 }
                             </ul>
                         </div>
-                        <div class="rounded-xl border border-(--blux-border) bg-(--pg-code-bg) p-3 font-mono text-[11px] text-[#d7dcde]">
+                        <div class="rounded-xl border border-(--lux-border) bg-(--pg-code-bg) p-3 font-mono text-[11px] text-[#d7dcde]">
                             <p class="mb-1 text-[#94a3b8]">DataListJsonContext (NativeAOT JSON AST)</p>
                             <pre class="overflow-x-auto whitespace-pre-wrap">@_qFilterJson</pre>
                         </div>
@@ -71,19 +71,19 @@
             case "query-paging":
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-wrap items-center gap-2">
-                        <BxButton Label="Previous" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" Disabled="@(_qPage <= 1)" OnClick="@(() => SetPage(_qPage - 1))" />
-                        <span class="px-2 font-mono text-xs text-(--blux-text-highlighted)">Page @_qPage / @_qTotalPages</span>
-                        <BxButton Label="Next" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" Disabled="@(_qPage >= _qTotalPages)" OnClick="@(() => SetPage(_qPage + 1))" />
-                        <span class="ms-2 font-mono text-xs text-(--blux-text-muted)">PageSize:</span>
+                        <LxButton Label="Previous" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" Disabled="@(_qPage <= 1)" OnClick="@(() => SetPage(_qPage - 1))" />
+                        <span class="px-2 font-mono text-xs text-(--lux-text-highlighted)">Page @_qPage / @_qTotalPages</span>
+                        <LxButton Label="Next" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" Disabled="@(_qPage >= _qTotalPages)" OnClick="@(() => SetPage(_qPage + 1))" />
+                        <span class="ms-2 font-mono text-xs text-(--lux-text-muted)">PageSize:</span>
                         @foreach (var sz in new[] { 2, 3, 5 })
                         {
-                            <BxButton Label="@sz.ToString()" Size="BxSize.Sm" Color="@(_qPageSize == sz ? BxColor.Primary : BxColor.Neutral)" Variant="ButtonVariant.Soft" OnClick="@(() => SetPageSize(sz))" />
+                            <LxButton Label="@sz.ToString()" Size="LxSize.Sm" Color="@(_qPageSize == sz ? LxColor.Primary : LxColor.Neutral)" Variant="ButtonVariant.Soft" OnClick="@(() => SetPageSize(sz))" />
                         }
                     </div>
                     <div class="grid gap-2 sm:grid-cols-3">
                         @foreach (var item in _qPageResult.Items)
                         {
-                            <div class="flex items-center justify-between rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 px-3 py-2 font-mono text-xs">
+                            <div class="flex items-center justify-between rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 px-3 py-2 font-mono text-xs">
                                 <span>#@item.Id @item.Name</span>
                                 <strong>€@item.Price</strong>
                             </div>
@@ -95,36 +95,36 @@
             case "query-facets-cursor":
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-wrap items-center gap-2">
-                        <span class="font-mono text-xs text-(--blux-text-muted)">FacetMode:</span>
-                        <BxButton Label="ExcludeSelf (multi-select UX)" Size="BxSize.Sm" Color="@(_qFacetMode == FacetMode.ExcludeSelf ? BxColor.Primary : BxColor.Neutral)" Variant="ButtonVariant.Soft" OnClick="@(() => SetFacetMode(FacetMode.ExcludeSelf))" />
-                        <BxButton Label="IncludeSelf (strict intersection)" Size="BxSize.Sm" Color="@(_qFacetMode == FacetMode.IncludeSelf ? BxColor.Primary : BxColor.Neutral)" Variant="ButtonVariant.Soft" OnClick="@(() => SetFacetMode(FacetMode.IncludeSelf))" />
-                        <BxButton Label="Next Cursor Page" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" Disabled="@(_qCursorResult.NextCursor is null)" OnClick="@NextCursorPage" />
-                        <BxButton Label="Reset Cursor" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Ghost" Disabled="@(_qCursor is null)" OnClick="@ResetCursorPage" />
+                        <span class="font-mono text-xs text-(--lux-text-muted)">FacetMode:</span>
+                        <LxButton Label="ExcludeSelf (multi-select UX)" Size="LxSize.Sm" Color="@(_qFacetMode == FacetMode.ExcludeSelf ? LxColor.Primary : LxColor.Neutral)" Variant="ButtonVariant.Soft" OnClick="@(() => SetFacetMode(FacetMode.ExcludeSelf))" />
+                        <LxButton Label="IncludeSelf (strict intersection)" Size="LxSize.Sm" Color="@(_qFacetMode == FacetMode.IncludeSelf ? LxColor.Primary : LxColor.Neutral)" Variant="ButtonVariant.Soft" OnClick="@(() => SetFacetMode(FacetMode.IncludeSelf))" />
+                        <LxButton Label="Next Cursor Page" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" Disabled="@(_qCursorResult.NextCursor is null)" OnClick="@NextCursorPage" />
+                        <LxButton Label="Reset Cursor" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Ghost" Disabled="@(_qCursor is null)" OnClick="@ResetCursorPage" />
                     </div>
                     <div class="grid gap-3 lg:grid-cols-2">
-                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">
-                            <p class="font-mono text-xs uppercase text-(--blux-text-muted)">Live Facet Buckets (Click to filter)</p>
+                        <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3">
+                            <p class="font-mono text-xs uppercase text-(--lux-text-muted)">Live Facet Buckets (Click to filter)</p>
                             <div class="mt-2 flex flex-wrap gap-2">
                                 @if (_qCursorResult.Facets is { Count: > 0 } facets)
                                 {
                                     @foreach (var opt in facets[0].Options)
                                     {
                                         var active = _qFacetCat == opt.Value;
-                                        <BxButton Label="@($"{opt.Value} ({opt.Count})")" Size="BxSize.Sm" Color="@(active ? BxColor.Primary : BxColor.Neutral)" Variant="@(active ? ButtonVariant.Solid : ButtonVariant.Outline)" OnClick="@(() => ToggleFacetCat(opt.Value))" />
+                                        <LxButton Label="@($"{opt.Value} ({opt.Count})")" Size="LxSize.Sm" Color="@(active ? LxColor.Primary : LxColor.Neutral)" Variant="@(active ? ButtonVariant.Solid : ButtonVariant.Outline)" OnClick="@(() => ToggleFacetCat(opt.Value))" />
                                     }
                                 }
                             </div>
-                            <p class="mt-3 font-mono text-[11px] text-(--blux-text-muted)">
-                                Active cursor: <code class="text-(--blux-text-highlighted)">@(_qCursor ?? "(first page)")</code><br />
-                                NextCursor: <code class="text-(--blux-text-highlighted)">@(_qCursorResult.NextCursor ?? "(end of stream)")</code>
+                            <p class="mt-3 font-mono text-[11px] text-(--lux-text-muted)">
+                                Active cursor: <code class="text-(--lux-text-highlighted)">@(_qCursor ?? "(first page)")</code><br />
+                                NextCursor: <code class="text-(--lux-text-highlighted)">@(_qCursorResult.NextCursor ?? "(end of stream)")</code>
                             </p>
                         </div>
-                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">
-                            <p class="font-mono text-xs uppercase text-(--blux-text-muted)">Keyset Cursor Slice (Take = 2 · Total = @_qCursorResult.TotalCount)</p>
+                        <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3">
+                            <p class="font-mono text-xs uppercase text-(--lux-text-muted)">Keyset Cursor Slice (Take = 2 · Total = @_qCursorResult.TotalCount)</p>
                             <ul class="mt-2 space-y-1.5 font-mono text-xs">
                                 @foreach (var item in _qCursorResult.Items)
                                 {
-                                    <li class="flex justify-between rounded-lg bg-(--blux-bg) px-2.5 py-1.5">
+                                    <li class="flex justify-between rounded-lg bg-(--lux-bg) px-2.5 py-1.5">
                                         <span>#@item.Id @item.Name (@item.Category)</span>
                                         <strong>€@item.Price</strong>
                                     </li>
@@ -138,19 +138,19 @@
             case "query-url-codecs":
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-wrap items-center gap-2">
-                        <div class="w-48"><BxInput Value="@_uSearch" ValueChanged="@OnUrlSearch" Placeholder="Search term (q)..." aria-label="URL search" /></div>
-                        <BxButton Label="@($"Prefix: {(_uPrefix ?? "(none)")}")" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@ToggleUrlPrefix" />
-                        <BxButton Label="@($"Layout: {_uLayout}")" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@ToggleUrlLayout" />
-                        <BxButton Label="@($"Page: {_uPage}")" Size="BxSize.Sm" Color="BxColor.Primary" Variant="ButtonVariant.Soft" OnClick="@NextUrlPage" />
-                        <BxButton Label="@(_uOnlyAudio ? "Category: Audio" : "Category: All")" Size="BxSize.Sm" Color="@(_uOnlyAudio ? BxColor.Success : BxColor.Neutral)" Variant="ButtonVariant.Soft" OnClick="@ToggleUrlAudio" />
+                        <div class="w-48"><LxInput Value="@_uSearch" ValueChanged="@OnUrlSearch" Placeholder="Search term (q)..." aria-label="URL search" /></div>
+                        <LxButton Label="@($"Prefix: {(_uPrefix ?? "(none)")}")" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@ToggleUrlPrefix" />
+                        <LxButton Label="@($"Layout: {_uLayout}")" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@ToggleUrlLayout" />
+                        <LxButton Label="@($"Page: {_uPage}")" Size="LxSize.Sm" Color="LxColor.Primary" Variant="ButtonVariant.Soft" OnClick="@NextUrlPage" />
+                        <LxButton Label="@(_uOnlyAudio ? "Category: Audio" : "Category: All")" Size="LxSize.Sm" Color="@(_uOnlyAudio ? LxColor.Success : LxColor.Neutral)" Variant="ButtonVariant.Soft" OnClick="@ToggleUrlAudio" />
                     </div>
-                    <div class="rounded-xl border border-(--blux-border) bg-(--pg-code-bg) p-3 font-mono text-xs text-[#d7dcde]">
+                    <div class="rounded-xl border border-(--lux-border) bg-(--pg-code-bg) p-3 font-mono text-xs text-[#d7dcde]">
                         <p class="mb-1 text-[#94a3b8]">1. DataListStateQuery.ToQuery(state, schema, prefix) → URL Query String</p>
-                        <code class="break-all text-(--blux-primary)">@_uQueryString</code>
+                        <code class="break-all text-(--lux-primary)">@_uQueryString</code>
                     </div>
-                    <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3 font-mono text-xs">
-                        <p class="text-(--blux-text-muted)">2. DataListStateQuery.FromQuery(pairs, schema, prefix) → Restored DataListState</p>
-                        <p class="mt-1 text-(--blux-text-highlighted)">
+                    <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3 font-mono text-xs">
+                        <p class="text-(--lux-text-muted)">2. DataListStateQuery.FromQuery(pairs, schema, prefix) → Restored DataListState</p>
+                        <p class="mt-1 text-(--lux-text-highlighted)">
                             Search=<strong>"@_uRestored.Search"</strong> · Page=<strong>@_uRestored.Page</strong> · Layout=<strong>@_uRestored.Layout</strong> · Filters=<strong>@_uRestored.Filters.Count</strong> · Equals Original: <strong>@_uRoundTripOk</strong>
                         </p>
                     </div>
@@ -158,81 +158,81 @@
                 break;
 
             case "table-basic":
-                <BxDataList TItem="TableDemoRow" Schema="@TableSchema" Items="@TableRows" UrlSync="false">
-                    <BxDataListTable TItem="TableDemoRow" HeaderMenu="true" ShowProgressLine="true" Summaries="@(new DataListSummaries<TableDemoRow>())">
-                        <BxDataListColumn TItem="TableDemoRow" Field="name" Title="Employee" />
-                        <BxDataListColumn TItem="TableDemoRow" Field="dept" Title="Department" />
-                        <BxDataListColumn TItem="TableDemoRow" Field="salary" Title="Salary (€)" Summary="DataListSummaryKind.Sum" />
-                    </BxDataListTable>
-                </BxDataList>
+                <LxDataList TItem="TableDemoRow" Schema="@TableSchema" Items="@TableRows" UrlSync="false">
+                    <LxDataListTable TItem="TableDemoRow" HeaderMenu="true" ShowProgressLine="true" Summaries="@(new DataListSummaries<TableDemoRow>())">
+                        <LxDataListColumn TItem="TableDemoRow" Field="name" Title="Employee" />
+                        <LxDataListColumn TItem="TableDemoRow" Field="dept" Title="Department" />
+                        <LxDataListColumn TItem="TableDemoRow" Field="salary" Title="Salary (€)" Summary="DataListSummaryKind.Sum" />
+                    </LxDataListTable>
+                </LxDataList>
                 break;
 
             case "table-tree":
-                <BxDataList TItem="OrgRow" Schema="@OrgSchema" Items="@OrgRoots" UrlSync="false">
-                    <BxDataListTable TItem="OrgRow" Tree="@OrgTree">
-                        <BxDataListColumn TItem="OrgRow" Field="name" Title="Organization Hierarchy" />
-                        <BxDataListColumn TItem="OrgRow" Field="role" Title="Role" />
-                    </BxDataListTable>
-                </BxDataList>
+                <LxDataList TItem="OrgRow" Schema="@OrgSchema" Items="@OrgRoots" UrlSync="false">
+                    <LxDataListTable TItem="OrgRow" Tree="@OrgTree">
+                        <LxDataListColumn TItem="OrgRow" Field="name" Title="Organization Hierarchy" />
+                        <LxDataListColumn TItem="OrgRow" Field="role" Title="Role" />
+                    </LxDataListTable>
+                </LxDataList>
                 break;
 
             case "table-grouped":
                 <div class="flex flex-col gap-3">
                     <div class="flex flex-wrap items-center gap-2">
-                        <span class="font-mono text-xs text-(--blux-text-muted)">Density:</span>
+                        <span class="font-mono text-xs text-(--lux-text-muted)">Density:</span>
                         @foreach (var d in Enum.GetValues<DataListDensity>())
                         {
-                            <BxButton Label="@d.ToString()" Size="BxSize.Sm" Color="@(_tableDensity == d ? BxColor.Primary : BxColor.Neutral)" Variant="ButtonVariant.Soft" OnClick="@(() => _tableDensity = d)" />
+                            <LxButton Label="@d.ToString()" Size="LxSize.Sm" Color="@(_tableDensity == d ? LxColor.Primary : LxColor.Neutral)" Variant="ButtonVariant.Soft" OnClick="@(() => _tableDensity = d)" />
                         }
                     </div>
-                    <BxDataList TItem="TableDemoRow" Schema="@TableSchema" Items="@TableRows" UrlSync="false">
-                        <BxDataListTable TItem="TableDemoRow" Density="@_tableDensity" GroupBy="@TableGroupBy" Summaries="@(new DataListSummaries<TableDemoRow>())">
-                            <BxDataListColumn TItem="TableDemoRow" Field="name" Title="Employee" />
-                            <BxDataListColumn TItem="TableDemoRow" Field="dept" Title="Department" />
-                            <BxDataListColumn TItem="TableDemoRow" Field="salary" Title="Salary (€)" Summary="DataListSummaryKind.Average" />
-                        </BxDataListTable>
-                    </BxDataList>
+                    <LxDataList TItem="TableDemoRow" Schema="@TableSchema" Items="@TableRows" UrlSync="false">
+                        <LxDataListTable TItem="TableDemoRow" Density="@_tableDensity" GroupBy="@TableGroupBy" Summaries="@(new DataListSummaries<TableDemoRow>())">
+                            <LxDataListColumn TItem="TableDemoRow" Field="name" Title="Employee" />
+                            <LxDataListColumn TItem="TableDemoRow" Field="dept" Title="Department" />
+                            <LxDataListColumn TItem="TableDemoRow" Field="salary" Title="Salary (€)" Summary="DataListSummaryKind.Average" />
+                        </LxDataListTable>
+                    </LxDataList>
                 </div>
                 break;
 
             case "table-density-summary":
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-wrap items-center gap-2">
-                        <span class="font-mono text-xs text-(--blux-text-muted)">Summary Kind:</span>
+                        <span class="font-mono text-xs text-(--lux-text-muted)">Summary Kind:</span>
                         @foreach (var kind in new[] { DataListSummaryKind.Sum, DataListSummaryKind.Average, DataListSummaryKind.Min, DataListSummaryKind.Max, DataListSummaryKind.Count })
                         {
-                            <BxButton Label="@kind.ToString()" Size="BxSize.Sm" Color="@(_tableSummaryKind == kind ? BxColor.Primary : BxColor.Neutral)" Variant="ButtonVariant.Soft" OnClick="@(() => _tableSummaryKind = kind)" />
+                            <LxButton Label="@kind.ToString()" Size="LxSize.Sm" Color="@(_tableSummaryKind == kind ? LxColor.Primary : LxColor.Neutral)" Variant="ButtonVariant.Soft" OnClick="@(() => _tableSummaryKind = kind)" />
                         }
-                        <BxButton Label="@(_tableMobileSummary ? "View: Compact Mobile Summary" : "View: Standard Table")" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => _tableMobileSummary = !_tableMobileSummary)" />
+                        <LxButton Label="@(_tableMobileSummary ? "View: Compact Mobile Summary" : "View: Standard Table")" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => _tableMobileSummary = !_tableMobileSummary)" />
                     </div>
-                    <BxDataList TItem="TableDemoRow" Schema="@TableSchema" Items="@TableRows" UrlSync="false">
-                        <BxDataListTable TItem="TableDemoRow"
+                    <LxDataList TItem="TableDemoRow" Schema="@TableSchema" Items="@TableRows" UrlSync="false">
+                        <LxDataListTable TItem="TableDemoRow"
                                          RowSummary="@(_tableMobileSummary ? TablePhoneSummary : null)"
                                          Summaries="@(new DataListSummaries<TableDemoRow>())">
-                            <BxDataListColumn TItem="TableDemoRow" Field="name" Title="Employee" />
-                            <BxDataListColumn TItem="TableDemoRow" Field="dept" Title="Department" />
-                            <BxDataListColumn TItem="TableDemoRow" Field="salary" Title="Salary (€)" Summary="@_tableSummaryKind" />
-                        </BxDataListTable>
-                    </BxDataList>
+                            <LxDataListColumn TItem="TableDemoRow" Field="name" Title="Employee" />
+                            <LxDataListColumn TItem="TableDemoRow" Field="dept" Title="Department" />
+                            <LxDataListColumn TItem="TableDemoRow" Field="salary" Title="Salary (€)" Summary="@_tableSummaryKind" />
+                        </LxDataListTable>
+                    </LxDataList>
                 </div>
                 break;
 
             case "table-selection-actions":
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-wrap items-center gap-2">
-                        <BxButton Label="Inspect Headless BuildTree()" Size="BxSize.Sm" OnClick="@InspectHeadlessTree" />
-                        <BxButton Label="@($"Expand Depth: {_treeDepth}")" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@CycleTreeDepth" />
+                        <LxButton Label="Inspect Headless BuildTree()" Size="LxSize.Sm" OnClick="@InspectHeadlessTree" />
+                        <LxButton Label="@($"Expand Depth: {_treeDepth}")" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@CycleTreeDepth" />
                     </div>
                     <div class="grid gap-2 sm:grid-cols-2 font-mono text-xs">
                         @foreach (var node in _headlessNodes)
                         {
-                            <div class="flex items-center justify-between rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 px-3 py-2" style="@($"padding-left:{12 + node.Depth * 18}px")">
-                                <span>@(node.HasChildren ? "▸" : "•") @node.Item.Name <span class="text-(--blux-text-muted)">(@node.Item.Role)</span></span>
-                                <span class="text-(--blux-text-muted)">Depth @node.Depth</span>
+                            <div class="flex items-center justify-between rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 px-3 py-2" style="@($"padding-left:{12 + node.Depth * 18}px")">
+                                <span>@(node.HasChildren ? "▸" : "•") @node.Item.Name <span class="text-(--lux-text-muted)">(@node.Item.Role)</span></span>
+                                <span class="text-(--lux-text-muted)">Depth @node.Depth</span>
                             </div>
                         }
                     </div>
-                    <p class="font-mono text-xs text-(--blux-text-muted)">
+                    <p class="font-mono text-xs text-(--lux-text-muted)">
                         <code>DataListTree&lt;T&gt;.BuildTree()</code> runs 100% headless in <code>Lux.Table.Core</code> (NativeAOT): <strong>@_headlessNodes.Count</strong> nodes, cycle-guarded.
                     </p>
                 </div>
@@ -240,29 +240,29 @@
 
             case "form-reactive":
                 <div class="flex flex-col gap-4">
-                    <div class="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-(--blux-border) bg-(--blux-bg-muted)/40 px-3 py-2 font-mono text-xs">
+                    <div class="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-(--lux-border) bg-(--lux-bg-muted)/40 px-3 py-2 font-mono text-xs">
                         <span>IsDirty: <strong>@_formCtrl.IsDirty</strong></span>
                         <span>DirtyPaths: <strong>@(_formCtrl.DirtyPaths.Count == 0 ? "none" : string.Join(", ", _formCtrl.DirtyPaths))</strong></span>
                         <span>Company visible (age &ge; 21): <strong>@(_formCtrl.GetValue<double>("age") >= 21)</strong></span>
                     </div>
-                    <BxFormEngine Form="@_formCtrl" SubmitLabel="Validate & Submit" ShowReset="true" />
+                    <LxFormEngine Form="@_formCtrl" SubmitLabel="Validate & Submit" ShowReset="true" />
                 </div>
                 break;
 
             case "form-wizard":
                 <div class="flex flex-col gap-3">
-                    <p class="font-mono text-xs text-(--blux-text-muted)">
+                    <p class="font-mono text-xs text-(--lux-text-muted)">
                         Step @(_wizardCtrl.CurrentStepIndex + 1) · Active: <strong>@_wizardCtrl.CurrentStep?.Title</strong>
                         (Select <code>free</code> to skip the Billing step automatically via <code>SkipWhen</code>)
                     </p>
-                    <BxFormEngine Form="@_wizardCtrl" SubmitLabel="Complete Onboarding" ShowReset="true" />
+                    <LxFormEngine Form="@_wizardCtrl" SubmitLabel="Complete Onboarding" ShowReset="true" />
                 </div>
                 break;
 
             case "form-array":
                 <div class="flex flex-col gap-4">
-                    <BxFormEngine Form="@_arrayCtrl" SubmitLabel="Build Invoice Payload" ShowReset="true" />
-                    <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3 font-mono text-xs">
+                    <LxFormEngine Form="@_arrayCtrl" SubmitLabel="Build Invoice Payload" ShowReset="true" />
+                    <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3 font-mono text-xs">
                         Line items count: <strong>@_arrayCtrl.GetArrayItems("items").Count</strong>
                     </div>
                 </div>
@@ -271,18 +271,18 @@
             case "form-dirty-diff":
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-wrap items-center gap-2">
-                        <BxButton Label="Mutate Name -> 'Claire'" Size="BxSize.Sm" OnClick="@(() => { _dirtyCtrl.SetValue("name", "Claire", markTouched: true); RefreshDirtyJson(); })" />
-                        <BxButton Label="Mutate Plan -> 'enterprise'" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => { _dirtyCtrl.SetValue("plan", "enterprise", markTouched: true); RefreshDirtyJson(); })" />
-                        <BxButton Label="ResetField('name')" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Soft" OnClick="@(() => { _dirtyCtrl.ResetField("name"); RefreshDirtyJson(); })" />
-                        <BxButton Label="SubmitAsync() (Re-baseline)" Size="BxSize.Sm" Color="BxColor.Success" Variant="ButtonVariant.Soft" OnClick="@SubmitDirtyDemoAsync" />
+                        <LxButton Label="Mutate Name -> 'Claire'" Size="LxSize.Sm" OnClick="@(() => { _dirtyCtrl.SetValue("name", "Claire", markTouched: true); RefreshDirtyJson(); })" />
+                        <LxButton Label="Mutate Plan -> 'enterprise'" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => { _dirtyCtrl.SetValue("plan", "enterprise", markTouched: true); RefreshDirtyJson(); })" />
+                        <LxButton Label="ResetField('name')" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Soft" OnClick="@(() => { _dirtyCtrl.ResetField("name"); RefreshDirtyJson(); })" />
+                        <LxButton Label="SubmitAsync() (Re-baseline)" Size="LxSize.Sm" Color="LxColor.Success" Variant="ButtonVariant.Soft" OnClick="@SubmitDirtyDemoAsync" />
                     </div>
                     <div class="grid gap-3 lg:grid-cols-2 font-mono text-xs">
-                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3 space-y-1">
-                            <p>IsDirty: <strong class="text-(--blux-text-highlighted)">@_dirtyCtrl.IsDirty</strong></p>
-                            <p>DirtyPaths: <strong class="text-(--blux-text-highlighted)">@(_dirtyCtrl.DirtyPaths.Count == 0 ? "(clean)" : string.Join(", ", _dirtyCtrl.DirtyPaths))</strong></p>
+                        <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3 space-y-1">
+                            <p>IsDirty: <strong class="text-(--lux-text-highlighted)">@_dirtyCtrl.IsDirty</strong></p>
+                            <p>DirtyPaths: <strong class="text-(--lux-text-highlighted)">@(_dirtyCtrl.DirtyPaths.Count == 0 ? "(clean)" : string.Join(", ", _dirtyCtrl.DirtyPaths))</strong></p>
                             <p>Value(name): <strong>@(_dirtyCtrl.GetValue<string>("name"))</strong> · Value(plan): <strong>@(_dirtyCtrl.GetValue<string>("plan"))</strong></p>
                         </div>
-                        <div class="rounded-xl border border-(--blux-border) bg-(--pg-code-bg) p-3 text-[#d7dcde]">
+                        <div class="rounded-xl border border-(--lux-border) bg-(--pg-code-bg) p-3 text-[#d7dcde]">
                             <p class="mb-1 text-[#94a3b8]">BuildOutput() (trimmed &amp; transformed)</p>
                             <pre class="overflow-x-auto">@_dirtyOutputJson</pre>
                         </div>
@@ -293,31 +293,31 @@
             case "form-sections-errors":
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-wrap items-center gap-2">
-                        <BxButton Label="Inject Server Blocking Error on 'email'" Size="BxSize.Sm" Color="BxColor.Error" Variant="ButtonVariant.Soft" OnClick="@(() => _sectionCtrl.SetError("email", "Email already registered on server", blocking: true))" />
-                        <BxButton Label="ClearError('email')" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => _sectionCtrl.ClearError("email"))" />
-                        <BxButton Label="Fill All Required" Size="BxSize.Sm" Color="BxColor.Success" Variant="ButtonVariant.Soft" OnClick="@(() => { _sectionCtrl.SetValue("email", "team@luxstack.dev"); _sectionCtrl.SetValue("vat", "FR99123456789"); _sectionCtrl.ClearError("email"); })" />
+                        <LxButton Label="Inject Server Blocking Error on 'email'" Size="LxSize.Sm" Color="LxColor.Error" Variant="ButtonVariant.Soft" OnClick="@(() => _sectionCtrl.SetError("email", "Email already registered on server", blocking: true))" />
+                        <LxButton Label="ClearError('email')" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => _sectionCtrl.ClearError("email"))" />
+                        <LxButton Label="Fill All Required" Size="LxSize.Sm" Color="LxColor.Success" Variant="ButtonVariant.Soft" OnClick="@(() => { _sectionCtrl.SetValue("email", "team@luxstack.dev"); _sectionCtrl.SetValue("vat", "FR99123456789"); _sectionCtrl.ClearError("email"); })" />
                     </div>
                     <div class="grid gap-3 sm:grid-cols-3 font-mono text-xs">
                         @foreach (var sec in _sectionCtrl.GetSectionStates())
                         {
-                            <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">
-                                <p class="text-(--blux-text-muted)">@sec.Label</p>
-                                <p class="mt-1 text-sm font-semibold text-(--blux-text-highlighted)">@sec.Status</p>
+                            <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3">
+                                <p class="text-(--lux-text-muted)">@sec.Label</p>
+                                <p class="mt-1 text-sm font-semibold text-(--lux-text-highlighted)">@sec.Status</p>
                             </div>
                         }
                     </div>
-                    <p class="font-mono text-xs text-(--blux-text-muted)">
-                        HasBlockingErrors: <strong class="text-(--blux-text-highlighted)">@_sectionCtrl.HasBlockingErrors</strong> · Email error: <strong>@(_sectionCtrl.GetError("email") ?? "none")</strong>
+                    <p class="font-mono text-xs text-(--lux-text-muted)">
+                        HasBlockingErrors: <strong class="text-(--lux-text-highlighted)">@_sectionCtrl.HasBlockingErrors</strong> · Email error: <strong>@(_sectionCtrl.GetError("email") ?? "none")</strong>
                     </p>
                 </div>
                 break;
 
             case "dashboard-kpi":
                 <div class="flex flex-col gap-5">
-                    <BxDashboardStats Title="Executive KPIs" Items="@DashStats" />
+                    <LxDashboardStats Title="Executive KPIs" Items="@DashStats" />
                     <div class="grid gap-4 lg:grid-cols-2">
-                        <BxDashboardGauge Title="Q4 ARR Target" Value="86" Max="100" Target="90" Format="DashboardFormatPreset.Percent" Caption="86% reached" />
-                        <BxDashboardBars Title="Platform Distribution" Items="@DashBars" Format="DashboardFormatPreset.Compact" />
+                        <LxDashboardGauge Title="Q4 ARR Target" Value="86" Max="100" Target="90" Format="DashboardFormatPreset.Percent" Caption="86% reached" />
+                        <LxDashboardBars Title="Platform Distribution" Items="@DashBars" Format="DashboardFormatPreset.Compact" />
                     </div>
                 </div>
                 break;
@@ -325,23 +325,23 @@
             case "dashboard-waves":
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-wrap items-center gap-2">
-                        <BxButton Label="Run Staged RefreshAsync()" Size="BxSize.Sm" OnClick="@RunDashWavesAsync" />
-                        <BxButton Label="Activate Deferred Resource" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@ActivateDeferredAsync" />
+                        <LxButton Label="Run Staged RefreshAsync()" Size="LxSize.Sm" OnClick="@RunDashWavesAsync" />
+                        <LxButton Label="Activate Deferred Resource" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@ActivateDeferredAsync" />
                     </div>
                     <div class="grid gap-3 sm:grid-cols-3 font-mono text-xs">
-                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">
-                            <p class="text-(--blux-text-muted)">WAVE 1 · ESSENTIAL</p>
-                            <p class="mt-1 text-base font-semibold text-(--blux-text-highlighted)">@_waveEssential.State</p>
+                        <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3">
+                            <p class="text-(--lux-text-muted)">WAVE 1 · ESSENTIAL</p>
+                            <p class="mt-1 text-base font-semibold text-(--lux-text-highlighted)">@_waveEssential.State</p>
                             <p class="mt-1">Value: @(_waveEssential.Data?.ToString() ?? "—")</p>
                         </div>
-                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">
-                            <p class="text-(--blux-text-muted)">WAVE 2 · BACKGROUND</p>
-                            <p class="mt-1 text-base font-semibold text-(--blux-text-highlighted)">@_waveBackground.State</p>
+                        <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3">
+                            <p class="text-(--lux-text-muted)">WAVE 2 · BACKGROUND</p>
+                            <p class="mt-1 text-base font-semibold text-(--lux-text-highlighted)">@_waveBackground.State</p>
                             <p class="mt-1">Value: @(_waveBackground.Data ?? "—")</p>
                         </div>
-                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">
-                            <p class="text-(--blux-text-muted)">WAVE 3 · DEFERRED</p>
-                            <p class="mt-1 text-base font-semibold text-(--blux-text-highlighted)">@_waveDeferred.State</p>
+                        <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3">
+                            <p class="text-(--lux-text-muted)">WAVE 3 · DEFERRED</p>
+                            <p class="mt-1 text-base font-semibold text-(--lux-text-highlighted)">@_waveDeferred.State</p>
                             <p class="mt-1">Value: @(_waveDeferred.Data ?? "Idle until activated")</p>
                         </div>
                     </div>
@@ -350,15 +350,15 @@
 
             case "dashboard-table-alerts":
                 <div class="flex flex-col gap-4">
-                    <BxDashboardTable Title="Top Regions" Menu="true" Columns="@DashTableCols" Rows="@DashTableRows" />
+                    <LxDashboardTable Title="Top Regions" Menu="true" Columns="@DashTableCols" Rows="@DashTableRows" />
                     <div class="grid gap-4 lg:grid-cols-2">
-                        <BxDashboardAlerts Title="Operational Alerts" Items="@DashAlerts" />
-                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-4">
+                        <LxDashboardAlerts Title="Operational Alerts" Items="@DashAlerts" />
+                        <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-4">
                             <div class="flex items-center justify-between gap-2">
-                                <span class="font-mono text-xs uppercase text-(--blux-text-muted)">DashboardFormat.ExportCsv (fr-FR BOM)</span>
-                                <BxButton Label="Generate CSV" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@GenerateSampleCsv" />
+                                <span class="font-mono text-xs uppercase text-(--lux-text-muted)">DashboardFormat.ExportCsv (fr-FR BOM)</span>
+                                <LxButton Label="Generate CSV" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@GenerateSampleCsv" />
                             </div>
-                            <pre class="mt-3 overflow-x-auto font-mono text-xs text-(--blux-text-highlighted)">@_dashCsvPreview</pre>
+                            <pre class="mt-3 overflow-x-auto font-mono text-xs text-(--lux-text-highlighted)">@_dashCsvPreview</pre>
                         </div>
                     </div>
                 </div>
@@ -367,20 +367,20 @@
             case "dashboard-filters-views":
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-wrap items-center gap-2">
-                        <span class="font-mono text-xs text-(--blux-text-muted)">Views:</span>
+                        <span class="font-mono text-xs text-(--lux-text-muted)">Views:</span>
                         @foreach (var v in _dashFilterCtrl.Views)
                         {
-                            <BxButton Label="@(v.Badge is null ? v.Label : $"{v.Label} ({v.Badge})")" Size="BxSize.Sm" Color="@(_dashFilterCtrl.CurrentView == v.Key ? BxColor.Primary : BxColor.Neutral)" Variant="ButtonVariant.Soft" OnClick="@(() => _dashFilterCtrl.CurrentView = v.Key)" />
+                            <LxButton Label="@(v.Badge is null ? v.Label : $"{v.Label} ({v.Badge})")" Size="LxSize.Sm" Color="@(_dashFilterCtrl.CurrentView == v.Key ? LxColor.Primary : LxColor.Neutral)" Variant="ButtonVariant.Soft" OnClick="@(() => _dashFilterCtrl.CurrentView = v.Key)" />
                         }
-                        <span class="ms-2 font-mono text-xs text-(--blux-text-muted)">Regions:</span>
+                        <span class="ms-2 font-mono text-xs text-(--lux-text-muted)">Regions:</span>
                         @foreach (var r in new[] { "eu", "us", "ap" })
                         {
                             var active = _dashRegionFilter.Values.Contains(r);
-                            <BxButton Label="@r.ToUpperInvariant()" Size="BxSize.Sm" Color="@(active ? BxColor.Primary : BxColor.Neutral)" Variant="@(active ? ButtonVariant.Solid : ButtonVariant.Outline)" OnClick="@(() => _dashRegionFilter.Toggle(r))" />
+                            <LxButton Label="@r.ToUpperInvariant()" Size="LxSize.Sm" Color="@(active ? LxColor.Primary : LxColor.Neutral)" Variant="@(active ? ButtonVariant.Solid : ButtonVariant.Outline)" OnClick="@(() => _dashRegionFilter.Toggle(r))" />
                         }
-                        <BxButton Label="ResetFilters()" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Ghost" Disabled="@(!_dashFilterCtrl.Filtered)" OnClick="@(() => _dashFilterCtrl.ResetFilters())" />
+                        <LxButton Label="ResetFilters()" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Ghost" Disabled="@(!_dashFilterCtrl.Filtered)" OnClick="@(() => _dashFilterCtrl.ResetFilters())" />
                     </div>
-                    <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3 font-mono text-xs">
+                    <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3 font-mono text-xs">
                         CurrentView: <strong>@_dashFilterCtrl.CurrentView</strong> ·
                         Selected Regions: <strong>@string.Join(", ", _dashRegionFilter.Values)</strong> ·
                         Controller.Filtered: <strong>@_dashFilterCtrl.Filtered</strong>
@@ -393,23 +393,23 @@
                     <div class="flex flex-wrap items-center gap-2">
                         @foreach (var mode in new[] { DashboardComparisonMode.Previous, DashboardComparisonMode.Year })
                         {
-                            <BxButton Label="@($"Compare: {mode}")" Size="BxSize.Sm" Color="@(_dashCompMode == mode ? BxColor.Primary : BxColor.Neutral)" Variant="ButtonVariant.Soft" OnClick="@(() => _dashCompMode = mode)" />
+                            <LxButton Label="@($"Compare: {mode}")" Size="LxSize.Sm" Color="@(_dashCompMode == mode ? LxColor.Primary : LxColor.Neutral)" Variant="ButtonVariant.Soft" OnClick="@(() => _dashCompMode = mode)" />
                         }
                     </div>
                     <div class="grid gap-3 lg:grid-cols-2 font-mono text-xs">
-                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3 space-y-1">
-                            <p class="text-(--blux-text-muted)">DashboardFormat Presets (InvariantCulture)</p>
+                        <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3 space-y-1">
+                            <p class="text-(--lux-text-muted)">DashboardFormat Presets (InvariantCulture)</p>
                             <p>Compact(2_400_000) = <strong>@DashboardFormat.Format(2_400_000, DashboardFormatPreset.Compact, CultureInfo.InvariantCulture)</strong></p>
                             <p>Delta(14.2) = <strong>@DashboardFormat.Format(14.2, DashboardFormatPreset.Delta, CultureInfo.InvariantCulture)</strong> · Ratio(0.57) = <strong>@DashboardFormat.Format(0.57, DashboardFormatPreset.Ratio, CultureInfo.InvariantCulture)</strong></p>
                             <p>Null/NaN guard = <strong>@DashboardFormat.Format(double.NaN, DashboardFormatPreset.Number, CultureInfo.InvariantCulture)</strong></p>
                         </div>
-                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3 space-y-1">
+                        <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3 space-y-1">
                             @{
                                 var range = DashboardFormat.ResolveComparisonRange(
                                     (new DateTimeOffset(2024, 2, 1, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2024, 2, 29, 0, 0, 0, TimeSpan.Zero)),
                                     _dashCompMode);
                             }
-                            <p class="text-(--blux-text-muted)">Leap-Year Comparison (2024-02-01 → 2024-02-29)</p>
+                            <p class="text-(--lux-text-muted)">Leap-Year Comparison (2024-02-01 → 2024-02-29)</p>
                             <p>Resolved Start: <strong>@range?.Start.ToString("yyyy-MM-dd")</strong></p>
                             <p>Resolved End: <strong>@range?.End.ToString("yyyy-MM-dd")</strong> (clamped safely on leap years)</p>
                         </div>
@@ -420,28 +420,28 @@
             case "display-blocks":
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-wrap items-center gap-3 font-mono text-xs">
-                        <span class="text-(--blux-text-muted)">Test Meter Thresholds (Warn 75 / Error 90):</span>
-                        <BxButton Label="55% (Normal)" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Soft" OnClick="@(() => _meterVal = 55)" />
-                        <BxButton Label="82% (Warning)" Size="BxSize.Sm" Color="BxColor.Warning" Variant="ButtonVariant.Soft" OnClick="@(() => _meterVal = 82)" />
-                        <BxButton Label="95% (Error)" Size="BxSize.Sm" Color="BxColor.Error" Variant="ButtonVariant.Soft" OnClick="@(() => _meterVal = 95)" />
+                        <span class="text-(--lux-text-muted)">Test Meter Thresholds (Warn 75 / Error 90):</span>
+                        <LxButton Label="55% (Normal)" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Soft" OnClick="@(() => _meterVal = 55)" />
+                        <LxButton Label="82% (Warning)" Size="LxSize.Sm" Color="LxColor.Warning" Variant="ButtonVariant.Soft" OnClick="@(() => _meterVal = 82)" />
+                        <LxButton Label="95% (Error)" Size="LxSize.Sm" Color="LxColor.Error" Variant="ButtonVariant.Soft" OnClick="@(() => _meterVal = 95)" />
                     </div>
                     <div class="grid gap-4 lg:grid-cols-2">
-                        <BxDisplay Kind="DisplayKind.Stat" Title="Monthly Recurring Revenue" Value="€148,900" Delta="+14.2%" Trend="@([102.0, 118.0, 134.0, 148.9])" />
-                        <BxDisplay Kind="DisplayKind.Meter" Title="Storage Quota" MeterValue="@_meterVal" MeterMax="100" WarningThreshold="75" ErrorThreshold="90" />
-                        <BxDisplay Kind="DisplayKind.Code" Variant="secret" Title="Production API Token" Value="sk_live_luxstack_3210" VisibleChars="4" Copy="true" />
-                        <BxDisplay Kind="DisplayKind.Diff" Title="Plan Upgrade" DiffItems="@([new DisplayDiffItem("Tier", "Starter", "Enterprise", Changed: true)])" />
+                        <LxDisplay Kind="DisplayKind.Stat" Title="Monthly Recurring Revenue" Value="€148,900" Delta="+14.2%" Trend="@([102.0, 118.0, 134.0, 148.9])" />
+                        <LxDisplay Kind="DisplayKind.Meter" Title="Storage Quota" MeterValue="@_meterVal" MeterMax="100" WarningThreshold="75" ErrorThreshold="90" />
+                        <LxDisplay Kind="DisplayKind.Code" Variant="secret" Title="Production API Token" Value="sk_live_luxstack_3210" VisibleChars="4" Copy="true" />
+                        <LxDisplay Kind="DisplayKind.Diff" Title="Plan Upgrade" DiffItems="@([new DisplayDiffItem("Tier", "Starter", "Enterprise", Changed: true)])" />
                     </div>
                 </div>
                 break;
 
             case "display-structured":
                 <div class="grid gap-4 lg:grid-cols-2">
-                    <BxDisplay Kind="DisplayKind.Facts" Surface="DisplaySurface.Bordered" Title="Cluster Metadata" Facts="@([
+                    <LxDisplay Kind="DisplayKind.Facts" Surface="DisplaySurface.Bordered" Title="Cluster Metadata" Facts="@([
                         new DisplayFact { Label = "Environment", Value = "Production", Copy = true, Mono = true },
-                        new DisplayFact { Label = "Region", Value = "eu-west-3", Chip = new DisplayChip("Healthy", BxColor.Success) },
+                        new DisplayFact { Label = "Region", Value = "eu-west-3", Chip = new DisplayChip("Healthy", LxColor.Success) },
                         new DisplayFact { Label = "Failover", Value = null }
                     ])" />
-                    <BxDisplay Kind="DisplayKind.Timeline" Surface="DisplaySurface.Bordered" Title="Release Pipeline" TimelineItems="@([
+                    <LxDisplay Kind="DisplayKind.Timeline" Surface="DisplaySurface.Bordered" Title="Release Pipeline" TimelineItems="@([
                         new DisplayTimelineItem("Build NativeAOT Core", Time: "09:12", State: DisplayTimelineState.Done),
                         new DisplayTimelineItem("Run 860 Tests", Time: "09:14", State: DisplayTimelineState.Done),
                         new DisplayTimelineItem("Rollout Canary", Time: "In progress", State: DisplayTimelineState.Current),
@@ -452,8 +452,8 @@
 
             case "display-audio":
                 <div class="flex flex-col gap-4">
-                    <BxAudioPlayer Src="/media/sample.mp3" Title="Exam Listening Extract (Start=15s · End=45s · MaxPlays=2 · Seekable=false)" Start="15" End="45" MaxPlays="2" Seekable="false" />
-                    <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3 font-mono text-xs">
+                    <LxAudioPlayer Src="/media/sample.mp3" Title="Exam Listening Extract (Start=15s · End=45s · MaxPlays=2 · Seekable=false)" Start="15" End="45" MaxPlays="2" Seekable="false" />
+                    <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3 font-mono text-xs">
                         <span>Headless <code>FilePreviewService.DetectKind("report.csv")</code> = <strong>@FilePreviewService.DetectKind("report.csv")</strong> · </span>
                         <span><code>FormatFileSize(1_572_864)</code> = <strong>@FilePreviewService.FormatFileSize(1_572_864, CultureInfo.InvariantCulture)</strong> · </span>
                         <span><code>ParseCsv</code> parsed <strong>@FilePreviewService.ParseCsv("Region,MRR\nEU,148900\nUS,192400").Rows.Count</strong> rows</span>
@@ -463,12 +463,12 @@
 
             case "display-accordion-list":
                 <div class="grid gap-4 lg:grid-cols-2">
-                    <BxDisplay Kind="DisplayKind.Accordion" Surface="DisplaySurface.Bordered" Title="Platform FAQs" Multiple="true" AccordionItems="@([
+                    <LxDisplay Kind="DisplayKind.Accordion" Surface="DisplaySurface.Bordered" Title="Platform FAQs" Multiple="true" AccordionItems="@([
                         new DisplayAccordionItem("NativeAOT Support", "Lux.Display.Core ships with IsAotCompatible=true and zero UI dependencies."),
                         new DisplayAccordionItem("Secret Masking", "DisplayKind.Code with Variant='secret' masks characters and lets users toggle visibility in place."),
-                        new DisplayAccordionItem("Exam Media Quotas", "BxAudioPlayer and BxVideoPlayer enforce Start/End clip bounds, Seekable=false, and MaxPlays.")
+                        new DisplayAccordionItem("Exam Media Quotas", "LxAudioPlayer and LxVideoPlayer enforce Start/End clip bounds, Seekable=false, and MaxPlays.")
                     ])" />
-                    <BxDisplay Kind="DisplayKind.List" Surface="DisplaySurface.Bordered" Title="Release Checklist (Progressive Reveal)" Max="2" Step="2" ListItems="@([
+                    <LxDisplay Kind="DisplayKind.List" Surface="DisplaySurface.Bordered" Title="Release Checklist (Progressive Reveal)" Max="2" Step="2" ListItems="@([
                         new DisplayListItem { Text = "1. Compile NativeAOT core assemblies" },
                         new DisplayListItem { Text = "2. Run xUnit + bUnit verification suites" },
                         new DisplayListItem { Text = "3. Verify WCAG AA contrast ratios" },
@@ -480,26 +480,26 @@
             case "display-csv-inspector":
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-wrap items-center gap-3">
-                        <div class="w-60"><BxInput @bind-Value="_previewFileName" Placeholder="Filename (e.g. spec.pdf)" aria-label="Filename" /></div>
-                        <span class="font-mono text-xs text-(--blux-text-muted)">
-                            DetectKind → <strong class="text-(--blux-text-highlighted)">@FilePreviewService.DetectKind(_previewFileName)</strong> ·
-                            DefaultContainer → <strong class="text-(--blux-text-highlighted)">@FilePreviewService.DefaultContainerForKind(FilePreviewService.DetectKind(_previewFileName))</strong>
+                        <div class="w-60"><LxInput @bind-Value="_previewFileName" Placeholder="Filename (e.g. spec.pdf)" aria-label="Filename" /></div>
+                        <span class="font-mono text-xs text-(--lux-text-muted)">
+                            DetectKind → <strong class="text-(--lux-text-highlighted)">@FilePreviewService.DetectKind(_previewFileName)</strong> ·
+                            DefaultContainer → <strong class="text-(--lux-text-highlighted)">@FilePreviewService.DefaultContainerForKind(FilePreviewService.DetectKind(_previewFileName))</strong>
                         </span>
                     </div>
                     @{ var parsedCsv = FilePreviewService.ParseCsv(_previewCsvText, maxRows: 50); }
-                    <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3 font-mono text-xs">
-                        <p class="text-(--blux-text-muted)">FilePreviewService.ParseCsv (Headers: @parsedCsv.Headers.Count · Rows: @parsedCsv.Rows.Count)</p>
+                    <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3 font-mono text-xs">
+                        <p class="text-(--lux-text-muted)">FilePreviewService.ParseCsv (Headers: @parsedCsv.Headers.Count · Rows: @parsedCsv.Rows.Count)</p>
                         <div class="mt-2 overflow-x-auto">
                             <table class="w-full text-start">
                                 <thead>
-                                    <tr class="border-b border-(--blux-border)">
+                                    <tr class="border-b border-(--lux-border)">
                                         @foreach (var h in parsedCsv.Headers) { <th class="px-2 py-1 text-start">@h</th> }
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (var row in parsedCsv.Rows)
                                     {
-                                        <tr class="border-b border-(--blux-border)/50">
+                                        <tr class="border-b border-(--lux-border)/50">
                                             @foreach (var cell in row) { <td class="px-2 py-1">@cell</td> }
                                         </tr>
                                     }
@@ -511,24 +511,24 @@
                 break;
 
             case "spreadsheet-wizard":
-                <BxSpreadsheetImport Importer="@_importer" Title="Import Product Rates" Wizard="true" />
+                <LxSpreadsheetImport Importer="@_importer" Title="Import Product Rates" Wizard="true" />
                 break;
 
             case "spreadsheet-reconcile":
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-wrap items-center gap-2">
-                        <BxButton Label="Answer Unknown ('C1-Advanced' -> 'B2')" Size="BxSize.Sm" Disabled="@(_reconcileImporter.OpenQuestions.Count == 0)" OnClick="@AnswerUnknownDemo" />
-                        <BxButton Label="Fix Duplicate Email (Row 1)" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@FixDuplicateDemo" />
-                        <BxButton Label="Reset Sample" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Ghost" OnClick="@ResetReconcileDemo" />
+                        <LxButton Label="Answer Unknown ('C1-Advanced' -> 'B2')" Size="LxSize.Sm" Disabled="@(_reconcileImporter.OpenQuestions.Count == 0)" OnClick="@AnswerUnknownDemo" />
+                        <LxButton Label="Fix Duplicate Email (Row 1)" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@FixDuplicateDemo" />
+                        <LxButton Label="Reset Sample" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Ghost" OnClick="@ResetReconcileDemo" />
                     </div>
                     <div class="grid gap-3 sm:grid-cols-4 font-mono text-xs">
-                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">OpenQuestions: <strong>@_reconcileImporter.OpenQuestions.Count</strong></div>
-                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">InvalidRows: <strong>@_reconcileImporter.InvalidRows.Count</strong></div>
-                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">Importable: <strong>@_reconcileImporter.ImportableRows.Count</strong></div>
-                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">CanSubmit: <strong>@_reconcileImporter.CanSubmit</strong></div>
+                        <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3">OpenQuestions: <strong>@_reconcileImporter.OpenQuestions.Count</strong></div>
+                        <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3">InvalidRows: <strong>@_reconcileImporter.InvalidRows.Count</strong></div>
+                        <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3">Importable: <strong>@_reconcileImporter.ImportableRows.Count</strong></div>
+                        <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3">CanSubmit: <strong>@_reconcileImporter.CanSubmit</strong></div>
                     </div>
-                    <p class="font-mono text-xs text-(--blux-text-muted)">
-                        Row 2 (<code>bob@example.com</code>) matched <code>ExistingRecords</code> -> Mode: <strong class="text-(--blux-text-highlighted)">@_reconcileImporter.AllRows[2].Mode</strong>
+                    <p class="font-mono text-xs text-(--lux-text-muted)">
+                        Row 2 (<code>bob@example.com</code>) matched <code>ExistingRecords</code> -> Mode: <strong class="text-(--lux-text-highlighted)">@_reconcileImporter.AllRows[2].Mode</strong>
                     </p>
                 </div>
                 break;
@@ -537,13 +537,13 @@
                 <div class="flex flex-col gap-3">
                     <div class="flex flex-wrap items-center gap-3">
                         <div class="w-72">
-                            <BxInput @bind-Value="_rawHeaderInput" Placeholder="Type any messy header..." aria-label="Raw header text" />
+                            <LxInput @bind-Value="_rawHeaderInput" Placeholder="Type any messy header..." aria-label="Raw header text" />
                         </div>
-                        <span class="font-mono text-xs text-(--blux-text-muted)">NormalizeText → <strong class="text-(--blux-text-highlighted)">"@SpreadsheetImporter.NormalizeText(_rawHeaderInput)"</strong></span>
+                        <span class="font-mono text-xs text-(--lux-text-muted)">NormalizeText → <strong class="text-(--lux-text-highlighted)">"@SpreadsheetImporter.NormalizeText(_rawHeaderInput)"</strong></span>
                     </div>
-                    <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3 font-mono text-xs">
-                        <p class="text-(--blux-text-muted)">ExportTemplateCsv():</p>
-                        <pre class="mt-1 overflow-x-auto text-(--blux-text-highlighted)">@_importer.ExportTemplateCsv()</pre>
+                    <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3 font-mono text-xs">
+                        <p class="text-(--lux-text-muted)">ExportTemplateCsv():</p>
+                        <pre class="mt-1 overflow-x-auto text-(--lux-text-highlighted)">@_importer.ExportTemplateCsv()</pre>
                     </div>
                 </div>
                 break;
@@ -551,17 +551,17 @@
             case "spreadsheet-edit-retry":
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-wrap items-center gap-2">
-                        <BxButton Label="EditCell(Row 0, 'price', '49,90')" Size="BxSize.Sm" OnClick="@(() => _editImporter.EditCell(0, "price", "49,90"))" />
-                        <BxButton Label="RevertCell(Row 0, 'price')" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => _editImporter.RevertCell(0, "price"))" />
-                        <BxButton Label="DiscardRow(1)" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Soft" OnClick="@(() => _editImporter.DiscardRows([1]))" />
-                        <BxButton Label="RestoreRow(1)" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Ghost" OnClick="@(() => _editImporter.RestoreRows([1]))" />
+                        <LxButton Label="EditCell(Row 0, 'price', '49,90')" Size="LxSize.Sm" OnClick="@(() => _editImporter.EditCell(0, "price", "49,90"))" />
+                        <LxButton Label="RevertCell(Row 0, 'price')" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => _editImporter.RevertCell(0, "price"))" />
+                        <LxButton Label="DiscardRow(1)" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Soft" OnClick="@(() => _editImporter.DiscardRows([1]))" />
+                        <LxButton Label="RestoreRow(1)" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Ghost" OnClick="@(() => _editImporter.RestoreRows([1]))" />
                     </div>
                     <div class="grid gap-3 sm:grid-cols-3 font-mono text-xs">
-                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">InvalidRows: <strong>@_editImporter.InvalidRows.Count</strong></div>
-                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">ImportableRows: <strong>@_editImporter.ImportableRows.Count</strong></div>
-                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">DiscardedRows: <strong>@_editImporter.DiscardedRows.Count</strong></div>
+                        <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3">InvalidRows: <strong>@_editImporter.InvalidRows.Count</strong></div>
+                        <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3">ImportableRows: <strong>@_editImporter.ImportableRows.Count</strong></div>
+                        <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3">DiscardedRows: <strong>@_editImporter.DiscardedRows.Count</strong></div>
                     </div>
-                    <div class="rounded-xl border border-(--blux-border) bg-(--pg-code-bg) p-3 font-mono text-xs text-[#d7dcde]">
+                    <div class="rounded-xl border border-(--lux-border) bg-(--pg-code-bg) p-3 font-mono text-xs text-[#d7dcde]">
                         <p class="mb-1 text-[#94a3b8]">ExportInvalidRowsCsv()</p>
                         <pre class="overflow-x-auto">@(string.IsNullOrWhiteSpace(_editImporter.ExportInvalidRowsCsv()) ? "(no invalid rows — all clean!)" : _editImporter.ExportInvalidRowsCsv())</pre>
                     </div>
@@ -571,44 +571,44 @@
             case "spreadsheet-batch-submit":
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-wrap items-center gap-2">
-                        <BxButton Label="1. SubmitAsync() (Row 1 rejected by API)" Size="BxSize.Sm" OnClick="@RunBatchSubmitDemoAsync" />
-                        <BxButton Label="2. Fix Row 1 & RetryRejectedAsync()" Size="BxSize.Sm" Color="BxColor.Success" Variant="ButtonVariant.Soft" Disabled="@(_batchImporter.RejectedCount == 0)" OnClick="@RetryRejectedDemoAsync" />
-                        <BxButton Label="Reset" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Ghost" OnClick="@InitBatchImporter" />
+                        <LxButton Label="1. SubmitAsync() (Row 1 rejected by API)" Size="LxSize.Sm" OnClick="@RunBatchSubmitDemoAsync" />
+                        <LxButton Label="2. Fix Row 1 & RetryRejectedAsync()" Size="LxSize.Sm" Color="LxColor.Success" Variant="ButtonVariant.Soft" Disabled="@(_batchImporter.RejectedCount == 0)" OnClick="@RetryRejectedDemoAsync" />
+                        <LxButton Label="Reset" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Ghost" OnClick="@InitBatchImporter" />
                     </div>
                     <div class="grid gap-3 sm:grid-cols-4 font-mono text-xs">
-                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">Status: <strong>@_batchImporter.SubmitStatus</strong></div>
-                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">Imported: <strong>@_batchImporter.ImportedCount</strong></div>
-                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">Rejected: <strong>@_batchImporter.RejectedCount</strong></div>
-                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3">Progress: <strong>@_batchImporter.SubmitDone / @_batchImporter.SubmitTotal</strong></div>
+                        <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3">Status: <strong>@_batchImporter.SubmitStatus</strong></div>
+                        <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3">Imported: <strong>@_batchImporter.ImportedCount</strong></div>
+                        <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3">Rejected: <strong>@_batchImporter.RejectedCount</strong></div>
+                        <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3">Progress: <strong>@_batchImporter.SubmitDone / @_batchImporter.SubmitTotal</strong></div>
                     </div>
                 </div>
                 break;
 
             case "agent-bridge":
                 <div class="grid gap-4 lg:grid-cols-2">
-                    <div class="flex flex-col gap-3 rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-4">
-                        <p class="font-mono text-xs uppercase text-(--blux-text-muted)">Semantic Actions &amp; Query("region", "Europe")</p>
+                    <div class="flex flex-col gap-3 rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-4">
+                        <p class="font-mono text-xs uppercase text-(--lux-text-muted)">Semantic Actions &amp; Query("region", "Europe")</p>
                         <div class="flex flex-wrap gap-2">
-                            <BxButton Label="Act: setValue(Project)" Size="BxSize.Sm" OnClick="@RunAgentStep" />
-                            <BxButton Label="Query('region', 'Europe')" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@RunAgentQueryDemo" />
+                            <LxButton Label="Act: setValue(Project)" Size="LxSize.Sm" OnClick="@RunAgentStep" />
+                            <LxButton Label="Query('region', 'Europe')" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@RunAgentQueryDemo" />
                         </div>
                         @if (_agentQueryNote is not null)
                         {
-                            <p class="font-mono text-xs text-(--blux-primary-text)">@_agentQueryNote</p>
+                            <p class="font-mono text-xs text-(--lux-primary-text)">@_agentQueryNote</p>
                         }
                         @if (_lastObserved is not null)
                         {
-                            <p class="font-mono text-xs text-(--blux-text-muted)">Observed: @_lastObserved</p>
+                            <p class="font-mono text-xs text-(--lux-text-muted)">Observed: @_lastObserved</p>
                         }
                     </div>
-                    <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-4 font-mono text-xs">
-                        <p class="uppercase text-(--blux-text-muted)">AgentBridgeService.Snapshot() · Secrets Redacted</p>
+                    <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-4 font-mono text-xs">
+                        <p class="uppercase text-(--lux-text-muted)">AgentBridgeService.Snapshot() · Secrets Redacted</p>
                         <ul class="mt-2 space-y-1">
                             @foreach (var s in _agent.Snapshot())
                             {
                                 <li class="flex justify-between gap-2">
                                     <span>@s.Ref · @s.Label (@s.Component)</span>
-                                    <strong class="text-(--blux-text-highlighted)">@(s.Value?.ToString() ?? "null")</strong>
+                                    <strong class="text-(--lux-text-highlighted)">@(s.Value?.ToString() ?? "null")</strong>
                                 </li>
                             }
                         </ul>
@@ -619,23 +619,23 @@
             case "agent-policy":
                 <div class="flex flex-col gap-3">
                     <div class="flex flex-wrap items-center gap-2">
-                        <BxButton Label="@(_allowConfirm ? "AllowPolicy: Approve Submit" : "AllowPolicy: Block ConfirmRequired")" Size="BxSize.Sm" Color="@(_allowConfirm ? BxColor.Success : BxColor.Warning)" Variant="ButtonVariant.Soft" OnClick="@(() => _allowConfirm = !_allowConfirm)" />
-                        <BxButton Label="Run ActAsync([submit])" Size="BxSize.Sm" OnClick="@RunPolicySubmitDemo" />
+                        <LxButton Label="@(_allowConfirm ? "AllowPolicy: Approve Submit" : "AllowPolicy: Block ConfirmRequired")" Size="LxSize.Sm" Color="@(_allowConfirm ? LxColor.Success : LxColor.Warning)" Variant="ButtonVariant.Soft" OnClick="@(() => _allowConfirm = !_allowConfirm)" />
+                        <LxButton Label="Run ActAsync([submit])" Size="LxSize.Sm" OnClick="@RunPolicySubmitDemo" />
                     </div>
-                    <p class="font-mono text-xs text-(--blux-text-highlighted)">@_policyResultText</p>
+                    <p class="font-mono text-xs text-(--lux-text-highlighted)">@_policyResultText</p>
                 </div>
                 break;
 
             case "agent-undo":
                 <div class="flex flex-col gap-3">
                     <div class="flex flex-wrap items-center gap-2">
-                        <BxButton Label="Record Next State" Size="BxSize.Sm" OnClick="@RecordUndoStep" />
-                        <BxButton Label="Undo" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" Disabled="@(!_undo.CanUndo)" OnClick="@(() => _undo.Undo())" />
-                        <BxButton Label="Redo" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" Disabled="@(!_undo.CanRedo)" OnClick="@(() => _undo.Redo())" />
-                        <BxButton Label="Clear History" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Ghost" OnClick="@(() => _undo.Clear())" />
+                        <LxButton Label="Record Next State" Size="LxSize.Sm" OnClick="@RecordUndoStep" />
+                        <LxButton Label="Undo" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" Disabled="@(!_undo.CanUndo)" OnClick="@(() => _undo.Undo())" />
+                        <LxButton Label="Redo" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" Disabled="@(!_undo.CanRedo)" OnClick="@(() => _undo.Redo())" />
+                        <LxButton Label="Clear History" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Ghost" OnClick="@(() => _undo.Clear())" />
                     </div>
-                    <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3 font-mono text-xs">
-                        Current: <strong class="text-(--blux-text-highlighted)">"@_undo.Current"</strong> · CanUndo: <strong>@_undo.CanUndo</strong> · CanRedo: <strong>@_undo.CanRedo</strong>
+                    <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3 font-mono text-xs">
+                        Current: <strong class="text-(--lux-text-highlighted)">"@_undo.Current"</strong> · CanUndo: <strong>@_undo.CanUndo</strong> · CanRedo: <strong>@_undo.CanRedo</strong>
                     </div>
                 </div>
                 break;
@@ -643,18 +643,18 @@
             case "agent-multi-controller":
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-wrap items-center gap-2">
-                        <BxButton Label="Run Cross-Controller Plan (Form + Dashboard)" Size="BxSize.Sm" OnClick="@RunMultiControllerPlanAsync" />
-                        <BxButton Label="Reset Dashboard Filters via Agent" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@ResetMultiDashboardAsync" />
+                        <LxButton Label="Run Cross-Controller Plan (Form + Dashboard)" Size="LxSize.Sm" OnClick="@RunMultiControllerPlanAsync" />
+                        <LxButton Label="Reset Dashboard Filters via Agent" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@ResetMultiDashboardAsync" />
                     </div>
                     <div class="grid gap-3 lg:grid-cols-2 font-mono text-xs">
-                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3 space-y-1">
-                            <p class="text-(--blux-text-muted)">Unified Snapshot (@_multiAgent.Snapshot().Count controls)</p>
+                        <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3 space-y-1">
+                            <p class="text-(--lux-text-muted)">Unified Snapshot (@_multiAgent.Snapshot().Count controls)</p>
                             @foreach (var s in _multiAgent.Snapshot())
                             {
                                 <p><code>@s.Ref</code> [@s.Component] <strong>@s.Label</strong> = <code>@s.Value</code></p>
                             }
                         </div>
-                        <div class="rounded-xl border border-(--blux-border) bg-(--pg-code-bg) p-3 text-[#d7dcde]">
+                        <div class="rounded-xl border border-(--lux-border) bg-(--pg-code-bg) p-3 text-[#d7dcde]">
                             <p class="mb-1 text-[#94a3b8]">Last Cross-Controller Result</p>
                             <pre class="overflow-x-auto whitespace-pre-wrap">@_multiAgentStatus</pre>
                         </div>
@@ -665,19 +665,19 @@
             case "agent-tools-diagnostics":
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-wrap items-center gap-2">
-                        <BxButton Label="Trigger: Not Found" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => RunDiagStepAsync("unknown-control", "setValue", ["x"]))" />
-                        <BxButton Label="Trigger: Unsupported Action" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => RunDiagStepAsync("Project", "submit", null))" />
-                        <BxButton Label="Trigger: Policy Refusal" Size="BxSize.Sm" Color="BxColor.Error" Variant="ButtonVariant.Soft" OnClick="@(() => RunDiagStepAsync("Project Settings", "submit", null))" />
+                        <LxButton Label="Trigger: Not Found" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => RunDiagStepAsync("unknown-control", "setValue", ["x"]))" />
+                        <LxButton Label="Trigger: Unsupported Action" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => RunDiagStepAsync("Project", "submit", null))" />
+                        <LxButton Label="Trigger: Policy Refusal" Size="LxSize.Sm" Color="LxColor.Error" Variant="ButtonVariant.Soft" OnClick="@(() => RunDiagStepAsync("Project Settings", "submit", null))" />
                     </div>
                     <div class="grid gap-3 lg:grid-cols-2 font-mono text-xs">
-                        <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-3 space-y-1">
-                            <p class="text-(--blux-text-muted)">AgentBridgeService.GetToolDefinitions()</p>
+                        <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-3 space-y-1">
+                            <p class="text-(--lux-text-muted)">AgentBridgeService.GetToolDefinitions()</p>
                             @foreach (var tool in AgentBridgeService.GetToolDefinitions())
                             {
                                 <p><strong>@tool.Name</strong> — ReadOnly:@tool.ReadOnlyHint · Consequential:@tool.ConsequentialHint</p>
                             }
                         </div>
-                        <div class="rounded-xl border border-(--blux-border) bg-(--pg-code-bg) p-3 text-[#d7dcde]">
+                        <div class="rounded-xl border border-(--lux-border) bg-(--pg-code-bg) p-3 text-[#d7dcde]">
                             <p class="mb-1 text-[#94a3b8]">Deterministic AgentActResult</p>
                             <pre class="overflow-x-auto whitespace-pre-wrap">@_diagResult</pre>
                         </div>

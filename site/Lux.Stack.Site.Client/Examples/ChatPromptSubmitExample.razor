@@ -1,9 +1,9 @@
-@* Inside a BxChatPrompt the button follows its Status. Standalone, give it one. Stop and retry need interactivity. *@
+@* Inside a LxChatPrompt the button follows its Status. Standalone, give it one. Stop and retry need interactivity. *@
 <div class="flex flex-wrap items-center gap-6" data-testid="chat-prompt-submit-example">
     @foreach (var status in Enum.GetValues<ChatStatus>())
     {
-        <div class="flex flex-col items-center gap-2 text-xs text-(--blux-text-muted)">
-            <BxChatPromptSubmit Status="status" OnStop="Stop" OnReload="Retry"
+        <div class="flex flex-col items-center gap-2 text-xs text-(--lux-text-muted)">
+            <LxChatPromptSubmit Status="status" OnStop="Stop" OnReload="Retry"
                                 data-testid="@($"chat-submit-{status.ToString().ToLowerInvariant()}")" />
             @status
         </div>

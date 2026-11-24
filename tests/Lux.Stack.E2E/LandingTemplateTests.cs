@@ -12,15 +12,15 @@ internal static class LandingChecks
 
     /// <summary>
     /// The page is static HTML: every section is there, and the pieces that move work without .NET in the browser. The monthly and yearly
-    /// switch is two radio buttons and CSS, the accordion and the color mode button are Blux elements, so no circuit and no WebAssembly start.
+    /// switch is two radio buttons and CSS, the accordion and the color mode button are Lux elements, so no circuit and no WebAssembly start.
     /// </summary>
     public static async Task AssertBehaviour(IPage page)
     {
         await Assertions.Expect(page.GetByRole(AriaRole.Heading, new() { Level = 1 })).ToContainTextAsync("Send an invoice");
         foreach (var id in SectionIds) await Assertions.Expect(page.Locator($"section#{id}")).ToHaveCountAsync(1);
         await Assertions.Expect(page.GetByTestId("testimonial")).ToHaveCountAsync(3);
-        // Blux's browser side is loaded by blazor.web.js, static pages included.
-        await page.WaitForFunctionAsync("() => !!customElements.get('bx-accordion')");
+        // Lux's browser side is loaded by blazor.web.js, static pages included.
+        await page.WaitForFunctionAsync("() => !!customElements.get('lx-accordion')");
 
         // Pricing: monthly first, and the yearly copy is not in the layout.
         var pricing = page.GetByTestId("pricing");
@@ -46,7 +46,7 @@ internal static class LandingChecks
 
         // Color mode.
         var dark = (await page.Locator("html").GetAttributeAsync("class") ?? "").Contains("dark");
-        await page.Locator("[data-bx-color-mode=toggle]").ClickAsync();
+        await page.Locator("[data-lx-color-mode=toggle]").ClickAsync();
         await Assertions.Expect(page.Locator("html")).ToHaveClassAsync(dark ? new Regex("^((?!dark).)*$") : new Regex("dark"));
     }
 
@@ -101,21 +101,21 @@ internal static class LandingChecks
 
 /// <summary>
 /// The Landing template as a user ships it: <c>dotnet publish -c Release</c>, run in Production at the root and below a path base. Started by
-/// <c>build/verify-templates.mjs</c> with <c>BLUX_TEMPLATE_PUBLISHED</c>, <c>BLUX_TEMPLATE_ASSEMBLY</c> and <c>BLUX_TEMPLATE_PROBE</c>; without them
+/// <c>build/verify-templates.mjs</c> with <c>LUX_TEMPLATE_PUBLISHED</c>, <c>LUX_TEMPLATE_ASSEMBLY</c> and <c>LUX_TEMPLATE_PROBE</c>; without them
 /// the tests are skipped. The page is static: the test fails if a WebSocket opens or a WebAssembly file is requested.
 /// </summary>
 public class LandingTemplateTests(PlaygroundServer server)
 {
-    private static string? Published => Environment.GetEnvironmentVariable("BLUX_TEMPLATE_PUBLISHED");
-    private static string? AssemblyName => Environment.GetEnvironmentVariable("BLUX_TEMPLATE_ASSEMBLY");
-    private static string? Probe => Environment.GetEnvironmentVariable("BLUX_TEMPLATE_PROBE");
+    private static string? Published => Environment.GetEnvironmentVariable("LUX_TEMPLATE_PUBLISHED");
+    private static string? AssemblyName => Environment.GetEnvironmentVariable("LUX_TEMPLATE_ASSEMBLY");
+    private static string? Probe => Environment.GetEnvironmentVariable("LUX_TEMPLATE_PROBE");
 
     [Theory]
     [InlineData(null)]
     [InlineData("/demo/landing")]
     public async Task Published_site_is_static_and_its_parts_work(string? pathBase)
     {
-        Assert.SkipWhen(string.IsNullOrEmpty(Published) || string.IsNullOrEmpty(AssemblyName), "BLUX_TEMPLATE_PUBLISHED and BLUX_TEMPLATE_ASSEMBLY are not set.");
+        Assert.SkipWhen(string.IsNullOrEmpty(Published) || string.IsNullOrEmpty(AssemblyName), "LUX_TEMPLATE_PUBLISHED and LUX_TEMPLATE_ASSEMBLY are not set.");
 
         var port = FreePort();
         var host = $"http://127.0.0.1:{port}";

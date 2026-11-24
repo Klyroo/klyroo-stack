@@ -1,12 +1,12 @@
 <div class="w-full max-w-xs">
-    <BxTree Items="Items" @bind-Value="_selected" AriaLabel="Project files" />
-    <p class="mt-3 text-sm text-(--blux-text-muted)" data-testid="tree-state">Selected: @(_selected ?? "none")</p>
+    <LxTree Items="Items" @bind-Value="_selected" AriaLabel="Project files" />
+    <p class="mt-3 text-sm text-(--lux-text-muted)" data-testid="tree-state">Selected: @(_selected ?? "none")</p>
 </div>
 
 @code {
     private string? _selected;
 
-    private static readonly BxTreeItem[] Items =
+    private static readonly LxTreeItem[] Items =
     [
         new("src")
         {

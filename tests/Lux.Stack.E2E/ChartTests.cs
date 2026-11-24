@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace Lux.Stack.E2E;
 
-/// <summary>The "Chart" family: BxChart, drawn as SVG on the server with a tooltip and keyboard exploration in the browser.</summary>
+/// <summary>The "Chart" family: LxChart, drawn as SVG on the server with a tooltip and keyboard exploration in the browser.</summary>
 public class ChartTests(PlaygroundServer server) : PlaygroundTest(server)
 {
     private static readonly string[] Slugs = ["chart"];
@@ -75,7 +75,7 @@ public class ChartTests(PlaygroundServer server) : PlaygroundTest(server)
         Assert.Equal("info", await chart.Locator("g[data-series='1']").GetAttributeAsync("data-color"));
         // The color is applied through the variable of data-color: the stroke of the first bar is the primary text color.
         var stroke = await chart.Locator("g[data-series='0'] rect").First.EvaluateAsync<string>("e => getComputedStyle(e).stroke");
-        var expected = await chart.Locator("g[data-series='0']").EvaluateAsync<string>("e => { const s = document.createElement('i'); s.style.color = 'var(--bx-color-text)'; e.appendChild(s); const c = getComputedStyle(s).color; s.remove(); return c; }");
+        var expected = await chart.Locator("g[data-series='0']").EvaluateAsync<string>("e => { const s = document.createElement('i'); s.style.color = 'var(--lx-color-text)'; e.appendChild(s); const c = getComputedStyle(s).color; s.remove(); return c; }");
         Assert.Equal(expected, stroke);
         await Assertions.Expect(chart.GetByRole(AriaRole.List, new() { Name = "Legend" }).GetByRole(AriaRole.Listitem)).ToHaveCountAsync(2);
         // Series differ without color: the second series is filled with a pattern, the first is plain.

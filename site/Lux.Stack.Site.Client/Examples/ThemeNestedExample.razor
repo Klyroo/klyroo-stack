@@ -1,19 +1,19 @@
 @using Lux.UI.Theming
-@* One BxTheme can carry several component types, and themes nest: the innermost wins. *@
-<BxTheme Overrides="_outer">
+@* One LxTheme can carry several component types, and themes nest: the innermost wins. *@
+<LxTheme Overrides="_outer">
     <div class="flex flex-wrap items-center gap-3" data-testid="theme-outer">
-        <BxButton Label="Outer" />
-        <BxBadge Label="Outer" />
-        <BxTheme For="typeof(BxButton)" Ui='new ButtonUi { Base = "rounded-none" }'>
-            <BxButton Label="Inner" data-testid="theme-inner" />
-        </BxTheme>
+        <LxButton Label="Outer" />
+        <LxBadge Label="Outer" />
+        <LxTheme For="typeof(LxButton)" Ui='new ButtonUi { Base = "rounded-none" }'>
+            <LxButton Label="Inner" data-testid="theme-inner" />
+        </LxTheme>
     </div>
-</BxTheme>
+</LxTheme>
 
 @code {
     private readonly Dictionary<Type, ISlotOverrides> _outer = new()
     {
-        [typeof(BxButton)] = new ButtonUi { Base = "rounded-full" },
-        [typeof(BxBadge)] = new BadgeUi { Base = "rounded-full" },
+        [typeof(LxButton)] = new ButtonUi { Base = "rounded-full" },
+        [typeof(LxBadge)] = new BadgeUi { Base = "rounded-full" },
     };
 }

@@ -99,7 +99,7 @@ public class PickersTests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task InputDate_picking_a_day_posts_an_ISO_date(string mode)
     {
         await Open(mode, "input-date");
-        var field = Page.Locator("bx-date-field", new() { Has = Page.GetByTestId("appointment") });
+        var field = Page.Locator("lx-date-field", new() { Has = Page.GetByTestId("appointment") });
         var input = Page.GetByTestId("appointment");
         await Assertions.Expect(input).ToHaveValueAsync("2026-11-10");
 
@@ -370,8 +370,8 @@ public class PickersTests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task ColorPicker_reports_once_when_a_drag_ends(string mode)
     {
         await Open(mode, "color-picker");
-        var picker = Page.Locator("bx-color-picker[data-testid=brand]");
-        await picker.EvaluateAsync("el => { window.__reports = 0; el.addEventListener('bx-change', () => window.__reports++); }");
+        var picker = Page.Locator("lx-color-picker[data-testid=brand]");
+        await picker.EvaluateAsync("el => { window.__reports = 0; el.addEventListener('lx-change', () => window.__reports++); }");
         var box = (await picker.Locator("[data-slot=area]").BoundingBoxAsync())!;
 
         await Page.Mouse.MoveAsync(box.X + 10, box.Y + 10);

@@ -4,39 +4,39 @@
    Columns are never in the URL. Statically rendered, the page applies the cookie (hidden columns, order, pins, widths) at its first paint; the panel and the resize handles need the page to be interactive. *@
 <div class="flex w-full flex-col gap-8">
     <div class="w-full" data-testid="list-columns">
-        <BxDataList TItem="Invoice" Label="Invoices with configurable columns" Schema="InvoiceData.Schema" Items="_items" UrlKey="cols" PreferencesKey="demo-cols">
+        <LxDataList TItem="Invoice" Label="Invoices with configurable columns" Schema="InvoiceData.Schema" Items="_items" UrlKey="cols" PreferencesKey="demo-cols">
             <div class="flex flex-wrap items-center justify-between gap-2">
-                <BxDataListSearch />
+                <LxDataListSearch />
                 <div class="flex items-center gap-2">
-                    <BxDataListResultCount />
-                    <BxDataListColumnPanel SearchThreshold="3" />
-                    <BxDataListRefresh />
+                    <LxDataListResultCount />
+                    <LxDataListColumnPanel SearchThreshold="3" />
+                    <LxDataListRefresh />
                 </div>
             </div>
-            <BxDataListTable Caption="Invoices with configurable columns" Resizable="true">
-                <BxDataListColumn Field="id" Title="No." Align="DataListAlign.End" Width="90" Pinned="DataListPin.Start" />
-                <BxDataListColumn Field="customer" Required="true" Width="220" />
-                <BxDataListColumn Field="status" Width="140" />
-                <BxDataListColumn Field="amount" Align="DataListAlign.End" Format="C2" Width="150" />
-                <BxDataListColumn Field="issued" Title="Issued date" Width="160" />
-            </BxDataListTable>
-            <BxDataListPagination />
-        </BxDataList>
+            <LxDataListTable Caption="Invoices with configurable columns" Resizable="true">
+                <LxDataListColumn Field="id" Title="No." Align="DataListAlign.End" Width="90" Pinned="DataListPin.Start" />
+                <LxDataListColumn Field="customer" Required="true" Width="220" />
+                <LxDataListColumn Field="status" Width="140" />
+                <LxDataListColumn Field="amount" Align="DataListAlign.End" Format="C2" Width="150" />
+                <LxDataListColumn Field="issued" Title="Issued date" Width="160" />
+            </LxDataListTable>
+            <LxDataListPagination />
+        </LxDataList>
     </div>
 
     <div class="w-full" data-testid="list-columns-fixed">
-        <BxDataList TItem="Invoice" Label="Invoices with selection and row actions" Schema="InvoiceData.Schema" Items="_items" UrlKey="fixed" PreferencesKey="demo-cols-fixed" Selectable="true">
+        <LxDataList TItem="Invoice" Label="Invoices with selection and row actions" Schema="InvoiceData.Schema" Items="_items" UrlKey="fixed" PreferencesKey="demo-cols-fixed" Selectable="true">
             <div class="flex flex-wrap items-center justify-end gap-2">
-                <BxDataListColumnPanel />
+                <LxDataListColumnPanel />
             </div>
-            <BxDataListTable Caption="Invoices with selection and row actions" Resizable="true" RowActions="_actions" RowActionsMaxVisible="1">
-                <BxDataListColumn Field="id" Title="No." Align="DataListAlign.End" Width="90" />
-                <BxDataListColumn Field="customer" Width="220" />
-                <BxDataListColumn Field="status" Width="140" />
-                <BxDataListColumn Field="amount" Align="DataListAlign.End" Format="C2" Width="150" />
-            </BxDataListTable>
-            <BxDataListPagination />
-        </BxDataList>
+            <LxDataListTable Caption="Invoices with selection and row actions" Resizable="true" RowActions="_actions" RowActionsMaxVisible="1">
+                <LxDataListColumn Field="id" Title="No." Align="DataListAlign.End" Width="90" />
+                <LxDataListColumn Field="customer" Width="220" />
+                <LxDataListColumn Field="status" Width="140" />
+                <LxDataListColumn Field="amount" Align="DataListAlign.End" Format="C2" Width="150" />
+            </LxDataListTable>
+            <LxDataListPagination />
+        </LxDataList>
     </div>
 </div>
 

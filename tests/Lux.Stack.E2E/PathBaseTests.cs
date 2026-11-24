@@ -44,7 +44,7 @@ public class PathBaseTests(PathBaseFixture fixture) : IClassFixture<PathBaseFixt
     private async Task Open(string mode, string component)
     {
         await Page.GotoAsync($"{mode}/components/{component}");
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
         if (mode != "ssr")
         {
             await Assertions.Expect(Page.GetByTestId("renderer")).ToHaveAttributeAsync("data-interactive", "true", new() { Timeout = 30_000 });
@@ -56,7 +56,7 @@ public class PathBaseTests(PathBaseFixture fixture) : IClassFixture<PathBaseFixt
     {
         await Open("ssr", "button");
 
-        // "#main" resolves against <base href="/sub/">: without the handler of the Blux JS it would load the home page of the app.
+        // "#main" resolves against <base href="/sub/">: without the handler of the Lux JS it would load the home page of the app.
         var skip = Page.GetByRole(AriaRole.Link, new() { Name = "Skip to content" });
         await skip.FocusAsync();
         await Page.Keyboard.PressAsync("Enter");
@@ -149,15 +149,15 @@ public class PathBaseTests(PathBaseFixture fixture) : IClassFixture<PathBaseFixt
         await Page.GetByTestId("dashboard-collapse").ClickAsync();
 
         await Assertions.Expect(sidebar).ToHaveAttributeAsync("data-state", "collapsed");
-        var cookies = await CookiesNamed("blux-sidebar");
+        var cookies = await CookiesNamed("lux-sidebar");
         Assert.NotEmpty(cookies);
         // Scoped by path and by name: a server that reads it keeps the last cookie of a name, and the one of a root app would come after.
         Assert.All(cookies, c => Assert.Equal("/sub", c.Path));
-        Assert.All(cookies, c => Assert.StartsWith("blux-sidebar.sub~~playground-dashboard", c.Name));
-        Assert.Contains(cookies, c => c.Name == "blux-sidebar.sub~~playground-dashboard");
+        Assert.All(cookies, c => Assert.StartsWith("lux-sidebar.sub~~playground-dashboard", c.Name));
+        Assert.Contains(cookies, c => c.Name == "lux-sidebar.sub~~playground-dashboard");
 
         await Page.ReloadAsync();
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
         await Assertions.Expect(Page.GetByTestId("dashboard-sidebar")).ToHaveAttributeAsync("data-state", "collapsed");
         AssertEverythingStaysBelowThePathBase();
     }
@@ -168,7 +168,7 @@ public class PathBaseTests(PathBaseFixture fixture) : IClassFixture<PathBaseFixt
     public async Task The_sidebar_cookie_of_an_app_at_the_root_is_neither_read_nor_overwritten(string mode)
     {
         // An app at the root of the origin with the same sidebar id: its cookie is at "/" under the plain name, collapsed.
-        await _context.AddCookiesAsync([new Microsoft.Playwright.Cookie { Name = "blux-sidebar-playground-dashboard", Value = "1", Domain = "127.0.0.1", Path = "/" }]);
+        await _context.AddCookiesAsync([new Microsoft.Playwright.Cookie { Name = "lux-sidebar-playground-dashboard", Value = "1", Domain = "127.0.0.1", Path = "/" }]);
         await Open(mode, "dashboard-group");
         var sidebar = Page.GetByTestId("dashboard-sidebar");
         // The browser sends that cookie to /sub too, but this app reads its own name only.
@@ -176,12 +176,12 @@ public class PathBaseTests(PathBaseFixture fixture) : IClassFixture<PathBaseFixt
 
         await Page.GetByTestId("dashboard-collapse").ClickAsync();
         await Assertions.Expect(sidebar).ToHaveAttributeAsync("data-state", "collapsed");
-        await ExpectCookieValue("blux-sidebar.sub~~playground-dashboard", "/sub", "1");
+        await ExpectCookieValue("lux-sidebar.sub~~playground-dashboard", "/sub", "1");
         await Page.GetByTestId("dashboard-collapse").ClickAsync();
         await Assertions.Expect(sidebar).ToHaveAttributeAsync("data-state", "expanded");
-        await ExpectCookieValue("blux-sidebar.sub~~playground-dashboard", "/sub", "0");
+        await ExpectCookieValue("lux-sidebar.sub~~playground-dashboard", "/sub", "0");
 
-        var root = (await _context.CookiesAsync()).Single(c => c.Name == "blux-sidebar-playground-dashboard");
+        var root = (await _context.CookiesAsync()).Single(c => c.Name == "lux-sidebar-playground-dashboard");
         Assert.Equal("/", root.Path);
         Assert.Equal("1", root.Value);
     }
@@ -202,11 +202,11 @@ public class PathBaseTests(PathBaseFixture fixture) : IClassFixture<PathBaseFixt
     {
         await Open("ssr", "dashboard-group");
         await Page.GetByTestId("dashboard-collapse").ClickAsync();
-        await ExpectCookieValue("blux-sidebar.sub~~playground-dashboard", "/sub", "1");
-        await _context.AddCookiesAsync([new Microsoft.Playwright.Cookie { Name = "blux-sidebar-playground-dashboard", Value = "0", Domain = "127.0.0.1", Path = "/" }]);
+        await ExpectCookieValue("lux-sidebar.sub~~playground-dashboard", "/sub", "1");
+        await _context.AddCookiesAsync([new Microsoft.Playwright.Cookie { Name = "lux-sidebar-playground-dashboard", Value = "0", Domain = "127.0.0.1", Path = "/" }]);
 
         await Page.ReloadAsync();
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
 
         await Assertions.Expect(Page.GetByTestId("dashboard-sidebar")).ToHaveAttributeAsync("data-state", "collapsed");
     }
@@ -216,16 +216,16 @@ public class PathBaseTests(PathBaseFixture fixture) : IClassFixture<PathBaseFixt
     {
         await Open("wasm", "banner");
         await Page.GetByTestId("banner").GetByRole(AriaRole.Button, new() { Name = "Close" }).ClickAsync();
-        await Page.EvaluateAsync("() => Blux.setColorMode('dark')");
+        await Page.EvaluateAsync("() => Lux.setColorMode('dark')");
 
         var keys = await Page.EvaluateAsync<string[]>("() => Object.keys(localStorage)");
-        Assert.Contains("/sub:blux:banner:playground-launch", keys);
-        Assert.DoesNotContain("blux:banner:playground-launch", keys);
+        Assert.Contains("/sub:lux:banner:playground-launch", keys);
+        Assert.DoesNotContain("lux:banner:playground-launch", keys);
         // One color mode for every app of the origin.
-        Assert.Contains("blux-color-mode", keys);
-        Assert.DoesNotContain("/sub:blux-color-mode", keys);
+        Assert.Contains("lux-color-mode", keys);
+        Assert.DoesNotContain("/sub:lux-color-mode", keys);
         await Page.ReloadAsync();
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-banner')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-banner')");
         await Assertions.Expect(Page.GetByTestId("banner")).ToBeHiddenAsync();
     }
 
@@ -281,9 +281,9 @@ public class PathBaseTests(PathBaseFixture fixture) : IClassFixture<PathBaseFixt
         }
 
         var source = await Page.GetByTestId("image-basic").EvaluateAsync<string>("i => i.currentSrc");
-        Assert.StartsWith($"{Host}/sub/_blux/img?src=%2Fimg%2Fsample-gradient.png", source);
-        Assert.Contains(SameOriginPaths(), p => p.StartsWith("/sub/_blux/img?", StringComparison.Ordinal));
-        Assert.Equal(200, (await _context.APIRequest.GetAsync("_blux/img?src=/img/sample-waves.png&w=64&f=webp")).Status);
+        Assert.StartsWith($"{Host}/sub/_lux/img?src=%2Fimg%2Fsample-gradient.png", source);
+        Assert.Contains(SameOriginPaths(), p => p.StartsWith("/sub/_lux/img?", StringComparison.Ordinal));
+        Assert.Equal(200, (await _context.APIRequest.GetAsync("_lux/img?src=/img/sample-waves.png&w=64&f=webp")).Status);
         AssertEverythingStaysBelowThePathBase();
     }
 
@@ -291,7 +291,7 @@ public class PathBaseTests(PathBaseFixture fixture) : IClassFixture<PathBaseFixt
     public async Task The_home_page_and_its_unoptimized_images_stay_below_the_path_base()
     {
         await Page.GotoAsync("");
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
         await Page.EvaluateAsync("() => document.querySelectorAll('img[loading=lazy]').forEach(i => i.loading = 'eager')");
         await Page.WaitForFunctionAsync("() => [...document.images].every(i => i.complete && i.naturalWidth > 0)", null, new() { Timeout = 30_000 });
 

@@ -112,9 +112,9 @@
         @inject QueryState Query
         @implements IDisposable
 
-        <BxInput Value="@_search.Value" ValueChanged="v => _search.Value = v ?? string.Empty Debounce="300" />
+        <LxInput Value="@_search.Value" ValueChanged="v => _search.Value = v ?? string.Empty Debounce="300" />
         <p>Page @_page.Value</p>
-        <BxButton Label="Next" OnClick="() => _page.Set(_page.Value + 1, QueryHistory.Push)" />
+        <LxButton Label="Next" OnClick="() => _page.Set(_page.Value + 1, QueryHistory.Push)" />
 
         @code {
             private QueryValue<string> _search = default!;

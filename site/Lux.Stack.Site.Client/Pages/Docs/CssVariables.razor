@@ -5,10 +5,10 @@
 <div class="pg-prose">
     <p class="pg-eyebrow">Getting started</p>
     <h1>CSS variables</h1>
-    <p class="pg-lead">Every color, surface, border and size of the components reads a <code>--blux-*</code> variable. Override them in <code>:root</code> and <code>.dark</code>, or let <a href="/docs/design-system">the palettes</a> compute them.</p>
+    <p class="pg-lead">Every color, surface, border and size of the components reads a <code>--lux-*</code> variable. Override them in <code>:root</code> and <code>.dark</code>, or let <a href="/docs/design-system">the palettes</a> compute them.</p>
 
     <h2>Semantic colors</h2>
-    <p>Each of the seven colors is a triplet: the <strong>fill</strong> (<code>--blux-primary</code>), the <strong>text color</strong> to use on the page and on soft backgrounds (<code>-text</code>) and the <strong>text on the fill</strong> (<code>-contrast</code>). The triplet is what keeps contrast guaranteed: the fill is checked at 3:1, the text at 4.5:1, including over 20% tints and the 80% and 90% states of solid fills.</p>
+    <p>Each of the seven colors is a triplet: the <strong>fill</strong> (<code>--lux-primary</code>), the <strong>text color</strong> to use on the page and on soft backgrounds (<code>-text</code>) and the <strong>text on the fill</strong> (<code>-contrast</code>). The triplet is what keeps contrast guaranteed: the fill is checked at 3:1, the text at 4.5:1, including over 20% tints and the 80% and 90% states of solid fills.</p>
     <div class="not-prose overflow-x-auto rounded-xl border border-default" data-testid="color-table">
         <table class="w-full min-w-xl text-start text-sm">
             <caption class="sr-only">Semantic color variables</caption>
@@ -19,7 +19,7 @@
                 @foreach (var row in Colors)
                 {
                     <tr class="border-t border-default">
-                        <th scope="row" class="px-3 py-2 text-start font-mono text-xs font-medium text-highlighted">--blux-@row.Name</th>
+                        <th scope="row" class="px-3 py-2 text-start font-mono text-xs font-medium text-highlighted">--lux-@row.Name</th>
                         <td class="px-3 py-2 font-mono text-xs text-muted">@row.Light</td>
                         <td class="px-3 py-2 font-mono text-xs text-muted">@row.Dark</td>
                     </tr>
@@ -40,7 +40,7 @@
                 @foreach (var row in Surfaces)
                 {
                     <tr class="border-t border-default">
-                        <th scope="row" class="px-3 py-2 text-start font-mono text-xs font-medium text-highlighted">--blux-@row.Name</th>
+                        <th scope="row" class="px-3 py-2 text-start font-mono text-xs font-medium text-highlighted">--lux-@row.Name</th>
                         <td class="px-3 py-2 font-mono text-xs text-muted">@row.Utility</td>
                         <td class="px-3 py-2 font-mono text-xs text-muted">@row.Light</td>
                         <td class="px-3 py-2 font-mono text-xs text-muted">@row.Dark</td>
@@ -62,7 +62,7 @@
                 @foreach (var row in Sizes)
                 {
                     <tr class="border-t border-default">
-                        <th scope="row" class="px-3 py-2 text-start font-mono text-xs font-medium text-highlighted">--blux-@row.Name</th>
+                        <th scope="row" class="px-3 py-2 text-start font-mono text-xs font-medium text-highlighted">--lux-@row.Name</th>
                         <td class="px-3 py-2 font-mono text-xs text-muted">@row.Light</td>
                         <td class="px-3 py-2 text-muted">@row.Use</td>
                     </tr>
@@ -70,8 +70,8 @@
             </tbody>
         </table>
     </div>
-    <p>The radius scale reproduces Tailwind's: with the default <code>--blux-radius</code> of <code>0.5rem</code>, <code>rounded-lg</code> is <code>0.5rem</code>, <code>rounded-md</code> <code>0.375rem</code>, and so on. Each <code>rounded-*</code> utility is computed from <code>--blux-radius</code> at the element, so changing it, globally or on a subtree, resizes <strong>every</strong> <code>rounded-*</code> in Tailwind mode, in the components and in your own markup alike. <code>BxHeader</code> reads <code>--bx-header-height</code> or <code>--blux-header-height</code> (the first wins when both are set) at the element and <code>BxMain</code> subtracts it from the viewport, so either can be set on a subtree; <code>BxContainer</code>, the header and the footer cap their width at <code>--blux-container</code>.</p>
-    <p>The chart series read <code>--blux-chart-N</code> and fall back to a semantic color at the element (<code>chart-1</code> is the primary color), so a configured palette, or a <code>--blux-primary</code> set on a subtree, reaches the charts inside it. The chart variables have no value by default: set <code>--blux-chart-N</code> together with its <code>-text</code> and <code>-contrast</code> companions, globally or on a subtree, to give the charts their own palette.</p>
+    <p>The radius scale reproduces Tailwind's: with the default <code>--lux-radius</code> of <code>0.5rem</code>, <code>rounded-lg</code> is <code>0.5rem</code>, <code>rounded-md</code> <code>0.375rem</code>, and so on. Each <code>rounded-*</code> utility is computed from <code>--lux-radius</code> at the element, so changing it, globally or on a subtree, resizes <strong>every</strong> <code>rounded-*</code> in Tailwind mode, in the components and in your own markup alike. <code>LxHeader</code> reads <code>--lx-header-height</code> or <code>--lux-header-height</code> (the first wins when both are set) at the element and <code>LxMain</code> subtracts it from the viewport, so either can be set on a subtree; <code>LxContainer</code>, the header and the footer cap their width at <code>--lux-container</code>.</p>
+    <p>The chart series read <code>--lux-chart-N</code> and fall back to a semantic color at the element (<code>chart-1</code> is the primary color), so a configured palette, or a <code>--lux-primary</code> set on a subtree, reaches the charts inside it. The chart variables have no value by default: set <code>--lux-chart-N</code> together with its <code>-text</code> and <code>-contrast</code> companions, globally or on a subtree, to give the charts their own palette.</p>
     <p>If your app declares its own <code>@@theme</code> radius or colors (<code>--radius-*</code>, <code>--color-primary</code>…) before it imports <code>lux.theme.css</code>, the import overrides them: declare yours after the import to win.</p>
 
     <h2>Override in :root and .dark</h2>
@@ -92,8 +92,8 @@
             <div class="rounded-md border border-default bg-elevated p-3 text-default">bg-elevated<br />border-default</div>
             <div class="rounded-md border border-accented bg-accented p-3 text-default">bg-accented<br />border-accented</div>
             <div class="rounded-md border border-inverted bg-inverted p-3 text-inverted">bg-inverted<br />text-inverted</div>
-            <div class="rounded-md bg-primary p-3 text-(--blux-primary-contrast)">bg-primary</div>
-            <div class="rounded-md border border-primary p-3 text-(--blux-primary-text)">border-primary</div>
+            <div class="rounded-md bg-primary p-3 text-(--lux-primary-contrast)">bg-primary</div>
+            <div class="rounded-md border border-primary p-3 text-(--lux-primary-text)">border-primary</div>
         </div>
     </div>
     <div class="not-prose overflow-x-auto rounded-xl border border-default" data-testid="utility-table">
@@ -155,41 +155,41 @@
     private static readonly Row[] Sizes =
     [
         new("radius", "0.5rem", Use: "The base radius of controls and cards."),
-        new("rounded-xs … rounded-3xl", "0.125rem, 0.25rem, 0.375rem, 0.5rem, 0.75rem, 1rem, 1.5rem", Use: "Computed from --blux-radius at the element: 0.25, 0.5, 0.75, 1, 1.5, 2, 3 times it. There is no variable per step."),
+        new("rounded-xs … rounded-3xl", "0.125rem, 0.25rem, 0.375rem, 0.5rem, 0.75rem, 1rem, 1.5rem", Use: "Computed from --lux-radius at the element: 0.25, 0.5, 0.75, 1, 1.5, 2, 3 times it. There is no variable per step."),
         new("font-sans, font-mono", "(Tailwind's sans and mono stacks)", Use: "Page font and font-mono. The LuxFont items of the project set them to a self-hosted font (see Fonts); font-sans, font-mono and the preflight follow them in both CSS modes."),
-        new("container", "80rem", Use: "Maximum width of BxContainer, the header and the footer."),
-        new("header-height", "4rem", Use: "Height of BxHeader; BxMain and the page aside subtract it. --bx-header-height, when set, wins; both work on a subtree."),
-        new("chart-1 … chart-6", "(not set) primary, secondary, info, error, success, warning", Use: "Series colors of BxChart, each with -text and -contrast. Unset, a series falls back to the semantic color at the element."),
+        new("container", "80rem", Use: "Maximum width of LxContainer, the header and the footer."),
+        new("header-height", "4rem", Use: "Height of LxHeader; LxMain and the page aside subtract it. --lx-header-height, when set, wins; both work on a subtree."),
+        new("chart-1 … chart-6", "(not set) primary, secondary, info, error, success, warning", Use: "Series colors of LxChart, each with -text and -contrast. Unset, a series falls back to the semantic color at the element."),
     ];
 
     private static readonly Row[] Utilities =
     [
-        new("text-default, text-muted, text-dimmed, text-toned, text-highlighted, text-inverted", "--blux-text, -text-muted, -text-dimmed, -text-toned, -text-highlighted, -text-inverted"),
-        new("bg-default, bg-muted, bg-elevated, bg-accented, bg-inverted", "--blux-bg, -bg-muted, -bg-elevated, -bg-accented, -bg-inverted"),
-        new("border-default, border-muted, border-accented, border-inverted", "--blux-border, -border-muted, -border-accented, -border-inverted (also ring-*, divide-*, outline-*)"),
-        new("bg-primary, text-primary, border-primary, ring-primary … (secondary, success, info, warning, error, neutral)", "--blux-primary … --blux-neutral, the fills"),
-        new("rounded-xs, rounded-sm, rounded-md, rounded-lg, rounded-xl, rounded-2xl, rounded-3xl", "--blux-radius, at the element (xs 0.25, sm 0.5, md 0.75, lg 1, xl 1.5, 2xl 2, 3xl 3 times)"),
+        new("text-default, text-muted, text-dimmed, text-toned, text-highlighted, text-inverted", "--lux-text, -text-muted, -text-dimmed, -text-toned, -text-highlighted, -text-inverted"),
+        new("bg-default, bg-muted, bg-elevated, bg-accented, bg-inverted", "--lux-bg, -bg-muted, -bg-elevated, -bg-accented, -bg-inverted"),
+        new("border-default, border-muted, border-accented, border-inverted", "--lux-border, -border-muted, -border-accented, -border-inverted (also ring-*, divide-*, outline-*)"),
+        new("bg-primary, text-primary, border-primary, ring-primary … (secondary, success, info, warning, error, neutral)", "--lux-primary … --lux-neutral, the fills"),
+        new("rounded-xs, rounded-sm, rounded-md, rounded-lg, rounded-xl, rounded-2xl, rounded-3xl", "--lux-radius, at the element (xs 0.25, sm 0.5, md 0.75, lg 1, xl 1.5, 2xl 2, 3xl 3 times)"),
     ];
 
     private const string Override = """
         :root {
-          --blux-radius: 0.75rem;
-          --blux-container: 72rem;
-          --blux-header-height: 3.5rem;
-          --blux-primary: #0f766e;
-          --blux-primary-text: #115e59;
-          --blux-primary-contrast: #ffffff;
+          --lux-radius: 0.75rem;
+          --lux-container: 72rem;
+          --lux-header-height: 3.5rem;
+          --lux-primary: #0f766e;
+          --lux-primary-text: #115e59;
+          --lux-primary-contrast: #ffffff;
         }
         .dark {
-          --blux-primary: #2dd4bf;
-          --blux-primary-text: #2dd4bf;
-          --blux-primary-contrast: #042f2e;
+          --lux-primary: #2dd4bf;
+          --lux-primary-text: #2dd4bf;
+          --lux-primary-contrast: #042f2e;
         }
         """;
 
     private const string Tertiary = """
         @theme inline {
-          --color-tertiary: var(--blux-tertiary);
+          --color-tertiary: var(--lux-tertiary);
         }
         """;
 }

@@ -28,7 +28,7 @@ public class ToolsTests
     [Theory]
     [InlineData("button", "Button")]
     [InlineData("Button", "Button")]
-    [InlineData("BxButton", "Button")]
+    [InlineData("LxButton", "Button")]
     [InlineData("dropdown menu", "DropdownMenu")]
     [InlineData("dropdown-menu", "DropdownMenu")]
     [InlineData("tabs", "Tabs")]
@@ -124,7 +124,7 @@ public class ToolsTests
         Assert.Contains("## API", output);
         Assert.DoesNotContain("## Theme", output);
         Assert.Contains("`Variant`: `ButtonVariant` = `ButtonVariant.Solid`", output);
-        Assert.Contains("<BxButton", output);
+        Assert.Contains("<LxButton", output);
         Assert.Contains("/components/button", output);
     }
 
@@ -151,7 +151,7 @@ public class ToolsTests
     {
         var expected = Tools.GetComponent("dropdown-menu", "usage");
         Assert.Equal(expected, Tools.GetComponent("DropdownMenu", "usage"));
-        Assert.Equal(expected, Tools.GetComponent("BxDropdownMenu", "usage"));
+        Assert.Equal(expected, Tools.GetComponent("LxDropdownMenu", "usage"));
         Assert.Equal(expected, Tools.GetComponent("dropdown_menu", "usage"));
     }
 
@@ -191,7 +191,7 @@ public class ToolsTests
         using var doc = JsonDocument.Parse(Tools.GetComponentMetadata("button"));
         var type = doc.RootElement.GetProperty("components")[0];
 
-        Assert.Equal("BxButton", type.GetProperty("type").GetString());
+        Assert.Equal("LxButton", type.GetProperty("type").GetString());
         var parameters = type.GetProperty("parameters").EnumerateArray().Select(p => p.GetString()).ToList();
         Assert.Contains("Variant: ButtonVariant = ButtonVariant.Solid", parameters);
         Assert.Contains("OnClick: EventCallback<MouseEventArgs>", type.GetProperty("events").EnumerateArray().Select(p => p.GetString()));
@@ -245,7 +245,7 @@ public class ToolsTests
         var output = Tools.GetExample("ButtonVariantsExample");
 
         Assert.Contains("```razor", output);
-        Assert.Contains("<BxButton", output);
+        Assert.Contains("<LxButton", output);
         Assert.Equal(output, Tools.GetExample("ButtonVariants"));
         Assert.Equal(output, Tools.GetExample("buttonvariants"));
     }
@@ -358,8 +358,8 @@ public class ToolsTests
 
         Assert.Contains("dotnet add package Lux.UI", output);
         Assert.Contains("AddLuxUi", output);
-        Assert.Contains("BxColorModeScript", output);
-        Assert.Equal(css == "tailwind", output.Contains("obj/blux/lux.theme.css"));
+        Assert.Contains("LxColorModeScript", output);
+        Assert.Equal(css == "tailwind", output.Contains("obj/lux/lux.theme.css"));
         Assert.Equal(css == "precompiled", output.Contains("_content/Lux.UI/lux.css"));
         Assert.Equal(renderMode is "auto" or "wasm", output.Contains("`.Client` project"));
     }
@@ -379,7 +379,7 @@ public class ToolsTests
     {
         var guide = TestSupport.Bundle.Guides.Single(g => g.Path == "/docs/installation").Markdown;
 
-        foreach (var line in InstallationGuide.StylesheetHead.Split('\n').Select(l => l.Trim()).Where(l => l.StartsWith("<link") || l.StartsWith("<BxColorModeScript")))
+        foreach (var line in InstallationGuide.StylesheetHead.Split('\n').Select(l => l.Trim()).Where(l => l.StartsWith("<link") || l.StartsWith("<LxColorModeScript")))
         {
             Assert.Contains(line, guide);
         }

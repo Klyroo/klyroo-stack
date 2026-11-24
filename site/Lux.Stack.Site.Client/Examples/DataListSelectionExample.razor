@@ -3,25 +3,25 @@
 @* Rows in memory with a selection: tick rows (Shift extends a range, the box in the header ticks the page), move to another page (a list in memory keeps the selection) and narrow it with the search or a filter
    (only the selected rows that still match stay selected). The bar at the bottom shows the count, "Select all N results" and the actions; Delete asks first. Interactive only: statically rendered the table has no checkboxes. *@
 <div class="w-full" data-testid="list-selection">
-    <p role="status" class="mb-2 min-h-5 text-sm text-(--blux-text-muted)" data-testid="sel-message">@_message</p>
-    <BxDataList TItem="Invoice" Label="Invoices with a selection" Schema="InvoiceFilterData.Schema" Items="_items" UrlKey="sel">
+    <p role="status" class="mb-2 min-h-5 text-sm text-(--lux-text-muted)" data-testid="sel-message">@_message</p>
+    <LxDataList TItem="Invoice" Label="Invoices with a selection" Schema="InvoiceFilterData.Schema" Items="_items" UrlKey="sel">
         <div class="flex flex-wrap items-center justify-between gap-2">
-            <BxDataListSearch />
+            <LxDataListSearch />
             <div class="flex items-center gap-2">
-                <BxDataListResultCount />
-                <BxDataListActionsDropdown Actions="_toolbarActions" />
+                <LxDataListResultCount />
+                <LxDataListActionsDropdown Actions="_toolbarActions" />
             </div>
         </div>
-        <BxDataListFilterTags ShowAdd ShowClear />
-        <BxDataListTable>
-            <BxDataListColumn Field="id" Title="No." Align="DataListAlign.End" />
-            <BxDataListColumn Field="customer" />
-            <BxDataListColumn Field="status" />
-            <BxDataListColumn Field="amount" Align="DataListAlign.End" Format="C2" />
-        </BxDataListTable>
-        <BxDataListSelectionActions Actions="_actions" />
-        <BxDataListPagination />
-    </BxDataList>
+        <LxDataListFilterTags ShowAdd ShowClear />
+        <LxDataListTable>
+            <LxDataListColumn Field="id" Title="No." Align="DataListAlign.End" />
+            <LxDataListColumn Field="customer" />
+            <LxDataListColumn Field="status" />
+            <LxDataListColumn Field="amount" Align="DataListAlign.End" Format="C2" />
+        </LxDataListTable>
+        <LxDataListSelectionActions Actions="_actions" />
+        <LxDataListPagination />
+    </LxDataList>
 </div>
 
 @code {
@@ -52,14 +52,14 @@
                 Key = "delete",
                 Label = "Delete",
                 Icon = "trash",
-                Color = BxColor.Error,
+                Color = LxColor.Error,
                 ClearSelection = DataListSelectionClear.Success,
                 Confirm = new DataListActionConfirm<Invoice>
                 {
                     Title = "Delete invoices",
                     Description = context => $"{context.TargetCount} invoices will be removed from the list.",
                     ConfirmLabel = "Delete",
-                    Color = BxColor.Error,
+                    Color = LxColor.Error,
                 },
                 OnExecute = context =>
                 {

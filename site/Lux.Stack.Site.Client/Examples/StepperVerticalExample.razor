@@ -1,9 +1,9 @@
 <div class="w-full max-w-xs">
-    <BxStepper Items="Items" Current="1" Orientation="BxOrientation.Vertical" Color="BxColor.Success" AriaLabel="Onboarding" />
+    <LxStepper Items="Items" Current="1" Orientation="LxOrientation.Vertical" Color="LxColor.Success" AriaLabel="Onboarding" />
 </div>
 
 @code {
-    private static readonly BxStepperItem[] Items =
+    private static readonly LxStepperItem[] Items =
     [
         new("Create account") { Description = "Email and password" },
         new("Verify email") { Description = "Check your inbox" },

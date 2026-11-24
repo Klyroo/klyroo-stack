@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace Lux.Stack.E2E;
 
-/// <summary>BxInfiniteScroll: a sentinel that asks for the next items once, a button for the keyboard, a link for static pages.</summary>
+/// <summary>LxInfiniteScroll: a sentinel that asks for the next items once, a button for the keyboard, a link for static pages.</summary>
 public class InfiniteScrollTests(PlaygroundServer server) : PlaygroundTest(server)
 {
     private ILocator Feed => Page.GetByTestId("infinite-feed");

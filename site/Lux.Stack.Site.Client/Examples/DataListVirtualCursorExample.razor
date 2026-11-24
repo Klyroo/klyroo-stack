@@ -4,23 +4,23 @@
    what is loaded appends the next page of 20 (up to 600 invoices). Rows can be ticked: the box of a row that scrolls out of the window gives its focus back when the row comes into view. Statically rendered, the rows are
    not virtualized and the loader is a link to the next cursor. *@
 <div class="w-full" data-testid="list-virtual-cursor">
-    <BxDataList TItem="Invoice" Label="Virtualized invoices with cursor paging" Schema="InvoiceCursorData.Schema" Items="_items" PagingMode="DataListPagingMode.Cursor" UrlKey="vc" Selectable="true">
+    <LxDataList TItem="Invoice" Label="Virtualized invoices with cursor paging" Schema="InvoiceCursorData.Schema" Items="_items" PagingMode="DataListPagingMode.Cursor" UrlKey="vc" Selectable="true">
         <div class="flex flex-wrap items-center justify-between gap-2">
-            <BxDataListSearch />
+            <LxDataListSearch />
             <div class="flex items-center gap-2">
-                <BxDataListResultCount />
-                <BxDataListRefresh />
+                <LxDataListResultCount />
+                <LxDataListRefresh />
             </div>
         </div>
-        <BxDataListErrorState />
-        <BxDataListTable Caption="Virtualized invoices with cursor paging" Virtualize="true">
-            <BxDataListColumn Field="id" Title="No." Align="DataListAlign.End" />
-            <BxDataListColumn Field="customer" />
-            <BxDataListColumn Field="status" />
-            <BxDataListColumn Field="amount" Align="DataListAlign.End" Format="C2" />
-        </BxDataListTable>
-        <BxDataListInfiniteLoader ShowEnd="true" />
-    </BxDataList>
+        <LxDataListErrorState />
+        <LxDataListTable Caption="Virtualized invoices with cursor paging" Virtualize="true">
+            <LxDataListColumn Field="id" Title="No." Align="DataListAlign.End" />
+            <LxDataListColumn Field="customer" />
+            <LxDataListColumn Field="status" />
+            <LxDataListColumn Field="amount" Align="DataListAlign.End" Format="C2" />
+        </LxDataListTable>
+        <LxDataListInfiniteLoader ShowEnd="true" />
+    </LxDataList>
 </div>
 
 @code {

@@ -1,16 +1,16 @@
 @using Lux.UI.Theming
-@* In a real app this wraps @Body in MainLayout.razor and replaces <BxToaster />:
-   <BxApp Lang="en" Overrides="_overrides">@Body</BxApp>
+@* In a real app this wraps @Body in MainLayout.razor and replaces <LxToaster />:
+   <LxApp Lang="en" Overrides="_overrides">@Body</LxApp>
    The site's layout already has a toaster, so this one turns it off. *@
-<BxApp Toaster="false" Lang="en" Dir="ltr" Overrides="_overrides" Class="flex flex-wrap items-center gap-3" data-testid="app">
-    <BxButton Label="Save" />
-    <BxButton Label="Cancel" Variant="ButtonVariant.Outline" Color="BxColor.Neutral" />
-    <BxBadge Label="Every button is rounded" Variant="BxVariant.Subtle" />
-</BxApp>
+<LxApp Toaster="false" Lang="en" Dir="ltr" Overrides="_overrides" Class="flex flex-wrap items-center gap-3" data-testid="app">
+    <LxButton Label="Save" />
+    <LxButton Label="Cancel" Variant="ButtonVariant.Outline" Color="LxColor.Neutral" />
+    <LxBadge Label="Every button is rounded" Variant="LxVariant.Subtle" />
+</LxApp>
 
 @code {
     private readonly Dictionary<Type, ISlotOverrides> _overrides = new()
     {
-        [typeof(BxButton)] = new ButtonUi { Base = "rounded-full" },
+        [typeof(LxButton)] = new ButtonUi { Base = "rounded-full" },
     };
 }

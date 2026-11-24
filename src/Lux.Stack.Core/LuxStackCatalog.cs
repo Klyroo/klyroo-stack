@@ -33,7 +33,7 @@ public static class LuxStackCatalog
             TemplateShortName: "lux-starter",
             SkillPath: "/home/gpoumarat/lux-ui/skills/lux-ui/SKILL.md",
             Summary: "Foundation Design System (100+ Blazor components, Tailwind v4 engine, 12 locales, SSR/WASM/MAUI Hybrid, Images & Server cookies).",
-            KeyComponents: ["BxApp", "BxButton", "BxInput", "BxSelect", "BxModal", "BxDrawer", "BxTabs", "BxCard", "BxCalendar", "BxChart", "BxChat", "BxEditor"],
+            KeyComponents: ["LxApp", "LxButton", "LxInput", "LxSelect", "LxModal", "LxDrawer", "LxTabs", "LxCard", "LxCalendar", "LxChart", "LxChat", "LxEditor"],
             AccentHex: "#10b981",
             LandingPagePath: "/ui"),
 
@@ -61,7 +61,7 @@ public static class LuxStackCatalog
             TemplateShortName: "lux-table-admin",
             SkillPath: "/home/gpoumarat/lux-table/skills/lux-table/SKILL.md",
             Summary: "Full-featured DataList (Table, Grid, Virtualization, Pinning, Resizing, Grouping, Tree hierarchy, Summary rows, Footer aggregations, Saved Views, Export).",
-            KeyComponents: ["BxDataList", "BxDataListTable", "BxDataListGrid", "BxDataListColumn", "BxDataListToolbar", "BxDataListFilterBar", "BxDataListPagination", "DataListTree", "DataListGroupBy", "DataListSummaries"],
+            KeyComponents: ["LxDataList", "LxDataListTable", "LxDataListGrid", "LxDataListColumn", "LxDataListToolbar", "LxDataListFilterBar", "LxDataListPagination", "DataListTree", "DataListGroupBy", "DataListSummaries"],
             AccentHex: "#00d8ff",
             LandingPagePath: "/table"),
 
@@ -75,7 +75,7 @@ public static class LuxStackCatalog
             TemplateShortName: "lux-form-wizard",
             SkillPath: "/home/gpoumarat/lux-form/skills/lux-form/SKILL.md",
             Summary: "Schema-driven Form Engine (31 field kinds, reactive conditions, dirty diffing, validation triggers, multi-step wizard with SkipWhen, FormPage sections & overlay FormService).",
-            KeyComponents: ["FormSchema", "FormController", "FormService", "BxFormEngine", "BxFormPage", "BxFormProvider"],
+            KeyComponents: ["FormSchema", "FormController", "FormService", "LxFormEngine", "LxFormPage", "LxFormProvider"],
             AccentHex: "#f59e0b",
             LandingPagePath: "/form"),
 
@@ -89,7 +89,7 @@ public static class LuxStackCatalog
             TemplateShortName: "lux-analytics",
             SkillPath: "/home/gpoumarat/lux-dashboard/skills/lux-dashboard/SKILL.md",
             Summary: "Analytical Dashboard Engine (staged Essential/Background/Deferred queries, filters & presets, views, comparison date ranges, CSV export, KPI & chart cards).",
-            KeyComponents: ["DashboardController", "DashboardResource", "DashboardFilterControl", "DashboardFormat", "BxDashboardPage", "BxDashboardGrid", "BxDashboardCard", "BxDashboardStat", "BxDashboardStats", "BxDashboardGauge", "BxDashboardTable", "BxDashboardChart", "BxDashboardBars", "BxDashboardList", "BxDashboardAlerts", "BxDashboardFeed"],
+            KeyComponents: ["DashboardController", "DashboardResource", "DashboardFilterControl", "DashboardFormat", "LxDashboardPage", "LxDashboardGrid", "LxDashboardCard", "LxDashboardStat", "LxDashboardStats", "LxDashboardGauge", "LxDashboardTable", "LxDashboardChart", "LxDashboardBars", "LxDashboardList", "LxDashboardAlerts", "LxDashboardFeed"],
             AccentHex: "#8b5cf6",
             LandingPagePath: "/dashboard"),
 
@@ -103,7 +103,7 @@ public static class LuxStackCatalog
             TemplateShortName: "lux-display-portal",
             SkillPath: "/home/gpoumarat/lux-display/skills/lux-display/SKILL.md",
             Summary: "19-kind read-only Display blocks, Audio/Video media players with clip & play-quota rules, and multi-format FilePreview overlay provider.",
-            KeyComponents: ["BxDisplay", "BxAudioPlayer", "BxVideoPlayer", "BxFilePreviewProvider", "FilePreviewService"],
+            KeyComponents: ["LxDisplay", "LxAudioPlayer", "LxVideoPlayer", "LxFilePreviewProvider", "FilePreviewService"],
             AccentHex: "#ec4899",
             LandingPagePath: "/display"),
 
@@ -117,7 +117,7 @@ public static class LuxStackCatalog
             TemplateShortName: "lux-spreadsheet-app",
             SkillPath: "/home/gpoumarat/lux-spreadsheet/skills/lux-spreadsheet/SKILL.md",
             Summary: "Headless workbook/CSV/TSV importer (layout detection, NFD header normalization, 80%-pass column suggestions, unknown value questions, duplicates/upsert, inline edits & wizard).",
-            KeyComponents: ["SpreadsheetSchema", "SpreadsheetImporter", "BxSpreadsheetImport"],
+            KeyComponents: ["SpreadsheetSchema", "SpreadsheetImporter", "LxSpreadsheetImport"],
             AccentHex: "#14b8a6",
             LandingPagePath: "/spreadsheet"),
 

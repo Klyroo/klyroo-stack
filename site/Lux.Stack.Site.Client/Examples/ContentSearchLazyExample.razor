@@ -2,9 +2,9 @@
    Alt+L) and keeps for the page. A relative address is resolved against <base href>. Try it with the network tab open: nothing is requested until
    the first open. *@
 <div class="flex flex-col items-start gap-3" data-testid="content-search-lazy-example">
-    <BxContentSearchButton For="lazy" Collapsed="false" Keys="_keys" data-testid="content-search-lazy-button" />
-    <p class="text-sm text-(--blux-text-muted)" data-testid="content-search-lazy-last">Last result: @(_last ?? "none")</p>
-    <BxContentSearch Name="lazy" Shortcut="alt+l" IndexUrl="examples/lazy-search-index.json" OnSelect="item => _last = item.Label"
+    <LxContentSearchButton For="lazy" Collapsed="false" Keys="_keys" data-testid="content-search-lazy-button" />
+    <p class="text-sm text-(--lux-text-muted)" data-testid="content-search-lazy-last">Last result: @(_last ?? "none")</p>
+    <LxContentSearch Name="lazy" Shortcut="alt+l" IndexUrl="examples/lazy-search-index.json" OnSelect="item => _last = item.Label"
                      Label="Search the lazy docs" Placeholder="Search the lazy docs..." />
 </div>
 

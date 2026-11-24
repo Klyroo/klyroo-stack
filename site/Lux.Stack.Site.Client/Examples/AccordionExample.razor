@@ -1,9 +1,9 @@
 <div class="w-full max-w-lg">
-    <BxAccordion Items="Items" Value="@(["render-modes"])" />
+    <LxAccordion Items="Items" Value="@(["render-modes"])" />
 </div>
 
 @code {
-    private static readonly BxAccordionItem[] Items =
+    private static readonly LxAccordionItem[] Items =
     [
         new("Which render modes are supported?") { Value = "render-modes", Content = @<p>Interactive Server, WebAssembly and Auto, plus static server rendering.</p> },
         new("Do I need Tailwind?") { Value = "tailwind", Content = @<p>No. Without it, load lux.css and theme with CSS variables.</p> },

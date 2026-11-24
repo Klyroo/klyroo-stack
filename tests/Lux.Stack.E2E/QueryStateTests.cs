@@ -11,7 +11,7 @@ public class QueryStateTests(PlaygroundServer server) : PlaygroundTest(server)
     private async Task OpenState(string mode, string query = "")
     {
         await Page.GotoAsync($"/{mode}/docs/url-state{query}");
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover') && document.title.length > 0");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover') && document.title.length > 0");
         if (mode != "ssr")
         {
             await Assertions.Expect(Page.GetByTestId("renderer")).ToHaveAttributeAsync("data-interactive", "true", new() { Timeout = 30_000 });

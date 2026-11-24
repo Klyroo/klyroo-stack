@@ -1,11 +1,11 @@
 <div class="flex w-full max-w-2xl flex-col gap-3">
-    <BxFormField Label="Changing buttons" Help="Items can change while the editor is open: the buttons show the state of the action they now stand for.">
-        <BxEditor Value="@("<p><strong><em>Bold and italic</em></strong></p>")" Name="changing" data-testid="editor-changing">
-            <BxEditorToolbar Items="Current" />
-        </BxEditor>
-    </BxFormField>
+    <LxFormField Label="Changing buttons" Help="Items can change while the editor is open: the buttons show the state of the action they now stand for.">
+        <LxEditor Value="@("<p><strong><em>Bold and italic</em></strong></p>")" Name="changing" data-testid="editor-changing">
+            <LxEditorToolbar Items="Current" />
+        </LxEditor>
+    </LxFormField>
     <div>
-        <BxButton Variant="ButtonVariant.Outline" OnClick="Next" data-testid="editor-changing-next">Use other buttons</BxButton>
+        <LxButton Variant="ButtonVariant.Outline" OnClick="Next" data-testid="editor-changing-next">Use other buttons</LxButton>
     </div>
 </div>
 

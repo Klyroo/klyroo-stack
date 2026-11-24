@@ -1,12 +1,12 @@
 <div class="flex flex-col gap-4">
-    <BxSwitch @bind-Value="_notify" Label="Email notifications" Description="One digest per week." data-testid="notify" />
-    <p class="text-sm text-(--blux-text-muted)" data-testid="notify-state">Notifications: @(_notify ? "on" : "off")</p>
+    <LxSwitch @bind-Value="_notify" Label="Email notifications" Description="One digest per week." data-testid="notify" />
+    <p class="text-sm text-(--lux-text-muted)" data-testid="notify-state">Notifications: @(_notify ? "on" : "off")</p>
     <div class="flex flex-wrap items-center gap-4">
-        @foreach (var size in Enum.GetValues<BxSize>())
+        @foreach (var size in Enum.GetValues<LxSize>())
         {
-            <BxSwitch Size="size" Value="true" Label="@size.ToString()" Color="BxColor.Success" />
+            <LxSwitch Size="size" Value="true" Label="@size.ToString()" Color="LxColor.Success" />
         }
-        <BxSwitch Disabled Label="Disabled" />
+        <LxSwitch Disabled Label="Disabled" />
     </div>
 </div>
 

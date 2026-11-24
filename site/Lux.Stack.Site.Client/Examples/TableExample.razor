@@ -1,17 +1,17 @@
 <div class="w-full">
-    <BxTable Items="People" Caption="Team members" Class="rounded-xl border border-(--blux-border)">
-        <BxColumn TItem="Person" Title="Name" Field="p => p.Name" Sortable Class="font-medium text-(--blux-text)" />
-        <BxColumn TItem="Person" Title="Role" Field="p => p.Role" Sortable />
-        <BxColumn TItem="Person" Title="Joined" Field="p => p.Joined" Sortable>
+    <LxTable Items="People" Caption="Team members" Class="rounded-xl border border-(--lux-border)">
+        <LxColumn TItem="Person" Title="Name" Field="p => p.Name" Sortable Class="font-medium text-(--lux-text)" />
+        <LxColumn TItem="Person" Title="Role" Field="p => p.Role" Sortable />
+        <LxColumn TItem="Person" Title="Joined" Field="p => p.Joined" Sortable>
             <Template>@context.Joined.ToString("MMM yyyy")</Template>
-        </BxColumn>
-        <BxColumn TItem="Person" Title="Status">
+        </LxColumn>
+        <LxColumn TItem="Person" Title="Status">
             <Template>
-                <BxBadge Label="@context.Status" Variant="BxVariant.Subtle" Size="BxSize.Sm"
-                         Color="@(context.Status == "Active" ? BxColor.Success : BxColor.Neutral)" />
+                <LxBadge Label="@context.Status" Variant="LxVariant.Subtle" Size="LxSize.Sm"
+                         Color="@(context.Status == "Active" ? LxColor.Success : LxColor.Neutral)" />
             </Template>
-        </BxColumn>
-    </BxTable>
+        </LxColumn>
+    </LxTable>
 </div>
 
 @code {

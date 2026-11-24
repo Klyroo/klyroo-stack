@@ -1,9 +1,9 @@
 <div class="w-full max-w-xs">
-    <BxTree Items="Items" AriaLabel="Sections" />
+    <LxTree Items="Items" AriaLabel="Sections" />
 </div>
 
 @code {
-    private static readonly BxTreeItem[] Items =
+    private static readonly LxTreeItem[] Items =
     [
         new("Guide") { Href = "/docs", Children = [new("Install") { Href = "/docs/installation" }, new("Render modes") { Href = "/docs/render-modes" }] },
         new("Theming") { Href = "/docs/theming" },

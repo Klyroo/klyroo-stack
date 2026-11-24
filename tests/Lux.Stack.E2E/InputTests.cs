@@ -1,6 +1,6 @@
 namespace Lux.Stack.E2E;
 
-/// <summary>BxInput Debounce, Enter and ClearOnEscape: done by a script in the browser, so one report per pause in every interactive mode.</summary>
+/// <summary>LxInput Debounce, Enter and ClearOnEscape: done by a script in the browser, so one report per pause in every interactive mode.</summary>
 public class InputTests(PlaygroundServer server) : PlaygroundTest(server)
 {
     private ILocator Debounced => Page.GetByTestId("debounced");
@@ -117,7 +117,7 @@ public class InputTests(PlaygroundServer server) : PlaygroundTest(server)
         await Plain.PressAsync("Enter");
 
         await Assertions.Expect(Page.GetByTestId("plain-state")).ToHaveTextAsync("Plain: typed");
-        await Assertions.Expect(Plain).Not.ToHaveAttributeAsync("data-bx-debounce", new System.Text.RegularExpressions.Regex(".*"));
+        await Assertions.Expect(Plain).Not.ToHaveAttributeAsync("data-lx-debounce", new System.Text.RegularExpressions.Regex(".*"));
     }
 
     [Theory]
@@ -127,16 +127,16 @@ public class InputTests(PlaygroundServer server) : PlaygroundTest(server)
         await Open(mode, "input");
         await Debounced.FillAsync("abc");
         await Assertions.Expect(State).ToHaveTextAsync("Value: abc");
-        var sequence = await Debounced.GetAttributeAsync("data-bx-seq");
+        var sequence = await Debounced.GetAttributeAsync("data-lx-seq");
         Assert.NotNull(sequence);
 
         // What Blazor does when a render computed after an earlier report arrives late: it writes the old value
         // into the input. The sequence of that render is lower than the last one reported.
-        await Debounced.EvaluateAsync("(el, seq) => { el.setAttribute('data-bx-seq', String(Number(seq) - 1)); el.value = 'old'; }", sequence);
+        await Debounced.EvaluateAsync("(el, seq) => { el.setAttribute('data-lx-seq', String(Number(seq) - 1)); el.value = 'old'; }", sequence);
         await Assertions.Expect(Debounced).ToHaveValueAsync("abc");
 
         // A render that has seen the last report is applied.
-        await Debounced.EvaluateAsync("(el, seq) => { el.setAttribute('data-bx-seq', seq); el.value = 'new'; }", sequence);
+        await Debounced.EvaluateAsync("(el, seq) => { el.setAttribute('data-lx-seq', seq); el.value = 'new'; }", sequence);
         await Assertions.Expect(Debounced).ToHaveValueAsync("new");
     }
 
@@ -218,7 +218,7 @@ public class InputTests(PlaygroundServer server) : PlaygroundTest(server)
         await Open(mode, "input");
         // The pause is held open (the script reads the attribute when a key is typed), so "d" is still waiting when the reset is clicked
         // however slowly the click is made; the report of "abc" is made by Enter.
-        await Debounced.EvaluateAsync("e => e.setAttribute('data-bx-debounce', '600000')");
+        await Debounced.EvaluateAsync("e => e.setAttribute('data-lx-debounce', '600000')");
         await Debounced.PressSequentiallyAsync("abc", new() { Delay = 20 });
         await Debounced.PressAsync("Enter");
         await Assertions.Expect(State).ToHaveTextAsync("Value: abc");
@@ -237,7 +237,7 @@ public class InputTests(PlaygroundServer server) : PlaygroundTest(server)
         await Assertions.Expect(Reports).ToHaveTextAsync("Reports: 2");
 
         // Typing goes on from the new sequence.
-        await Debounced.EvaluateAsync("e => e.setAttribute('data-bx-debounce', '400')");
+        await Debounced.EvaluateAsync("e => e.setAttribute('data-lx-debounce', '400')");
         await Debounced.PressSequentiallyAsync("z", new() { Delay = 20 });
         await Assertions.Expect(State).ToHaveTextAsync("Value: z");
         await Assertions.Expect(Reports).ToHaveTextAsync("Reports: 3");
@@ -293,12 +293,12 @@ public class InputTests(PlaygroundServer server) : PlaygroundTest(server)
         var email = Page.GetByTestId("email");
 
         // The pause is held open while the absence of a report is checked (a check made within 400 ms is a race on a loaded machine), then the field is left.
-        await email.EvaluateAsync("e => e.setAttribute('data-bx-debounce', '600000')");
+        await email.EvaluateAsync("e => e.setAttribute('data-lx-debounce', '600000')");
         await email.PressSequentiallyAsync("nope", new() { Delay = 30 });
         await Assertions.Expect(email).Not.ToHaveAttributeAsync("aria-invalid", "true");
         await Assertions.Expect(Page.Locator("form .validation-message")).ToBeHiddenAsync();
         await email.PressAsync("Tab");
-        await email.EvaluateAsync("e => e.setAttribute('data-bx-debounce', '400')");
+        await email.EvaluateAsync("e => e.setAttribute('data-lx-debounce', '400')");
         await Assertions.Expect(Page.Locator("form .validation-message")).ToHaveTextAsync("Not an email address.");
         await Assertions.Expect(email).ToHaveAttributeAsync("aria-invalid", "true");
         await Assertions.Expect(email).ToHaveClassAsync(new System.Text.RegularExpressions.Regex(@"\bmodified\b.*\binvalid\b"));

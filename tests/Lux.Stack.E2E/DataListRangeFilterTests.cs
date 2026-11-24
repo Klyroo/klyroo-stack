@@ -18,7 +18,7 @@ public class DataListRangeFilterTests(PlaygroundServer server) : PlaygroundTest(
 
     private static async Task WaitForList(IPage page, string mode)
     {
-        await page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
         if (mode != "ssr")
         {
             await Assertions.Expect(page.GetByTestId("renderer")).ToHaveAttributeAsync("data-interactive", "true", new() { Timeout = 30_000 });
@@ -69,7 +69,7 @@ public class DataListRangeFilterTests(PlaygroundServer server) : PlaygroundTest(
     private async Task NavigateFromAnotherPage(string mode, string query)
     {
         await Page.GotoAsync($"/{mode}/components/button");
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
         // A navigation before the circuit or the runtime is up would be lost.
         if (mode != "ssr") await Assertions.Expect(Page.GetByTestId("renderer")).ToHaveAttributeAsync("data-interactive", "true", new() { Timeout = 30_000 });
         await Page.EvaluateAsync("() => { window.__enhanced = new Promise((r) => { Blazor.addEventListener('enhancedload', () => setTimeout(r, 50), { once: true }); setTimeout(r, 8000); }); }");
@@ -275,7 +275,7 @@ public class DataListRangeFilterTests(PlaygroundServer server) : PlaygroundTest(
         await OpenList(mode, "?dat.f.issued.between=2026-01-03..2026-01-09");
         await OpenTag(Date, "Issued is between 1/3/2026 – 1/9/2026", "Edit filter Issued");
         var panel = Editor(Date, "Edit filter Issued");
-        var calendar = panel.Locator("bx-calendar");
+        var calendar = panel.Locator("lx-calendar");
         await Assertions.Expect(panel.Locator("[data-slot=filter-range-limit]")).ToHaveTextAsync("At most 92 days");
 
         await calendar.Locator("button[data-date='2026-01-12']").ClickAsync();
@@ -427,16 +427,16 @@ public class DataListRangeFilterTests(PlaygroundServer server) : PlaygroundTest(
 
         // The first visit has no cookie yet: the static render has no zone.
         await page.GotoAsync("/ssr/components/data-list");
-        await page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
         await Assertions.Expect(page.GetByTestId("url-zone")).ToHaveTextAsync("none");
-        var cookie = await WaitForCookie(context, "blux-timezone");
+        var cookie = await WaitForCookie(context, "lux-timezone");
         Assert.Equal("Asia/Tokyo", cookie.Value);
         Assert.Equal("/", cookie.Path);
         Assert.Equal(SameSiteAttribute.Lax, cookie.SameSite);
         Assert.True(cookie.Expires > DateTimeOffset.UtcNow.AddDays(300).ToUnixTimeSeconds());
 
         await page.ReloadAsync();
-        await page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
 
         await Assertions.Expect(page.GetByTestId("url-zone")).ToHaveTextAsync("Asia/Tokyo");
     }
@@ -445,7 +445,7 @@ public class DataListRangeFilterTests(PlaygroundServer server) : PlaygroundTest(
     public async Task A_cookie_with_an_unknown_zone_leaves_the_static_render_in_utc()
     {
         var context = await NewContext(new());
-        await context.AddCookiesAsync([new() { Name = "blux-timezone", Value = "Nowhere/Land", Url = BaseUrl }]);
+        await context.AddCookiesAsync([new() { Name = "lux-timezone", Value = "Nowhere/Land", Url = BaseUrl }]);
         var page = await context.NewPageAsync();
 
         await page.GotoAsync("/ssr/components/data-list");
@@ -458,7 +458,7 @@ public class DataListRangeFilterTests(PlaygroundServer server) : PlaygroundTest(
     public async Task With_the_cookie_a_prerendered_date_filter_still_shows_the_right_rows_once_interactive(string mode)
     {
         var context = await NewContext(new() { TimezoneId = "Pacific/Kiritimati" });
-        await context.AddCookiesAsync([new() { Name = "blux-timezone", Value = "Pacific/Kiritimati", Url = BaseUrl }]);
+        await context.AddCookiesAsync([new() { Name = "lux-timezone", Value = "Pacific/Kiritimati", Url = BaseUrl }]);
         var page = await context.NewPageAsync();
 
         await page.GotoAsync($"/{mode}/components/data-list-filters?dat.f.issued=2026-01-03");

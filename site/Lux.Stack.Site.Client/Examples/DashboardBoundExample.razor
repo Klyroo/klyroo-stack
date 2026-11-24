@@ -1,28 +1,28 @@
 <div class="flex flex-col gap-3">
-    <div class="h-72 w-full overflow-hidden rounded-xl border border-(--blux-border)" data-testid="dashboard-bound">
-        <BxDashboardGroup StorageKey="playground-dashboard-bound" @bind-Sizes="_sizes">
-            <BxDashboardSidebar As="div" @bind-Collapsed="_collapsed" data-testid="dashboard-bound-sidebar">
-                <Header><span class="font-semibold text-(--blux-text-highlighted)">Acme</span></Header>
+    <div class="h-72 w-full overflow-hidden rounded-xl border border-(--lux-border)" data-testid="dashboard-bound">
+        <LxDashboardGroup StorageKey="playground-dashboard-bound" @bind-Sizes="_sizes">
+            <LxDashboardSidebar As="div" @bind-Collapsed="_collapsed" data-testid="dashboard-bound-sidebar">
+                <Header><span class="font-semibold text-(--lux-text-highlighted)">Acme</span></Header>
                 <ChildContent>
-                    <BxNavigationMenu Items="_items" Orientation="BxOrientation.Vertical" AriaLabel="Workspace, bound" Ui="_navUi" />
+                    <LxNavigationMenu Items="_items" Orientation="LxOrientation.Vertical" AriaLabel="Workspace, bound" Ui="_navUi" />
                 </ChildContent>
-            </BxDashboardSidebar>
-            <BxDashboardPanel Resizable Size="40" MinSize="15" MaxSize="85" ResizeLabel="Resize list">
+            </LxDashboardSidebar>
+            <LxDashboardPanel Resizable Size="40" MinSize="15" MaxSize="85" ResizeLabel="Resize list">
                 <Header>
-                    <BxDashboardNavbar Title="List">
-                        <Leading><BxDashboardSidebarCollapse data-testid="dashboard-bound-collapse" /></Leading>
-                    </BxDashboardNavbar>
+                    <LxDashboardNavbar Title="List">
+                        <Leading><LxDashboardSidebarCollapse data-testid="dashboard-bound-collapse" /></Leading>
+                    </LxDashboardNavbar>
                 </Header>
-            </BxDashboardPanel>
-            <BxDashboardPanel>
-                <Header><BxDashboardNavbar Title="Detail" Toggle="false" /></Header>
-            </BxDashboardPanel>
-        </BxDashboardGroup>
+            </LxDashboardPanel>
+            <LxDashboardPanel>
+                <Header><LxDashboardNavbar Title="Detail" Toggle="false" /></Header>
+            </LxDashboardPanel>
+        </LxDashboardGroup>
     </div>
-    <div class="flex flex-wrap items-center gap-3 text-sm text-(--blux-text-muted)">
+    <div class="flex flex-wrap items-center gap-3 text-sm text-(--lux-text-muted)">
         <p data-testid="dashboard-bound-sizes">Sizes: @string.Join(",", _sizes.Select(s => Math.Round(s)))</p>
         <p data-testid="dashboard-bound-collapsed">Collapsed: @(_collapsed ? "true" : "false")</p>
-        <BxButton Label="Set 25 / 75" Size="BxSize.Sm" Variant="ButtonVariant.Outline" Color="BxColor.Neutral" OnClick="() => _sizes = [25, 75]" data-testid="dashboard-bound-set" />
+        <LxButton Label="Set 25 / 75" Size="LxSize.Sm" Variant="ButtonVariant.Outline" Color="LxColor.Neutral" OnClick="() => _sizes = [25, 75]" data-testid="dashboard-bound-set" />
     </div>
 </div>
 
@@ -32,9 +32,9 @@
 
     private static readonly NavigationMenuUi _navUi = new() { Label = "group-data-[state=collapsed]/sidebar:sr-only" };
 
-    private static readonly BxNavigationItem[] _items =
+    private static readonly LxNavigationItem[] _items =
     [
-        new("Home") { Href = "/", Exact = true, Icon = BxIcons.Named("home", "size-5") },
-        new("Inbox") { Href = "/components/dashboard-group", Icon = BxIcons.Named("inbox", "size-5") },
+        new("Home") { Href = "/", Exact = true, Icon = LxIcons.Named("home", "size-5") },
+        new("Inbox") { Href = "/components/dashboard-group", Icon = LxIcons.Named("inbox", "size-5") },
     ];
 }

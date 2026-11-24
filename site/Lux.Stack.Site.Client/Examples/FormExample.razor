@@ -1,21 +1,21 @@
 @using System.ComponentModel.DataAnnotations
 
-<BxForm Model="Model" FormName="bx-form" OnValidSubmit="SaveAsync" ShowSummary class="flex w-full max-w-sm flex-col">
-    <BxFormField Label="Name" Required For="() => Model!.Name">
-        <BxInput @bind-Value="Model!.Name" />
-    </BxFormField>
-    <BxFormField Label="Seats" For="() => Model!.Seats">
-        <BxInputNumber @bind-Value="Model!.Seats" Min="1" Max="50" />
-    </BxFormField>
-    <BxButton Type="submit" Label="Create workspace" />
+<LxForm Model="Model" FormName="lx-form" OnValidSubmit="SaveAsync" ShowSummary class="flex w-full max-w-sm flex-col">
+    <LxFormField Label="Name" Required For="() => Model!.Name">
+        <LxInput @bind-Value="Model!.Name" />
+    </LxFormField>
+    <LxFormField Label="Seats" For="() => Model!.Seats">
+        <LxInputNumber @bind-Value="Model!.Seats" Min="1" Max="50" />
+    </LxFormField>
+    <LxButton Type="submit" Label="Create workspace" />
     @if (_saved)
     {
-        <p role="status" class="text-sm text-(--blux-success-text)" data-testid="form-saved">Workspace @Model!.Name created.</p>
+        <p role="status" class="text-sm text-(--lux-success-text)" data-testid="form-saved">Workspace @Model!.Name created.</p>
     }
-</BxForm>
+</LxForm>
 
 @code {
-    [SupplyParameterFromForm(FormName = "bx-form")]
+    [SupplyParameterFromForm(FormName = "lx-form")]
     private Workspace? Model { get; set; }
 
     private bool _saved;

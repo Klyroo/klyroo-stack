@@ -40,7 +40,7 @@ public class LayoutTests(PlaygroundServer server) : PlaygroundTest(server)
     private async Task Reload(string mode)
     {
         await Page.ReloadAsync();
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-sidebar')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-sidebar')");
         if (mode != "ssr")
         {
             await Assertions.Expect(Page.GetByTestId("renderer")).ToHaveAttributeAsync("data-interactive", "true", new() { Timeout = 30_000 });
@@ -132,7 +132,7 @@ public class LayoutTests(PlaygroundServer server) : PlaygroundTest(server)
         await Assertions.Expect(sidebar).ToHaveAttributeAsync("data-state", "collapsed");
         await Assertions.Expect(toggle).ToHaveAttributeAsync("aria-pressed", "true");
         await Assertions.Expect(sidebar).ToHaveCSSAsync("width", "64px");
-        await ExpectCookie("blux-sidebar-playground-sidebar", "1");
+        await ExpectCookie("lux-sidebar-playground-sidebar", "1");
         // Collapsed to icons, the links keep their names for assistive technology.
         await Assertions.Expect(sidebar.GetByRole(AriaRole.Link, new() { Name = "Inbox" })).ToBeVisibleAsync();
 
@@ -144,7 +144,7 @@ public class LayoutTests(PlaygroundServer server) : PlaygroundTest(server)
         await toggle.ClickAsync();
         await Assertions.Expect(sidebar).ToHaveAttributeAsync("data-state", "expanded");
         await Assertions.Expect(sidebar).ToHaveCSSAsync("width", "256px");
-        await ExpectCookie("blux-sidebar-playground-sidebar", "0");
+        await ExpectCookie("lux-sidebar-playground-sidebar", "0");
     }
 
     [Theory]
@@ -152,7 +152,7 @@ public class LayoutTests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task Sidebar_remembered_state_is_applied_on_load_without_animating(string mode)
     {
         // The browser remembers the state in a cookie that the server can read too.
-        await Page.Context.AddCookiesAsync([new Cookie { Name = "blux-sidebar-playground-sidebar", Value = "1", Url = BaseUrl }]);
+        await Page.Context.AddCookiesAsync([new Cookie { Name = "lux-sidebar-playground-sidebar", Value = "1", Url = BaseUrl }]);
         await Page.Context.AddInitScriptAsync(
             "window.__widthTransitions = 0; document.addEventListener('transitionrun', (e) => { if (e.propertyName === 'width' && e.target.dataset?.testid === 'sidebar') window.__widthTransitions++; }, true);");
 
@@ -174,7 +174,7 @@ public class LayoutTests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task Sidebar_remembered_state_is_painted_before_any_script_module_runs()
     {
         // Without blazor.web.js nothing but the inline first-paint script can apply the cookie.
-        await Page.Context.AddCookiesAsync([new Cookie { Name = "blux-sidebar-playground-sidebar", Value = "1", Url = BaseUrl }]);
+        await Page.Context.AddCookiesAsync([new Cookie { Name = "lux-sidebar-playground-sidebar", Value = "1", Url = BaseUrl }]);
         await Page.RouteAsync("**/_framework/blazor.web*.js", route => route.AbortAsync());
 
         await Page.GotoAsync("/ssr/components/sidebar");
@@ -247,7 +247,7 @@ public class LayoutTests(PlaygroundServer server) : PlaygroundTest(server)
         await Page.Keyboard.PressAsync("Home");
         await Assertions.Expect(sidebar).ToHaveCSSAsync("width", "192px");
         await Page.Keyboard.PressAsync("ArrowRight");
-        await ExpectCookie("blux-sidebar-playground-sidebar-resizable-width", "208");
+        await ExpectCookie("lux-sidebar-playground-sidebar-resizable-width", "208");
 
         await Reload(mode);
 
@@ -280,7 +280,7 @@ public class LayoutTests(PlaygroundServer server) : PlaygroundTest(server)
     {
         await Page.SetViewportSizeAsync(390, 800);
         await Open(mode, "sidebar");
-        var host = Page.Locator("bx-sidebar").First;
+        var host = Page.Locator("lx-sidebar").First;
         var open = host.GetByRole(AriaRole.Button, new() { Name = "Open sidebar" });
         var dialog = host.GetByRole(AriaRole.Dialog, new() { Name = "Sidebar" });
         await Assertions.Expect(Page.GetByTestId("sidebar")).ToBeHiddenAsync();
@@ -301,7 +301,7 @@ public class LayoutTests(PlaygroundServer server) : PlaygroundTest(server)
     private async Task OpenContentDemo(string mode)
     {
         await Open(mode, "sidebar");
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-sidebar')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-sidebar')");
         await ContentDemo.ScrollIntoViewIfNeededAsync();
         // The panel is wired by the browser once the element is set up; the search is a component that needs the interactive modes to be ready.
         await Assertions.Expect(ContentDemo.Locator("[data-testid=sidebar-content]")).ToBeAttachedAsync();
@@ -390,7 +390,7 @@ public class LayoutTests(PlaygroundServer server) : PlaygroundTest(server)
         await Page.SetViewportSizeAsync(390, 800);
         await OpenContentDemo(mode);
         var aside = ContentDemo.Locator("[data-testid=sidebar-content]");
-        var open = ContentDemo.Locator("button[data-bx-sidebar-open]");
+        var open = ContentDemo.Locator("button[data-lx-sidebar-open]");
         await open.ClickAsync();
         Assert.True(await IsPanelOpen());
 
@@ -578,10 +578,10 @@ public class LayoutTests(PlaygroundServer server) : PlaygroundTest(server)
             """);
         Assert.Null(await panel.GetAttributeAsync("role"));
 
-        await Page.EvaluateAsync("() => document.querySelector('[data-testid=sidebar-content-demo] bx-sidebar').refresh()");
+        await Page.EvaluateAsync("() => document.querySelector('[data-testid=sidebar-content-demo] lx-sidebar').refresh()");
 
         Assert.Equal("dialog", await panel.GetAttributeAsync("role"));
-        Assert.True(await ContentDemo.Locator("bx-sidebar > div:not([data-slot])").EvaluateAsync<bool>("e => e.inert"));
+        Assert.True(await ContentDemo.Locator("lx-sidebar > div:not([data-slot])").EvaluateAsync<bool>("e => e.inert"));
     }
 
     [Fact]
@@ -590,7 +590,7 @@ public class LayoutTests(PlaygroundServer server) : PlaygroundTest(server)
         var context = await NewContext(new() { JavaScriptEnabled = false, ViewportSize = new() { Width = 390, Height = 800 } });
         var page = await context.NewPageAsync();
         await page.GotoAsync("/ssr/components/dashboard-sidebar");
-        var toggle = page.Locator("button[data-bx-sidebar-open]").First;
+        var toggle = page.Locator("button[data-lx-sidebar-open]").First;
         var target = await toggle.GetAttributeAsync("popovertarget");
         Assert.False(string.IsNullOrEmpty(target));
         var aside = page.Locator($"[id='{target}']");

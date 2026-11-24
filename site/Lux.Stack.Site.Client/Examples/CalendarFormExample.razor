@@ -2,13 +2,13 @@
 
 <EditForm Model="Model" FormName="calendar-form" OnValidSubmit="Save" class="flex flex-col items-start gap-4" novalidate>
     <div class="flex flex-wrap items-start gap-8">
-        <BxCalendar Mode="BxCalendarMode.Multiple" @bind-Values="Model!.Days" AriaLabel="Days to book" data-testid="form-days" />
-        <BxCalendar Mode="BxCalendarMode.Range" @bind-Range="Model!.Stay" AriaLabel="Stay dates" data-testid="form-stay" />
+        <LxCalendar Mode="LxCalendarMode.Multiple" @bind-Values="Model!.Days" AriaLabel="Days to book" data-testid="form-days" />
+        <LxCalendar Mode="LxCalendarMode.Range" @bind-Range="Model!.Stay" AriaLabel="Stay dates" data-testid="form-stay" />
     </div>
-    <BxButton Type="submit" Label="Book dates" />
+    <LxButton Type="submit" Label="Book dates" />
     @if (_saved)
     {
-        <p role="status" class="text-sm text-(--blux-success-text)" data-testid="calendar-saved">Booked: @Text()</p>
+        <p role="status" class="text-sm text-(--lux-success-text)" data-testid="calendar-saved">Booked: @Text()</p>
     }
 </EditForm>
 
@@ -29,6 +29,6 @@
     {
         public IReadOnlyList<DateOnly> Days { get; set; } = [new(2026, 11, 2)];
 
-        public BxDateRange? Stay { get; set; } = new(new DateOnly(2026, 11, 9), new DateOnly(2026, 11, 13));
+        public LxDateRange? Stay { get; set; } = new(new DateOnly(2026, 11, 9), new DateOnly(2026, 11, 13));
     }
 }

@@ -17,7 +17,7 @@ public static partial class LuxLibraryDocs
                         Paragraphs:
                         [
                             "Production spreadsheet uploads from Excel, ERPs, and Google Sheets rarely match a clean schema: title rows appear above headers, accented column names carry asterisks or '(required)', European decimals use commas, and select values contain typos or legacy codes.",
-                            "Lux.Spreadsheet puts the entire parsing, layout detection, NFD header normalization, >=80% sample validation scoring, reconciliation, review filtering, and batch retry state machine inside 100% NativeAOT C# (Lux.Spreadsheet.Core), paired with the 5-step BxSpreadsheetImport wizard for Blazor Web and .NET MAUI Blazor Hybrid."
+                            "Lux.Spreadsheet puts the entire parsing, layout detection, NFD header normalization, >=80% sample validation scoring, reconciliation, review filtering, and batch retry state machine inside 100% NativeAOT C# (Lux.Spreadsheet.Core), paired with the 5-step LxSpreadsheetImport wizard for Blazor Web and .NET MAUI Blazor Hybrid."
                         ],
                         LiveDemoKey: "spreadsheet-wizard",
                         LiveDemoTitle: "Lux.Spreadsheet · Live 5-Step Import Wizard"),
@@ -36,7 +36,7 @@ public static partial class LuxLibraryDocs
                         TableRows:
                         [
                             new("Lux.Spreadsheet.Core", "SpreadsheetImporter, SpreadsheetSchema, SpreadsheetColumnSchema, SpreadsheetRule, SpreadsheetOption, SpreadsheetRow", "Headless C# · IsAotCompatible=true"),
-                            new("Lux.Spreadsheet", "BxSpreadsheetImport, AddLuxSpreadsheet()", "browser, ios, android, maccatalyst, windows")
+                            new("Lux.Spreadsheet", "LxSpreadsheetImport, AddLuxSpreadsheet()", "browser, ios, android, maccatalyst, windows")
                         ])
                 ]),
             new("installation", "Installation & Setup", "Getting Started",
@@ -187,13 +187,13 @@ public static partial class LuxLibraryDocs
                         CodeSamples:
                         [
                             new("ImportIntoTable.razor", """
-                                <BxModal @bind-Open="_showImport" Title="Import Rates CSV">
-                                    <BxSpreadsheetImport Importer="@_importer" Wizard="true" />
-                                </BxModal>
+                                <LxModal @bind-Open="_showImport" Title="Import Rates CSV">
+                                    <LxSpreadsheetImport Importer="@_importer" Wizard="true" />
+                                </LxModal>
 
-                                <BxDataList @ref="_tableRef" TItem="ProductRate" Schema="@RateSchema" Provider="@LoadRatesAsync">
-                                    <BxDataListTable TItem="ProductRate" ShowProgressLine="true" />
-                                </BxDataList>
+                                <LxDataList @ref="_tableRef" TItem="ProductRate" Schema="@RateSchema" Provider="@LoadRatesAsync">
+                                    <LxDataListTable TItem="ProductRate" ShowProgressLine="true" />
+                                </LxDataList>
                                 """)
                         ])
                 ]),
@@ -281,14 +281,14 @@ public static partial class LuxLibraryDocs
             new("examples", "Live Examples", "Examples",
                 "5 interactive spreadsheet import playgrounds covering the full 5-step wizard, unknown value & duplicate reconciliation, Unicode NFD normalization, inline cell editing & invalid CSV export, and chunked batch submit with targeted retry.",
                 [
-                    new("import-wizard", "1. Full 5-Step BxSpreadsheetImport Wizard",
+                    new("import-wizard", "1. Full 5-Step LxSpreadsheetImport Wizard",
                         Paragraphs: ["Walk through Source/Layout detection, Column Mapping, Unknown Values, Review & Inline Editing, and Batch Submit with preloaded CSV data."],
                         LiveDemoKey: "spreadsheet-wizard",
-                        LiveDemoTitle: "BxSpreadsheetImport · 5-Step Import Wizard",
+                        LiveDemoTitle: "LxSpreadsheetImport · 5-Step Import Wizard",
                         CodeSamples:
                         [
                             new("RatesImporter.razor", """
-                                <BxSpreadsheetImport Importer="@_importer" Title="Import Product Rates" Wizard="true" />
+                                <LxSpreadsheetImport Importer="@_importer" Title="Import Product Rates" Wizard="true" />
                                 """)
                         ]),
                     new("reference-reconcile", "2. Unknown Value Questions, Duplicates & ExistingRecords Upsert",
@@ -350,6 +350,6 @@ public static partial class LuxLibraryDocs
             new("api", "API Reference", "Reference",
                 "Complete public API reference for Lux.Spreadsheet.Core and Lux.Spreadsheet.",
                 [],
-                ApiTypes: [typeof(BxSpreadsheetImport), typeof(SpreadsheetImporter), typeof(SpreadsheetSchema), typeof(SpreadsheetColumnSchema), typeof(SpreadsheetRule), typeof(SpreadsheetRow)])
+                ApiTypes: [typeof(LxSpreadsheetImport), typeof(SpreadsheetImporter), typeof(SpreadsheetSchema), typeof(SpreadsheetColumnSchema), typeof(SpreadsheetRule), typeof(SpreadsheetRow)])
         ]);
 }

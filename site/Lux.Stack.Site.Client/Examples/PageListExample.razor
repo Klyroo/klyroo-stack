@@ -1,10 +1,10 @@
 <div class="w-full max-w-xl">
-    <BxPageList>
+    <LxPageList>
         @foreach (var (name, role) in _people)
         {
-            <li><BxUser Name="@name" Description="@role" /></li>
+            <li><LxUser Name="@name" Description="@role" /></li>
         }
-    </BxPageList>
+    </LxPageList>
 </div>
 
 @code {

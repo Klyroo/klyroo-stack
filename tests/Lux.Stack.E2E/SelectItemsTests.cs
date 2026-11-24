@@ -91,7 +91,7 @@ public class SelectItemsTests(PlaygroundServer server) : PlaygroundTest(server)
         var trigger = Page.GetByRole(AriaRole.Combobox, new() { Name = "Destination" });
         await trigger.FocusAsync();
         await Page.Keyboard.PressAsync("ArrowDown");
-        var search = Page.Locator("bx-select-menu", new() { Has = Page.GetByTestId("destination") }).Locator("[data-slot=search]");
+        var search = Page.Locator("lx-select-menu", new() { Has = Page.GetByTestId("destination") }).Locator("[data-slot=search]");
         await Assertions.Expect(search).ToBeFocusedAsync();
         await Assertions.Expect(Page.GetByRole(AriaRole.Group, new() { Name = "Asia" })).ToBeVisibleAsync();
         await Assertions.Expect(Page.GetByRole(AriaRole.Option, new() { Name = "Japan" }).Locator("[data-slot=count]")).ToHaveTextAsync("17");
@@ -323,7 +323,7 @@ public class SelectItemsTests(PlaygroundServer server) : PlaygroundTest(server)
 
         // Enter and the next ArrowDown in the same task: the "toggle" event of the closing arrives after both, so closing cannot wait for it.
         var search = await Page.EvaluateAsync<string>(@"() => {
-            const host = document.querySelector('bx-select-menu:has([data-testid=destination])') ?? document.querySelector('[data-testid=destination]').closest('bx-select-menu');
+            const host = document.querySelector('lx-select-menu:has([data-testid=destination])') ?? document.querySelector('[data-testid=destination]').closest('lx-select-menu');
             const field = host.querySelector('[data-slot=search]');
             const press = (target, key) => target.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
             press(field, 'Enter');

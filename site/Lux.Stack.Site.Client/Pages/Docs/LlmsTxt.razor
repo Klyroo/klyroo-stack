@@ -22,15 +22,15 @@
     <h2>Hosting your own copy</h2>
     <p>
         The links in both files and in the answers of the MCP server are made from the public address of the site. Set it with the
-        <code>Blux:SiteUrl</code> configuration key (the environment variable <code>Blux__SiteUrl</code>), for example <code>https://ui.example.com</code>:
+        <code>Lux:SiteUrl</code> configuration key (the environment variable <code>Lux__SiteUrl</code>), for example <code>https://ui.example.com</code>:
         the files are then generated once at startup and never depend on the <code>Host</code> header of a request. Without it the address of the request is
         used, which is right for local use but lets any client choose the host written in the links.
     </p>
     <p>
         Behind a reverse proxy that terminates TLS, the app only sees http. The server reads <code>X-Forwarded-Proto</code>, <code>X-Forwarded-Host</code>
-        and <code>X-Forwarded-For</code> from loopback proxies; list other proxy addresses in <code>Blux:KnownProxies</code> so links are https and the
+        and <code>X-Forwarded-For</code> from loopback proxies; list other proxy addresses in <code>Lux:KnownProxies</code> so links are https and the
         rate limit counts real clients. The <code>/mcp</code> endpoint allows 120 requests per minute per client IP
-        (<code>Blux:Ai:RequestsPerMinute</code>) and stops a request after 30 seconds (<code>Blux:Ai:RequestTimeoutSeconds</code>).
+        (<code>Lux:Ai:RequestsPerMinute</code>) and stops a request after 30 seconds (<code>Lux:Ai:RequestTimeoutSeconds</code>).
     </p>
 
     <h2>Use them</h2>

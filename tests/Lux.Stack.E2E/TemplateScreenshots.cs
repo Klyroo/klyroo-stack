@@ -3,9 +3,9 @@ namespace Lux.Stack.E2E;
 /// <summary>
 /// Not a test: the generator of the screenshots the /templates page shows. It opens the live demo of every available template, inside the docs
 /// host the fixture started, at 1280x800 in light and in dark, and writes <c>template-{name}-{light|dark}.png</c> to the folder in
-/// <c>BLUX_TEMPLATE_SCREENSHOTS</c>; without the variable it is skipped. Run it on demand and commit the images, they are not compared in CI:
+/// <c>LUX_TEMPLATE_SCREENSHOTS</c>; without the variable it is skipped. Run it on demand and commit the images, they are not compared in CI:
 /// <code>
-/// BLUX_TEMPLATE_SCREENSHOTS=playground/Lux.Stack.Site/Lux.Stack.Site/wwwroot/img dotnet test --project tests/Lux.Stack.E2E --filter-class "Lux.Stack.E2E.TemplateScreenshots"
+/// LUX_TEMPLATE_SCREENSHOTS=playground/Lux.Stack.Site/Lux.Stack.Site/wwwroot/img dotnet test --project tests/Lux.Stack.E2E --filter-class "Lux.Stack.E2E.TemplateScreenshots"
 /// </code>
 /// </summary>
 public class TemplateScreenshots(PlaygroundServer server)
@@ -16,8 +16,8 @@ public class TemplateScreenshots(PlaygroundServer server)
     [Fact]
     public async Task Generate()
     {
-        var output = Environment.GetEnvironmentVariable("BLUX_TEMPLATE_SCREENSHOTS");
-        Assert.SkipWhen(string.IsNullOrEmpty(output), "BLUX_TEMPLATE_SCREENSHOTS is not set.");
+        var output = Environment.GetEnvironmentVariable("LUX_TEMPLATE_SCREENSHOTS");
+        Assert.SkipWhen(string.IsNullOrEmpty(output), "LUX_TEMPLATE_SCREENSHOTS is not set.");
         Assert.SkipUnless(server.TemplatesReady, "The template demos are not running.");
         // A relative folder is relative to the repository root (the working directory of a test run is the build output).
         output = Path.GetFullPath(output!, RepoRoot());
@@ -36,8 +36,8 @@ public class TemplateScreenshots(PlaygroundServer server)
                 });
                 var page = await context.NewPageAsync();
                 await page.GotoAsync($"templates/{name}/demo/");
-                // Blux's script has run, and a template that renders interactively (data-testid="renderer") has left the prerendered state.
-                await page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+                // Lux's script has run, and a template that renders interactively (data-testid="renderer") has left the prerendered state.
+                await page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
                 await page.WaitForFunctionAsync("() => { const r = document.querySelector('[data-testid=renderer]'); return !r || /Server|WebAssembly/.test(r.textContent ?? ''); }", null, new() { Timeout = 30_000 });
                 await Assertions.Expect(page.Locator("html")).ToHaveClassAsync(new System.Text.RegularExpressions.Regex(mode == "dark" ? "dark" : "^((?!dark).)*$"));
                 // Fonts and the icon bundle settled, and nothing animating when the shot is taken.

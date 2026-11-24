@@ -47,7 +47,7 @@ public static class TemplateLaunch
     /// <param name="ParentPid">The id of the host process, for the fallback of the watchdog.</param>
     /// <param name="MemoryLimitMegabytes">The managed heap hard limit of the demo (0 for none); a small <c>GCConserveMemory</c> is always set.</param>
     /// <param name="Settings">
-    /// The settings of this demo from <c>Blux:Templates:Demos:{name}</c>, by configuration key (<c>Changelog:Source</c>). They reach the demo as environment variables
+    /// The settings of this demo from <c>Lux:Templates:Demos:{name}</c>, by configuration key (<c>Changelog:Source</c>). They reach the demo as environment variables
     /// (<c>Changelog__Source</c>), so a secret in them is not on its command line. They never replace what this launch decides itself (the environment name, the
     /// watchdog, the memory limit).
     /// </param>
@@ -55,7 +55,7 @@ public static class TemplateLaunch
 
     /// <summary>
     /// The environment of a demo: only what a .NET app needs to run (the path, the home folder, locale and time zone, the <c>DOTNET_</c> settings) from
-    /// the environment of the host, never the rest of it (<c>Kestrel__*</c>, <c>Blux__*</c>, connection strings, tokens), then the settings given for this demo
+    /// the environment of the host, never the rest of it (<c>Kestrel__*</c>, <c>Lux__*</c>, connection strings, tokens), then the settings given for this demo
     /// (<see cref="ChildSettings.Settings"/>), then what the supervisor decides.
     /// The address and the path base are command line arguments, not variables.
     /// </summary>
@@ -90,8 +90,8 @@ public static class TemplateLaunch
         if (settings.WatchdogHook is { Length: > 0 } hook)
         {
             environment["DOTNET_STARTUP_HOOKS"] = hook;
-            environment["BLUX_WATCHDOG_STDIN"] = "1";
-            environment["BLUX_WATCHDOG_PARENT_PID"] = settings.ParentPid.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            environment["LUX_WATCHDOG_STDIN"] = "1";
+            environment["LUX_WATCHDOG_PARENT_PID"] = settings.ParentPid.ToString(System.Globalization.CultureInfo.InvariantCulture);
         }
         else
         {

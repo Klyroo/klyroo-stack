@@ -7,13 +7,13 @@
     <meta name="description" content="Accessible, themable Blazor components for every render mode." />
     @* The site can be served below a path base (see Program.cs): every relative URL, the stylesheets, the framework and the image endpoint included, follows this. *@
     <base href="@_baseHref" />
-    <BxColorModeScript />
-    <BxCultureMeta />
-    <BxThemeStyle />
+    <LxColorModeScript />
+    <LxCultureMeta />
+    <LxThemeStyle />
     @* Self-hosted at build time from the LuxFont items of the project (Geist, Geist Mono, Doto): no third-party request. *@
-    <BxFonts />
+    <LxFonts />
     <ResourcePreloader />
-    @* The site compiles Tailwind itself (Blux "Tailwind in the app" mode): one stylesheet, no lux.css. *@
+    @* The site compiles Tailwind itself (Lux "Tailwind in the app" mode): one stylesheet, no lux.css. *@
     <link rel="stylesheet" href="@Assets["site.css"]" />
     <link rel="stylesheet" href="@Assets["Lux.Stack.Site.styles.css"]" />
     <ImportMap />
@@ -37,13 +37,13 @@
     private string _baseHref => Configuration["PathBase"] is { Length: > 0 } pathBase ? "/" + pathBase.Trim('/') + "/" : "/";
 
     private IComponentRenderMode? _mode;
-    private BxLocale _locale = BxLocales.En;
+    private LxLocale _locale = LxLocales.En;
 
     // /ssr, /server, /wasm and /auto prefixes pick a mode, to test components in each; everything else runs in Auto.
     protected override void OnParametersSet()
     {
         // lang and dir of the page follow the culture of the request, like the components do.
-        _locale = BxLocales.Resolve(System.Globalization.CultureInfo.CurrentUICulture);
+        _locale = LxLocales.Resolve(System.Globalization.CultureInfo.CurrentUICulture);
         // A page that opts out of interactive routing (ExcludeFromInteractiveRouting, like /templates) renders on the server only.
         _mode = !HttpContext.AcceptsInteractiveRouting() ? null : PlaygroundServices.ModeFromPath(HttpContext.Request.Path) switch
         {

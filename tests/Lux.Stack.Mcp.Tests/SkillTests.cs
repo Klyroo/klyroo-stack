@@ -13,7 +13,7 @@ public partial class SkillTests
     private static readonly string SkillDirectory = Path.Combine(TestSupport.RepoRoot, "skills", "lux-ui");
 
     // Lux.UI and the sister package whose components the generated reference lists.
-    private static readonly Dictionary<string, Type> LibraryTypes = new[] { typeof(BxButton).Assembly, typeof(Lux.Table.BxDataListEmpty).Assembly }
+    private static readonly Dictionary<string, Type> LibraryTypes = new[] { typeof(LxButton).Assembly, typeof(Lux.Table.LxDataListEmpty).Assembly }
         .SelectMany(a => a.GetTypes())
         .Where(t => t.IsPublic && t.Namespace is "Lux.UI" or "Lux.UI.Theming" or "Lux.Table")
         .GroupBy(t => t.Name.Split('`')[0])
@@ -65,8 +65,8 @@ public partial class SkillTests
     [MemberData(nameof(Files))]
     public void Every_Bx_type_the_skill_names_exists_in_the_library(string file)
     {
-        var missing = BxName().Matches(Read(file)).Select(m => m.Value).Distinct()
-            .Where(name => !LibraryTypes.ContainsKey(name) && name is not ("BxIcons" or "BxColor"))
+        var missing = LxName().Matches(Read(file)).Select(m => m.Value).Distinct()
+            .Where(name => !LibraryTypes.ContainsKey(name) && name is not ("LxIcons" or "LxColor"))
             .ToList();
 
         Assert.True(missing.Count == 0, $"{file} names types that do not exist: {string.Join(", ", missing)}");
@@ -121,11 +121,11 @@ public partial class SkillTests
         Assert.True(tags.Select(t => t.Tag).Distinct().Count() > 40);
     }
 
-    // The tags of a Razor sample that are Blux components, with the names of their attributes. Quotes may nest inside
+    // The tags of a Razor sample that are Lux components, with the names of their attributes. Quotes may nest inside
     // @(...) expressions, so values are read with a parenthesis depth.
     private static IEnumerable<(string Tag, List<string> Attributes)> Tags(string code)
     {
-        foreach (Match start in Regex.Matches(code, @"<(Bx[A-Za-z]+)(?=[\s/>])"))
+        foreach (Match start in Regex.Matches(code, @"<(Lx[A-Za-z]+)(?=[\s/>])"))
         {
             var attributes = new List<string>();
             var i = start.Index + start.Length;
@@ -165,7 +165,7 @@ public partial class SkillTests
     private static partial Regex ReferenceLink();
 
     [GeneratedRegex(@"\bBx[A-Z][A-Za-z]+")]
-    private static partial Regex BxName();
+    private static partial Regex LxName();
 
     [GeneratedRegex(@"\b[A-Z][A-Za-z]+Ui\b")]
     private static partial Regex UiName();

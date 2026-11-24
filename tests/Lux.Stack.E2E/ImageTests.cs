@@ -1,7 +1,7 @@
 namespace Lux.Stack.E2E;
 
 /// <summary>
-/// The docs site runs Lux.UI.Images.Local at _blux/img (below the base of the app), so the BxImage page loads real resized images in every render mode.
+/// The docs site runs Lux.UI.Images.Local at _lux/img (below the base of the app), so the LxImage page loads real resized images in every render mode.
 /// </summary>
 public class ImageTests(PlaygroundServer server) : PlaygroundTest(server)
 {
@@ -36,7 +36,7 @@ public class ImageTests(PlaygroundServer server) : PlaygroundTest(server)
         var source = await image.EvaluateAsync<string>("i => i.currentSrc");
         var response = await Page.APIRequest.GetAsync(source);
 
-        Assert.Contains("/_blux/img?src=%2Fimg%2Fsample-gradient.png", source);
+        Assert.Contains("/_lux/img?src=%2Fimg%2Fsample-gradient.png", source);
         Assert.Equal("image/webp", response.Headers["content-type"]);
         // 320 CSS pixels at density 1 is served as the next step of the optimizer, 384.
         Assert.Equal(384, await image.EvaluateAsync<int>("i => i.naturalWidth"));
@@ -104,11 +104,11 @@ public class ImageTests(PlaygroundServer server) : PlaygroundTest(server)
         await Assertions.Expect(avatar).ToBeVisibleAsync();
 
         // /missing.png goes through the optimizer, which answers 404: the image is hidden and the fallback shows.
-        var image = avatar.Locator("img[data-bx-avatar-image]");
+        var image = avatar.Locator("img[data-lx-avatar-image]");
         await Assertions.Expect(image).ToBeHiddenAsync();
         await Assertions.Expect(avatar.Locator("[aria-hidden=true]")).ToHaveTextAsync("AL");
         var source = await image.GetAttributeAsync("src");
-        Assert.StartsWith("_blux/img?src=%2Fmissing.png", source);
+        Assert.StartsWith("_lux/img?src=%2Fmissing.png", source);
         await Assertions.Expect(image).ToHaveAttributeAsync("width", "40");
     }
 
@@ -118,7 +118,7 @@ public class ImageTests(PlaygroundServer server) : PlaygroundTest(server)
     {
         await Open(mode, "avatar");
 
-        var remote = Page.Locator("img[data-bx-avatar-image][src^='https://i.pravatar.cc']");
+        var remote = Page.Locator("img[data-lx-avatar-image][src^='https://i.pravatar.cc']");
 
         Assert.Equal(1, await remote.CountAsync());
     }
@@ -137,10 +137,10 @@ public class ImageTests(PlaygroundServer server) : PlaygroundTest(server)
     {
         await Page.GotoAsync("/");
 
-        Assert.Equal(400, (await Page.APIRequest.GetAsync("/_blux/img?src=/../Program.cs")).Status);
-        Assert.Equal(400, (await Page.APIRequest.GetAsync("/_blux/img?src=%2e%2e%2fappsettings.json")).Status);
-        Assert.Equal(403, (await Page.APIRequest.GetAsync("/_blux/img?src=https://example.com/a.png")).Status);
-        Assert.Equal(415, (await Page.APIRequest.GetAsync("/_blux/img?src=/site.css")).Status);
-        Assert.Equal(200, (await Page.APIRequest.GetAsync("/_blux/img?src=/img/sample-waves.png&w=64&f=webp")).Status);
+        Assert.Equal(400, (await Page.APIRequest.GetAsync("/_lux/img?src=/../Program.cs")).Status);
+        Assert.Equal(400, (await Page.APIRequest.GetAsync("/_lux/img?src=%2e%2e%2fappsettings.json")).Status);
+        Assert.Equal(403, (await Page.APIRequest.GetAsync("/_lux/img?src=https://example.com/a.png")).Status);
+        Assert.Equal(415, (await Page.APIRequest.GetAsync("/_lux/img?src=/site.css")).Status);
+        Assert.Equal(200, (await Page.APIRequest.GetAsync("/_lux/img?src=/img/sample-waves.png&w=64&f=webp")).Status);
     }
 }

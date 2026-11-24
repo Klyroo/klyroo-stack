@@ -24,7 +24,7 @@ public static class LlmsText
         sb.Append("# Lux.UI\n\n");
         sb.Append($"> {Summary}\n\n");
         sb.Append($"{bundle.Components.Count} components in {bundle.Groups.Count} families, version {bundle.Version}. ");
-        sb.Append("Components are prefixed `Bx` (`<BxButton>`), register them with `builder.Services.AddLuxUi()` in the server and, for WebAssembly and Auto, the client `Program.cs`. ");
+        sb.Append("Components are prefixed `Lx` (`<LxButton>`), register them with `builder.Services.AddLuxUi()` in the server and, for WebAssembly and Auto, the client `Program.cs`. ");
         sb.Append("Bind state with `@bind-Value` or `@bind-Open`; style with `Class` (root) and `Ui` (per slot), globally through `AddLuxUi(o => o.Button.Slot(...))`. ");
         sb.Append($"For exact parameters use the MCP server at {baseUrl}/mcp (or the `lux-ui-mcp` dotnet tool) rather than guessing.\n");
 

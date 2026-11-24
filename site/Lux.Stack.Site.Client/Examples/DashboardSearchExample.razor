@@ -2,16 +2,16 @@
    in static rendering too. *@
 <div class="flex flex-col items-start gap-3" data-testid="dashboard-search-example">
     <div class="w-64">
-        <BxDashboardSearchButton data-testid="dashboard-search-example-button" />
+        <LxDashboardSearchButton data-testid="dashboard-search-example-button" />
     </div>
-    <p class="text-sm text-(--blux-text-muted)" data-testid="dashboard-search-example-last">Last command: @(_last ?? "none")</p>
-    <BxDashboardSearch Groups="_groups" OnSelect="item => _last = item.Label" />
+    <p class="text-sm text-(--lux-text-muted)" data-testid="dashboard-search-example-last">Last command: @(_last ?? "none")</p>
+    <LxDashboardSearch Groups="_groups" OnSelect="item => _last = item.Label" />
 </div>
 
 @code {
     private string? _last;
 
-    private static readonly BxCommandGroup[] _groups =
+    private static readonly LxCommandGroup[] _groups =
     [
         new("Go to",
         [

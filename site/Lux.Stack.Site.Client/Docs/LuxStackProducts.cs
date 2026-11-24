@@ -17,7 +17,7 @@ public sealed record LuxProductInfo(
     string HeroAccent,
     string Description,
     string AccentHex,
-    BxColor BadgeColor,
+    LxColor BadgeColor,
     string RepoName,
     string RepoPath,
     string CorePackage,
@@ -44,7 +44,7 @@ public static class LuxStackProducts
             HeroAccent: "zero SignalR lag.",
             Description: "Complete design system for Blazor (Server, WebAssembly, Auto, Static SSR) and .NET MAUI Blazor Hybrid. Menus, dialogs, popovers, and tabs answer instantaneously at 60fps in the browser via native Web Components and composable behaviors (dialog, popup, rovingTabindex, formAssociated).",
             AccentHex: "#10b981",
-            BadgeColor: BxColor.Success,
+            BadgeColor: LxColor.Success,
             RepoName: "lux-ui",
             RepoPath: "/home/gpoumarat/lux-ui",
             CorePackage: "Lux.UI.Build.Tasks",
@@ -55,7 +55,7 @@ public static class LuxStackProducts
             [
                 ("Zero-Roundtrip Popovers & Dialogs", "Built on native HTML Popover and <dialog> APIs with light-dismiss, Escape handling, and top-layer stacking managed directly by the browser.", "DOM Native"),
                 ("Composable Behaviors (ui-sdk.dev)", "Standalone JS primitives: dialog(), popup(), rovingTabindex(), formAssociated(), and dismissable() with zero external dependencies.", "Behaviors"),
-                ("Tailwind v4 & Design Tokens", "A single stylesheet driven by semantic CSS variables (--blux-primary, --blux-bg, --blux-border), 12 built-in locales, and instant dark mode.", "Tailwind v4"),
+                ("Tailwind v4 & Design Tokens", "A single stylesheet driven by semantic CSS variables (--lux-primary, --lux-bg, --lux-border), 12 built-in locales, and instant dark mode.", "Tailwind v4"),
                 ("Mobile 44px Touch & TV D-Pad", "44px touch hit targets calibrated for iOS/Android, safe area insets, and directional D-pad focus rings for Android TV.", "Multiplatform")
             ],
             CoreCodeTitle: "js/behaviors.js · Composable DOM Behaviors",
@@ -65,7 +65,7 @@ public static class LuxStackProducts
                 // Focus trap, Escape dismiss, aria-modal & return focus
                 const modalCtrl = dialog(dialogElement, {
                   closeOnBackdrop: true,
-                  onClose: () => dialogElement.dispatchEvent(new CustomEvent('bx-close'))
+                  onClose: () => dialogElement.dispatchEvent(new CustomEvent('lx-close'))
                 });
 
                 // Roving tabindex across toolbar or tabs (Arrow keys, Home/End)
@@ -76,28 +76,28 @@ public static class LuxStackProducts
                 """,
             UiCodeTitle: "App.razor · Blazor Web & MAUI Hybrid",
             UiCode: """
-                <BxModal Title="Deploy to production" Description="Zero round-trip open & close.">
+                <LxModal Title="Deploy to production" Description="Zero round-trip open & close.">
                     <ChildContent>
-                        <BxButton Label="Deploy now" Color="BxColor.Primary" />
+                        <LxButton Label="Deploy now" Color="LxColor.Primary" />
                     </ChildContent>
                     <Body>
-                        <BxFormField Label="Environment">
-                            <BxSelect Items="@Environments" @bind-Value="_env" />
-                        </BxFormField>
+                        <LxFormField Label="Environment">
+                            <LxSelect Items="@Environments" @bind-Value="_env" />
+                        </LxFormField>
                     </Body>
                     <Footer>
-                        <BxButton Label="Confirm" data-bx-close />
+                        <LxButton Label="Confirm" data-lx-close />
                     </Footer>
-                </BxModal>
+                </LxModal>
                 """,
             Components:
             [
-                new("BxButton", "Seven colors, six variants, loading and link states.", "/components/button", "UI"),
-                new("BxModal", "Native <dialog> with focus trap, inert background and Escape.", "/components/modal", "UI"),
-                new("BxSelect", "Keyboard typeahead and hidden input for native forms.", "/components/select", "UI"),
-                new("BxTabs", "Arrow keys and automatic activation without SignalR round-trip.", "/components/tabs", "UI"),
-                new("BxCommandPalette", "Full keyboard command launcher with groups and shortcuts.", "/components/command-palette", "UI"),
-                new("BxChatMessages", "Streaming AI chat bubbles, reasoning and tool calls.", "/components/chat-messages", "UI")
+                new("LxButton", "Seven colors, six variants, loading and link states.", "/components/button", "UI"),
+                new("LxModal", "Native <dialog> with focus trap, inert background and Escape.", "/components/modal", "UI"),
+                new("LxSelect", "Keyboard typeahead and hidden input for native forms.", "/components/select", "UI"),
+                new("LxTabs", "Arrow keys and automatic activation without SignalR round-trip.", "/components/tabs", "UI"),
+                new("LxCommandPalette", "Full keyboard command launcher with groups and shortcuts.", "/components/command-palette", "UI"),
+                new("LxChatMessages", "Streaming AI chat bubbles, reasoning and tool calls.", "/components/chat-messages", "UI")
             ]),
 
         new(
@@ -109,7 +109,7 @@ public static class LuxStackProducts
             HeroAccent: "& reactive URL state.",
             Description: "Strongly typed, 100% NativeAOT query engine: composable filter AST (DataListSchema, DataListRequest, DataListFilterGroup), reversible URL query codecs, InMemory & IQueryable evaluators, Entity Framework Core async SQL executor (EfAsyncQueryExecutor), and reactive QueryState for Blazor and MAUI Hybrid.",
             AccentHex: "#ff4154",
-            BadgeColor: BxColor.Error,
+            BadgeColor: LxColor.Error,
             RepoName: "lux-query",
             RepoPath: "/home/gpoumarat/lux-query",
             CorePackage: "Lux.Query.Core",
@@ -163,12 +163,12 @@ public static class LuxStackProducts
             Slug: "table",
             Name: "Lux.Table",
             ShortName: "Table",
-            Tagline: "Headless tree hierarchy engine & high-density enterprise BxDataList",
+            Tagline: "Headless tree hierarchy engine & high-density enterprise LxDataList",
             HeroHeadline: "Supercharged tables",
             HeroAccent: "& headless datagrids.",
             Description: "Headless-powered data tables and card grids for .NET: NativeAOT tree hierarchy (DataListTree<TItem>), visual grouping, footer aggregations, 2px loading progress line, automatic Sort/Hide HeaderMenu, 60fps virtualization, and responsive mobile summary rows.",
             AccentHex: "#00d8ff",
-            BadgeColor: BxColor.Info,
+            BadgeColor: LxColor.Info,
             RepoName: "lux-table",
             RepoPath: "/home/gpoumarat/lux-table",
             CorePackage: "Lux.Table.Core",
@@ -195,23 +195,23 @@ public static class LuxStackProducts
                 var (roots, allNodes) = tree.BuildTree(employees, schema);
                 // Every node carries Depth, Parent, IsLast & AncestorContinuations
                 """,
-            UiCodeTitle: "Lux.Table · BxDataList & BxDataListTable",
+            UiCodeTitle: "Lux.Table · LxDataList & LxDataListTable",
             UiCode: """
-                <BxDataList TItem="Employee" Schema="@_schema" Items="@_employees" UrlSync="false">
-                    <BxDataListTable TItem="Employee"
+                <LxDataList TItem="Employee" Schema="@_schema" Items="@_employees" UrlSync="false">
+                    <LxDataListTable TItem="Employee"
                                      HeaderMenu="true"
                                      Summaries="@(new DataListSummaries<Employee>())">
-                        <BxDataListColumn TItem="Employee" Field="name" Title="Name" />
-                        <BxDataListColumn TItem="Employee" Field="salary" Title="Salary"
+                        <LxDataListColumn TItem="Employee" Field="name" Title="Name" />
+                        <LxDataListColumn TItem="Employee" Field="salary" Title="Salary"
                                           Summary="DataListSummaryKind.Sum" />
-                    </BxDataListTable>
-                </BxDataList>
+                    </LxDataListTable>
+                </LxDataList>
                 """,
             Components:
             [
                 new("DataListTree<TItem>", "Pure headless NativeAOT hierarchy builder with rail continuations & expansion.", "/table/docs/tree", "Core"),
-                new("BxDataList<TItem>", "Full-featured enterprise datagrid with table, grid, filter bar & pagination.", "/table/docs/data-list", "UI"),
-                new("BxDataListTable<TItem>", "High-density table with HeaderMenu, summaries, tree view and column resizing.", "/table/docs/columns", "UI"),
+                new("LxDataList<TItem>", "Full-featured enterprise datagrid with table, grid, filter bar & pagination.", "/table/docs/data-list", "UI"),
+                new("LxDataListTable<TItem>", "High-density table with HeaderMenu, summaries, tree view and column resizing.", "/table/docs/columns", "UI"),
                 new("DataListRowSummary<TItem>", "Automatic mobile summary-row presentation below the md breakpoint.", "/table/docs/mobile-summary", "UI")
             ]),
 
@@ -224,7 +224,7 @@ public static class LuxStackProducts
             HeroAccent: "without boilerplate.",
             Description: "Declarative, 100% NativeAOT form engine in Lux.Form.Core: 31 field kinds (FormFieldKind), reactive conditional visibility, dirty/touched diffing, output transforms, multi-step wizards with SkipWhen, sectioned FormPage layouts, and programmatic modal/drawer overlays via FormService.",
             AccentHex: "#f59e0b",
-            BadgeColor: BxColor.Warning,
+            BadgeColor: LxColor.Warning,
             RepoName: "lux-form",
             RepoPath: "/home/gpoumarat/lux-form",
             CorePackage: "Lux.Form.Core",
@@ -236,7 +236,7 @@ public static class LuxStackProducts
                 ("31 Declarative Field Kinds", "Text, Password (with requirement checklist), Number, Select, AutoComplete, Checkbox, Switch, Slider, Repeatable Arrays, and Tabs driven by FormSchema.", "31 Field Kinds"),
                 ("Reactive Conditions & Transforms", "Evaluates Condition = f => ... live, automatically skips hidden fields during validation and output building, and applies TransformOutput on submit.", "Reactive Engine"),
                 ("Multi-Step Wizards with SkipWhen", "Split complex flows into FormStepSchema with conditional SkipWhen branching, per-step validation, and automatic dirty re-baselining after submit.", "Wizard Flow"),
-                ("FormPage & Overlay FormService", "Sectioned pages with completion indicators (BxFormPage) and programmatic modal/drawer form hosts via FormService + BxFormProvider.", "Overlay Host")
+                ("FormPage & Overlay FormService", "Sectioned pages with completion indicators (LxFormPage) and programmatic modal/drawer form hosts via FormService + LxFormProvider.", "Overlay Host")
             ],
             CoreCodeTitle: "Lux.Form.Core · Headless FormSchema & FormController",
             CoreCode: """
@@ -256,9 +256,9 @@ public static class LuxStackProducts
                 var form = new FormController(schema, new Dictionary<string, object?> { ["name"] = "Alice" });
                 var ok = await form.SubmitAsync();
                 """,
-            UiCodeTitle: "Lux.Form · BxFormEngine & BxFormPage",
+            UiCodeTitle: "Lux.Form · LxFormEngine & LxFormPage",
             UiCode: """
-                <BxFormEngine Form="@_form"
+                <LxFormEngine Form="@_form"
                               SubmitLabel="Save profile"
                               ShowReset="true"
                               OnSubmit="@HandleSubmit" />
@@ -268,8 +268,8 @@ public static class LuxStackProducts
                 new("FormSchema", "Declarative schema with 31 field kinds, steps, sections, rules & transforms.", "/form/docs", "Core"),
                 new("FormController", "Headless NativeAOT state machine for values, errors, dirty paths & steps.", "/form/docs", "Core"),
                 new("FormService", "Programmatic overlay service to open forms in modals or drawers.", "/form/docs", "Core"),
-                new("BxFormEngine", "Automatic Blazor/MAUI renderer for FormSchema & multi-step wizards.", "/form/docs", "UI"),
-                new("BxFormPage", "Sectioned form page layout with live completion & dirty status.", "/form/docs", "UI")
+                new("LxFormEngine", "Automatic Blazor/MAUI renderer for FormSchema & multi-step wizards.", "/form/docs", "UI"),
+                new("LxFormPage", "Sectioned form page layout with live completion & dirty status.", "/form/docs", "UI")
             ]),
 
         new(
@@ -281,7 +281,7 @@ public static class LuxStackProducts
             HeroAccent: "staged for speed.",
             Description: "Analytical dashboard orchestrator with 3-wave staged query loading (Essential -> Background -> Deferred), reactive global filter toolbar and views, leap-year-safe comparison date ranges, RFC 4180 UTF-8 BOM CSV export, and 13 ready-to-use KPI & visualization blocks.",
             AccentHex: "#8b5cf6",
-            BadgeColor: BxColor.Primary,
+            BadgeColor: LxColor.Primary,
             RepoName: "lux-dashboard",
             RepoPath: "/home/gpoumarat/lux-dashboard",
             CorePackage: "Lux.Dashboard.Core",
@@ -292,7 +292,7 @@ public static class LuxStackProducts
             [
                 ("3-Wave Staged Query Orchestration", "DashboardController runs Essential KPIs first, Background charts second, and keeps Deferred resources idle until explicitly requested.", "Staged Waves"),
                 ("Global Filters, Presets & Views", "Synchronized filters (DashboardFilterControl) with one-click Reset detection and tabbed DashboardViewMeta views with live count badges.", "Reactive Filters"),
-                ("13 Analytical Visualization Blocks", "BxDashboardPage, Grid, Card, Stat, Stats, SVG Gauge, Details, Bars, List, sortable Table with CSV export, Alerts, Feed, and Chart.", "13 Widgets"),
+                ("13 Analytical Visualization Blocks", "LxDashboardPage, Grid, Card, Stat, Stats, SVG Gauge, Details, Bars, List, sortable Table with CSV export, Alerts, Feed, and Chart.", "13 Widgets"),
                 ("Smart Formatters & CSV Export", "DashboardFormat formats Compact (12.6K), Delta (+14.2%), Points (+2.1 pts), Ratio (57%), leap-year date ranges, and locale-aware UTF-8 BOM CSV.", "Analytics Core")
             ],
             CoreCodeTitle: "Lux.Dashboard.Core · Staged DashboardController",
@@ -310,26 +310,26 @@ public static class LuxStackProducts
 
                 await controller.RefreshAsync(); // Runs Essential -> Background
                 """,
-            UiCodeTitle: "Lux.Dashboard · BxDashboardPage & KPI Widgets",
+            UiCodeTitle: "Lux.Dashboard · LxDashboardPage & KPI Widgets",
             UiCode: """
-                <BxDashboardPage Dashboard="@_dashboard" Title="Revenue Analytics">
-                    <BxDashboardGrid Menu="true" Freshness="true">
-                        <BxDashboardStats Title="Key Metrics" Items="@_statItems" />
-                        <BxDashboardGauge Title="ARR Goal" Value="84" Max="100" Target="90"
+                <LxDashboardPage Dashboard="@_dashboard" Title="Revenue Analytics">
+                    <LxDashboardGrid Menu="true" Freshness="true">
+                        <LxDashboardStats Title="Key Metrics" Items="@_statItems" />
+                        <LxDashboardGauge Title="ARR Goal" Value="84" Max="100" Target="90"
                                           Format="DashboardFormatPreset.Percent" />
-                        <BxDashboardBars Title="Channels" Items="@_barItems"
+                        <LxDashboardBars Title="Channels" Items="@_barItems"
                                          Format="DashboardFormatPreset.Compact" />
-                    </BxDashboardGrid>
-                </BxDashboardPage>
+                    </LxDashboardGrid>
+                </LxDashboardPage>
                 """,
             Components:
             [
                 new("DashboardController", "Staged 3-wave query coordinator (Essential/Background/Deferred), filters & views.", "/dashboard/docs", "Core"),
                 new("DashboardFormat", "Compact/Delta/Points/Ratio formatters, leap-year ranges & BOM CSV exporter.", "/dashboard/docs", "Core"),
-                new("BxDashboardPage", "Full analytical dashboard shell with filter toolbar, views & refresh state.", "/dashboard/docs", "UI"),
-                new("BxDashboardStats", "Multi-KPI summary strip with delta badges, progress and status pills.", "/dashboard/docs", "UI"),
-                new("BxDashboardGauge", "SVG circular gauge with target marker and formatted center value.", "/dashboard/docs", "UI"),
-                new("BxDashboardTable", "Sortable analytical table block with inline bars, deltas & CSV export.", "/dashboard/docs", "UI")
+                new("LxDashboardPage", "Full analytical dashboard shell with filter toolbar, views & refresh state.", "/dashboard/docs", "UI"),
+                new("LxDashboardStats", "Multi-KPI summary strip with delta badges, progress and status pills.", "/dashboard/docs", "UI"),
+                new("LxDashboardGauge", "SVG circular gauge with target marker and formatted center value.", "/dashboard/docs", "UI"),
+                new("LxDashboardTable", "Sortable analytical table block with inline bars, deltas & CSV export.", "/dashboard/docs", "UI")
             ]),
 
         new(
@@ -339,9 +339,9 @@ public static class LuxStackProducts
             Tagline: "19 read-only display blocks, constrained audio/video players & modal file preview",
             HeroHeadline: "Rich display blocks",
             HeroAccent: "& constrained media.",
-            Description: "19 read-only presentation blocks inside <BxDisplay> (Heading, Alert, Facts, Stat with sparkline, Breakdown, Meter with thresholds, Diff, masked Code/Secret, Timeline, Accordion…), constrained Audio/Video players with clip Start/End bounds and MaxPlays quotas, plus a modal multi-format file previewer.",
+            Description: "19 read-only presentation blocks inside <LxDisplay> (Heading, Alert, Facts, Stat with sparkline, Breakdown, Meter with thresholds, Diff, masked Code/Secret, Timeline, Accordion…), constrained Audio/Video players with clip Start/End bounds and MaxPlays quotas, plus a modal multi-format file previewer.",
             AccentHex: "#ec4899",
-            BadgeColor: BxColor.Secondary,
+            BadgeColor: LxColor.Secondary,
             RepoName: "lux-display",
             RepoPath: "/home/gpoumarat/lux-display",
             CorePackage: "Lux.Display.Core",
@@ -366,24 +366,24 @@ public static class LuxStackProducts
                 // Built-in RFC 4180 CSV parser for instant preview tables
                 var csv = FilePreviewService.ParseCsv("Region,MRR\nEurope,148900\nUS,192400");
                 """,
-            UiCodeTitle: "Lux.Display · BxDisplay & BxAudioPlayer",
+            UiCodeTitle: "Lux.Display · LxDisplay & LxAudioPlayer",
             UiCode: """
-                <BxDisplay Kind="DisplayKind.Stat" Title="MRR" Value="€148,900"
+                <LxDisplay Kind="DisplayKind.Stat" Title="MRR" Value="€148,900"
                            Delta="+14.2%" Trend="@([102, 118, 134, 149])" />
 
-                <BxDisplay Kind="DisplayKind.Code" Variant="secret"
+                <LxDisplay Kind="DisplayKind.Code" Variant="secret"
                            Value="sk_live_9876543210" VisibleChars="4" Copy="true" />
 
-                <BxAudioPlayer Src="/media/listening.mp3" Title="Listening Extract #1"
+                <LxAudioPlayer Src="/media/listening.mp3" Title="Listening Extract #1"
                                Start="15" End="45" MaxPlays="2" Seekable="false" />
                 """,
             Components:
             [
                 new("FilePreviewService", "Headless MIME detector, RFC 4180 CSV parser and lightbox queue state.", "/display/docs", "Core"),
-                new("BxDisplay", "19-kind read-only block component (Stat, Facts, Meter, Diff, Code/Secret, Timeline).", "/display/docs", "UI"),
-                new("BxAudioPlayer", "Constrained audio player with Start/End clip bounds, MaxPlays & Seekable guard.", "/display/docs", "UI"),
-                new("BxVideoPlayer", "Constrained video player with tracks, clip bounds and play-limit locking.", "/display/docs", "UI"),
-                new("BxFilePreviewProvider", "Modal lightbox host for images, PDFs, audio, video and parsed CSV files.", "/display/docs", "UI")
+                new("LxDisplay", "19-kind read-only block component (Stat, Facts, Meter, Diff, Code/Secret, Timeline).", "/display/docs", "UI"),
+                new("LxAudioPlayer", "Constrained audio player with Start/End clip bounds, MaxPlays & Seekable guard.", "/display/docs", "UI"),
+                new("LxVideoPlayer", "Constrained video player with tracks, clip bounds and play-limit locking.", "/display/docs", "UI"),
+                new("LxFilePreviewProvider", "Modal lightbox host for images, PDFs, audio, video and parsed CSV files.", "/display/docs", "UI")
             ]),
 
         new(
@@ -395,7 +395,7 @@ public static class LuxStackProducts
             HeroAccent: "& row reconciliation.",
             Description: "100% NativeAOT spreadsheet import engine in Lux.Spreadsheet.Core: 20-row heuristic header layout detection, NFD accent-insensitive normalization, ≥80% pass-rate column suggestions, unknown value resolution questions, duplicate & existing record upsert policies, inline cell edits, and batched submission with rejected-row retry.",
             AccentHex: "#14b8a6",
-            BadgeColor: BxColor.Success,
+            BadgeColor: LxColor.Success,
             RepoName: "lux-spreadsheet",
             RepoPath: "/home/gpoumarat/lux-spreadsheet",
             CorePackage: "Lux.Spreadsheet.Core",
@@ -426,9 +426,9 @@ public static class LuxStackProducts
                 var importer = new SpreadsheetImporter(schema);
                 importer.LoadText(csvText, "rates.csv"); // Auto-detects header row & 80%-pass suggestions
                 """,
-            UiCodeTitle: "Lux.Spreadsheet · BxSpreadsheetImport Wizard",
+            UiCodeTitle: "Lux.Spreadsheet · LxSpreadsheetImport Wizard",
             UiCode: """
-                <BxSpreadsheetImport Importer="@_importer"
+                <LxSpreadsheetImport Importer="@_importer"
                                      Title="Import Product Rates"
                                      Wizard="true" />
                 """,
@@ -436,7 +436,7 @@ public static class LuxStackProducts
             [
                 new("SpreadsheetSchema", "Column definitions, rules, options, duplicate policies & existing record lookup.", "/spreadsheet/docs", "Core"),
                 new("SpreadsheetImporter", "Headless NativeAOT parser, layout detector, column suggester & batch runner.", "/spreadsheet/docs", "Core"),
-                new("BxSpreadsheetImport", "Interactive 5-step Blazor/MAUI import wizard with inline cell editing.", "/spreadsheet/docs", "UI")
+                new("LxSpreadsheetImport", "Interactive 5-step Blazor/MAUI import wizard with inline cell editing.", "/spreadsheet/docs", "UI")
             ]),
 
         new(
@@ -448,7 +448,7 @@ public static class LuxStackProducts
             HeroAccent: "& semantic WebMCP.",
             Description: "Inspired by ui-sdk.dev: makes Lux.Form, Lux.Dashboard, and Lux.Spreadsheet immediately inspectable and operable by AI agents without brittle CSS selectors. Provides semantic Snapshot/Query/Act, global permission policies, automatic [redacted] secret masking, WebMCP browser assets, and UndoStack<T>.",
             AccentHex: "#6366f1",
-            BadgeColor: BxColor.Info,
+            BadgeColor: LxColor.Info,
             RepoName: "lux-agent",
             RepoPath: "/home/gpoumarat/lux-agent",
             CorePackage: "Lux.Agent.Core",
@@ -480,13 +480,13 @@ public static class LuxStackProducts
             UiCodeTitle: "wwwroot/lux-agent.js · Browser WebMCP Bridge",
             UiCode: """
                 // Served automatically via _content/Lux.Agent/lux-agent.js
-                const snap = window.Blux.agent.snapshot();
-                const res  = await window.Blux.agent.act([
+                const snap = window.Lux.agent.snapshot();
+                const res  = await window.Lux.agent.act([
                   { ref: 'Project name', action: 'setValue', args: ['Atlas'] }
                 ]);
 
                 // Privacy-preserving observation stream (passwords auto-masked as "[redacted]")
-                const stop = window.Blux.agent.observe(evt => console.log(evt));
+                const stop = window.Lux.agent.observe(evt => console.log(evt));
                 """,
             Components:
             [

@@ -1,20 +1,20 @@
 <div class="flex w-full max-w-2xl flex-col gap-3">
     <div class="ms-8">
-        <BxFormField Label="Release notes" Help="Type / for blocks, @@ to mention someone and : followed by a word for an emoji.">
-            <BxEditor @bind-Value="_html" Placeholder="Write something..." data-testid="editor">
-                <BxEditorToolbar />
-                <BxEditorDragHandle />
-                <BxEditorSuggestionMenu />
-                <BxEditorMentionMenu Items="People" />
-                <BxEditorEmojiMenu />
-            </BxEditor>
-        </BxFormField>
+        <LxFormField Label="Release notes" Help="Type / for blocks, @@ to mention someone and : followed by a word for an emoji.">
+            <LxEditor @bind-Value="_html" Placeholder="Write something..." data-testid="editor">
+                <LxEditorToolbar />
+                <LxEditorDragHandle />
+                <LxEditorSuggestionMenu />
+                <LxEditorMentionMenu Items="People" />
+                <LxEditorEmojiMenu />
+            </LxEditor>
+        </LxFormField>
     </div>
-    <p class="break-all font-mono text-xs text-(--blux-text-muted)" data-testid="editor-html">@(string.IsNullOrEmpty(_html) ? "(empty)" : _html)</p>
+    <p class="break-all font-mono text-xs text-(--lux-text-muted)" data-testid="editor-html">@(string.IsNullOrEmpty(_html) ? "(empty)" : _html)</p>
 </div>
 
 @code {
-    private string? _html = "<p>Hello <strong>Blux</strong>.</p><p>Second paragraph.</p>";
+    private string? _html = "<p>Hello <strong>Lux</strong>.</p><p>Second paragraph.</p>";
 
     private static readonly EditorMentionItem[] People =
     [

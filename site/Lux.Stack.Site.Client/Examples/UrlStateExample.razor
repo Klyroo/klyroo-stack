@@ -10,7 +10,7 @@
        Without interactivity the same field is a GET form that carries the other keys as hidden fields. *@
     @if (RendererInfo.IsInteractive)
     {
-        <BxInput Value="@State.Q" ValueChanged="OnSearch" Debounce="300" ClearOnEscape Type="search" Placeholder="Search tasks" aria-label="Search" data-testid="url-q" />
+        <LxInput Value="@State.Q" ValueChanged="OnSearch" Debounce="300" ClearOnEscape Type="search" Placeholder="Search tasks" aria-label="Search" data-testid="url-q" />
     }
     else
     {
@@ -19,8 +19,8 @@
             {
                 <input type="hidden" name="@key" value="@value" />
             }
-            <BxInput Value="@State.Q" Name="q" Type="search" Placeholder="Search tasks" aria-label="Search" data-testid="url-q" />
-            <BxButton Type="submit" Label="Search" />
+            <LxInput Value="@State.Q" Name="q" Type="search" Placeholder="Search tasks" aria-label="Search" data-testid="url-q" />
+            <LxButton Type="submit" Label="Search" />
         </form>
     }
 
@@ -29,38 +29,38 @@
         @foreach (var status in Enum.GetValues<DemoStatus>())
         {
             var active = State.Status == status;
-            <BxButton Href="@Group.HrefWith(State with { Status = status, Page = 1 })" Label="@status.ToString()"
-                      Variant="@(active ? ButtonVariant.Solid : ButtonVariant.Outline)" Color="BxColor.Neutral"
+            <LxButton Href="@Group.HrefWith(State with { Status = status, Page = 1 })" Label="@status.ToString()"
+                      Variant="@(active ? ButtonVariant.Solid : ButtonVariant.Outline)" Color="LxColor.Neutral"
                       aria-current="@(active ? "true" : null)" data-testid="@($"url-status-{status.ToString().ToLowerInvariant()}")" />
         }
-        <BxButton Href="@Group.HrefWith(new DemoState())" Label="Clear" Variant="ButtonVariant.Ghost" Color="BxColor.Neutral" data-testid="url-clear" />
+        <LxButton Href="@Group.HrefWith(new DemoState())" Label="Clear" Variant="ButtonVariant.Ghost" Color="LxColor.Neutral" data-testid="url-clear" />
         @* Writes the state, then leaves for another page in the same handler: the write must not bring the user back. *@
-        <BxButton Label="Write and leave" Variant="ButtonVariant.Ghost" Color="BxColor.Neutral" OnClick="WriteAndLeave" data-testid="url-leave" />
+        <LxButton Label="Write and leave" Variant="ButtonVariant.Ghost" Color="LxColor.Neutral" OnClick="WriteAndLeave" data-testid="url-leave" />
     </nav>
 
     @* A button writes the state itself: one write, one history entry. *@
     <div class="flex items-center gap-3">
-        <BxButton Label="@(State.Desc ? "Z to A" : "A to Z")" Variant="ButtonVariant.Soft" Color="BxColor.Neutral" OnClick="ToggleSort" data-testid="url-sort" />
-        <span class="text-sm text-(--blux-text-muted)">Page <span data-testid="url-page">@State.Page</span> of @Pages</span>
-        <BxButton Href="@Group.HrefWith(State with { Page = Math.Max(1, State.Page - 1) })" Label="Previous" Variant="ButtonVariant.Outline" Color="BxColor.Neutral"
+        <LxButton Label="@(State.Desc ? "Z to A" : "A to Z")" Variant="ButtonVariant.Soft" Color="LxColor.Neutral" OnClick="ToggleSort" data-testid="url-sort" />
+        <span class="text-sm text-(--lux-text-muted)">Page <span data-testid="url-page">@State.Page</span> of @Pages</span>
+        <LxButton Href="@Group.HrefWith(State with { Page = Math.Max(1, State.Page - 1) })" Label="Previous" Variant="ButtonVariant.Outline" Color="LxColor.Neutral"
                   Disabled="@(State.Page <= 1)" data-testid="url-previous" />
-        <BxButton Href="@Group.HrefWith(State with { Page = Math.Min(Pages, State.Page + 1) })" Label="Next" Variant="ButtonVariant.Outline" Color="BxColor.Neutral"
+        <LxButton Href="@Group.HrefWith(State with { Page = Math.Min(Pages, State.Page + 1) })" Label="Next" Variant="ButtonVariant.Outline" Color="LxColor.Neutral"
                   Disabled="@(State.Page >= Pages)" data-testid="url-next" />
     </div>
 
-    <ul class="divide-y divide-(--blux-border) rounded-lg border border-(--blux-border) text-sm" data-testid="url-list">
+    <ul class="divide-y divide-(--lux-border) rounded-lg border border-(--lux-border) text-sm" data-testid="url-list">
         @foreach (var task in Visible)
         {
-            <li class="flex items-center justify-between px-3 py-2"><span>@task.Title</span><span class="text-(--blux-text-muted)">@task.Status</span></li>
+            <li class="flex items-center justify-between px-3 py-2"><span>@task.Title</span><span class="text-(--lux-text-muted)">@task.Status</span></li>
         }
         @if (Visible.Count == 0)
         {
-            <li class="px-3 py-2 text-(--blux-text-muted)">No task matches.</li>
+            <li class="px-3 py-2 text-(--lux-text-muted)">No task matches.</li>
         }
     </ul>
 
-    <p class="font-mono text-xs text-(--blux-text-muted)">Query: <span data-testid="url-query">@(new Uri(Navigation.Uri).Query)</span></p>
-    <p class="font-mono text-xs text-(--blux-text-muted)">SupplyParameterFromQuery q: <span data-testid="url-supplied">@SuppliedQ</span></p>
+    <p class="font-mono text-xs text-(--lux-text-muted)">Query: <span data-testid="url-query">@(new Uri(Navigation.Uri).Query)</span></p>
+    <p class="font-mono text-xs text-(--lux-text-muted)">SupplyParameterFromQuery q: <span data-testid="url-supplied">@SuppliedQ</span></p>
 </div>
 
 @code {

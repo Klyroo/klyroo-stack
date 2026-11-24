@@ -2,16 +2,16 @@
 
 <EditForm Model="Model" FormName="select-menu-form" OnValidSubmit="Save" class="flex w-full max-w-sm flex-col items-start gap-4" novalidate>
     <DataAnnotationsValidator />
-    <BxFormField Label="Stack" For="() => Model!.Stack" class="w-full">
-        <BxSelectMenu Items="Stack" Multiple @bind-Value="Model!.Stack" Placeholder="Pick technologies" />
-    </BxFormField>
-    <BxFormField Label="Keywords" For="() => Model!.Keywords" class="w-full">
-        <BxInputTags @bind-Value="Model!.Keywords" Placeholder="Type, then Enter" />
-    </BxFormField>
-    <BxButton Type="submit" Label="Save profile" />
+    <LxFormField Label="Stack" For="() => Model!.Stack" class="w-full">
+        <LxSelectMenu Items="Stack" Multiple @bind-Value="Model!.Stack" Placeholder="Pick technologies" />
+    </LxFormField>
+    <LxFormField Label="Keywords" For="() => Model!.Keywords" class="w-full">
+        <LxInputTags @bind-Value="Model!.Keywords" Placeholder="Type, then Enter" />
+    </LxFormField>
+    <LxButton Type="submit" Label="Save profile" />
     @if (_saved)
     {
-        <p role="status" class="text-sm text-(--blux-success-text)" data-testid="saved">Saved: @string.Join(", ", Model!.Stack) / @string.Join(", ", Model!.Keywords)</p>
+        <p role="status" class="text-sm text-(--lux-success-text)" data-testid="saved">Saved: @string.Join(", ", Model!.Stack) / @string.Join(", ", Model!.Keywords)</p>
     }
 </EditForm>
 
@@ -21,7 +21,7 @@
 
     private bool _saved;
 
-    private static readonly BxSelectItem[] Stack = [new("dotnet", ".NET"), new("node", "Node.js"), new("python", "Python"), new("go", "Go")];
+    private static readonly LxSelectItem[] Stack = [new("dotnet", ".NET"), new("node", "Node.js"), new("python", "Python"), new("go", "Go")];
 
     protected override void OnInitialized() => Model ??= new();
 

@@ -8,7 +8,7 @@ using Microsoft.Extensions.Options;
 namespace Lux.Stack.Site.Templates;
 
 /// <summary>
-/// Settings under <c>Blux:Templates</c>: <c>Enabled</c> (default true), <c>PublishRoot</c> (a folder holding one <c>dotnet publish</c> output per
+/// Settings under <c>Lux:Templates</c>: <c>Enabled</c> (default true), <c>PublishRoot</c> (a folder holding one <c>dotnet publish</c> output per
 /// template, <c>{PublishRoot}/{name}/</c>; when set, the demos run published, in Production), <c>Configuration</c> (the build configuration the demos
 /// are run from when no <c>PublishRoot</c> is set, default Debug), <c>StartupTimeoutSeconds</c> (default 120), <c>LivenessIntervalSeconds</c> (how often
 /// a running demo is asked for its home page, default 30; two answers in a row that are not the demo's restart it), <c>MemoryLimitMegabytes</c> (the
@@ -293,11 +293,11 @@ public sealed class TemplateDemoSupervisor : BackgroundService, ITemplateDemoSta
             .Select(e => new KeyValuePair<string, string?>((string)e.Key, (string?)e.Value));
 
     /// <summary>
-    /// The settings of one demo, <c>Blux:Templates:Demos:{name}:...</c> (a Changelog demo: <c>Blux:Templates:Demos:changelog:Changelog:Repository</c>, or the
-    /// environment variable <c>Blux__Templates__Demos__changelog__Changelog__Repository</c>), as keys relative to that section.
+    /// The settings of one demo, <c>Lux:Templates:Demos:{name}:...</c> (a Changelog demo: <c>Lux:Templates:Demos:changelog:Changelog:Repository</c>, or the
+    /// environment variable <c>Lux__Templates__Demos__changelog__Changelog__Repository</c>), as keys relative to that section.
     /// </summary>
     private Dictionary<string, string> DemoSettings(string name) =>
-        _configuration.GetSection($"Blux:Templates:Demos:{name}").AsEnumerable(makePathsRelative: true)
+        _configuration.GetSection($"Lux:Templates:Demos:{name}").AsEnumerable(makePathsRelative: true)
             .Where(pair => pair.Value is not null && pair.Key.Length > 0)
             .ToDictionary(pair => pair.Key, pair => pair.Value!, StringComparer.Ordinal);
 
@@ -343,7 +343,7 @@ public sealed class TemplateDemoSupervisor : BackgroundService, ITemplateDemoSta
         var repository = FindRepository();
         if (repository is null)
         {
-            problem = "Blux:Templates:PublishRoot is not set and no checkout of the repository was found to run the template from";
+            problem = "Lux:Templates:PublishRoot is not set and no checkout of the repository was found to run the template from";
             return false;
         }
         var project = Path.Combine(repository, "templates", template.Name, template.WebProject!);

@@ -4,10 +4,10 @@
 <div class="flex w-full max-w-xl flex-col gap-3" data-testid="chat-prompt-example">
     @foreach (var (text, reply) in _exchanges)
     {
-        <BxChatMessage Role="ChatRole.User" Text="@text" data-testid="chat-prompt-sent" />
-        <BxChatMessage Role="ChatRole.Assistant" Text="@reply" data-testid="chat-prompt-reply" />
+        <LxChatMessage Role="ChatRole.User" Text="@text" data-testid="chat-prompt-sent" />
+        <LxChatMessage Role="ChatRole.Assistant" Text="@reply" data-testid="chat-prompt-reply" />
     }
-    <BxChatPrompt FormName="chat-prompt-ssr" OnSubmit="Send" Placeholder="Write a message..." data-testid="chat-prompt" />
+    <LxChatPrompt FormName="chat-prompt-ssr" OnSubmit="Send" Placeholder="Write a message..." data-testid="chat-prompt" />
 </div>
 
 @code {

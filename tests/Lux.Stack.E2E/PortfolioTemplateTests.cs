@@ -22,9 +22,9 @@ internal static class PortfolioChecks
         await Assertions.Expect(page.GetByTestId("project").First).ToContainTextAsync("Harbor Atlas");
         await Assertions.Expect(page.GetByTestId("latest-article")).ToHaveCountAsync(3);
         await Assertions.Expect(page.GetByTestId("latest-article").First).ToContainTextAsync("A focus ring you can see");
-        await page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
         // The social icons of the hero card are real icons, not the missing icon placeholder.
-        await Assertions.Expect(page.Locator("[data-bx-missing-icon]")).ToHaveCountAsync(0);
+        await Assertions.Expect(page.Locator("[data-lx-missing-icon]")).ToHaveCountAsync(0);
 
         // Work, from the header.
         await page.GetByRole(AriaRole.Navigation, new() { Name = "Main" }).GetByRole(AriaRole.Link, new() { Name = "Work" }).First.ClickAsync();
@@ -108,7 +108,7 @@ internal static class PortfolioChecks
 
         // Search: one index for the projects, the articles and the text pages, fetched the first time the search opens.
         await Go(page, "");
-        await page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
         await page.GetByRole(AriaRole.Button, new() { Name = "Search" }).Locator("visible=true").First.ClickAsync();
         var search = page.GetByRole(AriaRole.Dialog);
         await Assertions.Expect(search).ToBeVisibleAsync();
@@ -157,7 +157,7 @@ internal static class PortfolioChecks
         // Nothing was stored: no cookie but the antiforgery one, the form is empty and the message is not in the page.
         Assert.DoesNotContain("design system for our product", await page.ContentAsync());
         await Assertions.Expect(form.GetByLabel("Name")).ToHaveValueAsync("");
-        Assert.All(await page.Context.CookiesAsync(), c => Assert.Matches("Antiforgery|Culture|blux-", c.Name));
+        Assert.All(await page.Context.CookiesAsync(), c => Assert.Matches("Antiforgery|Culture|lux-", c.Name));
         var reload = await page.ReloadAsync();
         Assert.Equal("GET", reload!.Request.Method);
         await Assertions.Expect(page.GetByTestId("contact-result")).ToBeVisibleAsync();
@@ -196,7 +196,7 @@ internal static class PortfolioChecks
     public static async Task AssertColorMode(IPage page)
     {
         var dark = (await page.Locator("html").GetAttributeAsync("class") ?? "").Contains("dark");
-        await page.Locator("[data-bx-color-mode=toggle]").Locator("visible=true").First.ClickAsync();
+        await page.Locator("[data-lx-color-mode=toggle]").Locator("visible=true").First.ClickAsync();
         await Assertions.Expect(page.Locator("html")).ToHaveClassAsync(dark ? new Regex("^((?!dark).)*$") : new Regex("dark"));
     }
 
@@ -207,7 +207,7 @@ internal static class PortfolioChecks
         foreach (var path in paths)
         {
             await Go(page, path);
-            await page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+            await page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
             var sizes = await page.EvaluateAsync<int[]>("() => [document.documentElement.scrollWidth, document.documentElement.clientWidth]");
             Assert.True(sizes[0] <= sizes[1], $"horizontal scroll at 375px on '{path}': scrollWidth {sizes[0]} > clientWidth {sizes[1]}");
         }
@@ -223,21 +223,21 @@ internal static class PortfolioChecks
 
 /// <summary>
 /// The Portfolio template as a user ships it: <c>dotnet publish -c Release</c>, run in Production at the root and below a path base. Started by
-/// <c>build/verify-templates.mjs</c> with <c>BLUX_TEMPLATE_PUBLISHED</c>, <c>BLUX_TEMPLATE_ASSEMBLY</c> and <c>BLUX_TEMPLATE_PROBE</c>; without them
+/// <c>build/verify-templates.mjs</c> with <c>LUX_TEMPLATE_PUBLISHED</c>, <c>LUX_TEMPLATE_ASSEMBLY</c> and <c>LUX_TEMPLATE_PROBE</c>; without them
 /// the tests are skipped. The pages are static: the test fails if a WebSocket opens or a WebAssembly file is requested.
 /// </summary>
 public class PortfolioTemplateTests(PlaygroundServer server)
 {
-    private static string? Published => Environment.GetEnvironmentVariable("BLUX_TEMPLATE_PUBLISHED");
-    private static string? AssemblyName => Environment.GetEnvironmentVariable("BLUX_TEMPLATE_ASSEMBLY");
-    private static string? Probe => Environment.GetEnvironmentVariable("BLUX_TEMPLATE_PROBE");
+    private static string? Published => Environment.GetEnvironmentVariable("LUX_TEMPLATE_PUBLISHED");
+    private static string? AssemblyName => Environment.GetEnvironmentVariable("LUX_TEMPLATE_ASSEMBLY");
+    private static string? Probe => Environment.GetEnvironmentVariable("LUX_TEMPLATE_PROBE");
 
     [Theory]
     [InlineData(null)]
     [InlineData("/demo/portfolio")]
     public async Task Published_site_is_static_and_its_parts_work(string? pathBase)
     {
-        Assert.SkipWhen(string.IsNullOrEmpty(Published) || string.IsNullOrEmpty(AssemblyName), "BLUX_TEMPLATE_PUBLISHED and BLUX_TEMPLATE_ASSEMBLY are not set.");
+        Assert.SkipWhen(string.IsNullOrEmpty(Published) || string.IsNullOrEmpty(AssemblyName), "LUX_TEMPLATE_PUBLISHED and LUX_TEMPLATE_ASSEMBLY are not set.");
 
         var port = FreePort();
         var host = $"http://127.0.0.1:{port}";

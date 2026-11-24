@@ -15,65 +15,65 @@
 @if (Product is null)
 {
     <div class="mx-auto max-w-3xl px-4 py-24 text-center">
-        <h1 class="text-3xl font-semibold text-(--blux-text-highlighted)">Unknown LuxStack library</h1>
-        <p class="mt-2 text-(--blux-text-muted)">Return to the LuxStack ecosystem hub to pick one of the 8 libraries.</p>
+        <h1 class="text-3xl font-semibold text-(--lux-text-highlighted)">Unknown LuxStack library</h1>
+        <p class="mt-2 text-(--lux-text-muted)">Return to the LuxStack ecosystem hub to pick one of the 8 libraries.</p>
         <div class="mt-6">
-            <BxButton Label="Back to LuxStack Hub" Href="/" />
+            <LxButton Label="Back to LuxStack Hub" Href="/" />
         </div>
     </div>
 }
 else
 {
     @* Product Hero *@
-    <section class="relative isolate overflow-hidden border-b border-(--blux-border)">
+    <section class="relative isolate overflow-hidden border-b border-(--lux-border)">
         <div class="pg-dots absolute inset-0 -z-10 [mask-image:linear-gradient(to_bottom,black,transparent_85%)]" aria-hidden="true"></div>
         <div class="mx-auto grid max-w-(--breakpoint-2xl) gap-10 px-4 pt-16 pb-14 sm:px-6 sm:pt-24 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)] lg:items-end lg:px-8">
             <div>
                 <div class="flex flex-wrap items-center gap-2.5">
-                    <span class="inline-flex items-center gap-2 rounded-full border px-3 py-1 font-mono text-xs font-semibold text-(--blux-text-highlighted)"
+                    <span class="inline-flex items-center gap-2 rounded-full border px-3 py-1 font-mono text-xs font-semibold text-(--lux-text-highlighted)"
                           style="@($"border-color:{Product.AccentHex}")">
                         <span class="size-2 rounded-full" style="@($"background:{Product.AccentHex}")"></span>
                         @Product.Name
                     </span>
-                    <BxBadge Label="Headless Core + Blazor/MAUI UI" Color="@Product.BadgeColor" Variant="BxVariant.Subtle" Size="BxSize.Sm" />
-                    <span class="font-mono text-xs text-(--blux-text-muted)">@Product.RepoPath</span>
+                    <LxBadge Label="Headless Core + Blazor/MAUI UI" Color="@Product.BadgeColor" Variant="LxVariant.Subtle" Size="LxSize.Sm" />
+                    <span class="font-mono text-xs text-(--lux-text-muted)">@Product.RepoPath</span>
                 </div>
 
-                <h1 class="mt-6 text-5xl font-semibold leading-[0.95] tracking-[-0.055em] text-(--blux-text-highlighted) sm:text-7xl">
+                <h1 class="mt-6 text-5xl font-semibold leading-[0.95] tracking-[-0.055em] text-(--lux-text-highlighted) sm:text-7xl">
                     @Product.HeroHeadline<br />
                     <span style="@($"color:{Product.AccentHex}")">@Product.HeroAccent</span>
                 </h1>
             </div>
 
             <div class="lg:pb-2">
-                <p class="text-lg leading-relaxed text-(--blux-text-muted) text-pretty">
+                <p class="text-lg leading-relaxed text-(--lux-text-muted) text-pretty">
                     @Product.Description
                 </p>
 
                 <div class="mt-6 flex flex-wrap items-center gap-3">
-                    <BxButton Label="@($"Read {Product.Name} docs")" Href="@Product.DocsHref" Size="BxSize.Lg" Class="rounded-lg px-5">
+                    <LxButton Label="@($"Read {Product.Name} docs")" Href="@Product.DocsHref" Size="LxSize.Lg" Class="rounded-lg px-5">
                         <TrailingIcon><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14m-6-6 6 6-6 6" /></svg></TrailingIcon>
-                    </BxButton>
-                    <BxButton Label="All LuxStack libraries" Href="/" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" Size="BxSize.Lg" Class="rounded-lg" />
+                    </LxButton>
+                    <LxButton Label="All LuxStack libraries" Href="/" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" Size="LxSize.Lg" Class="rounded-lg" />
                 </div>
 
                 <div class="mt-4 flex flex-col gap-2.5">
                     <button type="button" data-copy-text="@($"dotnet add package {Product.UiPackage}")"
-                            class="group flex items-center justify-between gap-3 rounded-xl border border-(--blux-border-accented) bg-(--blux-bg) px-4 py-2.5 font-mono text-xs text-(--blux-text-highlighted) hover:border-(--blux-primary-text)">
-                        <span><span class="text-(--blux-text-muted)">$</span> dotnet add package @Product.UiPackage <span class="text-(--blux-text-muted)"># Blazor + MAUI Hybrid</span></span>
-                        <span class="uppercase tracking-wider text-(--blux-text-muted) group-hover:text-(--blux-primary-text)" data-copy-label>Copy</span>
+                            class="group flex items-center justify-between gap-3 rounded-xl border border-(--lux-border-accented) bg-(--lux-bg) px-4 py-2.5 font-mono text-xs text-(--lux-text-highlighted) hover:border-(--lux-primary-text)">
+                        <span><span class="text-(--lux-text-muted)">$</span> dotnet add package @Product.UiPackage <span class="text-(--lux-text-muted)"># Blazor + MAUI Hybrid</span></span>
+                        <span class="uppercase tracking-wider text-(--lux-text-muted) group-hover:text-(--lux-primary-text)" data-copy-label>Copy</span>
                     </button>
                     <button type="button" data-copy-text="@($"dotnet add package {Product.CorePackage}")"
-                            class="group flex items-center justify-between gap-3 rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/50 px-4 py-2 font-mono text-xs text-(--blux-text) hover:border-(--blux-border-accented)">
-                        <span><span class="text-(--blux-text-muted)">$</span> dotnet add package @Product.CorePackage <span class="text-(--blux-text-muted)"># 100% Headless C# / NativeAOT</span></span>
-                        <span class="uppercase tracking-wider text-(--blux-text-muted)" data-copy-label>Copy</span>
+                            class="group flex items-center justify-between gap-3 rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/50 px-4 py-2 font-mono text-xs text-(--lux-text) hover:border-(--lux-border-accented)">
+                        <span><span class="text-(--lux-text-muted)">$</span> dotnet add package @Product.CorePackage <span class="text-(--lux-text-muted)"># 100% Headless C# / NativeAOT</span></span>
+                        <span class="uppercase tracking-wider text-(--lux-text-muted)" data-copy-label>Copy</span>
                     </button>
                 </div>
 
                 <div class="mt-5 flex flex-wrap gap-1.5">
                     @foreach (var platform in Product.Platforms)
                     {
-                        <span class="rounded-md border border-(--blux-border) bg-(--blux-bg-muted) px-2.5 py-1 font-mono text-[11px] text-(--blux-text-muted)">
+                        <span class="rounded-md border border-(--lux-border) bg-(--lux-bg-muted) px-2.5 py-1 font-mono text-[11px] text-(--lux-text-muted)">
                             @platform
                         </span>
                     }
@@ -83,14 +83,14 @@ else
 
         @* Live Interactive Product Showcase inside the Hero *@
         <div class="mx-auto max-w-(--breakpoint-2xl) px-4 pb-16 sm:px-6 lg:px-8">
-            <div class="overflow-hidden rounded-2xl border border-(--blux-border) bg-(--blux-bg)"
+            <div class="overflow-hidden rounded-2xl border border-(--lux-border) bg-(--lux-bg)"
                  style="@($"border-top: 3px solid {Product.AccentHex}")">
-                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-(--blux-border) bg-(--blux-bg-muted)/60 px-5 py-3">
-                    <div class="flex items-center gap-2 font-mono text-xs text-(--blux-text-highlighted)">
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-(--lux-border) bg-(--lux-bg-muted)/60 px-5 py-3">
+                    <div class="flex items-center gap-2 font-mono text-xs text-(--lux-text-highlighted)">
                         <span class="size-2 rounded-full" style="@($"background:{Product.AccentHex}")"></span>
                         <span>LIVE INTERACTIVE DEMO · @Product.Name</span>
                     </div>
-                    <span class="font-mono text-xs text-(--blux-text-muted)">Running live in Blazor</span>
+                    <span class="font-mono text-xs text-(--lux-text-muted)">Running live in Blazor</span>
                 </div>
 
                 <div class="p-6">
@@ -99,60 +99,60 @@ else
                         case "display":
                             <div class="grid gap-6 lg:grid-cols-2">
                                 <div class="flex flex-col gap-4">
-                                    <BxDisplay Kind="DisplayKind.Stat" Title="Monthly Recurring Revenue" Value="€148,900" Delta="+14.2%" Trend="@([102.0, 118.0, 131.0, 148.9])" />
-                                    <BxDisplay Kind="DisplayKind.Code" Variant="secret" Title="Production API Key" Value="sk_live_luxstack_9981" VisibleChars="4" Copy="true" />
+                                    <LxDisplay Kind="DisplayKind.Stat" Title="Monthly Recurring Revenue" Value="€148,900" Delta="+14.2%" Trend="@([102.0, 118.0, 131.0, 148.9])" />
+                                    <LxDisplay Kind="DisplayKind.Code" Variant="secret" Title="Production API Key" Value="sk_live_luxstack_9981" VisibleChars="4" Copy="true" />
                                 </div>
                                 <div class="flex flex-col gap-4">
-                                    <BxDisplay Kind="DisplayKind.Meter" Title="Storage Quota" MeterValue="82" MeterMax="100" WarningThreshold="75" ErrorThreshold="90" />
-                                    <BxAudioPlayer Src="/media/sample.mp3" Title="Certification Audio Clip (10s–40s · MaxPlays=2 · Seek Locked)" Start="10" End="40" MaxPlays="2" Seekable="false" />
+                                    <LxDisplay Kind="DisplayKind.Meter" Title="Storage Quota" MeterValue="82" MeterMax="100" WarningThreshold="75" ErrorThreshold="90" />
+                                    <LxAudioPlayer Src="/media/sample.mp3" Title="Certification Audio Clip (10s–40s · MaxPlays=2 · Seek Locked)" Start="10" End="40" MaxPlays="2" Seekable="false" />
                                 </div>
                             </div>
                             break;
 
                         case "dashboard":
                             <div class="flex flex-col gap-6">
-                                <BxDashboardStats Title="Live Executive Metrics" Items="@DemoStats" />
+                                <LxDashboardStats Title="Live Executive Metrics" Items="@DemoStats" />
                                 <div class="grid gap-4 lg:grid-cols-2">
-                                    <BxDashboardGauge Title="Q4 ARR Goal" Value="86" Max="100" Target="90" Format="DashboardFormatPreset.Percent" Caption="86% reached" />
-                                    <BxDashboardBars Title="Sessions by Platform" Items="@DemoBars" Format="DashboardFormatPreset.Compact" />
+                                    <LxDashboardGauge Title="Q4 ARR Goal" Value="86" Max="100" Target="90" Format="DashboardFormatPreset.Percent" Caption="86% reached" />
+                                    <LxDashboardBars Title="Sessions by Platform" Items="@DemoBars" Format="DashboardFormatPreset.Compact" />
                                 </div>
                             </div>
                             break;
 
                         case "form":
                             <div class="mx-auto max-w-2xl">
-                                <BxFormEngine Form="@_demoForm" SubmitLabel="Validate & Deploy" ShowReset="true" />
+                                <LxFormEngine Form="@_demoForm" SubmitLabel="Validate & Deploy" ShowReset="true" />
                             </div>
                             break;
 
                         case "spreadsheet":
-                            <BxSpreadsheetImport Importer="@_demoImporter" Title="Import Rates (CSV / Paste)" Wizard="true" />
+                            <LxSpreadsheetImport Importer="@_demoImporter" Title="Import Rates (CSV / Paste)" Wizard="true" />
                             break;
 
                         case "table":
-                            <BxDataList TItem="DemoTableRow" Schema="@DemoTableSchema" Items="@DemoRows" UrlSync="false">
-                                <BxDataListTable TItem="DemoTableRow" HeaderMenu="true" Summaries="@(new DataListSummaries<DemoTableRow>())">
-                                    <BxDataListColumn TItem="DemoTableRow" Field="pkg" Title="Package" />
-                                    <BxDataListColumn TItem="DemoTableRow" Field="layer" Title="Architecture" />
-                                    <BxDataListColumn TItem="DemoTableRow" Field="size" Title="Assemblies" Summary="DataListSummaryKind.Sum" />
-                                </BxDataListTable>
-                            </BxDataList>
+                            <LxDataList TItem="DemoTableRow" Schema="@DemoTableSchema" Items="@DemoRows" UrlSync="false">
+                                <LxDataListTable TItem="DemoTableRow" HeaderMenu="true" Summaries="@(new DataListSummaries<DemoTableRow>())">
+                                    <LxDataListColumn TItem="DemoTableRow" Field="pkg" Title="Package" />
+                                    <LxDataListColumn TItem="DemoTableRow" Field="layer" Title="Architecture" />
+                                    <LxDataListColumn TItem="DemoTableRow" Field="size" Title="Assemblies" Summary="DataListSummaryKind.Sum" />
+                                </LxDataListTable>
+                            </LxDataList>
                             break;
 
                         case "query":
                             <div class="flex flex-col gap-4">
                                 <div class="flex flex-wrap items-center gap-3">
                                     <div class="w-64">
-                                        <BxInput Value="@_querySearch" ValueChanged="@RunLiveQuery" Placeholder="Search products (e.g. M)..." aria-label="Search query" />
+                                        <LxInput Value="@_querySearch" ValueChanged="@RunLiveQuery" Placeholder="Search products (e.g. M)..." aria-label="Search query" />
                                     </div>
-                                    <BxButton Label="@(_queryDesc ? "Sort: Price DESC" : "Sort: Price ASC")" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@ToggleQuerySort" />
-                                    <span class="font-mono text-xs text-(--blux-text-muted)">Matched @_queryResult.TotalCount items via DataListSchema.ExecuteInMemory</span>
+                                    <LxButton Label="@(_queryDesc ? "Sort: Price DESC" : "Sort: Price ASC")" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@ToggleQuerySort" />
+                                    <span class="font-mono text-xs text-(--lux-text-muted)">Matched @_queryResult.TotalCount items via DataListSchema.ExecuteInMemory</span>
                                 </div>
                                 <div class="grid gap-2 sm:grid-cols-3">
                                     @foreach (var item in _queryResult.Items)
                                     {
-                                        <div class="flex items-center justify-between rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 px-4 py-3 font-mono text-xs">
-                                            <span class="font-semibold text-(--blux-text-highlighted)">@item.Name</span>
+                                        <div class="flex items-center justify-between rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 px-4 py-3 font-mono text-xs">
+                                            <span class="font-semibold text-(--lux-text-highlighted)">@item.Name</span>
                                             <span style="color:#ff4154">€@item.Price</span>
                                         </div>
                                     }
@@ -162,26 +162,26 @@ else
 
                         case "agent":
                             <div class="grid gap-4 lg:grid-cols-2">
-                                <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-4">
+                                <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-4">
                                     <div class="flex items-center justify-between">
-                                        <p class="font-mono text-xs uppercase text-(--blux-text-muted)">AgentBridgeService · Live Snapshot &amp; Act</p>
-                                        <span class="font-mono text-xs text-(--blux-primary-text)">CanUndo: @_undoStack.CanUndo · CanRedo: @_undoStack.CanRedo</span>
+                                        <p class="font-mono text-xs uppercase text-(--lux-text-muted)">AgentBridgeService · Live Snapshot &amp; Act</p>
+                                        <span class="font-mono text-xs text-(--lux-primary-text)">CanUndo: @_undoStack.CanUndo · CanRedo: @_undoStack.CanRedo</span>
                                     </div>
-                                    <p class="mt-2 font-mono text-sm text-(--blux-text-highlighted)">Current State: "@_undoStack.Current"</p>
+                                    <p class="mt-2 font-mono text-sm text-(--lux-text-highlighted)">Current State: "@_undoStack.Current"</p>
                                     <div class="mt-4 flex flex-wrap gap-2">
-                                        <BxButton Label="Run Agent ActAsync" Size="BxSize.Sm" OnClick="@RunLiveAgentAct" />
-                                        <BxButton Label="Undo" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" Disabled="@(!_undoStack.CanUndo)" OnClick="@(() => _undoStack.Undo())" />
-                                        <BxButton Label="Redo" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" Disabled="@(!_undoStack.CanRedo)" OnClick="@(() => _undoStack.Redo())" />
+                                        <LxButton Label="Run Agent ActAsync" Size="LxSize.Sm" OnClick="@RunLiveAgentAct" />
+                                        <LxButton Label="Undo" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" Disabled="@(!_undoStack.CanUndo)" OnClick="@(() => _undoStack.Undo())" />
+                                        <LxButton Label="Redo" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" Disabled="@(!_undoStack.CanRedo)" OnClick="@(() => _undoStack.Redo())" />
                                     </div>
                                 </div>
-                                <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-muted)/40 p-4 font-mono text-xs">
-                                    <p class="uppercase text-(--blux-text-muted)">Semantic Snapshot (Password Auto-Redacted)</p>
+                                <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-muted)/40 p-4 font-mono text-xs">
+                                    <p class="uppercase text-(--lux-text-muted)">Semantic Snapshot (Password Auto-Redacted)</p>
                                     <ul class="mt-2 space-y-1">
                                         @foreach (var s in _liveAgent.Snapshot())
                                         {
-                                            <li class="flex items-center justify-between gap-2 text-(--blux-text)">
-                                                <span><span class="text-(--blux-primary-text)">@s.Ref</span> · @s.Label (@s.Component)</span>
-                                                <span class="font-semibold text-(--blux-text-highlighted)">@(s.Value?.ToString() ?? "null")</span>
+                                            <li class="flex items-center justify-between gap-2 text-(--lux-text)">
+                                                <span><span class="text-(--lux-primary-text)">@s.Ref</span> · @s.Label (@s.Component)</span>
+                                                <span class="font-semibold text-(--lux-text-highlighted)">@(s.Value?.ToString() ?? "null")</span>
                                             </li>
                                         }
                                     </ul>
@@ -191,10 +191,10 @@ else
 
                         default:
                             <div class="flex flex-wrap items-center gap-4">
-                                <BxButton Label="Primary Action" />
-                                <BxButton Label="Outline" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" />
-                                <BxSwitch Value="true" Label="Zero-roundtrip toggle" />
-                                <BxBadge Label="60fps Web Component" Color="BxColor.Success" Variant="BxVariant.Subtle" />
+                                <LxButton Label="Primary Action" />
+                                <LxButton Label="Outline" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" />
+                                <LxSwitch Value="true" Label="Zero-roundtrip toggle" />
+                                <LxBadge Label="60fps Web Component" Color="LxColor.Success" Variant="LxVariant.Subtle" />
                             </div>
                             break;
                     }
@@ -204,23 +204,23 @@ else
     </section>
 
     @* Why Lux.<Product>? (4 Feature Pillars) *@
-    <section aria-labelledby="features-heading" class="border-b border-(--blux-border)">
+    <section aria-labelledby="features-heading" class="border-b border-(--lux-border)">
         <div class="mx-auto max-w-(--breakpoint-2xl) px-4 py-20 sm:px-6 lg:px-8">
             <p class="pg-eyebrow-mono">Why @Product.Name</p>
-            <h2 id="features-heading" class="mt-2 text-3xl font-semibold tracking-tight text-(--blux-text-highlighted) sm:text-5xl">
+            <h2 id="features-heading" class="mt-2 text-3xl font-semibold tracking-tight text-(--lux-text-highlighted) sm:text-5xl">
                 Built for scale, headless first.
             </h2>
 
             <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 @foreach (var (title, desc, tag) in Product.Features)
                 {
-                    <div class="flex flex-col rounded-2xl border border-(--blux-border) bg-(--blux-bg) p-6">
+                    <div class="flex flex-col rounded-2xl border border-(--lux-border) bg-(--lux-bg) p-6">
                         <div class="flex items-center justify-between gap-2">
-                            <span class="rounded-md border border-(--blux-border) bg-(--blux-bg-muted) px-2 py-0.5 font-mono text-[11px]"
+                            <span class="rounded-md border border-(--lux-border) bg-(--lux-bg-muted) px-2 py-0.5 font-mono text-[11px]"
                                   style="@($"color:{Product.AccentHex}")">@tag</span>
                         </div>
-                        <h3 class="mt-4 text-lg font-semibold text-(--blux-text-highlighted)">@title</h3>
-                        <p class="mt-2 flex-1 text-sm leading-relaxed text-(--blux-text-muted)">@desc</p>
+                        <h3 class="mt-4 text-lg font-semibold text-(--lux-text-highlighted)">@title</h3>
+                        <p class="mt-2 flex-1 text-sm leading-relaxed text-(--lux-text-muted)">@desc</p>
                     </div>
                 }
             </div>
@@ -228,25 +228,25 @@ else
     </section>
 
     @* Side-by-Side Architecture Split: Headless C# Core vs Blazor & MAUI UI *@
-    <section aria-labelledby="architecture-heading" class="border-b border-(--blux-border)">
+    <section aria-labelledby="architecture-heading" class="border-b border-(--lux-border)">
         <div class="mx-auto max-w-(--breakpoint-2xl) px-4 py-20 sm:px-6 lg:px-8">
             <div class="grid gap-6 lg:grid-cols-2 lg:items-end">
                 <div>
                     <p class="pg-eyebrow-mono">Two-Layer Headless Architecture</p>
-                    <h2 id="architecture-heading" class="mt-2 text-3xl font-semibold tracking-tight text-(--blux-text-highlighted) sm:text-5xl">
+                    <h2 id="architecture-heading" class="mt-2 text-3xl font-semibold tracking-tight text-(--lux-text-highlighted) sm:text-5xl">
                         Headless C# Core.<br />
                         <span style="@($"color:{Product.AccentHex}")">Declarative Razor UI.</span>
                     </h2>
                 </div>
-                <p class="text-base text-(--blux-text-muted) lg:max-w-xl lg:justify-self-end">
-                    Use <code class="font-mono text-sm text-(--blux-text-highlighted)">@Product.CorePackage</code> directly in C# ViewModels, Console workers or NativeAOT services, or pair it with
-                    <code class="font-mono text-sm text-(--blux-text-highlighted)">@Product.UiPackage</code> in Blazor Web and .NET MAUI Blazor Hybrid.
+                <p class="text-base text-(--lux-text-muted) lg:max-w-xl lg:justify-self-end">
+                    Use <code class="font-mono text-sm text-(--lux-text-highlighted)">@Product.CorePackage</code> directly in C# ViewModels, Console workers or NativeAOT services, or pair it with
+                    <code class="font-mono text-sm text-(--lux-text-highlighted)">@Product.UiPackage</code> in Blazor Web and .NET MAUI Blazor Hybrid.
                 </p>
             </div>
 
             <div class="mt-12 grid gap-6 lg:grid-cols-2">
-                <CodeBlock Title="@Product.CoreCodeTitle" Code="@Product.CoreCode" Class="rounded-2xl border border-(--blux-border)" />
-                <CodeBlock Title="@Product.UiCodeTitle" Code="@Product.UiCode" Class="rounded-2xl border border-(--blux-border)" />
+                <CodeBlock Title="@Product.CoreCodeTitle" Code="@Product.CoreCode" Class="rounded-2xl border border-(--lux-border)" />
+                <CodeBlock Title="@Product.UiCodeTitle" Code="@Product.UiCode" Class="rounded-2xl border border-(--lux-border)" />
             </div>
         </div>
     </section>
@@ -257,26 +257,26 @@ else
             <div class="flex flex-wrap items-end justify-between gap-4">
                 <div>
                     <p class="pg-eyebrow-mono">Exports &amp; Playground Links</p>
-                    <h2 id="exports-heading" class="mt-2 text-3xl font-semibold tracking-tight text-(--blux-text-highlighted)">
+                    <h2 id="exports-heading" class="mt-2 text-3xl font-semibold tracking-tight text-(--lux-text-highlighted)">
                         Included in @Product.Name
                     </h2>
                 </div>
-                <BxButton Label="View all 8 LuxStack libraries" Href="/" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" Class="rounded-lg" />
+                <LxButton Label="View all 8 LuxStack libraries" Href="/" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" Class="rounded-lg" />
             </div>
 
             <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach (var comp in Product.Components)
                 {
-                    <a href="@comp.Href" class="group flex flex-col justify-between rounded-xl border border-(--blux-border) bg-(--blux-bg) p-5 transition-colors hover:border-(--blux-border-accented)">
+                    <a href="@comp.Href" class="group flex flex-col justify-between rounded-xl border border-(--lux-border) bg-(--lux-bg) p-5 transition-colors hover:border-(--lux-border-accented)">
                         <div>
                             <div class="flex items-center justify-between gap-2">
-                                <span class="font-mono text-base font-semibold text-(--blux-text-highlighted) group-hover:underline">@comp.Name</span>
-                                <BxBadge Label="@comp.Layer" Color="@(comp.Layer == "Core" ? BxColor.Info : BxColor.Success)" Variant="BxVariant.Subtle" Size="BxSize.Sm" />
+                                <span class="font-mono text-base font-semibold text-(--lux-text-highlighted) group-hover:underline">@comp.Name</span>
+                                <LxBadge Label="@comp.Layer" Color="@(comp.Layer == "Core" ? LxColor.Info : LxColor.Success)" Variant="LxVariant.Subtle" Size="LxSize.Sm" />
                             </div>
-                            <p class="mt-2 text-sm text-(--blux-text-muted)">@comp.Description</p>
+                            <p class="mt-2 text-sm text-(--lux-text-muted)">@comp.Description</p>
                         </div>
-                        <p class="mt-4 font-mono text-xs text-(--blux-text-muted)">
-                            Package: <span class="text-(--blux-text-highlighted)">@(comp.Layer == "Core" ? Product.CorePackage : Product.UiPackage)</span> →
+                        <p class="mt-4 font-mono text-xs text-(--lux-text-muted)">
+                            Package: <span class="text-(--lux-text-highlighted)">@(comp.Layer == "Core" ? Product.CorePackage : Product.UiPackage)</span> →
                         </p>
                     </a>
                 }

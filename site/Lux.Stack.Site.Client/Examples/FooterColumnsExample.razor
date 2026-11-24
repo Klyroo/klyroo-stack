@@ -1,21 +1,21 @@
-<div class="w-full overflow-hidden rounded-xl border border-(--blux-border)">
-    <BxFooter>
+<div class="w-full overflow-hidden rounded-xl border border-(--lux-border)">
+    <LxFooter>
         <Top>
-            <BxFooterColumns Columns="_columns" AriaLabel="Sitemap" data-testid="footer-columns">
+            <LxFooterColumns Columns="_columns" AriaLabel="Sitemap" data-testid="footer-columns">
                 <Left>
-                    <p class="font-mono text-sm font-semibold text-(--blux-text-highlighted)">acme/app</p>
-                    <p class="mt-2 max-w-xs text-sm text-(--blux-text-muted)">Tools for teams that ship.</p>
+                    <p class="font-mono text-sm font-semibold text-(--lux-text-highlighted)">acme/app</p>
+                    <p class="mt-2 max-w-xs text-sm text-(--lux-text-muted)">Tools for teams that ship.</p>
                 </Left>
-            </BxFooterColumns>
+            </LxFooterColumns>
         </Top>
         <Left>
             <p>Copyright 2026 Acme Inc.</p>
         </Left>
-    </BxFooter>
+    </LxFooter>
 </div>
 
 @code {
-    private static readonly BxFooterColumn[] _columns =
+    private static readonly LxFooterColumn[] _columns =
     [
         new("Product")
         {

@@ -27,7 +27,7 @@ public class GuideMarkdownTests
             <CodeBlock Title="Program.cs" Code="@Setup" />
             <CodeBlock Code="dotnet add package Lux.UI" />
             <CodeBlock Code="@("builder.Services.AddLuxUi(\"x\");")" />
-            <div class="not-prose my-4"><BxButton Label="Live demo" /></div>
+            <div class="not-prose my-4"><LxButton Label="Live demo" /></div>
         </div>
 
         @code {

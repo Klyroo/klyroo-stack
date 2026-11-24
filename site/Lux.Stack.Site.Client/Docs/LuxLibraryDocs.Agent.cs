@@ -197,21 +197,21 @@ public static partial class LuxLibraryDocs
                         ])
                 ]),
             new("integrations-query-ui", "Integration: Lux.Query, Lux.Table & Lux.UI Confirmation Modals", "Integrations",
-                "Pair Lux.Agent AllowPolicy with Lux.UI BxModal human-in-the-loop confirmations and trigger URL-synced Lux.Query / Lux.Table updates safely.",
+                "Pair Lux.Agent AllowPolicy with Lux.UI LxModal human-in-the-loop confirmations and trigger URL-synced Lux.Query / Lux.Table updates safely.",
                 [
-                    new("modal-confirm", "1. Lux.Agent + Lux.UI (Human-in-the-Loop BxModal Approval Gate)",
+                    new("modal-confirm", "1. Lux.Agent + Lux.UI (Human-in-the-Loop LxModal Approval Gate)",
                         CodeSamples:
                         [
                             new("AgentApprovalHost.razor", """
                                 @inject AgentBridgeService Agent
 
-                                <BxModal @bind-Open="_askOpen" Title="Approve AI Action?">
+                                <LxModal @bind-Open="_askOpen" Title="Approve AI Action?">
                                     <p>Allow assistant to run <code>@_pendingStep?.Action</code> on <strong>@_pendingStep?.Ref</strong>?</p>
                                     <div class="mt-4 flex justify-end gap-2">
-                                        <BxButton Label="Reject" Variant="ButtonVariant.Outline" OnClick="@(() => Resolve(false))" />
-                                        <BxButton Label="Approve" Color="BxColor.Primary" OnClick="@(() => Resolve(true))" />
+                                        <LxButton Label="Reject" Variant="ButtonVariant.Outline" OnClick="@(() => Resolve(false))" />
+                                        <LxButton Label="Approve" Color="LxColor.Primary" OnClick="@(() => Resolve(true))" />
                                     </div>
-                                </BxModal>
+                                </LxModal>
 
                                 @code {
                                     private bool _askOpen;

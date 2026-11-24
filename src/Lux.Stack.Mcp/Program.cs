@@ -67,7 +67,7 @@ if (tools is not null && ToolFilter.Unknown(tools) is { Count: > 0 } unknown)
 var builder = Host.CreateEmptyApplicationBuilder(settings: null);
 builder.Logging.SetMinimumLevel(LogLevel.Warning);
 builder.Logging.AddConsole(o => o.LogToStandardErrorThreshold = LogLevel.Trace);
-builder.Services.AddBluxDocsServer(o =>
+builder.Services.AddLuxDocsServer(o =>
 {
     o.SiteUrl = Option("--site-url");
     o.Tools = tools;

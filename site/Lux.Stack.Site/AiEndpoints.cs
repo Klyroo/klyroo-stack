@@ -10,23 +10,23 @@ namespace Lux.Stack.Site;
 /// The AI tooling of the docs site: the MCP server at <c>/mcp</c> and the <c>llms.txt</c> files. All of it is generated from the
 /// docs bundle embedded in Lux.Stack.Mcp.Core, the same one the <c>lux-ui-mcp</c> dotnet tool serves over stdio.
 /// <para>
-/// Configuration: <c>Blux:SiteUrl</c> (public address, e.g. <c>https://ui.example.com</c>; links in llms.txt and tool answers use it instead of the
-/// request's Host header), <c>Blux:Ai:RequestsPerMinute</c> (per client IP on /mcp, default 120), <c>Blux:Ai:RequestTimeoutSeconds</c> (default 30)
-/// and <c>Blux:KnownProxies</c> (IP addresses of reverse proxies whose X-Forwarded-* headers are trusted, besides loopback).
+/// Configuration: <c>Lux:SiteUrl</c> (public address, e.g. <c>https://ui.example.com</c>; links in llms.txt and tool answers use it instead of the
+/// request's Host header), <c>Lux:Ai:RequestsPerMinute</c> (per client IP on /mcp, default 120), <c>Lux:Ai:RequestTimeoutSeconds</c> (default 30)
+/// and <c>Lux:KnownProxies</c> (IP addresses of reverse proxies whose X-Forwarded-* headers are trusted, besides loopback).
 /// </para>
 /// </summary>
 public static class AiEndpoints
 {
-    private const string PolicyName = "blux-mcp";
+    private const string PolicyName = "lux-mcp";
 
     public static IServiceCollection AddLuxAi(this IServiceCollection services, IConfiguration configuration)
     {
         // Validates the address (an invalid one stops the start) and decides what the links of llms.txt are made of.
-        var pages = new LlmsPages(Lux.Stack.Mcp.DocsBundleLoader.Embedded, configuration["Blux:SiteUrl"]);
+        var pages = new LlmsPages(Lux.Stack.Mcp.DocsBundleLoader.Embedded, configuration["Lux:SiteUrl"]);
         services.AddSingleton(pages);
 
-        var perMinute = Math.Max(1, configuration.GetValue("Blux:Ai:RequestsPerMinute", 120));
-        var timeout = TimeSpan.FromSeconds(Math.Max(1, configuration.GetValue("Blux:Ai:RequestTimeoutSeconds", 30)));
+        var perMinute = Math.Max(1, configuration.GetValue("Lux:Ai:RequestsPerMinute", 120));
+        var timeout = TimeSpan.FromSeconds(Math.Max(1, configuration.GetValue("Lux:Ai:RequestTimeoutSeconds", 30)));
         services.AddRateLimiter(limiter =>
         {
             limiter.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -37,17 +37,17 @@ public static class AiEndpoints
         services.AddRequestTimeouts(options => options.AddPolicy(PolicyName, timeout));
 
         // Behind a TLS-terminating proxy the app sees http and the proxy's address: read the original scheme, host and client IP, but only
-        // from loopback and the proxies listed in Blux:KnownProxies, so a client cannot forge them.
+        // from loopback and the proxies listed in Lux:KnownProxies, so a client cannot forge them.
         services.Configure<ForwardedHeadersOptions>(options =>
         {
             options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
-            foreach (var proxy in configuration.GetSection("Blux:KnownProxies").Get<string[]>() ?? [])
+            foreach (var proxy in configuration.GetSection("Lux:KnownProxies").Get<string[]>() ?? [])
             {
                 options.KnownProxies.Add(IPAddress.Parse(proxy));
             }
         });
 
-        services.AddBluxDocsServer(o => o.SiteUrl = pages.SiteUrl).WithHttpTransport(http =>
+        services.AddLuxDocsServer(o => o.SiteUrl = pages.SiteUrl).WithHttpTransport(http =>
         {
             // Every request is independent (nothing to remember between calls), so no session affinity is needed.
             http.Stateless = true;

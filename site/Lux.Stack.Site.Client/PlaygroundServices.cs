@@ -22,7 +22,7 @@ public static class PlaygroundServices
     }
 
     /// <summary>Where the server maps the image optimizer.</summary>
-    public const string ImageEndpoint = BxLocalImageProvider.DefaultEndpoint;
+    public const string ImageEndpoint = LxLocalImageProvider.DefaultEndpoint;
 
     /// <summary>Maps the first URL segment to a render mode; anything else renders statically.</summary>
     public static string? ModeFromPath(string path) =>

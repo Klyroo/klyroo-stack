@@ -7,7 +7,7 @@
     <p class="pg-eyebrow">Data</p>
     <h1>Data list sources and counts</h1>
     <p class="pg-lead">
-        A <code>BxDataList</code> reads its rows from one source: a list in memory, a database query or a provider you write. All three answer the same
+        A <code>LxDataList</code> reads its rows from one source: a list in memory, a database query or a provider you write. All three answer the same
         <code>DataListRequest</code> (paging, sort, filters, search, counts), so the filters and the counts next to their options work the same way on each.
     </p>
 
@@ -54,19 +54,19 @@
     <p>
         A filter with a long or private list of options loads them with <code>WithRemoteOptions</code>. The editor asks for a page when it opens (a tag's popover) or renders (the filter panel), searches after a
         pause in the typing, loads the next page as the list scrolls, and shows an error with a Retry button. The paging, the search and the cancellation are those of the remote
-        <code>BxSelectMenu</code>. A value that the address restored is labelled by the resolver (asked for while the rows load); without one it shows as it is. With <code>WithFacets()</code> the options that are listed carry their counts, asked for by value
+        <code>LxSelectMenu</code>. A value that the address restored is labelled by the resolver (asked for while the rows load); without one it shows as it is. With <code>WithFacets()</code> the options that are listed carry their counts, asked for by value
         (<code>DataListFacetRequest.Values</code>) as pages load, so a page has its counts whatever the number of distinct values. A tag's popover loads when it opens, a filter panel section when it opens, and the add filter menu when the filter is picked.
     </p>
     <CodeBlock Title="Schema.cs" Code="@Remote" />
     <p>
         Statically rendered there is no .NET to search with: the editor lists the selected values and the most counted options (at most <code>WithOptionLimit</code>, else the page size), all labelled by the resolver in one call on the
         server, and says that searching the rest needs JavaScript. A counted option the resolver does not know is not listed. The labels travel with the prerendered result (and count in its size), so the interactive render shows them at once.
-        The remote engine behind the editors, <code>BxRemoteOptions</code>, is public API of <code>Lux.UI</code>.
+        The remote engine behind the editors, <code>LxRemoteOptions</code>, is public API of <code>Lux.UI</code>.
     </p>
 
     <h2>Selection and bulk actions</h2>
     <p>
-        A list with a <code>BxDataListSelectionActions</code> bar (or <code>Selectable</code>, or a bound <code>SelectedKeys</code>) shows a checkbox column and needs a <code>RowKey</code> in the schema.
+        A list with a <code>LxDataListSelectionActions</code> bar (or <code>Selectable</code>, or a bound <code>SelectedKeys</code>) shows a checkbox column and needs a <code>RowKey</code> in the schema.
         A list in memory keeps the selected rows across pages while the search and the filters still match them; a list over a provider or a <code>Queryable</code> keeps the rows of the page on screen only.
         When the source returns a <code>TotalCount</code> the bar offers "Select all N results", and an action then receives <code>Scope = DataListActionScope.All</code> with the
         <code>DataListRequest</code> of the query on screen (search, filters and sort, no paging): the rows never reach the client, so send the request to your server and apply it there with
@@ -132,7 +132,7 @@
         """;
 
     private const string Provider = """
-        <BxDataList TItem="Product" Schema="Schema" Provider="LoadAsync" ResultJson="AppJson.Default.DataListResultProduct" />
+        <LxDataList TItem="Product" Schema="Schema" Provider="LoadAsync" ResultJson="AppJson.Default.DataListResultProduct" />
 
         @code {
             // request.Facets lists the filters that ask for counts, and is empty while the user pages or sorts.

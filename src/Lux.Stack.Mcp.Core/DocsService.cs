@@ -64,7 +64,7 @@ public sealed partial class DocsService
 
     private static readonly HashSet<string> StopWords = new(StringComparer.Ordinal)
     {
-        "a", "an", "the", "to", "for", "of", "in", "on", "with", "and", "or", "i", "need", "want", "how", "do", "can", "use", "using", "component", "components", "blazor", "bx", "blux", "ui",
+        "a", "an", "the", "to", "for", "of", "in", "on", "with", "and", "or", "i", "need", "want", "how", "do", "can", "use", "using", "component", "components", "blazor", "bx", "lux", "ui",
     };
 
     /// <summary>Longest query or name looked at, in characters; the rest is ignored so the cost of a lookup does not grow with the input.</summary>
@@ -89,7 +89,7 @@ public sealed partial class DocsService
             _byKey.TryAdd(Normalize(component.Slug), component);
             _byKey.TryAdd(Normalize(component.Name), component);
         }
-        // The types of a page (BxColumn on the Table page) lead to the page too, after every exact name.
+        // The types of a page (LxColumn on the Table page) lead to the page too, after every exact name.
         foreach (var component in bundle.Components)
         {
             foreach (var api in component.Api) _byKey.TryAdd(Normalize(TypeKey(api.Name)), component);
@@ -103,7 +103,7 @@ public sealed partial class DocsService
 
     public IReadOnlyList<BundleComponent> Components => Bundle.Components;
 
-    /// <summary><c>BxButton</c>, <c>button</c>, <c>Button</c> and <c>dropdown_menu</c> all become a key of letters and digits without the <c>Bx</c> prefix.</summary>
+    /// <summary><c>LxButton</c>, <c>button</c>, <c>Button</c> and <c>dropdown_menu</c> all become a key of letters and digits without the <c>Lx</c> prefix.</summary>
     public static string Normalize(string name)
     {
         var key = new string([.. name.Where(char.IsLetterOrDigit).Select(char.ToLowerInvariant)]);

@@ -68,12 +68,12 @@ public class OverlayTests(PlaygroundServer server) : PlaygroundTest(server)
         await Assertions.Expect(Page.GetByTestId("modal-state")).ToHaveTextAsync("Dialog: open");
 
         var open = await Page.EvaluateAsync<bool>(@"() => {
-            const element = document.querySelector('[data-testid=modal-save]').closest('bx-modal');
+            const element = document.querySelector('[data-testid=modal-save]').closest('lx-modal');
             const dialog = element.querySelector(':scope > dialog');
-            const seq = element.getAttribute('data-bx-seq');
+            const seq = element.getAttribute('data-lx-seq');
             element.querySelector('[data-testid=modal-save]').click();
             element.removeAttribute('open');
-            element.setAttribute('data-bx-seq', seq);
+            element.setAttribute('data-lx-seq', seq);
             element.setAttribute('open', '');
             return dialog.open;
         }");

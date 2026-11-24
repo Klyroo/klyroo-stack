@@ -3,22 +3,22 @@
    Static rendering: the prompt posts, the page waits for the whole answer and renders it. *@
 @implements IDisposable
 
-<div class="h-96 w-full max-w-xl overflow-hidden rounded-xl border border-(--blux-border)" data-testid="chat-palette-demo">
-    <BxChatPalette>
+<div class="h-96 w-full max-w-xl overflow-hidden rounded-xl border border-(--lux-border)" data-testid="chat-palette-demo">
+    <LxChatPalette>
         <ChildContent>
-        <BxChatMessages Status="_status" data-testid="chat-palette-messages">
+        <LxChatMessages Status="_status" data-testid="chat-palette-messages">
             @foreach (var message in _messages)
             {
-                <BxChatMessage @key="message.Id" Role="message.Role" Compact Streaming="message.Streaming" Text="@message.Text"
-                               AvatarText="@(message.Role == ChatRole.Assistant ? "B" : null)" AvatarAlt="@(message.Role == ChatRole.Assistant ? "Blux assistant" : null)" />
+                <LxChatMessage @key="message.Id" Role="message.Role" Compact Streaming="message.Streaming" Text="@message.Text"
+                               AvatarText="@(message.Role == ChatRole.Assistant ? "B" : null)" AvatarAlt="@(message.Role == ChatRole.Assistant ? "Lux assistant" : null)" />
             }
-        </BxChatMessages>
+        </LxChatMessages>
         </ChildContent>
         <Prompt>
-            <BxChatPrompt FormName="chat-palette" Status="_status" OnSubmit="Send" OnStop="Stop" OnReload="Retry" Variant="FieldVariant.Subtle"
+            <LxChatPrompt FormName="chat-palette" Status="_status" OnSubmit="Send" OnStop="Stop" OnReload="Retry" Variant="FieldVariant.Subtle"
                           Placeholder="Ask something..." Label="Message to the assistant" data-testid="chat-palette-prompt" />
         </Prompt>
-    </BxChatPalette>
+    </LxChatPalette>
 </div>
 
 @code {

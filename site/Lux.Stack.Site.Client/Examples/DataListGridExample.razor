@@ -1,97 +1,97 @@
 @using Lux.Query
 
-@* Table and Grid views with BxDataListLayoutSwitch, BxDataListSortMenu and BxDataListGrid:
-   - The first list has both BxDataListTable and BxDataListGrid, a layout switch, a sort menu, search, selection and row actions.
+@* Table and Grid views with LxDataListLayoutSwitch, LxDataListSortMenu and LxDataListGrid:
+   - The first list has both LxDataListTable and LxDataListGrid, a layout switch, a sort menu, search, selection and row actions.
    - The second list is a standalone grid (DefaultLayout = Grid) with custom sort options and a card removal action. *@
 <div class="flex w-full flex-col gap-8">
     <div class="w-full" data-testid="list-grid-switch">
-        <BxDataList TItem="Invoice" Label="Invoices with table and grid views" Schema="InvoiceData.Schema" Items="_items" UrlKey="grid" PreferencesKey="demo-grid" Selectable="true">
+        <LxDataList TItem="Invoice" Label="Invoices with table and grid views" Schema="InvoiceData.Schema" Items="_items" UrlKey="grid" PreferencesKey="demo-grid" Selectable="true">
             <div class="flex flex-wrap items-center justify-between gap-2">
-                <BxDataListSearch />
+                <LxDataListSearch />
                 <div class="flex flex-wrap items-center gap-2">
-                    <BxDataListResultCount />
-                    <BxDataListSortMenu />
-                    <BxDataListViewToggle />
-                    <BxDataListLayoutSwitch />
-                    <BxDataListRefresh />
+                    <LxDataListResultCount />
+                    <LxDataListSortMenu />
+                    <LxDataListViewToggle />
+                    <LxDataListLayoutSwitch />
+                    <LxDataListRefresh />
                 </div>
             </div>
-            <BxDataListSelectionActions Actions="_bulkActions" />
-            <BxDataListTable Caption="Invoices with table and grid views" RowActions="_rowActions" RowSummary="_summary" Summaries="_summaries">
-                <BxDataListColumn Field="id" Title="No." Align="DataListAlign.End" />
-                <BxDataListColumn Field="customer" Summary="DataListSummaryKind.Count" />
-                <BxDataListColumn Field="status" />
-                <BxDataListColumn Field="amount" Align="DataListAlign.End" Format="C2" Summary="DataListSummaryKind.Sum" />
-            </BxDataListTable>
-            <BxDataListGrid Columns="3" RowActions="_rowActions">
+            <LxDataListSelectionActions Actions="_bulkActions" />
+            <LxDataListTable Caption="Invoices with table and grid views" RowActions="_rowActions" RowSummary="_summary" Summaries="_summaries">
+                <LxDataListColumn Field="id" Title="No." Align="DataListAlign.End" />
+                <LxDataListColumn Field="customer" Summary="DataListSummaryKind.Count" />
+                <LxDataListColumn Field="status" />
+                <LxDataListColumn Field="amount" Align="DataListAlign.End" Format="C2" Summary="DataListSummaryKind.Sum" />
+            </LxDataListTable>
+            <LxDataListGrid Columns="3" RowActions="_rowActions">
                 <ItemTemplate Context="invoice">
                     <div class="flex flex-col gap-1">
                         <div class="flex items-baseline justify-between gap-2">
-                            <span class="font-semibold text-(--blux-text-highlighted)" data-slot="card-customer">@invoice.Customer</span>
-                            <span class="text-xs tabular-nums text-(--blux-text-muted)">#@invoice.Id</span>
+                            <span class="font-semibold text-(--lux-text-highlighted)" data-slot="card-customer">@invoice.Customer</span>
+                            <span class="text-xs tabular-nums text-(--lux-text-muted)">#@invoice.Id</span>
                         </div>
-                        <div class="flex items-center justify-between gap-2 text-xs text-(--blux-text-muted)">
+                        <div class="flex items-center justify-between gap-2 text-xs text-(--lux-text-muted)">
                             <span>@invoice.Status</span>
-                            <span class="font-medium tabular-nums text-(--blux-text)">@invoice.Amount.ToString("C2")</span>
+                            <span class="font-medium tabular-nums text-(--lux-text)">@invoice.Amount.ToString("C2")</span>
                         </div>
                     </div>
                 </ItemTemplate>
-            </BxDataListGrid>
-            <BxDataListPagination />
-        </BxDataList>
+            </LxDataListGrid>
+            <LxDataListPagination />
+        </LxDataList>
     </div>
 
     <div class="w-full" data-testid="list-grid-only">
-        <BxDataList TItem="Invoice" Label="Removable invoice cards" Schema="_gridOnlySchema" Items="_removable" UrlKey="cards" UrlSync="false">
+        <LxDataList TItem="Invoice" Label="Removable invoice cards" Schema="_gridOnlySchema" Items="_removable" UrlKey="cards" UrlSync="false">
             <div class="flex flex-wrap items-center justify-between gap-2">
-                <BxDataListResultCount />
-                <BxDataListSortMenu Items="_sortOptions" />
+                <LxDataListResultCount />
+                <LxDataListSortMenu Items="_sortOptions" />
             </div>
-            <BxDataListGrid Columns="3" RowActions="_removeActions" RowActionsMaxVisible="1" />
-        </BxDataList>
+            <LxDataListGrid Columns="3" RowActions="_removeActions" RowActionsMaxVisible="1" />
+        </LxDataList>
     </div>
 
     <div class="w-full" data-testid="list-grouped">
-        <BxDataList TItem="Invoice" Label="Invoices grouped by status" Schema="InvoiceData.Schema" Items="_groupedItems" PagingMode="DataListPagingMode.None" UrlKey="grp" PreferencesKey="demo-groups" Selectable="true">
+        <LxDataList TItem="Invoice" Label="Invoices grouped by status" Schema="InvoiceData.Schema" Items="_groupedItems" PagingMode="DataListPagingMode.None" UrlKey="grp" PreferencesKey="demo-groups" Selectable="true">
             <div class="flex flex-wrap items-center justify-between gap-2">
-                <BxDataListResultCount />
+                <LxDataListResultCount />
                 <div class="flex flex-wrap items-center gap-2">
-                    <BxDataListSortMenu />
-                    <BxDataListLayoutSwitch />
+                    <LxDataListSortMenu />
+                    <LxDataListLayoutSwitch />
                 </div>
             </div>
-            <BxDataListSelectionActions Actions="_bulkActions" />
-            <BxDataListTable Caption="Invoices grouped by status" GroupBy="_groupBy">
-                <BxDataListColumn Field="id" Title="No." Align="DataListAlign.End" />
-                <BxDataListColumn Field="customer" />
-                <BxDataListColumn Field="status" />
-                <BxDataListColumn Field="amount" Align="DataListAlign.End" Format="C2" />
-            </BxDataListTable>
-            <BxDataListGrid Columns="3" GroupBy="_groupBy" />
-        </BxDataList>
+            <LxDataListSelectionActions Actions="_bulkActions" />
+            <LxDataListTable Caption="Invoices grouped by status" GroupBy="_groupBy">
+                <LxDataListColumn Field="id" Title="No." Align="DataListAlign.End" />
+                <LxDataListColumn Field="customer" />
+                <LxDataListColumn Field="status" />
+                <LxDataListColumn Field="amount" Align="DataListAlign.End" Format="C2" />
+            </LxDataListTable>
+            <LxDataListGrid Columns="3" GroupBy="_groupBy" />
+        </LxDataList>
     </div>
 
     <div class="w-full" data-testid="list-tree">
-        <BxDataList @ref="_treeList" TItem="DepartmentNode" Label="Departments tree" Schema="_treeSchema" Items="_treeItems" PagingMode="DataListPagingMode.None" UrlSync="false" Selectable="true">
+        <LxDataList @ref="_treeList" TItem="DepartmentNode" Label="Departments tree" Schema="_treeSchema" Items="_treeItems" PagingMode="DataListPagingMode.None" UrlSync="false" Selectable="true">
             <div class="flex flex-wrap items-center justify-between gap-2">
-                <BxDataListResultCount />
+                <LxDataListResultCount />
                 <div class="flex flex-wrap items-center gap-2">
-                    <BxButton Label="Expand all" Size="BxSize.Sm" Variant="ButtonVariant.Outline" Color="BxColor.Neutral" data-slot="tree-expand-all" OnClick="@(() => _treeList?.ExpandAll())" />
-                    <BxButton Label="Collapse all" Size="BxSize.Sm" Variant="ButtonVariant.Outline" Color="BxColor.Neutral" data-slot="tree-collapse-all" OnClick="@(() => _treeList?.CollapseAll())" />
+                    <LxButton Label="Expand all" Size="LxSize.Sm" Variant="ButtonVariant.Outline" Color="LxColor.Neutral" data-slot="tree-expand-all" OnClick="@(() => _treeList?.ExpandAll())" />
+                    <LxButton Label="Collapse all" Size="LxSize.Sm" Variant="ButtonVariant.Outline" Color="LxColor.Neutral" data-slot="tree-collapse-all" OnClick="@(() => _treeList?.CollapseAll())" />
                 </div>
             </div>
-            <BxDataListSelectionActions Actions="_treeActions" />
-            <BxDataListTable Caption="Departments tree" Tree="_tree">
-                <BxDataListColumn Field="name" Title="Department" />
-                <BxDataListColumn Field="head" Title="Lead" />
-                <BxDataListColumn Field="headcount" Title="Headcount" Align="DataListAlign.End" />
-            </BxDataListTable>
-        </BxDataList>
+            <LxDataListSelectionActions Actions="_treeActions" />
+            <LxDataListTable Caption="Departments tree" Tree="_tree">
+                <LxDataListColumn Field="name" Title="Department" />
+                <LxDataListColumn Field="head" Title="Lead" />
+                <LxDataListColumn Field="headcount" Title="Headcount" Align="DataListAlign.End" />
+            </LxDataListTable>
+        </LxDataList>
     </div>
 </div>
 
 @code {
-    private BxDataList<DepartmentNode>? _treeList;
+    private LxDataList<DepartmentNode>? _treeList;
     private static readonly Invoice[] _items = InvoiceData.All[..25];
     private List<Invoice> _removable = [.. InvoiceData.All[..6]];
     private static readonly Invoice[] _groupedItems =
@@ -175,7 +175,7 @@
     {
         Title = i => i.Customer,
         Leading = i => @<span>#@i.Id</span>,
-        Status = i => @<span class="rounded-full border border-(--blux-border-accented) px-2 py-0.5 text-xs">@i.Status</span>,
+        Status = i => @<span class="rounded-full border border-(--lux-border-accented) px-2 py-0.5 text-xs">@i.Status</span>,
         Details = i => [i.Amount.ToString("C2"), i.Issued.ToString("yyyy-MM-dd")],
         Href = i => $"#invoice-{i.Id}",
     };
@@ -192,7 +192,7 @@
             Key = "remove",
             Label = "Remove",
             Icon = "trash",
-            Color = BxColor.Error,
+            Color = LxColor.Error,
             OnExecute = ctx =>
             {
                 _removable = [.. _removable.Where(i => i.Id != ctx.Item.Id)];

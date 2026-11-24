@@ -17,7 +17,7 @@ public class DataListFilterPanelTests(PlaygroundServer server) : PlaygroundTest(
 
     private static async Task WaitForList(IPage page, string mode)
     {
-        await page.WaitForFunctionAsync("() => !!customElements.get('bx-popover') && !!customElements.get('bx-collapsible')");
+        await page.WaitForFunctionAsync("() => !!customElements.get('lx-popover') && !!customElements.get('lx-collapsible')");
         if (mode != "ssr")
         {
             await Assertions.Expect(page.GetByTestId("renderer")).ToHaveAttributeAsync("data-interactive", "true", new() { Timeout = 30_000 });
@@ -37,9 +37,9 @@ public class DataListFilterPanelTests(PlaygroundServer server) : PlaygroundTest(
 
     private ILocator Tag(string name) => List.Locator("[data-slot=filter-tag] [data-slot=filter-tag-button]", new() { HasTextString = name });
 
-    private static ILocator Section(ILocator panel, string key) => panel.Locator($"bx-collapsible[data-filter={key}]");
+    private static ILocator Section(ILocator panel, string key) => panel.Locator($"lx-collapsible[data-filter={key}]");
 
-    private static ILocator Trigger(ILocator panel, string key) => Section(panel, key).Locator("button[data-bx-collapsible-trigger]");
+    private static ILocator Trigger(ILocator panel, string key) => Section(panel, key).Locator("button[data-lx-collapsible-trigger]");
 
     private static AriaRole Control(string mode) => mode == "ssr" ? AriaRole.Link : AriaRole.Button;
 
@@ -71,7 +71,7 @@ public class DataListFilterPanelTests(PlaygroundServer server) : PlaygroundTest(
     private async Task NavigateFromAnotherPage(string mode, string query)
     {
         await Page.GotoAsync($"/{mode}/components/button");
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
         if (mode != "ssr") await Assertions.Expect(Page.GetByTestId("renderer")).ToHaveAttributeAsync("data-interactive", "true", new() { Timeout = 30_000 });
         await Page.EvaluateAsync("() => { window.__enhanced = new Promise((r) => { Blazor.addEventListener('enhancedload', () => setTimeout(r, 50), { once: true }); setTimeout(r, 8000); }); }");
         await Page.EvaluateAsync("address => Blazor.navigateTo(address)", $"/{mode}/components/data-list-filter-panel{query}");
@@ -587,7 +587,7 @@ public class DataListFilterPanelTests(PlaygroundServer server) : PlaygroundTest(
         await Assertions.Expect(Trigger(Panel, "customer")).ToHaveAttributeAsync("aria-expanded", "true");
         await Assertions.Expect(Trigger(Panel, "amount")).ToHaveAttributeAsync("aria-expanded", "true");
         await Assertions.Expect(Section(Panel, "amount")).ToHaveAttributeAsync("data-state", "open");
-        await Assertions.Expect(Section(Panel, "amount").Locator("[data-bx-collapsible-content]")).ToBeVisibleAsync();
+        await Assertions.Expect(Section(Panel, "amount").Locator("[data-lx-collapsible-content]")).ToBeVisibleAsync();
         await Assertions.Expect(Trigger(Panel, "issued")).ToHaveAttributeAsync("aria-expanded", "false");
     }
 
@@ -618,7 +618,7 @@ public class DataListFilterPanelTests(PlaygroundServer server) : PlaygroundTest(
 
         await Assertions.Expect(Tag("Customer contains globex")).ToBeVisibleAsync();
         await Assertions.Expect(Trigger(Panel, "amount")).ToHaveAttributeAsync("aria-expanded", "false");
-        await Assertions.Expect(Section(Panel, "amount").Locator("[data-bx-collapsible-content]")).ToHaveAttributeAsync("hidden", "until-found");
+        await Assertions.Expect(Section(Panel, "amount").Locator("[data-lx-collapsible-content]")).ToHaveAttributeAsync("hidden", "until-found");
         await Assertions.Expect(Trigger(Panel, "customer")).ToHaveAttributeAsync("aria-expanded", "true");
     }
 

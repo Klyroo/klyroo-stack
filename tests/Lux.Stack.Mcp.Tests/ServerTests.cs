@@ -23,13 +23,13 @@ public class ServerTests
         }
     }
 
-    private static async Task<Session> Connect(Action<BluxDocsOptions>? configure = null)
+    private static async Task<Session> Connect(Action<LuxDocsOptions>? configure = null)
     {
         var toServer = new Pipe();
         var toClient = new Pipe();
         var builder = Host.CreateApplicationBuilder();
         builder.Logging.ClearProviders();
-        builder.Services.AddBluxDocsServer(configure).WithStreamServerTransport(toServer.Reader.AsStream(), toClient.Writer.AsStream());
+        builder.Services.AddLuxDocsServer(configure).WithStreamServerTransport(toServer.Reader.AsStream(), toClient.Writer.AsStream());
         var host = builder.Build();
         await host.StartAsync();
         var client = await McpClient.CreateAsync(new StreamClientTransport(toServer.Writer.AsStream(), toClient.Reader.AsStream()));
@@ -158,7 +158,7 @@ public class ServerTests
         Assert.Equal(DocsTools.Names.Order(), tools.Select(t => t.Name).Order());
 
         var result = await client.CallToolAsync("get-component-metadata", new Dictionary<string, object?> { ["name"] = "switch" });
-        Assert.Contains("BxSwitch", Text(result));
+        Assert.Contains("LxSwitch", Text(result));
     }
 
     [Fact]

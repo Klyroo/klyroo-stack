@@ -1,7 +1,7 @@
 namespace Lux.Stack.Site.Client.Templates;
 
 /// <summary>
-/// What the /templates page reads from the configuration of the docs host: <c>Blux:Templates:RepositoryBase</c>, the address the template
+/// What the /templates page reads from the configuration of the docs host: <c>Lux:Templates:RepositoryBase</c>, the address the template
 /// repositories are published below (for example <c>https://github.com/acme</c>). Unset until they exist: the page then says so instead of linking.
 /// </summary>
 public sealed record TemplateSettings(string? RepositoryBase = null)

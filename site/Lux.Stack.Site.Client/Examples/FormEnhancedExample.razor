@@ -1,27 +1,27 @@
 @using System.ComponentModel.DataAnnotations
 
-<BxForm Model="Model" FormName="enhanced-form" Enhance OnValidSubmit="Save" class="flex w-full max-w-sm flex-col">
-    <BxFormField Label="Stack" For="() => Model!.Stack">
-        <BxSelectMenu Items="Stack" Multiple @bind-Value="Model!.Stack" Placeholder="Pick technologies" />
-    </BxFormField>
-    <BxFormField Label="Marks" For="() => Model!.Marks">
-        <BxToggleGroup Items="Marks" AriaLabel="Marks" Multiple @bind-Value="Model!.Marks" />
-    </BxFormField>
-    <BxFormField Label="Seats" For="() => Model!.Seats">
-        <BxInputNumber @bind-Value="Model!.Seats" Min="0" Max="50" />
-    </BxFormField>
-    <BxFormField Label="Code" For="() => Model!.Code">
-        <BxPinInput Length="4" @bind-Value="Model!.Code" />
-    </BxFormField>
-    <BxFormField Label="Visit" For="() => Model!.Visit">
-        <BxCalendar @bind-Value="Model!.Visit" AriaLabel="Visit date" />
-    </BxFormField>
-    <BxButton Type="submit" Label="Save enhanced" />
+<LxForm Model="Model" FormName="enhanced-form" Enhance OnValidSubmit="Save" class="flex w-full max-w-sm flex-col">
+    <LxFormField Label="Stack" For="() => Model!.Stack">
+        <LxSelectMenu Items="Stack" Multiple @bind-Value="Model!.Stack" Placeholder="Pick technologies" />
+    </LxFormField>
+    <LxFormField Label="Marks" For="() => Model!.Marks">
+        <LxToggleGroup Items="Marks" AriaLabel="Marks" Multiple @bind-Value="Model!.Marks" />
+    </LxFormField>
+    <LxFormField Label="Seats" For="() => Model!.Seats">
+        <LxInputNumber @bind-Value="Model!.Seats" Min="0" Max="50" />
+    </LxFormField>
+    <LxFormField Label="Code" For="() => Model!.Code">
+        <LxPinInput Length="4" @bind-Value="Model!.Code" />
+    </LxFormField>
+    <LxFormField Label="Visit" For="() => Model!.Visit">
+        <LxCalendar @bind-Value="Model!.Visit" AriaLabel="Visit date" />
+    </LxFormField>
+    <LxButton Type="submit" Label="Save enhanced" />
     @if (_posted is not null)
     {
-        <p role="status" class="text-sm text-(--blux-success-text)" data-testid="enhanced-saved">Posted: @_posted</p>
+        <p role="status" class="text-sm text-(--lux-success-text)" data-testid="enhanced-saved">Posted: @_posted</p>
     }
-</BxForm>
+</LxForm>
 
 @code {
     [SupplyParameterFromForm(FormName = "enhanced-form")]
@@ -29,8 +29,8 @@
 
     private string? _posted;
 
-    private static readonly BxSelectItem[] Stack = [new("dotnet", ".NET"), new("node", "Node.js"), new("go", "Go")];
-    private static readonly BxToggleItem[] Marks = [new("bold", "Bold"), new("italic", "Italic")];
+    private static readonly LxSelectItem[] Stack = [new("dotnet", ".NET"), new("node", "Node.js"), new("go", "Go")];
+    private static readonly LxToggleItem[] Marks = [new("bold", "Bold"), new("italic", "Italic")];
 
     protected override void OnInitialized() => Model ??= new();
 

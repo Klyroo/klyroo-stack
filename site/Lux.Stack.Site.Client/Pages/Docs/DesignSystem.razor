@@ -29,9 +29,9 @@
     </div>
 
     <h2>Choose the palettes</h2>
-    <p>Map a role to any of the 26 Tailwind CSS v4 palettes (<code>BxPalette.Blue</code>, <code>BxPalette.Zinc</code>…), in <code>AddLuxUi</code>, with the same call on the server and in the WebAssembly client. A role you leave alone keeps the Lux.UI default; <code>BxPalette.Lux</code> puts it back.</p>
+    <p>Map a role to any of the 26 Tailwind CSS v4 palettes (<code>LxPalette.Blue</code>, <code>LxPalette.Zinc</code>…), in <code>AddLuxUi</code>, with the same call on the server and in the WebAssembly client. A role you leave alone keeps the Lux.UI default; <code>LxPalette.Lux</code> puts it back.</p>
     <CodeBlock Title="Program.cs" Code="@Configure" />
-    <p>Then render <code>BxThemeStyle</code> in <code>&lt;head&gt;</code>, next to the color mode script and before your stylesheet. It writes one <code>&lt;style&gt;</code> with the <code>:root</code> and <code>.dark</code> variables, and renders nothing while the colors are the defaults, which <code>lux.css</code> already contains. It is plain markup, so it is the same in static rendering, prerendering and every interactive mode.</p>
+    <p>Then render <code>LxThemeStyle</code> in <code>&lt;head&gt;</code>, next to the color mode script and before your stylesheet. It writes one <code>&lt;style&gt;</code> with the <code>:root</code> and <code>.dark</code> variables, and renders nothing while the colors are the defaults, which <code>lux.css</code> already contains. It is plain markup, so it is the same in static rendering, prerendering and every interactive mode.</p>
     <CodeBlock Title="App.razor" Code="@Head" />
 
     <h2>How the tokens are picked</h2>
@@ -46,15 +46,15 @@
     <h2>Your own palette</h2>
     <p>Give all 11 shades, as <code>#rgb</code>, <code>#rrggbb</code> or <code>oklch(L C H)</code>, written as in CSS Color 4: <code>L</code> is a number from 0 to 1 or a percentage, <code>C</code> a number or a percentage (100% is 0.4), <code>H</code> a number of degrees or a value with <code>deg</code>, <code>grad</code>, <code>rad</code> or <code>turn</code>. A missing shade or a color that does not parse (<code>NaN</code>, <code>Infinity</code>, an unknown unit…) throws an <code>ArgumentException</code> naming the palette and the value when the palette is created.</p>
     <CodeBlock Title="Program.cs" Code="@Custom" />
-    <p>When no combination of shades can meet the contrast rules, for example with a palette whose shades are all the same gray, resolving the theme (the first <code>BxThemeStyle</code> render) throws an <code>InvalidOperationException</code> naming the color, the palette and the rule that fails, instead of shipping a low-contrast theme. Set <code>o.Colors.AllowLowContrast = true</code> to keep the best combination found anyway.</p>
+    <p>When no combination of shades can meet the contrast rules, for example with a palette whose shades are all the same gray, resolving the theme (the first <code>LxThemeStyle</code> render) throws an <code>InvalidOperationException</code> naming the color, the palette and the rule that fails, instead of shipping a low-contrast theme. Set <code>o.Colors.AllowLowContrast = true</code> to keep the best combination found anyway.</p>
 
     <h2>Extra semantic colors</h2>
-    <p>Register any custom semantic role name and use it as a <code>Color</code>. <code>BxThemeStyle</code> writes its three variables and its <code>[data-color='tertiary']</code> rule automatically — no hand-written CSS required.</p>
+    <p>Register any custom semantic role name and use it as a <code>Color</code>. <code>LxThemeStyle</code> writes its three variables and its <code>[data-color='tertiary']</code> rule automatically — no hand-written CSS required.</p>
     <CodeBlock Title="Program.cs" Code="@Extra" />
     <CodeBlock Code="@ExtraUse" />
 
     <h2>Palettes, live</h2>
-    <p>This block renders the palettes of its own options into a scope with <code>BxThemeStyle Colors Scope</code>, so you can see the tokens move, in light and in dark mode. A scope receives every token in both modes, even with the default colors, so the preview is exact inside a page that configured other colors. It needs interactivity to switch.</p>
+    <p>This block renders the palettes of its own options into a scope with <code>LxThemeStyle Colors Scope</code>, so you can see the tokens move, in light and in dark mode. A scope receives every token in both modes, even with the default colors, so the preview is exact inside a page that configured other colors. It needs interactivity to switch.</p>
     <div class="not-prose">
         <Example Of="typeof(Examples.ThemeStyleExample)" Title="Primary palette" />
     </div>
@@ -66,15 +66,15 @@
     <h2>Which components follow the defaults</h2>
     <p>A component follows <code>Defaults.Color</code> or <code>Defaults.Size</code> when its built-in value is the library default, <code>Primary</code> or <code>Md</code>, and the parameter is not set. Some keep a fixed value on purpose.</p>
     <ul>
-        <li><strong>Follow Defaults.Color:</strong> <code>BxButton</code>, <code>BxBadge</code>, <code>BxChip</code>, <code>BxAlert</code>, <code>BxBanner</code>, <code>BxProgress</code>, <code>BxStepper</code>, <code>BxTimeline</code>, <code>BxTree</code>, <code>BxPagination</code>, <code>BxTabs</code>, <code>BxNavigationMenu</code>, <code>BxCarousel</code>, <code>BxSplitter</code>, <code>BxFileUpload</code>, <code>BxAuthForm</code>, <code>BxLocaleSelect</code>, <code>BxColorModeSelect</code> and <code>BxColorModeSwitch</code>, every form field, <code>BxChatPrompt</code> and its send button, <code>BxContentToc</code> and <code>BxContentNavigation</code>, <code>BxEditorToolbar</code> and <code>BxEditorDragHandle</code>, and the page family: <code>BxPageCta</code>, <code>BxPageFeature</code>, <code>BxPageCard</code>, <code>BxBlogPost</code>, <code>BxPricingPlan</code>, <code>BxPricingTable</code> and <code>BxChangelogVersion</code>. The badge of a blog post or a changelog version, the buttons of a pricing table and the buttons built from <code>PageLinkItem</code> follow it unless a color is set on them.</li>
-        <li><strong>Follow Defaults.Size:</strong> <code>BxButton</code>, <code>BxBadge</code>, <code>BxChip</code>, <code>BxAvatar</code>, <code>BxAvatarGroup</code>, <code>BxUser</code>, <code>BxKbd</code>, <code>BxProgress</code>, <code>BxStepper</code>, <code>BxTimeline</code>, <code>BxEmpty</code>, <code>BxPagination</code>, <code>BxLocaleSelect</code>, <code>BxColorModeSelect</code>, <code>BxColorModeSwitch</code>, <code>BxColorModeAvatar</code>, <code>BxColorModeButton</code>, <code>BxFileUpload</code>, <code>BxChatPromptSubmit</code>, <code>BxChatAttachment</code>, <code>BxContentSearchButton</code>, the dashboard sidebar toggle and collapse, and every form field (inside a <code>BxFormField</code>, the field's own size comes first).</li>
-        <li><strong>Neutral by design, so they ignore Defaults.Color:</strong> <code>BxKbd</code>, <code>BxSeparator</code>, <code>BxColorModeButton</code>, <code>BxContentSearchButton</code>, the dashboard sidebar toggle and collapse, <code>BxChatMessage</code> and <code>BxChatAttachment</code>. The chart series use their own <code>--blux-chart-N</code> colors, which fall back to the semantic colors.</li>
-        <li><strong>Fixed size by design, so they ignore Defaults.Size:</strong> <code>BxModal</code>, <code>BxContainer</code>, <code>BxIcon</code>, <code>BxSeparator</code> and the editor menus and toolbar. The page components size their own buttons (large in a hero, a section or a call to action, medium in a header).</li>
+        <li><strong>Follow Defaults.Color:</strong> <code>LxButton</code>, <code>LxBadge</code>, <code>LxChip</code>, <code>LxAlert</code>, <code>LxBanner</code>, <code>LxProgress</code>, <code>LxStepper</code>, <code>LxTimeline</code>, <code>LxTree</code>, <code>LxPagination</code>, <code>LxTabs</code>, <code>LxNavigationMenu</code>, <code>LxCarousel</code>, <code>LxSplitter</code>, <code>LxFileUpload</code>, <code>LxAuthForm</code>, <code>LxLocaleSelect</code>, <code>LxColorModeSelect</code> and <code>LxColorModeSwitch</code>, every form field, <code>LxChatPrompt</code> and its send button, <code>LxContentToc</code> and <code>LxContentNavigation</code>, <code>LxEditorToolbar</code> and <code>LxEditorDragHandle</code>, and the page family: <code>LxPageCta</code>, <code>LxPageFeature</code>, <code>LxPageCard</code>, <code>LxBlogPost</code>, <code>LxPricingPlan</code>, <code>LxPricingTable</code> and <code>LxChangelogVersion</code>. The badge of a blog post or a changelog version, the buttons of a pricing table and the buttons built from <code>PageLinkItem</code> follow it unless a color is set on them.</li>
+        <li><strong>Follow Defaults.Size:</strong> <code>LxButton</code>, <code>LxBadge</code>, <code>LxChip</code>, <code>LxAvatar</code>, <code>LxAvatarGroup</code>, <code>LxUser</code>, <code>LxKbd</code>, <code>LxProgress</code>, <code>LxStepper</code>, <code>LxTimeline</code>, <code>LxEmpty</code>, <code>LxPagination</code>, <code>LxLocaleSelect</code>, <code>LxColorModeSelect</code>, <code>LxColorModeSwitch</code>, <code>LxColorModeAvatar</code>, <code>LxColorModeButton</code>, <code>LxFileUpload</code>, <code>LxChatPromptSubmit</code>, <code>LxChatAttachment</code>, <code>LxContentSearchButton</code>, the dashboard sidebar toggle and collapse, and every form field (inside a <code>LxFormField</code>, the field's own size comes first).</li>
+        <li><strong>Neutral by design, so they ignore Defaults.Color:</strong> <code>LxKbd</code>, <code>LxSeparator</code>, <code>LxColorModeButton</code>, <code>LxContentSearchButton</code>, the dashboard sidebar toggle and collapse, <code>LxChatMessage</code> and <code>LxChatAttachment</code>. The chart series use their own <code>--lux-chart-N</code> colors, which fall back to the semantic colors.</li>
+        <li><strong>Fixed size by design, so they ignore Defaults.Size:</strong> <code>LxModal</code>, <code>LxContainer</code>, <code>LxIcon</code>, <code>LxSeparator</code> and the editor menus and toolbar. The page components size their own buttons (large in a hero, a section or a call to action, medium in a header).</li>
     </ul>
 
-    <h2>Without BxThemeStyle</h2>
+    <h2>Without LxThemeStyle</h2>
     <p>The tokens are plain CSS variables: the same colors can be written by hand, in <a href="/docs/css-variables">:root and .dark</a>, with or without Tailwind. The options only compute them for you and keep the contrast rules.</p>
-    <p>Everything is configured in <code>AddLuxUi</code>, which runs before the first render. The colors and defaults become read-only the first time a component or <code>BxThemeStyle</code> uses them, like a resolved theme, and a later change throws an <code>InvalidOperationException</code>.</p>
+    <p>Everything is configured in <code>AddLuxUi</code>, which runs before the first render. The colors and defaults become read-only the first time a component or <code>LxThemeStyle</code> uses them, like a resolved theme, and a later change throws an <code>InvalidOperationException</code>.</p>
 </div>
 
 @code {
@@ -94,23 +94,23 @@
     private const string Configure = """
         builder.Services.AddLuxUi(o =>
         {
-            o.Colors.Primary = BxPalette.Blue;
-            o.Colors.Neutral = BxPalette.Zinc;
-            o.Colors.Add("tertiary", BxPalette.Indigo);
+            o.Colors.Primary = LxPalette.Blue;
+            o.Colors.Neutral = LxPalette.Zinc;
+            o.Colors.Add("tertiary", LxPalette.Indigo);
         });
         """;
 
     private const string Head = """
         <head>
-            <BxColorModeScript />
-            <BxThemeStyle />
+            <LxColorModeScript />
+            <LxThemeStyle />
             <link rel="stylesheet" href="@Assets["_content/Lux.UI/lux.preflight.css"]" />
             <link rel="stylesheet" href="@Assets["_content/Lux.UI/lux.css"]" />
         </head>
         """;
 
     private const string Custom = """
-        var brand = BxPalette.Custom("brand", new Dictionary<int, string>
+        var brand = LxPalette.Custom("brand", new Dictionary<int, string>
         {
             [50] = "#f0fdfa", [100] = "#ccfbf1", [200] = "#99f6e4", [300] = "#5eead4", [400] = "#2dd4bf",
             [500] = "#14b8a6", [600] = "#0d9488", [700] = "#0f766e", [800] = "#115e59", [900] = "#134e4a",
@@ -120,19 +120,19 @@
         """;
 
     private const string Extra = """
-        builder.Services.AddLuxUi(o => o.Colors.Add("tertiary", BxPalette.Violet));
+        builder.Services.AddLuxUi(o => o.Colors.Add("tertiary", LxPalette.Violet));
         """;
 
     private const string ExtraUse = """
-        <BxButton Label="Share" Color="@("tertiary")" />
-        <BxBadge Label="New" Color="@("tertiary")" Variant="BxVariant.Soft" />
+        <LxButton Label="Share" Color="@("tertiary")" />
+        <LxBadge Label="New" Color="@("tertiary")" Variant="LxVariant.Soft" />
         """;
 
     private const string Defaults = """
         builder.Services.AddLuxUi(o =>
         {
-            o.Defaults.Color = BxColor.Secondary;
-            o.Defaults.Size = BxSize.Sm;
+            o.Defaults.Color = LxColor.Secondary;
+            o.Defaults.Size = LxSize.Sm;
         });
         """;
 }

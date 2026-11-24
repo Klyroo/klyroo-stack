@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 namespace Lux.Stack.E2E;
 
 /// <summary>
-/// The browser side of Blux in a Blazor Hybrid web view, without a device. A web view is recognized by the message bridge
+/// The browser side of Lux in a Blazor Hybrid web view, without a device. A web view is recognized by the message bridge
 /// blazor.webview.js uses (window.external.sendMessage / receiveMessage): the page is given one before it loads, so the
 /// storage, culture and touch behavior of the web view run in the playground. The real thing is the emulator run of the sample.
 /// </summary>
@@ -23,10 +23,10 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
     {
         var hybrid = await NewWebViewPage();
         await Open(hybrid, "server", "button");
-        await Assertions.Expect(hybrid.Locator("html")).ToHaveAttributeAsync("data-bx-host", "webview");
+        await Assertions.Expect(hybrid.Locator("html")).ToHaveAttributeAsync("data-lx-host", "webview");
 
         await Open("server", "button");
-        await Assertions.Expect(Page.Locator("html")).Not.ToHaveAttributeAsync("data-bx-host", "webview");
+        await Assertions.Expect(Page.Locator("html")).Not.ToHaveAttributeAsync("data-lx-host", "webview");
     }
 
     [Fact]
@@ -39,11 +39,11 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
         await sidebar.GetByRole(AriaRole.Button, new() { Name = "Collapse sidebar" }).ClickAsync();
 
         await Assertions.Expect(sidebar).ToHaveAttributeAsync("data-state", "collapsed");
-        await page.WaitForFunctionAsync("() => localStorage.getItem('blux-sidebar-playground-sidebar') === '1'");
-        Assert.DoesNotContain(await page.Context.CookiesAsync(), c => c.Name.StartsWith("blux-sidebar-", StringComparison.Ordinal));
+        await page.WaitForFunctionAsync("() => localStorage.getItem('lux-sidebar-playground-sidebar') === '1'");
+        Assert.DoesNotContain(await page.Context.CookiesAsync(), c => c.Name.StartsWith("lux-sidebar-", StringComparison.Ordinal));
 
         await page.ReloadAsync();
-        await page.WaitForFunctionAsync("() => !!customElements.get('bx-sidebar')");
+        await page.WaitForFunctionAsync("() => !!customElements.get('lx-sidebar')");
         await Assertions.Expect(page.GetByTestId("sidebar")).ToHaveAttributeAsync("data-state", "collapsed");
     }
 
@@ -68,7 +68,7 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
         var page = await NewWebViewPage();
         await Open(page, "server", "button");
 
-        var source = await page.EvaluateAsync<string?[]>("() => Blux.serverCulture()");
+        var source = await page.EvaluateAsync<string?[]>("() => Lux.serverCulture()");
 
         Assert.Equal([null, null, null], source);
     }
@@ -79,9 +79,9 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
         var page = await NewWebViewPage();
         await Open(page, "server", "button");
 
-        await page.EvaluateAsync("() => Blux.setStoredCulture('blux-culture', 'pt-BR')");
+        await page.EvaluateAsync("() => Lux.setStoredCulture('lux-culture', 'pt-BR')");
 
-        Assert.Equal("pt-BR", await page.EvaluateAsync<string>("() => Blux.getStoredCulture('blux-culture')"));
+        Assert.Equal("pt-BR", await page.EvaluateAsync<string>("() => Lux.getStoredCulture('lux-culture')"));
     }
 
     [Fact]
@@ -130,8 +130,8 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task Spatial_navigation_moves_focus_with_the_arrow_keys_in_tv_mode()
     {
         await Open("server", "tooltip");
-        await Page.EvaluateAsync("() => Blux.setSpatialNavigation(true)");
-        await Assertions.Expect(Page.Locator("html")).ToHaveAttributeAsync("data-bx-tv", "");
+        await Page.EvaluateAsync("() => Lux.setSpatialNavigation(true)");
+        await Assertions.Expect(Page.Locator("html")).ToHaveAttributeAsync("data-lx-tv", "");
         var buttons = Page.Locator("main button", new() { HasTextRegex = new Regex("^(top|right|bottom|left)$") });
         await buttons.First.FocusAsync();
         var first = await Page.EvaluateAsync<string>("() => document.activeElement.textContent.trim()");
@@ -150,13 +150,13 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task Forwarded_remote_keys_move_focus_and_Enter_activates()
     {
         await Open("server", "toast");
-        await Page.EvaluateAsync("() => Blux.setSpatialNavigation(true)");
+        await Page.EvaluateAsync("() => Lux.setSpatialNavigation(true)");
         await Page.GetByTestId("toast-trigger").FocusAsync();
 
         // The Android TV activity sends the keys this way (untrusted events: no default action).
-        Assert.True(await Page.EvaluateAsync<bool>("() => Blux.tvKey('ArrowRight')"));
+        Assert.True(await Page.EvaluateAsync<bool>("() => Lux.tvKey('ArrowRight')"));
         Assert.Equal("Show error", await Page.EvaluateAsync<string>("() => document.activeElement.textContent.trim()"));
-        await Page.EvaluateAsync("() => Blux.tvKey('Enter')");
+        await Page.EvaluateAsync("() => Lux.tvKey('Enter')");
 
         await Assertions.Expect(Page.GetByText("Upload failed", new() { Exact = true })).ToBeVisibleAsync();
     }
@@ -165,18 +165,18 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task Back_closes_the_topmost_overlay_and_reports_when_nothing_is_left()
     {
         await Open("server", "modal");
-        await Page.EvaluateAsync("() => Blux.setSpatialNavigation(true)");
-        Assert.False(await Page.EvaluateAsync<bool>("() => Blux.tvBack()"));
+        await Page.EvaluateAsync("() => Lux.setSpatialNavigation(true)");
+        Assert.False(await Page.EvaluateAsync<bool>("() => Lux.tvBack()"));
 
         await Page.GetByTestId("modal-trigger").ClickAsync();
         await Assertions.Expect(Page.GetByRole(AriaRole.Dialog)).ToBeVisibleAsync();
 
-        Assert.True(await Page.EvaluateAsync<bool>("() => Blux.tvBack()"));
+        Assert.True(await Page.EvaluateAsync<bool>("() => Lux.tvBack()"));
         await Assertions.Expect(Page.GetByRole(AriaRole.Dialog)).ToBeHiddenAsync();
     }
 
     // What the Android TV activity does: a key is sent into the page as an untrusted keydown.
-    private static Task<bool> Key(IPage page, string key) => page.EvaluateAsync<bool>("(k) => Blux.tvKey(k)", key);
+    private static Task<bool> Key(IPage page, string key) => page.EvaluateAsync<bool>("(k) => Lux.tvKey(k)", key);
 
     private static Task<string?> Active(IPage page) =>
         page.EvaluateAsync<string?>("() => document.activeElement?.closest('[data-testid]')?.getAttribute('data-testid') ?? document.activeElement?.tagName");
@@ -188,7 +188,7 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task A_form_can_be_walked_through_with_the_remote_in_both_directions()
     {
         await Open("server", "select");
-        await Page.EvaluateAsync("() => Blux.setSpatialNavigation(true)");
+        await Page.EvaluateAsync("() => Lux.setSpatialNavigation(true)");
         await Page.GetByTestId("tv-name").FocusAsync();
 
         // Arrows leave a text field, a select and a textarea: none of them keeps the focus.
@@ -209,7 +209,7 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task Select_opens_a_select_in_TV_mode_and_the_arrows_pick_inside_the_list()
     {
         await Open("server", "select");
-        await Page.EvaluateAsync("() => Blux.setSpatialNavigation(true)");
+        await Page.EvaluateAsync("() => Lux.setSpatialNavigation(true)");
         await Page.GetByTestId("tv-country").FocusAsync();
 
         await Key(Page, "Enter");
@@ -228,13 +228,13 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task Text_fields_take_the_arrows_only_in_editing_mode_which_Select_enters_and_Back_leaves()
     {
         await Open("server", "select");
-        await Page.EvaluateAsync("() => Blux.setSpatialNavigation(true)");
+        await Page.EvaluateAsync("() => Lux.setSpatialNavigation(true)");
         await Page.GetByTestId("tv-bio").FocusAsync();
         var bio = Page.GetByTestId("tv-bio");
 
         await Key(Page, "Enter");
-        await Assertions.Expect(bio).ToHaveAttributeAsync("data-bx-editing", "");
-        Assert.True(await Page.EvaluateAsync<bool>("() => Blux.tvTextEditing()"));
+        await Assertions.Expect(bio).ToHaveAttributeAsync("data-lx-editing", "");
+        Assert.True(await Page.EvaluateAsync<bool>("() => Lux.tvTextEditing()"));
         await Page.Keyboard.TypeAsync("one");
         await Key(Page, "Enter");
         await Page.Keyboard.TypeAsync("two");
@@ -245,9 +245,9 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
         Assert.Equal("one\ntwo", await bio.InputValueAsync());
         Assert.Equal(2, await bio.EvaluateAsync<int>("(e) => e.selectionStart"));
 
-        Assert.True(await Page.EvaluateAsync<bool>("() => Blux.tvBack()"));
-        await Assertions.Expect(bio).Not.ToHaveAttributeAsync("data-bx-editing", "");
-        Assert.False(await Page.EvaluateAsync<bool>("() => Blux.tvTextEditing()"));
+        Assert.True(await Page.EvaluateAsync<bool>("() => Lux.tvBack()"));
+        await Assertions.Expect(bio).Not.ToHaveAttributeAsync("data-lx-editing", "");
+        Assert.False(await Page.EvaluateAsync<bool>("() => Lux.tvTextEditing()"));
         await Key(Page, "ArrowUp");
         Assert.Equal("tv-country", await Active(Page));
     }
@@ -256,17 +256,17 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task Enter_leaves_editing_a_single_line_field()
     {
         await Open("server", "select");
-        await Page.EvaluateAsync("() => Blux.setSpatialNavigation(true)");
+        await Page.EvaluateAsync("() => Lux.setSpatialNavigation(true)");
         var name = Page.GetByTestId("tv-name");
         await name.FocusAsync();
 
         await Key(Page, "Enter");
-        await Assertions.Expect(name).ToHaveAttributeAsync("data-bx-editing", "");
+        await Assertions.Expect(name).ToHaveAttributeAsync("data-lx-editing", "");
         await Key(Page, "ArrowRight");
         Assert.Equal("tv-name", await Active(Page));
         await Key(Page, "Enter");
 
-        await Assertions.Expect(name).Not.ToHaveAttributeAsync("data-bx-editing", "");
+        await Assertions.Expect(name).Not.ToHaveAttributeAsync("data-lx-editing", "");
         await Key(Page, "ArrowDown");
         Assert.Equal("tv-country", await Active(Page));
     }
@@ -280,7 +280,7 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
               const box = document.createElement('div');
               box.innerHTML = '<input id="n" type="number" value="5" step="1" /><input id="r" type="range" min="0" max="10" value="2" /><select id="s"><option>a</option><option>b</option><option>c</option></select>';
               document.querySelector('[data-testid=tv-form]').after(box);
-              Blux.setSpatialNavigation(true);
+              Lux.setSpatialNavigation(true);
             }
             """);
         foreach (var (id, expected, key) in new[] { ("n", "6", "ArrowUp"), ("r", "1", "ArrowLeft"), ("s", "b", "ArrowDown") })
@@ -294,7 +294,7 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
             await Key(Page, key);
             Assert.Equal(expected, await Page.Locator("#" + id).EvaluateAsync<string>("(e) => e.tagName === 'SELECT' ? e.value : String(e.value)"));
             await Key(Page, "Escape");
-            await Assertions.Expect(Page.Locator("#" + id)).Not.ToHaveAttributeAsync("data-bx-editing", "");
+            await Assertions.Expect(Page.Locator("#" + id)).Not.ToHaveAttributeAsync("data-lx-editing", "");
         }
     }
 
@@ -302,37 +302,37 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task Back_does_not_close_a_modal_that_is_not_dismissible_and_does_not_leave_the_app()
     {
         await Open("server", "modal");
-        await Page.EvaluateAsync("() => Blux.setSpatialNavigation(true)");
+        await Page.EvaluateAsync("() => Lux.setSpatialNavigation(true)");
         await Page.GetByRole(AriaRole.Button, new() { Name = "Delete project" }).ClickAsync();
         var dialog = Page.GetByRole(AriaRole.Dialog, new() { Name = "Delete project?" });
         await Assertions.Expect(dialog).ToBeVisibleAsync();
 
         // True: the page took the key (the app must not go to the background either), and the modal stays.
-        Assert.True(await Page.EvaluateAsync<bool>("() => Blux.tvBack()"));
+        Assert.True(await Page.EvaluateAsync<bool>("() => Lux.tvBack()"));
         Assert.True(await Key(Page, "Escape"));
         await Assertions.Expect(dialog).ToBeVisibleAsync();
 
         await dialog.GetByRole(AriaRole.Button, new() { Name = "Cancel" }).ClickAsync();
         await Assertions.Expect(dialog).ToBeHiddenAsync();
-        Assert.False(await Page.EvaluateAsync<bool>("() => Blux.tvBack()"));
+        Assert.False(await Page.EvaluateAsync<bool>("() => Lux.tvBack()"));
     }
 
     [Fact]
     public async Task Back_closes_the_open_list_of_a_select_in_a_modal_before_the_modal()
     {
         await Open("server", "modal");
-        await Page.EvaluateAsync("() => Blux.setSpatialNavigation(true)");
+        await Page.EvaluateAsync("() => Lux.setSpatialNavigation(true)");
         await Page.GetByTestId("modal-select-trigger").ClickAsync();
         var dialog = Page.GetByRole(AriaRole.Dialog, new() { Name = "Shipping" });
         await Assertions.Expect(dialog).ToBeVisibleAsync();
         await Page.GetByTestId("modal-country").ClickAsync();
         Assert.Equal(1, await OpenPopovers(Page));
 
-        Assert.True(await Page.EvaluateAsync<bool>("() => Blux.tvBack()"));
+        Assert.True(await Page.EvaluateAsync<bool>("() => Lux.tvBack()"));
         Assert.Equal(0, await OpenPopovers(Page));
         await Assertions.Expect(dialog).ToBeVisibleAsync();
 
-        Assert.True(await Page.EvaluateAsync<bool>("() => Blux.tvBack()"));
+        Assert.True(await Page.EvaluateAsync<bool>("() => Lux.tvBack()"));
         await Assertions.Expect(dialog).ToBeHiddenAsync();
     }
 
@@ -342,7 +342,7 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
         await Open("server", "button");
         await Page.EvaluateAsync("""
             () => {
-              Blux.setSpatialNavigation(true);
+              Lux.setSpatialNavigation(true);
               const box = document.createElement('div');
               box.innerHTML = '<div id="pop" popover>menu</div><dialog id="dlg"><button>ok</button></dialog>';
               document.body.append(box);
@@ -351,11 +351,11 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
             }
             """);
 
-        Assert.True(await Page.EvaluateAsync<bool>("() => Blux.tvBack()"));
+        Assert.True(await Page.EvaluateAsync<bool>("() => Lux.tvBack()"));
         Assert.False(await Page.EvaluateAsync<bool>("() => document.getElementById('pop').matches(':popover-open')"));
         Assert.True(await Page.EvaluateAsync<bool>("() => document.getElementById('dlg').open"));
 
-        Assert.True(await Page.EvaluateAsync<bool>("() => Blux.tvBack()"));
+        Assert.True(await Page.EvaluateAsync<bool>("() => Lux.tvBack()"));
         Assert.False(await Page.EvaluateAsync<bool>("() => document.getElementById('dlg').open"));
     }
 
@@ -363,13 +363,13 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task Back_closes_the_modal_not_a_tooltip_inside_it_and_leaves_the_tooltip_state_closed()
     {
         await Open("server", "modal");
-        await Page.EvaluateAsync("() => Blux.setSpatialNavigation(true)");
+        await Page.EvaluateAsync("() => Lux.setSpatialNavigation(true)");
         await Page.GetByTestId("modal-select-trigger").ClickAsync();
         var dialog = Page.GetByRole(AriaRole.Dialog, new() { Name = "Shipping" });
         await Assertions.Expect(dialog).ToBeVisibleAsync();
         await Page.EvaluateAsync("""
             () => {
-              const tip = document.createElement('bx-tooltip');
+              const tip = document.createElement('lx-tooltip');
               tip.id = 'tip';
               tip.setAttribute('delay', '0');
               tip.innerHTML = '<span data-slot="trigger"><button id="tip-trigger" type="button">info</button></span><div popover="manual" role="tooltip">Helpful</div>';
@@ -380,7 +380,7 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
         await Assertions.Expect(Page.GetByRole(AriaRole.Tooltip, new() { Name = "Helpful" })).ToBeVisibleAsync();
 
         // One Back closes the modal: the tooltip is not a layer of its own, and it does not keep a stale "open" state.
-        Assert.True(await Page.EvaluateAsync<bool>("() => Blux.tvBack()"));
+        Assert.True(await Page.EvaluateAsync<bool>("() => Lux.tvBack()"));
         await Assertions.Expect(dialog).ToBeHiddenAsync();
         Assert.Equal("closed", await Page.EvaluateAsync<string>("() => document.getElementById('tip').dataset.state"));
     }
@@ -389,57 +389,57 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task Back_hides_a_visible_tooltip_through_its_own_hide_path_even_when_nothing_else_is_open()
     {
         await Open("server", "tooltip");
-        await Page.EvaluateAsync("() => Blux.setSpatialNavigation(true)");
+        await Page.EvaluateAsync("() => Lux.setSpatialNavigation(true)");
         await Page.GetByRole(AriaRole.Button, new() { Name = "top", Exact = true }).HoverAsync();
         var tooltip = Page.GetByRole(AriaRole.Tooltip, new() { Name = "Tooltip on the top" });
         await Assertions.Expect(tooltip).ToBeVisibleAsync();
 
         // No real layer: Back is not used by the page (the app may leave), but the tooltip is hidden and its state is closed.
-        Assert.False(await Page.EvaluateAsync<bool>("() => Blux.tvBack()"));
+        Assert.False(await Page.EvaluateAsync<bool>("() => Lux.tvBack()"));
         await Assertions.Expect(tooltip).ToBeHiddenAsync();
-        Assert.Equal("closed", await Page.EvaluateAsync<string>("() => document.querySelector('bx-tooltip[data-state]').dataset.state"));
+        Assert.Equal("closed", await Page.EvaluateAsync<string>("() => document.querySelector('lx-tooltip[data-state]').dataset.state"));
     }
 
     [Fact]
     public async Task Trusted_Enter_enters_editing_mode_and_the_arrows_then_belong_to_the_field_in_TV_mode()
     {
         await Open("server", "select");
-        await Page.EvaluateAsync("() => Blux.setSpatialNavigation(true)");
+        await Page.EvaluateAsync("() => Lux.setSpatialNavigation(true)");
         var name = Page.GetByTestId("tv-name");
         await name.FocusAsync();
         await name.FillAsync("abc");
 
         // A physical keyboard (trusted events): the first Enter enters editing without submitting anything.
         await Page.Keyboard.PressAsync("Enter");
-        await Assertions.Expect(name).ToHaveAttributeAsync("data-bx-editing", "");
+        await Assertions.Expect(name).ToHaveAttributeAsync("data-lx-editing", "");
         await Page.Keyboard.PressAsync("ArrowLeft");
         Assert.Equal("tv-name", await Active(Page));
         Assert.Equal(2, await name.EvaluateAsync<int>("(e) => e.selectionStart"));
 
         // Escape leaves editing and the arrows move the focus again.
         await Page.Keyboard.PressAsync("Escape");
-        await Assertions.Expect(name).Not.ToHaveAttributeAsync("data-bx-editing", "");
+        await Assertions.Expect(name).Not.ToHaveAttributeAsync("data-lx-editing", "");
         await Page.Keyboard.PressAsync("ArrowDown");
         Assert.Equal("tv-country", await Active(Page));
 
         // Enter while editing a single line field leaves editing again.
         await name.FocusAsync();
         await Page.Keyboard.PressAsync("Enter");
-        await Assertions.Expect(name).ToHaveAttributeAsync("data-bx-editing", "");
+        await Assertions.Expect(name).ToHaveAttributeAsync("data-lx-editing", "");
         await Page.Keyboard.PressAsync("Enter");
-        await Assertions.Expect(name).Not.ToHaveAttributeAsync("data-bx-editing", "");
+        await Assertions.Expect(name).Not.ToHaveAttributeAsync("data-lx-editing", "");
     }
 
     [Fact]
     public async Task Trusted_keys_edit_a_textarea_in_TV_mode_with_the_native_caret_and_line_breaks()
     {
         await Open("server", "select");
-        await Page.EvaluateAsync("() => Blux.setSpatialNavigation(true)");
+        await Page.EvaluateAsync("() => Lux.setSpatialNavigation(true)");
         var bio = Page.GetByTestId("tv-bio");
         await bio.FocusAsync();
 
         await Page.Keyboard.PressAsync("Enter");
-        await Assertions.Expect(bio).ToHaveAttributeAsync("data-bx-editing", "");
+        await Assertions.Expect(bio).ToHaveAttributeAsync("data-lx-editing", "");
         await Page.Keyboard.TypeAsync("one");
         await Page.Keyboard.PressAsync("Enter");
         await Page.Keyboard.TypeAsync("two");
@@ -450,7 +450,7 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
         Assert.Equal("one\ntwo", await bio.InputValueAsync());
         Assert.Equal(2, await bio.EvaluateAsync<int>("(e) => e.selectionStart"));
         await Page.Keyboard.PressAsync("Escape");
-        await Assertions.Expect(bio).Not.ToHaveAttributeAsync("data-bx-editing", "");
+        await Assertions.Expect(bio).Not.ToHaveAttributeAsync("data-lx-editing", "");
         await Page.Keyboard.PressAsync("ArrowUp");
         Assert.Equal("tv-country", await Active(Page));
     }
@@ -466,7 +466,7 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
         await Page.Keyboard.PressAsync("Enter");
         await Page.Keyboard.PressAsync("ArrowLeft");
 
-        await Assertions.Expect(name).Not.ToHaveAttributeAsync("data-bx-editing", "");
+        await Assertions.Expect(name).Not.ToHaveAttributeAsync("data-lx-editing", "");
         Assert.Equal("tv-name", await Active(Page));
         Assert.Equal(2, await name.EvaluateAsync<int>("(e) => e.selectionStart"));
     }
@@ -477,7 +477,7 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
         await Open("server", "tooltip");
         await Page.EvaluateAsync("""
             () => {
-              Blux.setSpatialNavigation(true);
+              Lux.setSpatialNavigation(true);
               const dialog = document.createElement('dialog');
               dialog.innerHTML = '<button id="inside">inside</button>';
               document.body.append(dialog);
@@ -504,7 +504,7 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
         await page.GetByTestId("header").GetByRole(AriaRole.Button, new() { Name = "Open menu" }).TapAsync();
 
         await Assertions.Expect(dialog).ToBeVisibleAsync();
-        await page.EvaluateAsync("() => Blux.tvBack()");
+        await page.EvaluateAsync("() => Lux.tvBack()");
         await Assertions.Expect(dialog).ToBeHiddenAsync();
     }
 
@@ -737,8 +737,8 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
     {
         var page = await NewTouchPage();
         await Open(page, "server", "input-number");
-        await page.EvaluateAsync("() => document.querySelectorAll('bx-input-number').forEach((n) => { n.querySelector('[data-slot=increment]')?.setAttribute('data-hit', 'increment'); n.querySelector('[data-slot=decrement]')?.setAttribute('data-hit', 'decrement'); })");
-        var vertical = page.Locator("bx-input-number:has([data-slot='increment'][class*='h-1/2'])").First;
+        await page.EvaluateAsync("() => document.querySelectorAll('lx-input-number').forEach((n) => { n.querySelector('[data-slot=increment]')?.setAttribute('data-hit', 'increment'); n.querySelector('[data-slot=decrement]')?.setAttribute('data-hit', 'decrement'); })");
+        var vertical = page.Locator("lx-input-number:has([data-slot='increment'][class*='h-1/2'])").First;
         await Assertions.Expect(vertical).ToBeVisibleAsync();
 
         var increment = vertical.Locator("[data-slot='increment']");
@@ -783,7 +783,7 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task The_bottom_safe_area_inset_is_applied_once()
     {
         await Open("server", "main");
-        await Page.EvaluateAsync("() => document.documentElement.style.setProperty('--bx-safe-bottom', '20px')");
+        await Page.EvaluateAsync("() => document.documentElement.style.setProperty('--lx-safe-bottom', '20px')");
         var main = Page.GetByTestId("main");
 
         // A footer follows the main block: it owns the inset.
@@ -794,7 +794,7 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
         var bare = await Page.EvaluateAsync<string[]>("""
             () => {
               const box = document.createElement('div');
-              box.innerHTML = '<main class="pb-(--bx-safe-bottom) has-[~footer]:pb-0"></main><footer></footer>';
+              box.innerHTML = '<main class="pb-(--lx-safe-bottom) has-[~footer]:pb-0"></main><footer></footer>';
               document.body.append(box);
               const main = box.querySelector('main');
               const withFooter = getComputedStyle(main).paddingBottom;
@@ -809,11 +809,11 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task A_dashboard_inside_the_main_block_leaves_the_bottom_inset_to_it()
     {
         await Open("server", "dashboard-group");
-        await Page.EvaluateAsync("() => document.documentElement.style.setProperty('--bx-safe-bottom', '20px')");
-        var dashboard = Page.Locator("bx-dashboard-group").First;
+        await Page.EvaluateAsync("() => document.documentElement.style.setProperty('--lx-safe-bottom', '20px')");
+        var dashboard = Page.Locator("lx-dashboard-group").First;
 
         Assert.Equal("20px", await dashboard.EvaluateAsync<string>("(e) => getComputedStyle(e).paddingBottom"));
-        await dashboard.EvaluateAsync("(e) => e.parentElement.setAttribute('data-bx-main', '')");
+        await dashboard.EvaluateAsync("(e) => e.parentElement.setAttribute('data-lx-main', '')");
         Assert.Equal("0px", await dashboard.EvaluateAsync<string>("(e) => getComputedStyle(e).paddingBottom"));
     }
 
@@ -821,12 +821,12 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task The_viewport_high_minimum_of_main_fits_inside_the_TV_overscan_margins()
     {
         await Open("server", "main");
-        await Page.EvaluateAsync("() => Blux.setSpatialNavigation(true)");
-        // BxMain's minimum height is the viewport minus --bx-tv-inset, which TV mode sets to both vertical margins of the html element.
+        await Page.EvaluateAsync("() => Lux.setSpatialNavigation(true)");
+        // LxMain's minimum height is the viewport minus --lx-tv-inset, which TV mode sets to both vertical margins of the html element.
         var overflow = await Page.EvaluateAsync<double>("""
             () => {
               const probe = document.createElement('div');
-              probe.style.minHeight = 'calc(100dvh - var(--bx-tv-inset, 0px))';
+              probe.style.minHeight = 'calc(100dvh - var(--lx-tv-inset, 0px))';
               document.body.replaceChildren(probe);
               return document.documentElement.scrollHeight - document.documentElement.clientHeight;
             }

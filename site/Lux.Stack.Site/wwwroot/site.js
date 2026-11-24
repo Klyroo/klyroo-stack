@@ -29,7 +29,7 @@ document.addEventListener('click', async (event) => {
 // Dark mode toggle in the header.
 document.addEventListener('click', (event) => {
   if (!event.target.closest?.('[data-color-mode-toggle]')) return;
-  Blux.setColorMode(document.documentElement.classList.contains('dark') ? 'light' : 'dark');
+  Lux.setColorMode(document.documentElement.classList.contains('dark') ? 'light' : 'dark');
 });
 
 // Showcase on the home page: list what the browser handled itself, without .NET.
@@ -42,15 +42,15 @@ function logBrowser(event, text) {
   const item = document.createElement('li');
   item.className = 'pg-log-line rounded-sm px-1';
   const time = document.createElement('span');
-  time.className = 'text-(--blux-text-dimmed)';
+  time.className = 'text-(--lux-text-dimmed)';
   time.textContent = `${(performance.now() / 1000).toFixed(1)}s `;
   item.append(time, text);
   list.prepend(item);
   while (list.children.length > 7) list.lastElementChild.remove();
 }
 
-document.addEventListener('bx-toggle', (e) => logBrowser(e, `bx-toggle open=${e.detail.open}`), true);
-document.addEventListener('bx-change', (e) => logBrowser(e, `bx-change value="${e.detail.value}"`), true);
+document.addEventListener('lx-toggle', (e) => logBrowser(e, `lx-toggle open=${e.detail.open}`), true);
+document.addEventListener('lx-change', (e) => logBrowser(e, `lx-change value="${e.detail.value}"`), true);
 document.addEventListener(
   'toggle',
   (e) => {

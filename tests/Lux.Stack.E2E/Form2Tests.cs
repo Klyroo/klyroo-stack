@@ -135,9 +135,9 @@ public class Form2Tests(PlaygroundServer server) : PlaygroundTest(server)
 
         // A real copy and paste: Firefox hides the data of a scripted ClipboardEvent from handlers.
         await Page.EvaluateAsync(
-            "() => { const t = document.createElement('textarea'); t.id = 'bx-test-clip'; t.value = '12-34 56'; document.body.append(t); t.select(); }");
+            "() => { const t = document.createElement('textarea'); t.id = 'lx-test-clip'; t.value = '12-34 56'; document.body.append(t); t.select(); }");
         await Page.Keyboard.PressAsync("ControlOrMeta+C");
-        await Page.EvaluateAsync("() => document.getElementById('bx-test-clip').remove()");
+        await Page.EvaluateAsync("() => document.getElementById('lx-test-clip').remove()");
         await cells.First.FocusAsync();
         await Page.Keyboard.PressAsync("ControlOrMeta+V");
 
@@ -245,7 +245,7 @@ public class Form2Tests(PlaygroundServer server) : PlaygroundTest(server)
         var text = await price.InputValueAsync();
 
         Assert.Contains(",5", text);
-        Assert.Equal("1234.5", await Page.Locator("bx-input-number").Nth(1).Locator("input[type=hidden]").InputValueAsync());
+        Assert.Equal("1234.5", await Page.Locator("lx-input-number").Nth(1).Locator("input[type=hidden]").InputValueAsync());
     }
 
     [Theory]
@@ -325,7 +325,7 @@ public class Form2Tests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task Unbound_InputTags_keeps_a_tag_the_user_adds(string mode)
     {
         await Open(mode, "input-tags");
-        var tags = Page.Locator("bx-input-tags[name=skills]");
+        var tags = Page.Locator("lx-input-tags[name=skills]");
 
         await tags.GetByRole(AriaRole.Textbox).FocusAsync();
         await Page.Keyboard.TypeAsync("rust");
@@ -349,7 +349,7 @@ public class Form2Tests(PlaygroundServer server) : PlaygroundTest(server)
         await Page.WaitForTimeoutAsync(300);
         await Assertions.Expect(listbox.GetByRole(AriaRole.Option, new() { Name = "Blue" })).ToHaveAttributeAsync("aria-selected", "true");
         await Assertions.Expect(listbox.GetByRole(AriaRole.Option, new() { Name = "Green" })).ToHaveAttributeAsync("aria-selected", "false");
-        await Assertions.Expect(Page.Locator("bx-listbox[name=color] input[type=hidden]")).ToHaveValueAsync("blue");
+        await Assertions.Expect(Page.Locator("lx-listbox[name=color] input[type=hidden]")).ToHaveValueAsync("blue");
     }
 
     [Theory]
@@ -378,7 +378,7 @@ public class Form2Tests(PlaygroundServer server) : PlaygroundTest(server)
         await Page.Keyboard.PressAsync("Escape");
 
         await Page.WaitForTimeoutAsync(300);
-        await Assertions.Expect(Page.Locator("bx-select-menu[name=editors] input[type=hidden]")).ToHaveCountAsync(2);
+        await Assertions.Expect(Page.Locator("lx-select-menu[name=editors] input[type=hidden]")).ToHaveCountAsync(2);
     }
 
     [Theory]
@@ -392,7 +392,7 @@ public class Form2Tests(PlaygroundServer server) : PlaygroundTest(server)
         await Page.Keyboard.PressAsync("ArrowUp");
         await Assertions.Expect(seats).ToHaveValueAsync("3");
         await Page.GetByRole(AriaRole.Button, new() { Name = "Raise the maximum" }).ClickAsync();
-        await Assertions.Expect(Page.Locator("bx-input-number:has(input[name=seats])")).ToHaveAttributeAsync("max", "25");
+        await Assertions.Expect(Page.Locator("lx-input-number:has(input[name=seats])")).ToHaveAttributeAsync("max", "25");
 
         await Assertions.Expect(seats).ToHaveValueAsync("3");
     }
@@ -419,7 +419,7 @@ public class Form2Tests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task InputMenu_strict_is_cleared_by_emptying_the_field(string mode)
     {
         await Open(mode, "input-menu");
-        var menu = Page.Locator("bx-input-menu").Nth(1);
+        var menu = Page.Locator("lx-input-menu").Nth(1);
         var field = menu.GetByRole(AriaRole.Combobox);
 
         await field.FocusAsync();
@@ -440,7 +440,7 @@ public class Form2Tests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task InputMenu_marks_the_chosen_suggestion_as_selected(string mode)
     {
         await Open(mode, "input-menu");
-        var menu = Page.Locator("bx-input-menu").Nth(1);
+        var menu = Page.Locator("lx-input-menu").Nth(1);
 
         await menu.GetByRole(AriaRole.Combobox).FocusAsync();
         await Page.Keyboard.TypeAsync("ger");
@@ -519,8 +519,8 @@ public class Form2Tests(PlaygroundServer server) : PlaygroundTest(server)
         await Assertions.Expect(Page.GetByTestId("enhanced-saved")).ToHaveTextAsync("Posted: dotnet,go / bold,italic / 3 / 1234 / 2026-11-18");
         Assert.True(await Page.EvaluateAsync<bool>("window.__notReloaded === true"), "The post reloaded the page instead of enhancing it.");
         // ...then reset the model, and the controls show that.
-        await Assertions.Expect(form.Locator("bx-select-menu input[type=hidden]")).ToHaveCountAsync(1);
-        await Assertions.Expect(form.Locator("bx-select-menu input[type=hidden]")).ToHaveValueAsync("dotnet");
+        await Assertions.Expect(form.Locator("lx-select-menu input[type=hidden]")).ToHaveCountAsync(1);
+        await Assertions.Expect(form.Locator("lx-select-menu input[type=hidden]")).ToHaveValueAsync("dotnet");
         await Assertions.Expect(form.GetByRole(AriaRole.Button, new() { Name = "Italic" })).ToHaveAttributeAsync("aria-pressed", "false");
         await Assertions.Expect(form.GetByRole(AriaRole.Button, new() { Name = "Bold" })).ToHaveAttributeAsync("aria-pressed", "true");
         await Assertions.Expect(form.GetByRole(AriaRole.Spinbutton, new() { Name = "Seats" })).ToHaveValueAsync("2");

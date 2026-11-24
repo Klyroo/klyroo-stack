@@ -1,15 +1,15 @@
 @* A data URI stands in for an uploaded picture. *@
 <div class="flex w-full max-w-xl flex-col gap-4" data-testid="chat-attachment-example">
     <div class="flex flex-wrap items-center gap-2">
-        <BxChatAttachment Name="report.pdf" Type="application/pdf" FileSize="248000" />
-        <BxChatAttachment Name="notes.txt" Type="text/plain" FileSize="1200" Removable OnRemove="RemoveNotes" data-testid="chat-attachment-removable" />
-        <BxChatAttachment Name="upload.zip" Type="application/zip" FileSize="5400000" Status="ChatAttachmentStatus.Uploading" />
-        <BxChatAttachment Name="broken.csv" Type="text/csv" Description="Upload failed: the file is too large." Status="ChatAttachmentStatus.Error" />
+        <LxChatAttachment Name="report.pdf" Type="application/pdf" FileSize="248000" />
+        <LxChatAttachment Name="notes.txt" Type="text/plain" FileSize="1200" Removable OnRemove="RemoveNotes" data-testid="chat-attachment-removable" />
+        <LxChatAttachment Name="upload.zip" Type="application/zip" FileSize="5400000" Status="ChatAttachmentStatus.Uploading" />
+        <LxChatAttachment Name="broken.csv" Type="text/csv" Description="Upload failed: the file is too large." Status="ChatAttachmentStatus.Error" />
     </div>
-    <p class="text-sm text-(--blux-text-muted)" role="status" data-testid="chat-attachment-removed">@(_removed is null ? "Nothing removed" : $"Removed {_removed}")</p>
+    <p class="text-sm text-(--lux-text-muted)" role="status" data-testid="chat-attachment-removed">@(_removed is null ? "Nothing removed" : $"Removed {_removed}")</p>
     <div class="flex flex-wrap items-center gap-2">
-        <BxChatAttachment Name="sunset.svg" Type="image/svg+xml" Url="@Picture" Variant="ChatAttachmentVariant.Thumbnail" Removable />
-        <BxChatAttachment Name="sunset.svg" Type="image/svg+xml" Url="@Picture" FileSize="900" Orientation="BxOrientation.Vertical" Class="w-48" />
+        <LxChatAttachment Name="sunset.svg" Type="image/svg+xml" Url="@Picture" Variant="ChatAttachmentVariant.Thumbnail" Removable />
+        <LxChatAttachment Name="sunset.svg" Type="image/svg+xml" Url="@Picture" FileSize="900" Orientation="LxOrientation.Vertical" Class="w-48" />
     </div>
 </div>
 

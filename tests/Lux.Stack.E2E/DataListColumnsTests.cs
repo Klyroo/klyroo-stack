@@ -9,7 +9,7 @@ namespace Lux.Stack.E2E;
 /// </summary>
 public class DataListColumnsTests(PlaygroundServer server) : PlaygroundTest(server)
 {
-    private const string Cookie = "blux-dl-cols";
+    private const string Cookie = "lux-dl-cols";
     private const string DemoKey = "demo-cols";
     private const string FixedKey = "demo-cols-fixed";
 
@@ -21,7 +21,7 @@ public class DataListColumnsTests(PlaygroundServer server) : PlaygroundTest(serv
 
     private async Task WaitForList(string mode)
     {
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
         if (mode != "ssr")
         {
             await Assertions.Expect(Page.GetByTestId("renderer")).ToHaveAttributeAsync("data-interactive", "true", new() { Timeout = 30_000 });
@@ -372,7 +372,7 @@ public class DataListColumnsTests(PlaygroundServer server) : PlaygroundTest(serv
         // The fixed columns stick with the pinned ones; the actions column has a width the table knows.
         await Assertions.Expect(Fixed.Locator("thead th[data-key=select]")).ToHaveAttributeAsync("data-pinned", "start");
         await Assertions.Expect(Fixed.Locator("thead th[data-key=actions]")).ToHaveAttributeAsync("data-pinned", "end");
-        await Page.WaitForFunctionAsync("() => parseFloat(getComputedStyle(document.querySelector('[data-testid=list-columns-fixed] [data-slot=table-root]')).getPropertyValue('--bx-actions-w')) > 0");
+        await Page.WaitForFunctionAsync("() => parseFloat(getComputedStyle(document.querySelector('[data-testid=list-columns-fixed] [data-slot=table-root]')).getPropertyValue('--lx-actions-w')) > 0");
 
         // Ticking a row still works, the row action is still there, and a hidden column took none of them with it.
         await Fixed.Locator("tbody tr[data-slot=row]").First.Locator("input[type=checkbox]").CheckAsync();
@@ -387,12 +387,12 @@ public class DataListColumnsTests(PlaygroundServer server) : PlaygroundTest(serv
     [InlineData("wasm")]
     public async Task In_a_web_view_the_preferences_are_kept_in_localStorage_and_no_cookie_is_written(string mode)
     {
-        // The message bridge of blazor.webview.js, which is how Blux tells a web view from a browser (see HybridTests).
+        // The message bridge of blazor.webview.js, which is how Lux tells a web view from a browser (see HybridTests).
         var context = await NewContext(new());
         await context.AddInitScriptAsync("Object.defineProperty(window, 'external', { value: { sendMessage() {}, receiveMessage() {} }, configurable: true });");
         var page = await context.NewPageAsync();
         await page.GotoAsync($"/{mode}/components/data-list-columns");
-        await page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
         await Assertions.Expect(page.GetByTestId("renderer")).ToHaveAttributeAsync("data-interactive", "true", new() { Timeout = 30_000 });
         var list = page.GetByTestId("list-columns");
         await Assertions.Expect(list.Locator("[data-slot=skeleton-row]")).ToHaveCountAsync(0, new() { Timeout = 15_000 });
@@ -401,8 +401,8 @@ public class DataListColumnsTests(PlaygroundServer server) : PlaygroundTest(serv
         await page.Locator("[data-slot=columns-content]:visible input[data-col-toggle=status]").UncheckAsync();
         await Assertions.Expect(list.Locator("thead th[data-key=status]")).ToHaveCountAsync(0);
 
-        await page.WaitForFunctionAsync("() => localStorage.getItem('blux-dl-cols') === 'demo-cols.v1!hstatus'");
-        Assert.DoesNotContain(await page.Context.CookiesAsync(), c => c.Name.StartsWith("blux-dl-cols", StringComparison.Ordinal));
+        await page.WaitForFunctionAsync("() => localStorage.getItem('lux-dl-cols') === 'demo-cols.v1!hstatus'");
+        Assert.DoesNotContain(await page.Context.CookiesAsync(), c => c.Name.StartsWith("lux-dl-cols", StringComparison.Ordinal));
 
         // No server reads a cookie in a web view: the list asks the browser, and shows the columns of the user once it did.
         await page.ReloadAsync();
@@ -419,7 +419,7 @@ public class DataListColumnsTests(PlaygroundServer server) : PlaygroundTest(serv
     {
         await Page.Context.AddCookiesAsync([new() { Name = Cookie, Value = $"{DemoKey}.v1!hissued!estatus", Url = BaseUrl }]);
         await Page.GotoAsync($"/{mode}/components/button");
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
         if (mode != "ssr") await Assertions.Expect(Page.GetByTestId("renderer")).ToHaveAttributeAsync("data-interactive", "true", new() { Timeout = 30_000 });
         await Page.EvaluateAsync("() => { window.__enhanced = new Promise((r) => { Blazor.addEventListener('enhancedload', () => setTimeout(r, 50), { once: true }); setTimeout(r, 8000); }); }");
         await Page.EvaluateAsync("address => Blazor.navigateTo(address)", $"/{mode}/components/data-list-columns");

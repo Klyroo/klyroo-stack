@@ -1,8 +1,8 @@
 <div class="flex w-full max-w-xs flex-col gap-3">
-    <BxFormField Label="Pickup time">
-        <BxInputTime Value="@(new TimeOnly(9, 0))" Hour12="_hour12" Name="pickup" data-testid="unbound-time" />
-    </BxFormField>
-    <BxButton Variant="ButtonVariant.Outline" Label="Switch the clock" OnClick="Switch" />
+    <LxFormField Label="Pickup time">
+        <LxInputTime Value="@(new TimeOnly(9, 0))" Hour12="_hour12" Name="pickup" data-testid="unbound-time" />
+    </LxFormField>
+    <LxButton Variant="ButtonVariant.Outline" Label="Switch the clock" OnClick="Switch" />
 </div>
 
 @code {

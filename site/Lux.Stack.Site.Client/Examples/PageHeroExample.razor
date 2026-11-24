@@ -1,14 +1,14 @@
-<div class="w-full overflow-hidden rounded-lg border border-(--blux-border) bg-(--blux-bg)">
-    <BxPageHero Headline="Open source" Title="Ship forms faster" HeadingLevel="3"
+<div class="w-full overflow-hidden rounded-lg border border-(--lux-border) bg-(--lux-bg)">
+    <LxPageHero Headline="Open source" Title="Ship forms faster" HeadingLevel="3"
                 Description="Accessible form controls that validate in the browser and on the server, in every render mode."
                 Links="_links" Ui="_ui">
         <Media>
-            <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-elevated) p-5 font-mono text-sm text-(--blux-text)">
-                <p><span class="text-(--blux-text-muted)">$</span> dotnet add package Lux.UI</p>
-                <p><span class="text-(--blux-text-muted)">$</span> dotnet run</p>
+            <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-elevated) p-5 font-mono text-sm text-(--lux-text)">
+                <p><span class="text-(--lux-text-muted)">$</span> dotnet add package Lux.UI</p>
+                <p><span class="text-(--lux-text-muted)">$</span> dotnet run</p>
             </div>
         </Media>
-    </BxPageHero>
+    </LxPageHero>
 </div>
 
 @code {
@@ -21,6 +21,6 @@
     private readonly PageLinkItem[] _links =
     [
         new("Get started", "/docs/installation") { TrailingIcon = "arrow-right" },
-        new("View the source", "https://github.com/") { Target = "_blank", Color = BxColor.Neutral, Variant = ButtonVariant.Outline },
+        new("View the source", "https://github.com/") { Target = "_blank", Color = LxColor.Neutral, Variant = ButtonVariant.Outline },
     ];
 }

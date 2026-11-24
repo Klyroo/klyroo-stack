@@ -30,9 +30,9 @@ public class FontsTests(PlaygroundServer server) : PlaygroundTest(server)
         await Page.WaitForFunctionAsync("[...document.fonts].some(f => f.family.replace(/\"/g, '') === 'Geist' && f.status === 'loaded')");
 
         Assert.True(await Page.EvaluateAsync<bool>("document.fonts.check('16px Geist')"));
-        var sans = await Page.EvaluateAsync<string>("getComputedStyle(document.documentElement).getPropertyValue('--blux-font-sans')");
+        var sans = await Page.EvaluateAsync<string>("getComputedStyle(document.documentElement).getPropertyValue('--lux-font-sans')");
         Assert.StartsWith("\"Geist\", \"Geist Fallback\"", sans.Trim());
-        var mono = await Page.EvaluateAsync<string>("getComputedStyle(document.documentElement).getPropertyValue('--blux-font-mono')");
+        var mono = await Page.EvaluateAsync<string>("getComputedStyle(document.documentElement).getPropertyValue('--lux-font-mono')");
         Assert.StartsWith("\"Geist Mono\", \"Geist Mono Fallback\"", mono.Trim());
         // The page text really is set in it (Tailwind's font-sans and the preflight follow the token).
         var body = await Page.EvaluateAsync<string>("getComputedStyle(document.body).fontFamily");
@@ -45,14 +45,14 @@ public class FontsTests(PlaygroundServer server) : PlaygroundTest(server)
         await Page.GotoAsync("/");
         var preloads = await Page.EvaluateAsync<string[]>("[...document.querySelectorAll('link[rel=preload][as=font]')].map(l => l.getAttribute('href'))");
         Assert.Equal(2, preloads.Length);
-        Assert.All(preloads, href => Assert.StartsWith("_blux/fonts/", href));
+        Assert.All(preloads, href => Assert.StartsWith("_lux/fonts/", href));
         Assert.Contains(preloads, href => href.Contains("Geist-400-700-normal-latin"));
 
         var response = await Page.APIRequest.GetAsync(preloads[0]);
         Assert.True(response.Ok);
         Assert.Equal("font/woff2", response.Headers["content-type"]);
         // Development servers send no-cache; a published app sends the year-long immutable header.
-        if (Environment.GetEnvironmentVariable("BLUX_PLAYGROUND_PUBLISHED") is { Length: > 0 })
+        if (Environment.GetEnvironmentVariable("LUX_PLAYGROUND_PUBLISHED") is { Length: > 0 })
         {
             Assert.Equal("max-age=31536000, immutable", response.Headers["cache-control"]);
         }
@@ -63,24 +63,24 @@ public class FontsTests(PlaygroundServer server) : PlaygroundTest(server)
     {
         await Page.GotoAsync("/");
         var hrefs = await Page.EvaluateAsync<string[]>("[...document.querySelectorAll('link[rel=stylesheet]')].map(l => l.getAttribute('href'))");
-        var css = await (await Page.APIRequest.GetAsync(hrefs.First(h => h.Contains("blux.fonts")))).TextAsync();
+        var css = await (await Page.APIRequest.GetAsync(hrefs.First(h => h.Contains("lux.fonts")))).TextAsync();
         var files = System.Text.RegularExpressions.Regex.Matches(css, "url\\(\"([^\"]+)\"\\)").Select(m => m.Groups[1].Value).Distinct().ToList();
         Assert.NotEmpty(files);
         // Doto's 700 and 900 are the same bytes: one file, two rules.
         Assert.Equal(files.Count, files.Select(f => f.Split('.')[^2]).Distinct().Count());
 
-        var published = Environment.GetEnvironmentVariable("BLUX_PLAYGROUND_PUBLISHED") is { Length: > 0 };
+        var published = Environment.GetEnvironmentVariable("LUX_PLAYGROUND_PUBLISHED") is { Length: > 0 };
         foreach (var file in files)
         {
-            var response = await Page.APIRequest.GetAsync("_blux/fonts/" + file);
+            var response = await Page.APIRequest.GetAsync("_lux/fonts/" + file);
             Assert.True(response.Ok, file);
             if (published) Assert.Equal("max-age=31536000, immutable", response.Headers["cache-control"]);
         }
 
         // The generated source and the build's own files stay out of the served folder.
-        foreach (var name in new[] { "LuxFontsManifest.g.cs", "blux.fonts.json", ".stamp" })
+        foreach (var name in new[] { "LuxFontsManifest.g.cs", "lux.fonts.json", ".stamp" })
         {
-            Assert.False((await Page.APIRequest.GetAsync("_blux/fonts/" + name)).Ok, name);
+            Assert.False((await Page.APIRequest.GetAsync("_lux/fonts/" + name)).Ok, name);
         }
     }
 
@@ -89,7 +89,7 @@ public class FontsTests(PlaygroundServer server) : PlaygroundTest(server)
     {
         await Page.GotoAsync("/");
         var hrefs = await Page.EvaluateAsync<string[]>("[...document.querySelectorAll('link[rel=stylesheet]')].map(l => l.getAttribute('href'))");
-        var fonts = Array.FindIndex(hrefs, h => h.Contains("blux.fonts"));
+        var fonts = Array.FindIndex(hrefs, h => h.Contains("lux.fonts"));
         var site = Array.FindIndex(hrefs, h => h.StartsWith("site"));
         Assert.InRange(fonts, 0, site - 1);
 

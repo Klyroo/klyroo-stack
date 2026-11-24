@@ -13,7 +13,7 @@ public class DataListPersistenceTests(PlaygroundServer server) : PlaygroundTest(
     public async Task A_large_first_result_does_not_break_the_circuit_and_small_results_are_still_adopted(string mode)
     {
         await Page.GotoAsync($"/{mode}/components/data-list");
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
         if (mode != "ssr")
         {
             await Assertions.Expect(Page.GetByTestId("renderer")).ToHaveAttributeAsync("data-interactive", "true", new() { Timeout = 30_000 });

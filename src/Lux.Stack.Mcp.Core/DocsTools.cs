@@ -61,7 +61,7 @@ public sealed class DocsTools(DocsService docs)
     [McpServerTool(Name = "get-component", Title = "Get a component", ReadOnly = true, Idempotent = true, OpenWorld = false)]
     [Description("The documentation of one component as Markdown, by section: usage (description and a minimal example), examples (every example with its source), api (parameters, events, slots, Ui slots), theme (slots, variants and defaults to restyle it).")]
     public string GetComponent(
-        [Description("A component name or slug: Button, BxButton, dropdown-menu.")] string name,
+        [Description("A component name or slug: Button, LxButton, dropdown-menu.")] string name,
         [Description("Comma-separated sections: usage, examples, api, theme. Default: usage,examples,api.")] string? sections = null)
     {
         var component = Resolve(name);
@@ -188,14 +188,14 @@ public sealed class DocsTools(DocsService docs)
     }
 
     [McpServerTool(Name = "search-icons", Title = "Search icons", ReadOnly = true, Idempotent = true, OpenWorld = false)]
-    [Description("Searches the Lucide icons built into Lux.UI, usable as `<BxIcon Name=\"search\" />` (or `i-lucide-search`, `lucide:search`) with no setup. Any other Iconify icon (200,000+ in 280 collections, browse https://icones.js.org) works by name too, as `i-{collection}-{name}` or `{collection}:{name}` (`ph:house`, `mdi:home`, `simple-icons:github`): the app's build downloads the icons it writes as literals and bundles them (see the Icons guide). The icons components draw (close, check, chevrons...) are replaced with `o.Icons.Close = \"ph:x\"` in AddLuxUi.")]
+    [Description("Searches the Lucide icons built into Lux.UI, usable as `<LxIcon Name=\"search\" />` (or `i-lucide-search`, `lucide:search`) with no setup. Any other Iconify icon (200,000+ in 280 collections, browse https://icones.js.org) works by name too, as `i-{collection}-{name}` or `{collection}:{name}` (`ph:house`, `mdi:home`, `simple-icons:github`): the app's build downloads the icons it writes as literals and bundles them (see the Icons guide). The icons components draw (close, check, chevrons...) are replaced with `o.Icons.Close = \"ph:x\"` in AddLuxUi.")]
     public string SearchIcons(
         [Description("A word of the icon name. Omit to list the built-in icons.")] string? query = null,
         [Description("Maximum number of results (default 30).")] int limit = 30)
     {
         var icons = docs.SearchIcons(query, Math.Max(1, limit));
         if (icons.Count == 0) return $"No built-in icon matches \"{query}\". {docs.Bundle.Icons.Count} Lucide icons are built in (call this tool without a query to list them), and any icon of the other Iconify collections works by name (`ph:house`, `i-mdi-home`): search them at https://icones.js.org and write the name as a literal, the build bundles it (Icons guide).\n";
-        return $"{icons.Count} of {docs.Bundle.Icons.Count} built-in Lucide icons. Use `<BxIcon Name=\"name\" />`. Any other Iconify icon works by name as `prefix:name` or `i-prefix-name` (`ph:house`, `simple-icons:github`), bundled at build time when written as a literal; custom SVGs come from a `LuxIconCollection` folder or `LuxOptions.Icons.Register`.\n\n"
+        return $"{icons.Count} of {docs.Bundle.Icons.Count} built-in Lucide icons. Use `<LxIcon Name=\"name\" />`. Any other Iconify icon works by name as `prefix:name` or `i-prefix-name` (`ph:house`, `simple-icons:github`), bundled at build time when written as a literal; custom SVGs come from a `LuxIconCollection` folder or `LuxOptions.Icons.Register`.\n\n"
             + string.Join('\n', icons.Select(i => $"- {i}")) + "\n";
     }
 

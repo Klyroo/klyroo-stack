@@ -103,7 +103,7 @@ public class Overlay2Tests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task ContextMenu_opens_with_Shift_F10_navigates_and_returns_focus(string mode)
     {
         await Open(mode, "context-menu");
-        var area = Page.Locator("bx-context-menu [data-slot=trigger]").First;
+        var area = Page.Locator("lx-context-menu [data-slot=trigger]").First;
 
         await area.FocusAsync();
         await Page.Keyboard.PressAsync("Shift+F10");
@@ -269,11 +269,11 @@ public class Overlay2Tests(PlaygroundServer server) : PlaygroundTest(server)
             window.__hits = [];
             const add = (tag, attrs) => { const e = document.createElement(tag); for (const k in attrs) e.setAttribute(k, attrs[k]); document.body.append(e); return e; };
             add('input', { id: 'hk-input' });
-            const hidden = add('button', { 'data-bx-hotkey': 'j', style: 'display:none' }); hidden.addEventListener('click', () => window.__hits.push('hidden'));
-            const disabled = add('button', { 'data-bx-hotkey': 'j', disabled: '' }); disabled.addEventListener('click', () => window.__hits.push('disabled'));
-            const live = add('button', { 'data-bx-hotkey': 'j' }); live.addEventListener('click', () => window.__hits.push('live'));
-            const bare = add('button', { 'data-bx-hotkey': 'g' }); bare.addEventListener('click', () => window.__hits.push('bare'));
-            const combo = add('button', { 'data-bx-hotkey': 'ctrl+g' }); combo.addEventListener('click', () => window.__hits.push('combo'));
+            const hidden = add('button', { 'data-lx-hotkey': 'j', style: 'display:none' }); hidden.addEventListener('click', () => window.__hits.push('hidden'));
+            const disabled = add('button', { 'data-lx-hotkey': 'j', disabled: '' }); disabled.addEventListener('click', () => window.__hits.push('disabled'));
+            const live = add('button', { 'data-lx-hotkey': 'j' }); live.addEventListener('click', () => window.__hits.push('live'));
+            const bare = add('button', { 'data-lx-hotkey': 'g' }); bare.addEventListener('click', () => window.__hits.push('bare'));
+            const combo = add('button', { 'data-lx-hotkey': 'ctrl+g' }); combo.addEventListener('click', () => window.__hits.push('combo'));
         }");
 
         await Page.Locator("#hk-input").FocusAsync();
@@ -326,7 +326,7 @@ public class Overlay2Tests(PlaygroundServer server) : PlaygroundTest(server)
         Assert.Equal(1, await button.Locator("svg:visible").CountAsync());
 
         await Page.ReloadAsync();
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
 
         await Assertions.Expect(Html).ToHaveClassAsync(new Regex("dark"));
         await Assertions.Expect(button).ToHaveAttributeAsync("aria-pressed", "true");
@@ -350,7 +350,7 @@ public class Overlay2Tests(PlaygroundServer server) : PlaygroundTest(server)
         await Assertions.Expect(second).ToBeCheckedAsync();
 
         await Page.ReloadAsync();
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
 
         await Assertions.Expect(Html).ToHaveClassAsync(new Regex("dark"));
         await Assertions.Expect(first).ToBeCheckedAsync();
@@ -372,7 +372,7 @@ public class Overlay2Tests(PlaygroundServer server) : PlaygroundTest(server)
         await Assertions.Expect(Html).ToHaveClassAsync(new Regex("dark"));
 
         await Page.ReloadAsync();
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
 
         await Assertions.Expect(Html).ToHaveClassAsync(new Regex("dark"));
         await Assertions.Expect(select).ToHaveValueAsync("dark");
@@ -390,7 +390,7 @@ public class Overlay2Tests(PlaygroundServer server) : PlaygroundTest(server)
         await Open(mode, "color-mode-select");
         var select = Page.GetByTestId("color-mode-select").GetByRole(AriaRole.Combobox);
 
-        await Page.EvaluateAsync("() => Blux.setColorMode('dark')");
+        await Page.EvaluateAsync("() => Lux.setColorMode('dark')");
 
         await Assertions.Expect(select).ToHaveValueAsync("dark");
     }
@@ -404,7 +404,7 @@ public class Overlay2Tests(PlaygroundServer server) : PlaygroundTest(server)
         await Assertions.Expect(avatar).ToHaveCountAsync(1);
         await Assertions.Expect(avatar.Locator("img")).ToHaveAttributeAsync("src", new Regex("%23ffd23f"));
 
-        await Page.EvaluateAsync("() => Blux.setColorMode('dark')");
+        await Page.EvaluateAsync("() => Lux.setColorMode('dark')");
 
         await Assertions.Expect(avatar).ToHaveCountAsync(1);
         await Assertions.Expect(avatar.Locator("img")).ToHaveAttributeAsync("src", new Regex("%230a0b0c"));
@@ -413,7 +413,7 @@ public class Overlay2Tests(PlaygroundServer server) : PlaygroundTest(server)
         var image = Page.Locator("img[data-testid=color-mode-image]:visible");
         await Assertions.Expect(image).ToHaveCountAsync(1);
         await Assertions.Expect(image).ToHaveAttributeAsync("src", new Regex("%230f172a"));
-        await Page.EvaluateAsync("() => Blux.setColorMode('light')");
+        await Page.EvaluateAsync("() => Lux.setColorMode('light')");
         await Assertions.Expect(image).ToHaveAttributeAsync("src", new Regex("%23fef3c7"));
         await Assertions.Expect(Page.GetByRole(AriaRole.Img, new() { Name = "A sun by day, a moon by night" })).ToHaveCountAsync(1);
     }

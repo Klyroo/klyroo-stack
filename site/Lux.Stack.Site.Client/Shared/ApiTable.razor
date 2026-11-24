@@ -2,29 +2,29 @@
 @using Lux.Stack.Site.Client.Docs
 
 @* Scrolls sideways on a phone: a keyboard user needs to focus it to scroll. *@
-<div role="region" aria-label="Parameters of @Name" tabindex="0" class="overflow-x-auto rounded-xl border border-(--blux-border) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--blux-primary-text)">
+<div role="region" aria-label="Parameters of @Name" tabindex="0" class="overflow-x-auto rounded-xl border border-(--lux-border) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--lux-primary-text)">
     <table class="min-w-full text-sm">
         <caption class="sr-only">Parameters of @Name</caption>
-        <thead class="bg-(--blux-bg-muted) text-start">
+        <thead class="bg-(--lux-bg-muted) text-start">
             <tr>
                 <th scope="col" class="px-4 py-2.5 text-start font-semibold">Parameter</th>
                 <th scope="col" class="px-4 py-2.5 text-start font-semibold">Type</th>
                 <th scope="col" class="px-4 py-2.5 text-start font-semibold">Default</th>
             </tr>
         </thead>
-        <tbody class="divide-y divide-(--blux-border)">
+        <tbody class="divide-y divide-(--lux-border)">
             @foreach (var p in ApiReader.Parameters(Of))
             {
                 <tr class="align-top">
                     <td class="px-4 py-3">
-                        <code class="font-mono text-[13px] font-medium text-(--blux-primary-text)">@p.Name</code>
+                        <code class="font-mono text-[13px] font-medium text-(--lux-primary-text)">@p.Name</code>
                         @if (p.Description is not null)
                         {
-                            <p class="mt-1 max-w-md text-(--blux-text-muted)">@p.Description</p>
+                            <p class="mt-1 max-w-md text-(--lux-text-muted)">@p.Description</p>
                         }
                     </td>
-                    <td class="px-4 py-3"><code class="whitespace-nowrap font-mono text-[13px] text-(--blux-text)">@p.Type</code></td>
-                    <td class="px-4 py-3"><code class="whitespace-nowrap font-mono text-[13px] text-(--blux-text-muted)">@(p.Default ?? "—")</code></td>
+                    <td class="px-4 py-3"><code class="whitespace-nowrap font-mono text-[13px] text-(--lux-text)">@p.Type</code></td>
+                    <td class="px-4 py-3"><code class="whitespace-nowrap font-mono text-[13px] text-(--lux-text-muted)">@(p.Default ?? "—")</code></td>
                 </tr>
             }
         </tbody>

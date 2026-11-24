@@ -1,9 +1,9 @@
 @* The search of this site (Ctrl+K, or the button in the header) is a ContentSearch over the catalog. This one has its own
    Name and shortcut, so it opens next to it: use the button, or Alt+O. Pages are listed with their headings. *@
 <div class="flex flex-col items-start gap-3" data-testid="content-search-example">
-    <BxContentSearchButton For="example" Collapsed="false" Keys="_keys" data-testid="content-search-example-button" />
-    <p class="text-sm text-(--blux-text-muted)" data-testid="content-search-example-last">Last result: @(_last ?? "none")</p>
-    <BxContentSearch Name="example" Shortcut="alt+o" Pages="_pages" OnSelect="item => _last = item.Label"
+    <LxContentSearchButton For="example" Collapsed="false" Keys="_keys" data-testid="content-search-example-button" />
+    <p class="text-sm text-(--lux-text-muted)" data-testid="content-search-example-last">Last result: @(_last ?? "none")</p>
+    <LxContentSearch Name="example" Shortcut="alt+o" Pages="_pages" OnSelect="item => _last = item.Label"
                      Label="Search the example docs" Placeholder="Search the example docs..." />
 </div>
 
@@ -11,7 +11,7 @@
     private string? _last;
     private static readonly string[] _keys = ["Alt", "O"];
 
-    private static readonly BxContentSearchPage[] _pages =
+    private static readonly LxContentSearchPage[] _pages =
     [
         new("Introduction", "?section=introduction")
         {

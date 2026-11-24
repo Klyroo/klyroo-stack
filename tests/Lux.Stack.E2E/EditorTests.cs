@@ -26,7 +26,7 @@ public class EditorTests(PlaygroundServer server) : PlaygroundTest(server)
     }
 
     private Task WaitForEditors() =>
-        Page.WaitForFunctionAsync("() => document.querySelectorAll('bx-editor').length > 0 && [...document.querySelectorAll('bx-editor')].every((e) => e.hasAttribute('data-ready') && e.querySelector('.ProseMirror'))",
+        Page.WaitForFunctionAsync("() => document.querySelectorAll('lx-editor').length > 0 && [...document.querySelectorAll('lx-editor')].every((e) => e.hasAttribute('data-ready') && e.querySelector('.ProseMirror'))",
             null, new() { Timeout = 30_000 });
 
     private ILocator Surface(string testId) => Page.GetByTestId(testId).Locator(".ProseMirror");
@@ -68,7 +68,7 @@ public class EditorTests(PlaygroundServer server) : PlaygroundTest(server)
         await Open("ssr", "button");
         await Page.WaitForTimeoutAsync(1500);
 
-        Assert.DoesNotContain(requested, url => url.Contains("blux-editor", StringComparison.Ordinal));
+        Assert.DoesNotContain(requested, url => url.Contains("lux-editor", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -79,24 +79,24 @@ public class EditorTests(PlaygroundServer server) : PlaygroundTest(server)
 
         await OpenEditor("ssr");
 
-        Assert.Single(requested, url => url.Contains("blux-editor", StringComparison.Ordinal));
+        Assert.Single(requested, url => url.Contains("lux-editor", StringComparison.Ordinal));
     }
 
     [Fact]
     public async Task Static_page_shows_the_value_read_only_until_the_editor_is_ready_and_when_it_cannot_load()
     {
-        await Page.RouteAsync("**/blux-editor*.js", route => route.AbortAsync());
+        await Page.RouteAsync("**/lux-editor*.js", route => route.AbortAsync());
         await Open("ssr", "editor");
 
         var editor = Page.GetByTestId("editor");
         await Assertions.Expect(editor.Locator("[data-slot=fallback]")).ToBeVisibleAsync();
         // Without a configured sanitizer the read-only view shows the text, never the posted markup.
-        await Assertions.Expect(editor.Locator("[data-slot=fallback]")).ToContainTextAsync("Hello Blux.");
+        await Assertions.Expect(editor.Locator("[data-slot=fallback]")).ToContainTextAsync("Hello Lux.");
         await Assertions.Expect(editor.Locator("[data-slot=fallback] strong")).ToHaveCountAsync(0);
         await Assertions.Expect(editor.Locator(".ProseMirror")).ToHaveCountAsync(0);
         await Assertions.Expect(editor).ToHaveAttributeAsync("data-error", "");
         // The value still posts without the engine.
-        await Assertions.Expect(editor.Locator("input[type=hidden]")).ToHaveValueAsync("<p>Hello <strong>Blux</strong>.</p><p>Second paragraph.</p>");
+        await Assertions.Expect(editor.Locator("input[type=hidden]")).ToHaveValueAsync("<p>Hello <strong>Lux</strong>.</p><p>Second paragraph.</p>");
     }
 
     [Fact]
@@ -142,7 +142,7 @@ public class EditorTests(PlaygroundServer server) : PlaygroundTest(server)
         await bold.ClickAsync();
 
         await Assertions.Expect(bold).ToHaveAttributeAsync("aria-pressed", "true");
-        await Assertions.Expect(html).ToContainTextAsync("<p><strong>Hello Blux.</strong></p>");
+        await Assertions.Expect(html).ToContainTextAsync("<p><strong>Hello Lux.</strong></p>");
 
         await Page.Keyboard.PressAsync("Control+b");
 
@@ -373,7 +373,7 @@ public class EditorTests(PlaygroundServer server) : PlaygroundTest(server)
         await Assertions.Expect(options.Last).ToHaveAttributeAsync("aria-selected", "true");
 
         await Page.Keyboard.TypeAsync("zzz");
-        await Assertions.Expect(Page.Locator("bx-editor-menu[data-char='/']").GetByText("No results")).ToBeVisibleAsync();
+        await Assertions.Expect(Page.Locator("lx-editor-menu[data-char='/']").GetByText("No results")).ToBeVisibleAsync();
         await Page.Keyboard.PressAsync("Escape");
         await Assertions.Expect(list).ToBeHiddenAsync();
         await Assertions.Expect(surface).ToHaveAttributeAsync("role", "textbox");
@@ -406,7 +406,7 @@ public class EditorTests(PlaygroundServer server) : PlaygroundTest(server)
         await Assertions.Expect(list.GetByRole(AriaRole.Option)).ToHaveCountAsync(1);
         await Page.Keyboard.PressAsync("Enter");
 
-        await Assertions.Expect(surface.Locator(".bx-mention")).ToHaveTextAsync("@Ada Lovelace");
+        await Assertions.Expect(surface.Locator(".lx-mention")).ToHaveTextAsync("@Ada Lovelace");
         await Assertions.Expect(list).ToBeHiddenAsync();
         await Assertions.Expect(Page.GetByTestId("mention-html")).ToContainTextAsync("data-id=\"ada\"");
     }
@@ -531,7 +531,7 @@ public class EditorTests(PlaygroundServer server) : PlaygroundTest(server)
         // same button. The listeners of the first wiring must be gone by then: net additions (added minus removed) are zero.
         var net = await Page.EvaluateAsync<int>("""
             async () => {
-                const handle = document.querySelector('[data-testid=editor-drag] bx-editor-drag-handle');
+                const handle = document.querySelector('[data-testid=editor-drag] lx-editor-drag-handle');
                 const button = handle.querySelector('button');
                 const parent = handle.parentElement;
                 const next = handle.nextSibling;
@@ -565,7 +565,7 @@ public class EditorTests(PlaygroundServer server) : PlaygroundTest(server)
         await OpenEditor("ssr", "editor-toolbar");
         await Page.EvaluateAsync("""
             () => {
-                const host = document.querySelector('[data-testid=editor-toolbar]').closest('bx-editor') ?? document.querySelector('bx-editor');
+                const host = document.querySelector('[data-testid=editor-toolbar]').closest('lx-editor') ?? document.querySelector('lx-editor');
                 window.__wires = 0;
                 const original = host.querySelectorAll.bind(host);
                 host.querySelectorAll = (selector) => { window.__wires++; return original(selector); };

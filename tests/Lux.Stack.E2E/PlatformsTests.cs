@@ -12,7 +12,7 @@ public class PlatformsTests(PlaygroundServer server) : PlaygroundTest(server)
     {
         await Page.GotoAsync("/");
         await Assertions.Expect(Page.GetByTestId("renderer").First).ToHaveAttributeAsync("data-interactive", "true", new() { Timeout = 30_000 });
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover') && document.title.length > 0");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover') && document.title.length > 0");
         await Page.Locator("#platforms").ScrollIntoViewIfNeededAsync();
     }
 

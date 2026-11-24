@@ -54,7 +54,7 @@ public static class SkillReference
         return text;
     }
 
-    /// <summary><c>BxTable&lt;TItem&gt;</c> is used as <c>BxTable</c> in Razor, which infers the type argument.</summary>
+    /// <summary><c>LxTable&lt;TItem&gt;</c> is used as <c>LxTable</c> in Razor, which infers the type argument.</summary>
     private static string TagName(string name)
     {
         var generic = name.IndexOf('<');

@@ -16,7 +16,7 @@ public static class InstallationGuide
 
     internal const string StylesheetHead = """
         <head>
-            <BxColorModeScript />
+            <LxColorModeScript />
             <link rel="stylesheet" href="@Assets["_content/Lux.UI/lux.preflight.css"]" />
             <link rel="stylesheet" href="@Assets["_content/Lux.UI/lux.css"]" />
         </head>
@@ -24,7 +24,7 @@ public static class InstallationGuide
 
     internal const string TailwindImport = """
         @import "tailwindcss";
-        @import "../obj/blux/lux.theme.css";
+        @import "../obj/lux/lux.theme.css";
         """;
 
     public static string Render(string? renderMode, string? cssMode, string version)
@@ -54,10 +54,10 @@ public static class InstallationGuide
             sb.Append("Components render on the server first (prerendering) and then in the browser, so register Lux.UI in the server project and in the `.Client` project, with the same configuration. ");
             sb.Append("A shared method in the client project keeps both in sync, otherwise components change appearance when WebAssembly takes over.\n\n");
             sb.Append(ComponentMarkdown.Fence("""
-                // Client project: BluxSetup.cs
-                public static class BluxSetup
+                // Client project: LuxSetup.cs
+                public static class LuxSetup
                 {
-                    public static IServiceCollection AddAppBlux(this IServiceCollection services) =>
+                    public static IServiceCollection AddAppLux(this IServiceCollection services) =>
                         services.AddLuxUi(options =>
                         {
                             // options.Button.Slot("base", "font-semibold");
@@ -65,7 +65,7 @@ public static class InstallationGuide
                 }
 
                 // Program.cs of the server project AND of the client project
-                builder.Services.AddAppBlux();
+                builder.Services.AddAppLux();
                 """, "csharp"));
         }
         else
@@ -77,14 +77,14 @@ public static class InstallationGuide
         sb.Append("\n## 3. Load the styles\n\n");
         if (css == "precompiled")
         {
-            sb.Append("Without Tailwind in your app, load the precompiled stylesheet and its reset in `App.razor`. `BxColorModeScript` applies the saved light or dark mode before first paint.\n\n");
+            sb.Append("Without Tailwind in your app, load the precompiled stylesheet and its reset in `App.razor`. `LxColorModeScript` applies the saved light or dark mode before first paint.\n\n");
             sb.Append(ComponentMarkdown.Fence(StylesheetHead));
             sb.Append("\n`Class` and `Ui` then only apply classes that already exist in `lux.css` or in your own CSS.\n");
         }
         else
         {
-            sb.Append("Every build copies the Blux theme (tokens, dark variant, the classes components use) to `obj/blux/lux.theme.css`. Import it after Tailwind and load only your compiled stylesheet, not `lux.css` nor `lux.preflight.css`. ");
-            sb.Append("Keep `<BxColorModeScript />` in `<head>`. The path in the import is relative to the CSS file.\n\n");
+            sb.Append("Every build copies the Lux theme (tokens, dark variant, the classes components use) to `obj/lux/lux.theme.css`. Import it after Tailwind and load only your compiled stylesheet, not `lux.css` nor `lux.preflight.css`. ");
+            sb.Append("Keep `<LxColorModeScript />` in `<head>`. The path in the import is relative to the CSS file.\n\n");
             sb.Append(ComponentMarkdown.Fence(TailwindImport, "css"));
             sb.Append("\n`Class` and `Ui` then accept any utility, because your Tailwind build sees them in your Razor files.\n");
         }
@@ -93,8 +93,8 @@ public static class InstallationGuide
         sb.Append("\n## 4. Use the components\n\n");
         sb.Append(ComponentMarkdown.Fence("@* _Imports.razor *@\n@using Lux.UI", "razor"));
         sb.Append(ComponentMarkdown.Fence("""
-            <BxButton Label="Save" OnClick="Save" />
-            <BxSwitch @bind-Value="notify" Label="Email notifications" />
+            <LxButton Label="Save" OnClick="Save" />
+            <LxSwitch @bind-Value="notify" Label="Email notifications" />
             """));
 
         sb.Append("\n## Render mode notes\n\n");
@@ -102,16 +102,16 @@ public static class InstallationGuide
         {
             "ssr" =>
                 "- Static server rendering has no interactivity: forms still post (Switch, Checkbox, RadioGroup, Input and Select render real form fields), and overlays, tabs and the accordion keep working because their behavior lives in the browser.\n" +
-                "- A `BxButton` with `OnClick` renders disabled, because its handler cannot run. Use `Href` or a submit button instead.\n",
+                "- A `LxButton` with `OnClick` renders disabled, because its handler cannot run. Use `Href` or a submit button instead.\n",
             "server" =>
                 "- Opening, closing, focus and keyboard navigation run in the browser, so a menu does not wait for a SignalR round trip. .NET only hears about state you bind (`@bind-Value`, `@bind-Open`).\n" +
-                "- A `BxButton` with `OnClick` is disabled during prerendering and becomes active once the circuit is interactive.\n",
+                "- A `LxButton` with `OnClick` is disabled during prerendering and becomes active once the circuit is interactive.\n",
             "wasm" =>
                 "- Register Lux.UI on the server too: prerendering runs there before WebAssembly loads.\n" +
-                "- A `BxButton` with `OnClick` is disabled until the WebAssembly runtime starts.\n",
+                "- A `LxButton` with `OnClick` is disabled until the WebAssembly runtime starts.\n",
             _ =>
                 "- Auto starts on the server and switches to WebAssembly later: register `AddLuxUi` with the same options in both projects.\n" +
-                "- A `BxButton` with `OnClick` is disabled until the page is interactive.\n",
+                "- A `LxButton` with `OnClick` is disabled until the page is interactive.\n",
         });
         sb.Append("- An overlay without `@bind-Open` never calls .NET; bind it only when your code needs the state. A Popover trigger must contain a `<button>`.\n");
         return sb.ToString();

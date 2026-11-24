@@ -235,7 +235,7 @@ public class MarketingTests(PlaygroundServer server) : PlaygroundTest(server)
         await Assertions.Expect(first.Locator("time")).ToHaveTextAsync(new System.Text.RegularExpressions.Regex(@"^(November 12, 2026|12 November 2026)$"));
 
         // The title's link covers the card, so the click on the description lands on it (hence Force: Playwright sees an overlay).
-        await first.GetByText("How Blux keeps one markup").ClickAsync(new() { Force = true });
+        await first.GetByText("How Lux keeps one markup").ClickAsync(new() { Force = true });
         await Assertions.Expect(Page).ToHaveURLAsync(new System.Text.RegularExpressions.Regex("/docs/render-modes"));
     }
 

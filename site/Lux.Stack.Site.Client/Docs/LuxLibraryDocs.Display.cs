@@ -11,7 +11,7 @@ public static partial class LuxLibraryDocs
             // GROUP 1: GETTING STARTED
             // =========================================================================
             new("", "Introduction & How It Works", "Getting Started",
-                "19 read-only display blocks (BxDisplay), constrained Audio/Video media players with clip bounds and play quotas (BxAudioPlayer, BxVideoPlayer), and a multi-format modal file previewer (FilePreviewService & BxFilePreviewProvider).",
+                "19 read-only display blocks (LxDisplay), constrained Audio/Video media players with clip bounds and play quotas (LxAudioPlayer, LxVideoPlayer), and a multi-format modal file previewer (FilePreviewService & LxFilePreviewProvider).",
                 [
                     new("overview", "What is Lux.Display?",
                         Paragraphs:
@@ -25,9 +25,9 @@ public static partial class LuxLibraryDocs
                         TableHeaders: ["Subsystem", "Core & UI Types", "What Happens"],
                         TableRows:
                         [
-                            new("1. Structured Blocks", "BxDisplay + 19 DisplayKind values + DisplaySurface", "Renders typed read-only blocks (Stat, Meter, Facts, Diff, Code/Secret, Timeline, Accordion, List) with automatic Loading skeletons and threshold tones."),
-                            new("2. Constrained Media", "BxAudioPlayer · BxVideoPlayer · MediaPlayerControl · VideoPlayerTrack", "Enforces Start/End clip bounds, Seekable=false locking, MaxPlays quotas with OnLimitReached, speed presets, and WebVTT caption tracks."),
-                            new("3. File Lightbox", "FilePreviewService + <BxFilePreviewProvider />", "Auto-detects 10 FilePreviewKind formats via DetectKind(), picks Modal vs Fullscreen via DefaultContainerForKind(), parses CSVs via ParseCsv(), and supports multi-file galleries with loop navigation.")
+                            new("1. Structured Blocks", "LxDisplay + 19 DisplayKind values + DisplaySurface", "Renders typed read-only blocks (Stat, Meter, Facts, Diff, Code/Secret, Timeline, Accordion, List) with automatic Loading skeletons and threshold tones."),
+                            new("2. Constrained Media", "LxAudioPlayer · LxVideoPlayer · MediaPlayerControl · VideoPlayerTrack", "Enforces Start/End clip bounds, Seekable=false locking, MaxPlays quotas with OnLimitReached, speed presets, and WebVTT caption tracks."),
+                            new("3. File Lightbox", "FilePreviewService + <LxFilePreviewProvider />", "Auto-detects 10 FilePreviewKind formats via DetectKind(), picks Modal vs Fullscreen via DefaultContainerForKind(), parses CSVs via ParseCsv(), and supports multi-file galleries with loop navigation.")
                         ]),
                     new("all-kinds", "All 19 DisplayKind Values",
                         TableHeaders: ["Category", "Exact DisplayKind Values", "Highlights"],
@@ -43,25 +43,25 @@ public static partial class LuxLibraryDocs
                         TableRows:
                         [
                             new("Lux.Display.Core", "FilePreviewService, FilePreviewFile, FilePreviewOptions, ParsedCsvPreview, MediaPlayerControl, VideoPlayerTrack, MediaPlayerProgress", "Headless C# · IsAotCompatible=true"),
-                            new("Lux.Display", "BxDisplay, BxAudioPlayer, BxVideoPlayer, BxFilePreviewProvider, AddLuxDisplay()", "browser, ios, android, maccatalyst, windows")
+                            new("Lux.Display", "LxDisplay, LxAudioPlayer, LxVideoPlayer, LxFilePreviewProvider, AddLuxDisplay()", "browser, ios, android, maccatalyst, windows")
                         ])
                 ]),
             new("installation", "Installation & Setup", "Getting Started",
-                "Install Lux.Display, register FilePreviewService, and mount BxFilePreviewProvider once in your root layout.",
+                "Install Lux.Display, register FilePreviewService, and mount LxFilePreviewProvider once in your root layout.",
                 [
                     new("nuget", "1. Install Packages",
                         CodeSamples:
                         [
                             new("Terminal", """
                                 dotnet add package Lux.Display.Core   # Headless NativeAOT MIME detector, CSV parser & media models
-                                dotnet add package Lux.Display        # BxDisplay, BxAudioPlayer, BxVideoPlayer & Lightbox
+                                dotnet add package Lux.Display        # LxDisplay, LxAudioPlayer, LxVideoPlayer & Lightbox
                                 """)
                         ]),
                     new("di", "2. Register Services & Mount Lightbox Host",
                         CodeSamples:
                         [
                             new("Program.cs / MauiProgram.cs", "builder.Services.AddLuxDisplay();"),
-                            new("MainLayout.razor", "<BxFilePreviewProvider />"),
+                            new("MainLayout.razor", "<LxFilePreviewProvider />"),
                             new("_Imports.razor", "@using Lux.Display")
                         ])
                 ]),
@@ -73,7 +73,7 @@ public static partial class LuxLibraryDocs
                 "Render headings with counts, expandable status alerts, copyable key/value fact lists, timelines, accordions, and progressive lists.",
                 [
                     new("surfaces", "DisplaySurface & Common Parameters",
-                        Paragraphs: ["Every BxDisplay block shares Surface (Plain, Muted, Bordered, Elevated), Tone (semantic BxColor), Loading (skeleton), Title, Description, Chip (DisplayChip), Action, and Actions (DisplayAction)."],
+                        Paragraphs: ["Every LxDisplay block shares Surface (Plain, Muted, Bordered, Elevated), Tone (semantic LxColor), Loading (skeleton), Title, Description, Chip (DisplayChip), Action, and Actions (DisplayAction)."],
                         TableHeaders: ["DisplaySurface", "Visual Style", "Best For"],
                         TableRows:
                         [
@@ -84,17 +84,17 @@ public static partial class LuxLibraryDocs
                         ]),
                     new("structured", "Facts & Release Timelines",
                         LiveDemoKey: "display-structured",
-                        LiveDemoTitle: "BxDisplay · Copyable Facts & Pipeline Timeline",
+                        LiveDemoTitle: "LxDisplay · Copyable Facts & Pipeline Timeline",
                         CodeSamples:
                         [
                             new("FactsAndTimeline.razor", """
-                                <BxDisplay Kind="DisplayKind.Facts" Surface="DisplaySurface.Bordered" Title="Cluster Metadata" Facts="@([
+                                <LxDisplay Kind="DisplayKind.Facts" Surface="DisplaySurface.Bordered" Title="Cluster Metadata" Facts="@([
                                     new DisplayFact { Label = "Environment", Value = "Production", Copy = true, Mono = true },
-                                    new DisplayFact { Label = "Region", Value = "eu-west-3", Chip = new DisplayChip("Healthy", BxColor.Success) },
+                                    new DisplayFact { Label = "Region", Value = "eu-west-3", Chip = new DisplayChip("Healthy", LxColor.Success) },
                                     new DisplayFact { Label = "Failover", Value = null }
                                 ])" />
 
-                                <BxDisplay Kind="DisplayKind.Timeline" Surface="DisplaySurface.Bordered" Title="Release Pipeline" TimelineItems="@([
+                                <LxDisplay Kind="DisplayKind.Timeline" Surface="DisplaySurface.Bordered" Title="Release Pipeline" TimelineItems="@([
                                     new DisplayTimelineItem("Build NativeAOT Core", Time: "09:12", State: DisplayTimelineState.Done),
                                     new DisplayTimelineItem("Rollout Canary", Time: "In progress", State: DisplayTimelineState.Current),
                                     new DisplayTimelineItem("Global Promotion", Time: "Pending", State: DisplayTimelineState.Upcoming)
@@ -116,10 +116,10 @@ public static partial class LuxLibraryDocs
                         CodeSamples:
                         [
                             new("MetricsAndSecret.razor", """
-                                <BxDisplay Kind="DisplayKind.Stat" Title="MRR" Value="€148,900" Delta="+14.2%" Trend="@([102.0, 118.0, 134.0, 148.9])" />
-                                <BxDisplay Kind="DisplayKind.Meter" Title="Storage Quota" MeterValue="@_val" MeterMax="100" WarningThreshold="75" ErrorThreshold="90" />
-                                <BxDisplay Kind="DisplayKind.Code" Variant="secret" Title="Webhook Secret" Value="sk_live_9876543210" VisibleChars="4" Copy="true" />
-                                <BxDisplay Kind="DisplayKind.Diff" Title="Plan Upgrade" DiffItems="@([new DisplayDiffItem("Tier", "Starter", "Enterprise", Changed: true)])" />
+                                <LxDisplay Kind="DisplayKind.Stat" Title="MRR" Value="€148,900" Delta="+14.2%" Trend="@([102.0, 118.0, 134.0, 148.9])" />
+                                <LxDisplay Kind="DisplayKind.Meter" Title="Storage Quota" MeterValue="@_val" MeterMax="100" WarningThreshold="75" ErrorThreshold="90" />
+                                <LxDisplay Kind="DisplayKind.Code" Variant="secret" Title="Webhook Secret" Value="sk_live_9876543210" VisibleChars="4" Copy="true" />
+                                <LxDisplay Kind="DisplayKind.Diff" Title="Plan Upgrade" DiffItems="@([new DisplayDiffItem("Tier", "Starter", "Enterprise", Changed: true)])" />
                                 """)
                         ]),
                     new("accordion-list", "Accordion & Progressive Reveal Lists",
@@ -128,12 +128,12 @@ public static partial class LuxLibraryDocs
                         CodeSamples:
                         [
                             new("AccordionAndList.razor", """
-                                <BxDisplay Kind="DisplayKind.Accordion" Multiple="true" AccordionItems="@([
+                                <LxDisplay Kind="DisplayKind.Accordion" Multiple="true" AccordionItems="@([
                                     new DisplayAccordionItem("NativeAOT Support", "Lux.Display.Core has zero UI dependencies."),
                                     new DisplayAccordionItem("Secret Masking", "Reveal/hide in place with clipboard copy.")
                                 ])" />
 
-                                <BxDisplay Kind="DisplayKind.List" Max="2" Step="2" ListItems="@_steps" />
+                                <LxDisplay Kind="DisplayKind.List" Max="2" Step="2" ListItems="@_steps" />
                                 """)
                         ])
                 ]),
@@ -144,7 +144,7 @@ public static partial class LuxLibraryDocs
             new("media-players", "Constrained Audio & Video Players", "Media & Files",
                 "Play bounded audio and video segments with play-count quotas, rate selection, WebVTT subtitles, and seek locking.",
                 [
-                    new("audio-video", "BxAudioPlayer & BxVideoPlayer Constraints",
+                    new("audio-video", "LxAudioPlayer & LxVideoPlayer Constraints",
                         Paragraphs: ["Both players enforce Start/End clip bounds, Seekable=\"false\" scrubbing locks, MaxPlays quotas (two-way @bind-Plays + OnLimitReached), and fine-grained MediaPlayerControl hiding."],
                         TableHeaders: ["Parameter", "Type", "Purpose"],
                         TableRows:
@@ -157,15 +157,15 @@ public static partial class LuxLibraryDocs
                             new("Tracks (Video)", "IReadOnlyList<VideoPlayerTrack>?", "WebVTT captions/subtitle tracks with default selection")
                         ],
                         LiveDemoKey: "display-audio",
-                        LiveDemoTitle: "BxAudioPlayer · Bounded Clip (15s–45s) & MaxPlays=2",
+                        LiveDemoTitle: "LxAudioPlayer · Bounded Clip (15s–45s) & MaxPlays=2",
                         CodeSamples:
                         [
                             new("ExamMedia.razor", """
-                                <BxAudioPlayer Src="/media/listening-test.mp3" Title="Listening Comprehension · Extract 1"
+                                <LxAudioPlayer Src="/media/listening-test.mp3" Title="Listening Comprehension · Extract 1"
                                                Start="15" End="45" MaxPlays="2" @bind-Plays="_playsUsed" Seekable="false"
                                                Hide="@([MediaPlayerControl.Download])" OnLimitReached="@HandleQuotaReached" />
 
-                                <BxVideoPlayer Src="/media/safety-briefing.mp4" Title="Annual Safety Briefing"
+                                <LxVideoPlayer Src="/media/safety-briefing.mp4" Title="Annual Safety Briefing"
                                                Start="0" End="90" MaxPlays="3" Seekable="false"
                                                Tracks="@([new VideoPlayerTrack("/media/en.vtt", "English", "en", Default: true)])" />
                                 """)
@@ -204,7 +204,7 @@ public static partial class LuxLibraryDocs
             // GROUP 4: INTEGRATIONS WITH OTHER LUXSTACK LIBRARIES
             // =========================================================================
             new("integrations-table-query", "Integration: Lux.Table & Lux.Query", "Integrations",
-                "Open file lightboxes directly from Lux.Table row actions and summarize Lux.Query results and facet breakdowns with BxDisplay blocks.",
+                "Open file lightboxes directly from Lux.Table row actions and summarize Lux.Query results and facet breakdowns with LxDisplay blocks.",
                 [
                     new("table-lightbox", "1. Lux.Display + Lux.Table (Row Attachment Lightbox & Gallery)",
                         CodeSamples:
@@ -232,8 +232,8 @@ public static partial class LuxLibraryDocs
                         CodeSamples:
                         [
                             new("QuerySummaryRibbon.razor", """
-                                <BxDisplay Kind="DisplayKind.Stat" Title="Matching Records" Value="@(_result.TotalCount?.ToString("N0") ?? "—")" />
-                                <BxDisplay Kind="DisplayKind.Facts" Title="Facet Counts" Facts="@([.. (_result.Facets?.FirstOrDefault()?.Options ?? [])
+                                <LxDisplay Kind="DisplayKind.Stat" Title="Matching Records" Value="@(_result.TotalCount?.ToString("N0") ?? "—")" />
+                                <LxDisplay Kind="DisplayKind.Facts" Title="Facet Counts" Facts="@([.. (_result.Facets?.FirstOrDefault()?.Options ?? [])
                                     .Select(o => new DisplayFact { Label = o.Value, Value = o.Count.ToString() })])" />
                                 """)
                         ])
@@ -245,7 +245,7 @@ public static partial class LuxLibraryDocs
                         CodeSamples:
                         [
                             new("FormChangeDiff.razor", """
-                                <BxDisplay Kind="DisplayKind.Diff" Title="Review Changes Before Saving"
+                                <LxDisplay Kind="DisplayKind.Diff" Title="Review Changes Before Saving"
                                            DiffItems="@([.. _form.DirtyPaths.Select(key =>
                                                new DisplayDiffItem(key, _baseline[key]?.ToString(), _form.GetValue<object>(key)?.ToString(), Changed: true))])" />
                                 """)
@@ -302,53 +302,53 @@ public static partial class LuxLibraryDocs
                     new("format-blocks", "1. Stat, Threshold-Reactive Meter, Masked Secret & Diff",
                         Paragraphs: ["Toggle Storage Quota across Normal (55%), Warning (82%), and Error (95%) thresholds alongside Stat sparklines, masked secret code blocks, and Diff rows."],
                         LiveDemoKey: "display-blocks",
-                        LiveDemoTitle: "BxDisplay · Stat, Meter, Secret Code & Diff",
+                        LiveDemoTitle: "LxDisplay · Stat, Meter, Secret Code & Diff",
                         CodeSamples:
                         [
                             new("DisplayBlocks.razor", """
-                                <BxDisplay Kind="DisplayKind.Stat" Title="MRR" Value="€148,900" Delta="+14.2%" Trend="@([102.0, 118.0, 134.0, 148.9])" />
-                                <BxDisplay Kind="DisplayKind.Meter" Title="Storage Quota" MeterValue="@_val" MeterMax="100" WarningThreshold="75" ErrorThreshold="90" />
-                                <BxDisplay Kind="DisplayKind.Code" Variant="secret" Title="API Token" Value="sk_live_luxstack_3210" VisibleChars="4" Copy="true" />
-                                <BxDisplay Kind="DisplayKind.Diff" Title="Plan Upgrade" DiffItems="@([new DisplayDiffItem("Tier", "Starter", "Enterprise", Changed: true)])" />
+                                <LxDisplay Kind="DisplayKind.Stat" Title="MRR" Value="€148,900" Delta="+14.2%" Trend="@([102.0, 118.0, 134.0, 148.9])" />
+                                <LxDisplay Kind="DisplayKind.Meter" Title="Storage Quota" MeterValue="@_val" MeterMax="100" WarningThreshold="75" ErrorThreshold="90" />
+                                <LxDisplay Kind="DisplayKind.Code" Variant="secret" Title="API Token" Value="sk_live_luxstack_3210" VisibleChars="4" Copy="true" />
+                                <LxDisplay Kind="DisplayKind.Diff" Title="Plan Upgrade" DiffItems="@([new DisplayDiffItem("Tier", "Starter", "Enterprise", Changed: true)])" />
                                 """)
                         ]),
                     new("structured-inspector", "2. Copyable Facts & Release Pipeline Timeline",
                         Paragraphs: ["Combine DisplayKind.Facts (copyable monospace metadata, status chips, null-safe fallbacks) with DisplayKind.Timeline (Done, Current, Upcoming)."],
                         LiveDemoKey: "display-structured",
-                        LiveDemoTitle: "BxDisplay · Facts & Timeline",
+                        LiveDemoTitle: "LxDisplay · Facts & Timeline",
                         CodeSamples:
                         [
                             new("StructuredBlocks.razor", """
-                                <BxDisplay Kind="DisplayKind.Facts" Surface="DisplaySurface.Bordered" Title="Cluster Metadata" Facts="@([
+                                <LxDisplay Kind="DisplayKind.Facts" Surface="DisplaySurface.Bordered" Title="Cluster Metadata" Facts="@([
                                     new DisplayFact { Label = "Environment", Value = "Production", Copy = true, Mono = true },
-                                    new DisplayFact { Label = "Region", Value = "eu-west-3", Chip = new DisplayChip("Healthy", BxColor.Success) }
+                                    new DisplayFact { Label = "Region", Value = "eu-west-3", Chip = new DisplayChip("Healthy", LxColor.Success) }
                                 ])" />
-                                <BxDisplay Kind="DisplayKind.Timeline" Surface="DisplaySurface.Bordered" Title="Release Pipeline" TimelineItems="@([
+                                <LxDisplay Kind="DisplayKind.Timeline" Surface="DisplaySurface.Bordered" Title="Release Pipeline" TimelineItems="@([
                                     new DisplayTimelineItem("Build NativeAOT Core", Time: "09:12", State: DisplayTimelineState.Done),
                                     new DisplayTimelineItem("Rollout Canary", Time: "In progress", State: DisplayTimelineState.Current)
                                 ])" />
                                 """)
                         ]),
-                    new("audio-player", "3. Constrained Exam BxAudioPlayer (Clip Bounds & MaxPlays)",
-                        Paragraphs: ["Render a constrained exam-mode BxAudioPlayer (Start=15s, End=45s, MaxPlays=2, Seekable=false) alongside headless FilePreviewService utilities."],
+                    new("audio-player", "3. Constrained Exam LxAudioPlayer (Clip Bounds & MaxPlays)",
+                        Paragraphs: ["Render a constrained exam-mode LxAudioPlayer (Start=15s, End=45s, MaxPlays=2, Seekable=false) alongside headless FilePreviewService utilities."],
                         LiveDemoKey: "display-audio",
-                        LiveDemoTitle: "BxAudioPlayer & Headless FilePreviewService",
+                        LiveDemoTitle: "LxAudioPlayer & Headless FilePreviewService",
                         CodeSamples:
                         [
                             new("AudioAndPreview.razor", """
-                                <BxAudioPlayer Src="/media/sample.mp3" Title="Exam Listening Extract"
+                                <LxAudioPlayer Src="/media/sample.mp3" Title="Exam Listening Extract"
                                                Start="15" End="45" MaxPlays="2" Seekable="false" />
                                 """)
                         ]),
                     new("accordion-list", "4. Multi-Open Accordion & Progressive Reveal List",
                         Paragraphs: ["Expand multiple FAQ sections with DisplayKind.Accordion and reveal additional checklist rows incrementally using Max=\"2\" Step=\"2\"."],
                         LiveDemoKey: "display-accordion-list",
-                        LiveDemoTitle: "BxDisplay · Accordion & Progressive List",
+                        LiveDemoTitle: "LxDisplay · Accordion & Progressive List",
                         CodeSamples:
                         [
                             new("AccordionList.razor", """
-                                <BxDisplay Kind="DisplayKind.Accordion" Multiple="true" AccordionItems="@_faqs" />
-                                <BxDisplay Kind="DisplayKind.List" Max="2" Step="2" ListItems="@_checklist" />
+                                <LxDisplay Kind="DisplayKind.Accordion" Multiple="true" AccordionItems="@_faqs" />
+                                <LxDisplay Kind="DisplayKind.List" Max="2" Step="2" ListItems="@_checklist" />
                                 """)
                         ]),
                     new("csv-mime-inspector", "5. Live FilePreviewService MIME Detector & RFC 4180 CSV Parser",
@@ -367,6 +367,6 @@ public static partial class LuxLibraryDocs
             new("api", "API Reference", "Reference",
                 "Complete public API reference for Lux.Display.Core and Lux.Display.",
                 [],
-                ApiTypes: [typeof(BxDisplay), typeof(BxAudioPlayer), typeof(BxVideoPlayer), typeof(BxFilePreviewProvider), typeof(FilePreviewService), typeof(FilePreviewFile), typeof(FilePreviewOptions)])
+                ApiTypes: [typeof(LxDisplay), typeof(LxAudioPlayer), typeof(LxVideoPlayer), typeof(LxFilePreviewProvider), typeof(FilePreviewService), typeof(FilePreviewFile), typeof(FilePreviewOptions)])
         ]);
 }

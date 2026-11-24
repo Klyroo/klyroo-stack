@@ -1,11 +1,11 @@
 <div class="flex w-full max-w-xs flex-col gap-3">
-    <BxFormField Label="Country">
-        <BxSelectMenu OptionsProvider="_source.ByPage" ResolveSelected="_source.Resolve" PageSize="20" Placeholder="Search a country"
+    <LxFormField Label="Country">
+        <LxSelectMenu OptionsProvider="_source.ByPage" ResolveSelected="_source.Resolve" PageSize="20" Placeholder="Search a country"
                       Value="_values" ValueChanged="@(v => _values = v ?? [])" data-testid="remote-select" />
-    </BxFormField>
-    <p class="text-sm text-(--blux-text-muted)" data-testid="remote-state">Selected: @(_values.Count > 0 ? string.Join(", ", _values) : "none")</p>
-    <p class="text-sm text-(--blux-text-muted)" data-testid="remote-requests">Source calls: @_source.Requests</p>
-    <p class="text-sm text-(--blux-text-muted)" data-testid="remote-last">Last call: @_source.Last</p>
+    </LxFormField>
+    <p class="text-sm text-(--lux-text-muted)" data-testid="remote-state">Selected: @(_values.Count > 0 ? string.Join(", ", _values) : "none")</p>
+    <p class="text-sm text-(--lux-text-muted)" data-testid="remote-requests">Source calls: @_source.Requests</p>
+    <p class="text-sm text-(--lux-text-muted)" data-testid="remote-last">Last call: @_source.Last</p>
 </div>
 
 @code {

@@ -1,9 +1,9 @@
 <div class="flex w-full max-w-xs flex-col gap-3">
-    <BxSwitch @bind-Value="_failing" Label="The source is down" data-testid="remote-fail" />
-    <BxFormField Label="Country">
-        <BxSelectMenu OptionsProvider="_source.ByPage" PageSize="20" Placeholder="Search a country" @bind-Value="_values" data-testid="remote-error-select" />
-    </BxFormField>
-    <p class="text-sm text-(--blux-text-muted)" data-testid="remote-error-requests">Source calls: @_source.Requests</p>
+    <LxSwitch @bind-Value="_failing" Label="The source is down" data-testid="remote-fail" />
+    <LxFormField Label="Country">
+        <LxSelectMenu OptionsProvider="_source.ByPage" PageSize="20" Placeholder="Search a country" @bind-Value="_values" data-testid="remote-error-select" />
+    </LxFormField>
+    <p class="text-sm text-(--lux-text-muted)" data-testid="remote-error-requests">Source calls: @_source.Requests</p>
 </div>
 
 @code {

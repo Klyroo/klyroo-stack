@@ -46,7 +46,7 @@ public sealed class DocsPrompts(DocsService docs)
         sb.Append("- Use only the parameters, events and slots above. Call `get-component` with sections api or examples when you need descriptions or a pattern to copy.\n");
         sb.Append("- Pass a parameter of a bindable component as `@bind-Name` when the value must flow back to .NET.\n");
         sb.Append("- Style with `Class` and `Ui`; do not invent parameters for styling. Call `get-component` with section theme to see the slots.\n");
-        sb.Append("- Components work in every render mode; a `BxButton` with `OnClick` is disabled until the page is interactive, so use `Href` or a submit button when the page may be static.\n");
+        sb.Append("- Components work in every render mode; a `LxButton` with `OnClick` is disabled until the page is interactive, so use `Href` or a submit button when the page may be static.\n");
         sb.Append("- Return the markup first, then a line for each assumption you made.\n");
         return sb.ToString();
     }

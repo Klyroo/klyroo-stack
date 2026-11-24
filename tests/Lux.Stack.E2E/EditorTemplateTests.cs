@@ -36,7 +36,7 @@ internal static class EditorChecks
     public static ILocator Items(IPage page) => page.GetByTestId("sidebar").GetByTestId("document-item");
 
     public static Task WaitEditor(IPage page) =>
-        page.WaitForFunctionAsync("() => { const e = document.querySelector('bx-editor'); return !!e && e.hasAttribute('data-ready') && !!e.querySelector('.ProseMirror'); }", null, new() { Timeout = 30_000 });
+        page.WaitForFunctionAsync("() => { const e = document.querySelector('lx-editor'); return !!e && e.hasAttribute('data-ready') && !!e.querySelector('.ProseMirror'); }", null, new() { Timeout = 30_000 });
 
     /// <summary>Waits until the status bar says the last change is in the storage.</summary>
     public static Task WaitSaved(IPage page) =>
@@ -647,21 +647,21 @@ internal static class EditorChecks
 
 /// <summary>
 /// The Editor template as a user ships it: <c>dotnet publish -c Release</c>, run in Production at the root and below a path base. Started by
-/// <c>build/verify-templates.mjs</c> with <c>BLUX_TEMPLATE_PUBLISHED</c>, <c>BLUX_TEMPLATE_ASSEMBLY</c> and <c>BLUX_TEMPLATE_PROBE</c>; without them the tests are skipped.
+/// <c>build/verify-templates.mjs</c> with <c>LUX_TEMPLATE_PUBLISHED</c>, <c>LUX_TEMPLATE_ASSEMBLY</c> and <c>LUX_TEMPLATE_PROBE</c>; without them the tests are skipped.
 /// No request may fail and the console stays free of errors.
 /// </summary>
 public class EditorTemplateTests(PlaygroundServer server)
 {
-    private static string? Published => Environment.GetEnvironmentVariable("BLUX_TEMPLATE_PUBLISHED");
-    private static string? AssemblyName => Environment.GetEnvironmentVariable("BLUX_TEMPLATE_ASSEMBLY");
-    private static string? Probe => Environment.GetEnvironmentVariable("BLUX_TEMPLATE_PROBE");
+    private static string? Published => Environment.GetEnvironmentVariable("LUX_TEMPLATE_PUBLISHED");
+    private static string? AssemblyName => Environment.GetEnvironmentVariable("LUX_TEMPLATE_ASSEMBLY");
+    private static string? Probe => Environment.GetEnvironmentVariable("LUX_TEMPLATE_PROBE");
 
     [Theory]
     [InlineData(null)]
     [InlineData("/demo/editor")]
     public async Task Published_app_works_from_the_first_document_to_the_deleted_one(string? pathBase)
     {
-        Assert.SkipWhen(string.IsNullOrEmpty(Published) || string.IsNullOrEmpty(AssemblyName), "BLUX_TEMPLATE_PUBLISHED and BLUX_TEMPLATE_ASSEMBLY are not set.");
+        Assert.SkipWhen(string.IsNullOrEmpty(Published) || string.IsNullOrEmpty(AssemblyName), "LUX_TEMPLATE_PUBLISHED and LUX_TEMPLATE_ASSEMBLY are not set.");
 
         var host = $"http://127.0.0.1:{FreePort()}";
         var directory = Path.GetFullPath(Published!);
@@ -750,7 +750,7 @@ public class EditorTemplateTests(PlaygroundServer server)
             // Accessibility in the color mode of the run and in the other one.
             var mode = async () => ((await page.Locator("html").GetAttributeAsync("class") ?? "").Contains("dark") ? "dark" : "light");
             await EditorChecks.AssertAccessible(page, await mode());
-            await page.Locator("[data-bx-color-mode=toggle]").First.ClickAsync();
+            await page.Locator("[data-lx-color-mode=toggle]").First.ClickAsync();
             await page.WaitForFunctionAsync("() => document.getAnimations().length === 0");
             await EditorChecks.AssertAccessible(page, await mode());
 
@@ -828,7 +828,7 @@ public class EditorDemoTests(PlaygroundServer server) : PlaygroundTest(server)
         if (!TemplatesReady)
         {
             Assert.False(Environment.GetEnvironmentVariable("CI") is { Length: > 0 }, "The template demos are not running.");
-            Assert.SkipWhen(true, "The docs run published with no BLUX_TEMPLATES_PUBLISHED folder: there is no template demo to open.");
+            Assert.SkipWhen(true, "The docs run published with no LUX_TEMPLATES_PUBLISHED folder: there is no template demo to open.");
         }
         var requests = new List<string>();
         Page.Request += (_, request) => { lock (requests) requests.Add(request.Url); };

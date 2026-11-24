@@ -1,14 +1,14 @@
-<div class="w-full overflow-hidden rounded-lg border border-(--blux-border) bg-(--blux-bg)">
-    <BxPageSection Icon="zap" Headline="Features" Title="Built for the way Blazor renders" HeadingLevel="3"
+<div class="w-full overflow-hidden rounded-lg border border-(--lux-border) bg-(--lux-bg)">
+    <LxPageSection Icon="zap" Headline="Features" Title="Built for the way Blazor renders" HeadingLevel="3"
                    Description="Components that work before the runtime starts and keep working after it does."
                    Features="_features" Links="_links" Ui="_ui">
         <Media>
-            <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg-elevated) p-6 text-sm text-(--blux-text-muted)">
-                <p class="font-mono text-(--blux-text)">Render mode: static</p>
+            <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg-elevated) p-6 text-sm text-(--lux-text-muted)">
+                <p class="font-mono text-(--lux-text)">Render mode: static</p>
                 <p class="mt-2">This panel is plain server-rendered HTML.</p>
             </div>
         </Media>
-    </BxPageSection>
+    </LxPageSection>
 </div>
 
 @code {
@@ -23,6 +23,6 @@
 
     private readonly PageLinkItem[] _links =
     [
-        new("Read the docs", "/docs/installation") { Color = BxColor.Neutral, Variant = ButtonVariant.Outline },
+        new("Read the docs", "/docs/installation") { Color = LxColor.Neutral, Variant = ButtonVariant.Outline },
     ];
 }

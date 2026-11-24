@@ -42,7 +42,7 @@ public sealed class StackFullEcosystemTests : BunitContext
         }
 
         Assert.Null(LuxStackCatalog.ResolveComponentModule("NonExistentWidget"));
-        Assert.Equal("lux-table", LuxStackCatalog.ResolveComponentModule("BxDataListTable<Customer>")?.Id);
+        Assert.Equal("lux-table", LuxStackCatalog.ResolveComponentModule("LxDataListTable<Customer>")?.Id);
     }
 
     [Fact]
@@ -52,16 +52,16 @@ public sealed class StackFullEcosystemTests : BunitContext
         JSInterop.Mode = JSRuntimeMode.Loose;
         SetRendererInfo(new RendererInfo("Server", true));
 
-        var formProvider = Render<BxFormProvider>();
-        var fileProvider = Render<BxFilePreviewProvider>();
+        var formProvider = Render<LxFormProvider>();
+        var fileProvider = Render<LxFilePreviewProvider>();
         Assert.True(Services.GetRequiredService<FilePreviewService>().IsMounted);
 
         var dash = new DashboardController("eco");
         dash.AddView("summary", "Summary");
-        var dashCut = Render<BxDashboardPage>(p => p
+        var dashCut = Render<LxDashboardPage>(p => p
             .Add(x => x.Dashboard, dash)
             .Add(x => x.Title, "LuxStack Control Center")
-            .AddChildContent<BxDashboardStat>(s => s
+            .AddChildContent<LxDashboardStat>(s => s
                 .Add(x => x.Label, "Total MRR")
                 .Add(x => x.Value, 240_000)
                 .Add(x => x.Compare, 200_000)));
@@ -71,18 +71,18 @@ public sealed class StackFullEcosystemTests : BunitContext
         Customer[] rows = [new(1, "Acme Corp", "EU", 120_000m), new(2, "Beta Labs", "US", 80_000m)];
         var tableCut = Render(builder =>
         {
-            builder.OpenComponent<BxDataList<Customer>>(0);
-            builder.AddAttribute(1, nameof(BxDataList<Customer>.Schema), CustomerSchema);
-            builder.AddAttribute(2, nameof(BxDataList<Customer>.Items), rows);
-            builder.AddAttribute(3, nameof(BxDataList<Customer>.UrlSync), false);
-            builder.AddAttribute(4, nameof(BxDataList<Customer>.ChildContent), (RenderFragment)(b =>
+            builder.OpenComponent<LxDataList<Customer>>(0);
+            builder.AddAttribute(1, nameof(LxDataList<Customer>.Schema), CustomerSchema);
+            builder.AddAttribute(2, nameof(LxDataList<Customer>.Items), rows);
+            builder.AddAttribute(3, nameof(LxDataList<Customer>.UrlSync), false);
+            builder.AddAttribute(4, nameof(LxDataList<Customer>.ChildContent), (RenderFragment)(b =>
             {
-                b.OpenComponent<BxDataListTable<Customer>>(0);
-                b.AddAttribute(1, nameof(BxDataListTable<Customer>.ChildContent), (RenderFragment)(cb =>
+                b.OpenComponent<LxDataListTable<Customer>>(0);
+                b.AddAttribute(1, nameof(LxDataListTable<Customer>.ChildContent), (RenderFragment)(cb =>
                 {
-                    cb.OpenComponent<BxDataListColumn<Customer>>(0);
-                    cb.AddAttribute(1, nameof(BxDataListColumn<Customer>.Field), "name");
-                    cb.AddAttribute(2, nameof(BxDataListColumn<Customer>.Title), "Customer");
+                    cb.OpenComponent<LxDataListColumn<Customer>>(0);
+                    cb.AddAttribute(1, nameof(LxDataListColumn<Customer>.Field), "name");
+                    cb.AddAttribute(2, nameof(LxDataListColumn<Customer>.Title), "Customer");
                     cb.CloseComponent();
                 }));
                 b.CloseComponent();
@@ -92,7 +92,7 @@ public sealed class StackFullEcosystemTests : BunitContext
         Assert.Contains("Acme Corp", tableCut.Markup);
         Assert.Contains("Beta Labs", tableCut.Markup);
 
-        // Open CSV preview via DI FilePreviewService and verify BxFilePreviewProvider renders CSV rows
+        // Open CSV preview via DI FilePreviewService and verify LxFilePreviewProvider renders CSV rows
         var previewSvc = Services.GetRequiredService<FilePreviewService>();
         previewSvc.Open(new FilePreviewFile
         {
@@ -117,7 +117,7 @@ public sealed class StackFullEcosystemTests : BunitContext
         var history = new UndoStack<IReadOnlyList<Customer>>([.. accounts], limit: 10);
 
         // 1. Add account via FormService Drawer
-        var formProvider = Render<BxFormProvider>();
+        var formProvider = Render<LxFormProvider>();
         var formSvc = Services.GetRequiredService<FormService>();
         var formTask = formSvc.CreateFormAsync(new FormSchema
         {

@@ -5,10 +5,10 @@
 <div class="pg-prose">
     <p class="pg-eyebrow">Getting started</p>
     <h1>Images</h1>
-    <p class="pg-lead">Components that show a picture render a <code>BxImage</code>, and an image provider turns its source into resized, format-converted candidates for <code>srcset</code>.</p>
+    <p class="pg-lead">Components that show a picture render a <code>LxImage</code>, and an image provider turns its source into resized, format-converted candidates for <code>srcset</code>.</p>
 
-    <h2>BxImage</h2>
-    <p><code>BxImage</code> renders one <code>img</code> with the <code>width</code>, <code>height</code>, <code>srcset</code>, <code>sizes</code> and <code>loading</code> a provider can fill in. <code>Alt</code> is required: pass an empty string for a decorative image. Without a provider (the default, <code>none</code>) the source is kept as it is and only <code>width</code>, <code>height</code> and <code>loading</code> are added, so nothing changes until you pick one.</p>
+    <h2>LxImage</h2>
+    <p><code>LxImage</code> renders one <code>img</code> with the <code>width</code>, <code>height</code>, <code>srcset</code>, <code>sizes</code> and <code>loading</code> a provider can fill in. <code>Alt</code> is required: pass an empty string for a decorative image. Without a provider (the default, <code>none</code>) the source is kept as it is and only <code>width</code>, <code>height</code> and <code>loading</code> are added, so nothing changes until you pick one.</p>
     <CodeBlock Title="Home.razor" Code="@BasicUsage" />
     <p>Supported parameters include <code>Width</code>, <code>Height</code>, <code>Sizes</code>, <code>Densities</code>, <code>Format</code>, <code>Quality</code>, <code>Fit</code>, <code>Modifiers</code> (provider specific), <code>Provider</code>, <code>Preset</code>, <code>Loading</code> (lazy by default, eager when preloading), <code>FetchPriority</code>, <code>Preload</code> and <code>Placeholder</code>.</p>
 
@@ -18,7 +18,7 @@
     <p>For <code>"100vw sm:50vw md:400px"</code> with <code>"x1 x2"</code> the <code>sizes</code> attribute is <code>(max-width: 639px) 100vw, (max-width: 767px) 50vw, 400px</code> and the <code>srcset</code> holds the candidates 320w, 400w, 640w, 800w and 1280w: each size multiplied by each density. Without <code>Sizes</code>, <code>Width</code> and <code>Height</code> give an <code>x</code> descriptor per density (<code>1x</code>, <code>2x</code>). An unprefixed fluid size such as <code>100vw</code> is measured against the first breakpoint (or the widest screen) so it always produces realistic responsive candidates.</p>
 
     <h2>Providers</h2>
-    <p>A provider is an <code>IBxImageProvider</code>: a name, whether it can resize, and <code>GetUrl(src, modifiers)</code>. Register it in <code>AddLuxUi</code>, on the server and in the WebAssembly client alike, and select it with <code>o.Images.DefaultProvider</code> or the <code>Provider</code> parameter. The settings become read-only once the first image is resolved.</p>
+    <p>A provider is an <code>ILxImageProvider</code>: a name, whether it can resize, and <code>GetUrl(src, modifiers)</code>. Register it in <code>AddLuxUi</code>, on the server and in the WebAssembly client alike, and select it with <code>o.Images.DefaultProvider</code> or the <code>Provider</code> parameter. The settings become read-only once the first image is resolved.</p>
     <CodeBlock Title="Program.cs" Code="@ProviderUsage" />
     <p>The <code>Lux.UI.Images</code> package holds the providers of the main services, each built from the vendor's documentation:</p>
     <div class="not-prose overflow-x-auto rounded-xl border border-default" data-testid="image-providers">
@@ -42,16 +42,16 @@
     <p>A remote <code>src</code> is only sent to a provider that fetches remote images (Cloudflare, Netlify, Vercel, local) when its host is in <code>o.Images.Domains</code>; any other host is rendered untouched. <code>o.Images.Presets</code> names bundles of options (<code>Preset="thumb"</code>), and <code>AddTemplate</code> or <code>TemplateImageProvider</code> covers any service whose URLs follow a pattern.</p>
 
     <h2>Components that use it</h2>
-    <p><code>BxAvatar</code> (and <code>BxColorModeAvatar</code>, <code>BxUser</code>), <code>BxColorModeImage</code>, <code>BxBlogPost</code>, <code>BxChangelogVersion</code>, <code>BxPageLogos</code> and the thumbnail of <code>BxChatAttachment</code> render a <code>BxImage</code>. Each takes an <code>ImageOptions</code> parameter forwarded directly to it. The avatar passes its size in pixels as the width and the height, so a provider serves a picture of exactly that size, and keeps its initials when the picture fails to load.</p>
+    <p><code>LxAvatar</code> (and <code>LxColorModeAvatar</code>, <code>LxUser</code>), <code>LxColorModeImage</code>, <code>LxBlogPost</code>, <code>LxChangelogVersion</code>, <code>LxPageLogos</code> and the thumbnail of <code>LxChatAttachment</code> render a <code>LxImage</code>. Each takes an <code>ImageOptions</code> parameter forwarded directly to it. The avatar passes its size in pixels as the width and the height, so a provider serves a picture of exactly that size, and keeps its initials when the picture fails to load.</p>
     <CodeBlock Code="@ComponentUsage" />
 
     <h2>Preloading</h2>
     <p><code>Preload</code> loads the image eagerly with a high fetch priority and adds <code>&lt;link rel="preload" as="image" imagesrcset imagesizes&gt;</code> to the head through <code>HeadContent</code>. That needs a <code>HeadOutlet</code> in the app, which the Blazor Web App template has.</p>
 
     <h2>Resizing on your own server</h2>
-    <p>The <code>Lux.UI.Images.Local</code> package is the counterpart of IPX: an endpoint that resizes and converts images with libvips (through NetVips) and a <code>local</code> provider that builds URLs to it. This site uses it, so the images of the <a href="/components/image">BxImage page</a> are real resized WebP files.</p>
+    <p>The <code>Lux.UI.Images.Local</code> package is the counterpart of IPX: an endpoint that resizes and converts images with libvips (through NetVips) and a <code>local</code> provider that builds URLs to it. This site uses it, so the images of the <a href="/components/image">LxImage page</a> are real resized WebP files.</p>
     <CodeBlock Title="Program.cs" Code="@LocalSetup" />
-    <p>In a WebAssembly client register only the URL builder, <code>o.Images.AddLocal(makeDefault: true)</code> from <code>Lux.UI.Images</code>, which has no server dependency. The endpoint is <code>_blux/img</code>, without a leading slash: the browser resolves it against <code>&lt;base href&gt;</code>, so an app served below a path base (<code>UsePathBase("/x")</code>, <code>&lt;base href="/x/"&gt;</code>) reaches its own optimizer at <code>/x/_blux/img</code> in every render mode. Call <code>UseRouting()</code> right after <code>UsePathBase</code>. An endpoint you give that starts with <code>/</code> is used literally, which is only right at the root.</p>
+    <p>In a WebAssembly client register only the URL builder, <code>o.Images.AddLocal(makeDefault: true)</code> from <code>Lux.UI.Images</code>, which has no server dependency. The endpoint is <code>_lux/img</code>, without a leading slash: the browser resolves it against <code>&lt;base href&gt;</code>, so an app served below a path base (<code>UsePathBase("/x")</code>, <code>&lt;base href="/x/"&gt;</code>) reaches its own optimizer at <code>/x/_lux/img</code> in every render mode. Call <code>UseRouting()</code> right after <code>UsePathBase</code>. An endpoint you give that starts with <code>/</code> is used literally, which is only right at the root.</p>
 
     <h3>Security</h3>
     <p>The endpoint is meant to face the internet, so every request is bounded in what it can reach and in what it costs.</p>
@@ -85,19 +85,19 @@
         new("AddVercel(sizes)", "Vercel Image Optimization", "/_vercel/image?url={src}&w=1080&q=75"),
         new("AddBunny(baseUrl)", "Bunny Optimizer", "{zone}.b-cdn.net/{path}?width=500&quality=75&format=webp"),
         new("AddTemplate(name, template)", "Any service", "{src} {encodedSrc} {width} {height} {quality} {format}"),
-        new("AddLocal(endpoint)", "Lux.UI.Images.Local", "_blux/img?src=%2Fimg%2Fa.png&w=384&f=webp"),
+        new("AddLocal(endpoint)", "Lux.UI.Images.Local", "_lux/img?src=%2Fimg%2Fa.png&w=384&f=webp"),
     ];
 
     private const string BasicUsage = """
-        <BxImage Src="/img/team.jpg" Alt="The team on stage" Width="640" Height="360"
+        <LxImage Src="/img/team.jpg" Alt="The team on stage" Width="640" Height="360"
                  Format="webp" Quality="80" Sizes="100vw md:640px" />
 
         @* Decorative: an empty alt *@
-        <BxImage Src="/img/texture.png" Alt="" />
+        <LxImage Src="/img/texture.png" Alt="" />
         """;
 
     private const string SizesUsage = """
-        <BxImage Src="/img/hero.jpg" Alt="Layered waves" Width="640" Height="360"
+        <LxImage Src="/img/hero.jpg" Alt="Layered waves" Width="640" Height="360"
                  Sizes="100vw sm:50vw md:400px" Densities="x1 x2" Format="webp" />
         """;
 
@@ -106,17 +106,17 @@
         {
             o.Images.Domains.Add("images.example.com");           // remote hosts a provider may process
             o.Images.AddCloudinary("my-cloud", makeDefault: true); // Lux.UI.Images
-            o.Images.AddProvider(new MyProvider());                // your own IBxImageProvider
-            o.Images.Presets["thumb"] = new BxImageOptions { Format = "webp", Quality = 60 };
+            o.Images.AddProvider(new MyProvider());                // your own ILxImageProvider
+            o.Images.Presets["thumb"] = new LxImageOptions { Format = "webp", Quality = 60 };
         });
         """;
 
     private const string ComponentUsage = """
-        <BxAvatar Src="/img/ada.jpg" Alt="Ada Lovelace" Size="BxSize.Lg"
-                  ImageOptions="@(new BxImageOptions { Format = "webp", Quality = 80 })" />
+        <LxAvatar Src="/img/ada.jpg" Alt="Ada Lovelace" Size="LxSize.Lg"
+                  ImageOptions="@(new LxImageOptions { Format = "webp", Quality = 80 })" />
 
-        <BxBlogPost Title="Launch" Image="/img/cover.jpg" ImageAlt="The launch"
-                    ImageOptions="@(new BxImageOptions { Sizes = "100vw md:50vw", Format = "webp" })" />
+        <LxBlogPost Title="Launch" Image="/img/cover.jpg" ImageAlt="The launch"
+                    ImageOptions="@(new LxImageOptions { Sizes = "100vw md:50vw", Format = "webp" })" />
         """;
 
     private const string LocalSetup = """
@@ -128,6 +128,6 @@
         });
 
         var app = builder.Build();
-        app.MapLuxImages();   // GET /_blux/img?src=/img/team.jpg&w=640&f=webp
+        app.MapLuxImages();   // GET /_lux/img?src=/img/team.jpg&w=640&f=webp
         """;
 }

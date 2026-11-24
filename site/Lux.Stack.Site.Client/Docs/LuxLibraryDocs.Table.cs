@@ -21,9 +21,9 @@ public static partial class LuxLibraryDocs
                             "Every table is powered by a DataListSchema<T> from Lux.Query.Core: columns, sorting, filtering, facets, URL synchronization, sticky column pinning, keyboard/pointer column resizing with cookie/localStorage persistence, hierarchical tree expansion with continuation rails, visual row grouping, footer summaries, bulk selection bars, 2px loading progress lines, 9 cell skeleton shapes, and automatic phone summary rows work seamlessly together."
                         ],
                         LiveDemoKey: "table-basic",
-                        LiveDemoTitle: "Lux.Table · Live BxDataList with HeaderMenu & Footer Sum"),
+                        LiveDemoTitle: "Lux.Table · Live LxDataList with HeaderMenu & Footer Sum"),
                     new("pipeline", "How Lux.Table Works End-to-End (The 5-Stage Lifecycle)",
-                        Paragraphs: ["BxDataList<TItem> acts as a headless coordinator that cascades a DataListContext<TItem> to every child slot (Toolbar, FilterBar, FilterPanel, SelectionBar, Table, Grid, Pagination, LoadMore)."],
+                        Paragraphs: ["LxDataList<TItem> acts as a headless coordinator that cascades a DataListContext<TItem> to every child slot (Toolbar, FilterBar, FilterPanel, SelectionBar, Table, Grid, Pagination, LoadMore)."],
                         TableHeaders: ["Stage", "Component / Type", "What Happens"],
                         TableRows:
                         [
@@ -31,14 +31,14 @@ public static partial class LuxLibraryDocs
                             new("2. URL & Preferences", "QueryState (UrlSync) + Lux.Table.lib.module.js", "Reads query state (?q=&p=&s=&f.*) via DataListStateQuery and restores pinned/hidden/resized column widths from cookie (Web) or localStorage (MAUI)."),
                             new("3. Execute Query", "DataListController<TItem>", "Coalesces filter/sort/page edits, shows a 2px progress line during background reloads, and cancels stale in-flight requests via CancellationToken."),
                             new("4. Shape Rows", "DataListTree<T> · DataListGroupBy<T> · DataListSummaries<T>", "Builds cycle-guarded tree nodes, collapsible group headers, or footer Sum/Average/Count/Min/Max aggregations."),
-                            new("5. Responsive Render", "BxDataListTable · BxDataListGrid · DataListRowSummary", "Renders full desktop columns, switches to Card Grid via layout toggle, or auto-switches to 2-line mobile summary rows under 768px.")
+                            new("5. Responsive Render", "LxDataListTable · LxDataListGrid · DataListRowSummary", "Renders full desktop columns, switches to Card Grid via layout toggle, or auto-switches to 2-line mobile summary rows under 768px.")
                         ]),
                     new("layers", "Two-Layer Architecture",
                         TableHeaders: ["Package", "Primary Exports", "Compatibility"],
                         TableRows:
                         [
                             new("Lux.Table.Core", "DataListTree<TItem>, DataListTreeNode<TItem>, DataListTreeSelectionMode", "Headless C# · IsAotCompatible=true"),
-                            new("Lux.Table", "BxDataList, BxDataListTable, BxDataListGrid, BxDataListColumn, Toolbar, FilterBar, FilterPanel, SelectionBar, Pagination, LoadMore, GroupBy, Summaries, RowSummary, Lux.Table.lib.module.js", "browser, ios, android, maccatalyst, windows")
+                            new("Lux.Table", "LxDataList, LxDataListTable, LxDataListGrid, LxDataListColumn, Toolbar, FilterBar, FilterPanel, SelectionBar, Pagination, LoadMore, GroupBy, Summaries, RowSummary, Lux.Table.lib.module.js", "browser, ios, android, maccatalyst, windows")
                         ])
                 ]),
             new("installation", "Installation & Setup", "Getting Started",
@@ -74,36 +74,36 @@ public static partial class LuxLibraryDocs
             // =========================================================================
             // GROUP 2: CORE COMPONENTS & FEATURES
             // =========================================================================
-            new("data-list", "BxDataList, Toolbar & Layouts", "Components",
-                "Coordinate Table and Card Grid views, Toolbars, FilterBars, FilterPanels, Bulk Selection Bars, and Pagination inside one BxDataList<TItem> root.",
+            new("data-list", "LxDataList, Toolbar & Layouts", "Components",
+                "Coordinate Table and Card Grid views, Toolbars, FilterBars, FilterPanels, Bulk Selection Bars, and Pagination inside one LxDataList<TItem> root.",
                 [
                     new("composition", "Full Enterprise Composition",
-                        Paragraphs: ["BxDataList<TItem> cascades DataListContext<TItem> to every descendant so you can compose Toolbars, FilterBars, FilterPanels, SelectionBars, Tables, Grids, LayoutSwitches, ViewToggles, and Paginators in any layout order."],
+                        Paragraphs: ["LxDataList<TItem> cascades DataListContext<TItem> to every descendant so you can compose Toolbars, FilterBars, FilterPanels, SelectionBars, Tables, Grids, LayoutSwitches, ViewToggles, and Paginators in any layout order."],
                         LiveDemoKey: "table-basic",
-                        LiveDemoTitle: "BxDataList with HeaderMenu & Footer Sum",
+                        LiveDemoTitle: "LxDataList with HeaderMenu & Footer Sum",
                         CodeSamples:
                         [
                             new("DirectoryPage.razor", """
-                                <BxDataList TItem="Employee"
+                                <LxDataList TItem="Employee"
                                             Schema="@EmployeeSchemas.Directory"
                                             Items="@_employees"
                                             UrlSync="true"
                                             ApplyMode="DataListApplyMode.Live">
-                                    <BxDataListToolbar TItem="Employee" />
-                                    <BxDataListFilterBar TItem="Employee" />
-                                    <BxDataListTable TItem="Employee"
+                                    <LxDataListToolbar TItem="Employee" />
+                                    <LxDataListFilterBar TItem="Employee" />
+                                    <LxDataListTable TItem="Employee"
                                                      HeaderMenu="true"
                                                      ShowProgressLine="true"
                                                      Density="DataListDensity.Default"
                                                      Summaries="@(new DataListSummaries<Employee>())">
-                                        <BxDataListColumn TItem="Employee" Field="name" Title="Employee" Pin="DataListPin.Start" />
-                                        <BxDataListColumn TItem="Employee" Field="dept" Title="Department" />
-                                        <BxDataListColumn TItem="Employee" Field="salary" Title="Salary"
+                                        <LxDataListColumn TItem="Employee" Field="name" Title="Employee" Pin="DataListPin.Start" />
+                                        <LxDataListColumn TItem="Employee" Field="dept" Title="Department" />
+                                        <LxDataListColumn TItem="Employee" Field="salary" Title="Salary"
                                                           Align="DataListAlign.End"
                                                           Summary="DataListSummaryKind.Sum" />
-                                    </BxDataListTable>
-                                    <BxDataListPagination TItem="Employee" />
-                                </BxDataList>
+                                    </LxDataListTable>
+                                    <LxDataListPagination TItem="Employee" />
+                                </LxDataList>
                                 """)
                         ]),
                     new("enums", "Layout, Density & Selection Enums",
@@ -124,8 +124,8 @@ public static partial class LuxLibraryDocs
                     new("header-menu", "HeaderMenu, Pinning & Keyboard Resizing",
                         Paragraphs:
                         [
-                            "Set HeaderMenu=\"true\" on BxDataListTable so clicking any sortable or hideable column header opens an accessible popover menu offering Sort Ascending, Sort Descending, Clear Sort, Pin Start/End, and Hide Column.",
-                            "When column resizing is enabled, resize handles support both pointer drag and keyboard navigation (ArrowRight/ArrowLeft in 16px steps, Shift+Arrow in 64px steps, Home/End for min/max width, Delete/Backspace to reset). Set PreferencesKey on BxDataList to persist column order, visibility, pins, and widths automatically."
+                            "Set HeaderMenu=\"true\" on LxDataListTable so clicking any sortable or hideable column header opens an accessible popover menu offering Sort Ascending, Sort Descending, Clear Sort, Pin Start/End, and Hide Column.",
+                            "When column resizing is enabled, resize handles support both pointer drag and keyboard navigation (ArrowRight/ArrowLeft in 16px steps, Shift+Arrow in 64px steps, Home/End for min/max width, Delete/Backspace to reset). Set PreferencesKey on LxDataList to persist column order, visibility, pins, and widths automatically."
                         ],
                         TableHeaders: ["DataListPin", "Behavior", "Typical Column"],
                         TableRows:
@@ -137,11 +137,11 @@ public static partial class LuxLibraryDocs
                         CodeSamples:
                         [
                             new("PinnedColumns.razor", """
-                                <BxDataListTable TItem="Employee" HeaderMenu="true">
-                                    <BxDataListColumn TItem="Employee" Field="name" Title="Employee" Pin="DataListPin.Start" SkeletonKind="DataListSkeletonKind.Avatar" />
-                                    <BxDataListColumn TItem="Employee" Field="dept" Title="Department" SkeletonKind="DataListSkeletonKind.Badge" />
-                                    <BxDataListColumn TItem="Employee" Field="salary" Title="Salary" Align="DataListAlign.End" SkeletonKind="DataListSkeletonKind.Number" Summary="DataListSummaryKind.Sum" />
-                                </BxDataListTable>
+                                <LxDataListTable TItem="Employee" HeaderMenu="true">
+                                    <LxDataListColumn TItem="Employee" Field="name" Title="Employee" Pin="DataListPin.Start" SkeletonKind="DataListSkeletonKind.Avatar" />
+                                    <LxDataListColumn TItem="Employee" Field="dept" Title="Department" SkeletonKind="DataListSkeletonKind.Badge" />
+                                    <LxDataListColumn TItem="Employee" Field="salary" Title="Salary" Align="DataListAlign.End" SkeletonKind="DataListSkeletonKind.Number" Summary="DataListSummaryKind.Sum" />
+                                </LxDataListTable>
                                 """)
                         ])
                 ]),
@@ -240,10 +240,10 @@ public static partial class LuxLibraryDocs
             // GROUP 3: INTEGRATIONS WITH OTHER LUXSTACK LIBRARIES
             // =========================================================================
             new("integrations-query", "Integration: Lux.Query & EF Core", "Integrations",
-                "Wire BxDataList directly to Lux.Query schemas, remote EF Core Minimal APIs, facets, URL synchronization, and keyset cursor infinite scroll.",
+                "Wire LxDataList directly to Lux.Query schemas, remote EF Core Minimal APIs, facets, URL synchronization, and keyset cursor infinite scroll.",
                 [
-                    new("query-provider", "1. Connecting BxDataList to an EF Core Minimal API via DataListProvider<T>",
-                        Paragraphs: ["Share one DataListSchema<T> from Lux.Query.Core between your server API and your Blazor/MAUI client. BxDataList invokes your DataListProvider<T> whenever search, filters, sorts, or paging change, cancelling stale requests automatically."],
+                    new("query-provider", "1. Connecting LxDataList to an EF Core Minimal API via DataListProvider<T>",
+                        Paragraphs: ["Share one DataListSchema<T> from Lux.Query.Core between your server API and your Blazor/MAUI client. LxDataList invokes your DataListProvider<T> whenever search, filters, sorts, or paging change, cancelling stale requests automatically."],
                         CodeSamples:
                         [
                             new("ServerBackedTable.razor", """
@@ -251,21 +251,21 @@ public static partial class LuxLibraryDocs
                                 @using Lux.Table
                                 @inject HttpClient Http
 
-                                <BxDataList TItem="EmployeeDto"
+                                <LxDataList TItem="EmployeeDto"
                                             Schema="@EmployeeSchemas.Directory"
                                             Provider="@LoadAsync"
                                             UrlSync="true"
                                             UrlPrefix="emp"
                                             PreferencesKey="emp-directory">
-                                    <BxDataListToolbar TItem="EmployeeDto" />
-                                    <BxDataListFilterPanel TItem="EmployeeDto" />
-                                    <BxDataListTable TItem="EmployeeDto" HeaderMenu="true" ShowProgressLine="true">
-                                        <BxDataListColumn TItem="EmployeeDto" Field="name" Title="Employee" Pin="DataListPin.Start" />
-                                        <BxDataListColumn TItem="EmployeeDto" Field="dept" Title="Department" />
-                                        <BxDataListColumn TItem="EmployeeDto" Field="salary" Title="Salary" Summary="DataListSummaryKind.Sum" />
-                                    </BxDataListTable>
-                                    <BxDataListPagination TItem="EmployeeDto" />
-                                </BxDataList>
+                                    <LxDataListToolbar TItem="EmployeeDto" />
+                                    <LxDataListFilterPanel TItem="EmployeeDto" />
+                                    <LxDataListTable TItem="EmployeeDto" HeaderMenu="true" ShowProgressLine="true">
+                                        <LxDataListColumn TItem="EmployeeDto" Field="name" Title="Employee" Pin="DataListPin.Start" />
+                                        <LxDataListColumn TItem="EmployeeDto" Field="dept" Title="Department" />
+                                        <LxDataListColumn TItem="EmployeeDto" Field="salary" Title="Salary" Summary="DataListSummaryKind.Sum" />
+                                    </LxDataListTable>
+                                    <LxDataListPagination TItem="EmployeeDto" />
+                                </LxDataList>
 
                                 @code {
                                     private async ValueTask<DataListResult<EmployeeDto>> LoadAsync(DataListRequest req, CancellationToken ct)
@@ -282,7 +282,7 @@ public static partial class LuxLibraryDocs
                         Paragraphs: ["Register builder.Services.AddLuxServer() on the ASP.NET Core server so hidden columns, column order, pins, and widths saved in the PreferencesKey cookie are applied on the very first SSR HTML frame with zero layout shift."])
                 ]),
             new("integrations-form-display", "Integration: Lux.Form & Lux.Display", "Integrations",
-                "Launch row edit drawers with Lux.Form (FormService.CreateFormAsync) and preview row attachments or detail modals with Lux.Display (FilePreviewService & BxDisplay).",
+                "Launch row edit drawers with Lux.Form (FormService.CreateFormAsync) and preview row attachments or detail modals with Lux.Display (FilePreviewService & LxDisplay).",
                 [
                     new("row-edit-form", "1. Row Action -> Lux.Form Drawer (Edit & Reload Table)",
                         Paragraphs: ["Wire a DataListRowAction<TItem> to FormService.CreateFormAsync(editSchema, initialData, FormShellMode.Drawer). When outcome.Submitted is true, persist the record and reload the table cleanly."],
@@ -334,17 +334,17 @@ public static partial class LuxLibraryDocs
                         ])
                 ]),
             new("integrations-spreadsheet-dashboard", "Integration: Lux.Spreadsheet, Lux.Dashboard & Lux.Agent", "Integrations",
-                "Pair bulk CSV imports (Lux.Spreadsheet) with live data tables, drill down from Lux.Dashboard cards into filtered BxDataList views, and test everything in xUnit/bUnit.",
+                "Pair bulk CSV imports (Lux.Spreadsheet) with live data tables, drill down from Lux.Dashboard cards into filtered LxDataList views, and test everything in xUnit/bUnit.",
                 [
                     new("import-to-table", "1. Lux.Spreadsheet Bulk Import -> Refresh Lux.Table",
                         CodeSamples:
                         [
                             new("ImportAndRefresh.razor", """
-                                @* After BxSpreadsheetImport finishes SubmitAsync(), refresh your BxDataList immediately *@
-                                <BxSpreadsheetImport Importer="@_importer" OnCompleted="@(() => _listRef.ReloadAsync())" />
-                                <BxDataList @ref="_listRef" TItem="ProductRate" Schema="@RateSchema" Provider="@LoadRatesAsync">
-                                    <BxDataListTable TItem="ProductRate" ShowProgressLine="true" />
-                                </BxDataList>
+                                @* After LxSpreadsheetImport finishes SubmitAsync(), refresh your LxDataList immediately *@
+                                <LxSpreadsheetImport Importer="@_importer" OnCompleted="@(() => _listRef.ReloadAsync())" />
+                                <LxDataList @ref="_listRef" TItem="ProductRate" Schema="@RateSchema" Provider="@LoadRatesAsync">
+                                    <LxDataListTable TItem="ProductRate" ShowProgressLine="true" />
+                                </LxDataList>
                                 """)
                         ]),
                     new("dashboard-drilldown", "2. Lux.Dashboard KPI Click -> Pre-Filtered Lux.Table URL",
@@ -357,7 +357,7 @@ public static partial class LuxLibraryDocs
                                     Filters = [new FilterRule("status", FilterOperator.Is, new FilterValue.Text("Pending"))]
                                 };
                                 var qs = string.Join("&", DataListStateQuery.ToQuery(state, InvoiceSchemas.All).Select(kv => $"{kv.Key}={kv.Value}"));
-                                string href = $"/invoices?{qs}"; // Pass to BxDashboardStat / DashboardAlertItem.ActionHref
+                                string href = $"/invoices?{qs}"; // Pass to LxDashboardStat / DashboardAlertItem.ActionHref
                                 """)
                         ])
                 ]),
@@ -368,7 +368,7 @@ public static partial class LuxLibraryDocs
             MauiAndAotPage("Lux.Table", "Lux.Table.Core", "Lux.Table", "builder.Services.AddLuxTable();",
                 "var (roots, allNodes) = new DataListTree<Employee> { Children = e => e.Reports }.BuildTree(employees);"),
             new("recipes", "Testing & Recipes", "Platforms",
-                "Unit testing DataListTree in xUnit and rendering BxDataList in bUnit.",
+                "Unit testing DataListTree in xUnit and rendering LxDataList in bUnit.",
                 [
                     new("xunit", "Headless Tree Tests",
                         CodeSamples:
@@ -390,7 +390,7 @@ public static partial class LuxLibraryDocs
                                 JSInterop.Mode = JSRuntimeMode.Loose;
                                 SetRendererInfo(new RendererInfo("Server", true));
 
-                                var cut = Render<BxDataList<Employee>>(...);
+                                var cut = Render<LxDataList<Employee>>(...);
                                 Assert.Equal(2, cut.FindAll("tbody tr").Count);
                                 Assert.NotNull(cut.Find("tfoot"));
                                 """)
@@ -402,24 +402,24 @@ public static partial class LuxLibraryDocs
             // GROUP 5: LIVE EXAMPLES (5 INTERACTIVE DEMOS)
             // =========================================================================
             new("examples", "Live Examples", "Examples",
-                "5 interactive BxDataList playgrounds demonstrating HeaderMenu, Sum/Average/Min/Max footers, hierarchical trees, GroupBy density switching, mobile RowSummary, and headless BuildTree.",
+                "5 interactive LxDataList playgrounds demonstrating HeaderMenu, Sum/Average/Min/Max footers, hierarchical trees, GroupBy density switching, mobile RowSummary, and headless BuildTree.",
                 [
                     new("basic-summary", "1. Interactive Grid with HeaderMenu & Sum Footer",
                         Paragraphs: ["Click column headers to sort or open the HeaderMenu, and inspect the live Sum aggregation in <tfoot>."],
                         LiveDemoKey: "table-basic",
-                        LiveDemoTitle: "BxDataList · Sorting, HeaderMenu & Sum Footer",
+                        LiveDemoTitle: "LxDataList · Sorting, HeaderMenu & Sum Footer",
                         CodeSamples:
                         [
                             new("EmployeeGrid.razor", """
-                                <BxDataList TItem="Employee" Schema="@EmployeeSchema" Items="@_employees" UrlSync="false">
-                                    <BxDataListTable TItem="Employee" HeaderMenu="true" ShowProgressLine="true"
+                                <LxDataList TItem="Employee" Schema="@EmployeeSchema" Items="@_employees" UrlSync="false">
+                                    <LxDataListTable TItem="Employee" HeaderMenu="true" ShowProgressLine="true"
                                                      Summaries="@(new DataListSummaries<Employee>())">
-                                        <BxDataListColumn TItem="Employee" Field="name" Title="Employee" />
-                                        <BxDataListColumn TItem="Employee" Field="dept" Title="Department" />
-                                        <BxDataListColumn TItem="Employee" Field="salary" Title="Salary (€)"
+                                        <LxDataListColumn TItem="Employee" Field="name" Title="Employee" />
+                                        <LxDataListColumn TItem="Employee" Field="dept" Title="Department" />
+                                        <LxDataListColumn TItem="Employee" Field="salary" Title="Salary (€)"
                                                           Summary="DataListSummaryKind.Sum" />
-                                    </BxDataListTable>
-                                </BxDataList>
+                                    </LxDataListTable>
+                                </LxDataList>
                                 """)
                         ]),
                     new("tree-hierarchy", "2. Hierarchical Tree Grid with Expand/Collapse Rails",
@@ -429,13 +429,13 @@ public static partial class LuxLibraryDocs
                         CodeSamples:
                         [
                             new("OrgTree.razor", """
-                                <BxDataList TItem="OrgRow" Schema="@OrgSchema" Items="@_roots" UrlSync="false">
-                                    <BxDataListTable TItem="OrgRow"
+                                <LxDataList TItem="OrgRow" Schema="@OrgSchema" Items="@_roots" UrlSync="false">
+                                    <LxDataListTable TItem="OrgRow"
                                                      Tree="@(new DataListTree<OrgRow> { Children = m => m.Reports, DefaultExpandedDepth = 2 })">
-                                        <BxDataListColumn TItem="OrgRow" Field="name" Title="Organization Hierarchy" />
-                                        <BxDataListColumn TItem="OrgRow" Field="role" Title="Role" />
-                                    </BxDataListTable>
-                                </BxDataList>
+                                        <LxDataListColumn TItem="OrgRow" Field="name" Title="Organization Hierarchy" />
+                                        <LxDataListColumn TItem="OrgRow" Field="role" Title="Role" />
+                                    </LxDataListTable>
+                                </LxDataList>
                                 """)
                         ]),
                     new("grouped-rows", "3. Visual Grouping & Live Density Switcher",
@@ -445,17 +445,17 @@ public static partial class LuxLibraryDocs
                         CodeSamples:
                         [
                             new("DepartmentGrid.razor", """
-                                <BxDataList TItem="Employee" Schema="@EmployeeSchema" Items="@_employees" UrlSync="false">
-                                    <BxDataListTable TItem="Employee"
+                                <LxDataList TItem="Employee" Schema="@EmployeeSchema" Items="@_employees" UrlSync="false">
+                                    <LxDataListTable TItem="Employee"
                                                      Density="@_density"
                                                      GroupBy="@(new DataListGroupBy<Employee> { Key = e => e.Dept })"
                                                      Summaries="@(new DataListSummaries<Employee>())">
-                                        <BxDataListColumn TItem="Employee" Field="name" Title="Employee" />
-                                        <BxDataListColumn TItem="Employee" Field="dept" Title="Department" />
-                                        <BxDataListColumn TItem="Employee" Field="salary" Title="Salary (€)"
+                                        <LxDataListColumn TItem="Employee" Field="name" Title="Employee" />
+                                        <LxDataListColumn TItem="Employee" Field="dept" Title="Department" />
+                                        <LxDataListColumn TItem="Employee" Field="salary" Title="Salary (€)"
                                                           Summary="DataListSummaryKind.Average" />
-                                    </BxDataListTable>
-                                </BxDataList>
+                                    </LxDataListTable>
+                                </LxDataList>
                                 """)
                         ]),
                     new("summary-and-mobile", "4. Dynamic Summary Aggregations & Mobile RowSummary Mode",
@@ -465,11 +465,11 @@ public static partial class LuxLibraryDocs
                         CodeSamples:
                         [
                             new("SummaryAndMobile.razor", """
-                                <BxDataListTable TItem="Employee"
+                                <LxDataListTable TItem="Employee"
                                                  RowSummary="@_phoneSummary"
                                                  Summaries="@(new DataListSummaries<Employee>())">
-                                    <BxDataListColumn TItem="Employee" Field="salary" Title="Salary (€)" Summary="@_summaryKind" />
-                                </BxDataListTable>
+                                    <LxDataListColumn TItem="Employee" Field="salary" Title="Salary (€)" Summary="@_summaryKind" />
+                                </LxDataListTable>
                                 """)
                         ]),
                     new("headless-tree-core", "5. Headless Lux.Table.Core BuildTree() Inspector (NativeAOT)",
@@ -488,6 +488,6 @@ public static partial class LuxLibraryDocs
             new("api", "API Reference", "Reference",
                 "Complete public API reference for Lux.Table.Core and Lux.Table.",
                 [],
-                ApiTypes: [typeof(BxDataList<object>), typeof(BxDataListTable<object>), typeof(BxDataListColumn<object>), typeof(DataListTree<object>), typeof(DataListGroupBy<object>), typeof(DataListSummaries<object>), typeof(DataListRowSummary<object>)])
+                ApiTypes: [typeof(LxDataList<object>), typeof(LxDataListTable<object>), typeof(LxDataListColumn<object>), typeof(DataListTree<object>), typeof(DataListGroupBy<object>), typeof(DataListSummaries<object>), typeof(DataListRowSummary<object>)])
         ]);
 }

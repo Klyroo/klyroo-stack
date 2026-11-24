@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 namespace Lux.Stack.E2E;
 
 /// <summary>
-/// <see cref="BxDataListLayoutSwitch{TItem}"/>, <see cref="BxDataListSortMenu{TItem}"/> and <see cref="BxDataListGrid{TItem}"/>
+/// <see cref="LxDataListLayoutSwitch{TItem}"/>, <see cref="LxDataListSortMenu{TItem}"/> and <see cref="LxDataListGrid{TItem}"/>
 /// on <c>/components/data-list-grid</c>, across all four render modes, enhanced navigation, phone viewport and light/dark accessibility checks.
 /// </summary>
 public class DataListGridTests(PlaygroundServer server) : PlaygroundTest(server)
@@ -11,7 +11,7 @@ public class DataListGridTests(PlaygroundServer server) : PlaygroundTest(server)
     private async Task OpenPage(string mode, string query = "")
     {
         await Page.GotoAsync($"/{mode}/components/data-list-grid{query}");
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
         if (mode != "ssr")
         {
             await Assertions.Expect(Page.GetByTestId("renderer")).ToHaveAttributeAsync("data-interactive", "true", new() { Timeout = 30_000 });
@@ -82,7 +82,7 @@ public class DataListGridTests(PlaygroundServer server) : PlaygroundTest(server)
         await cards.First.Locator("input[data-select=row]").CheckAsync();
         await Assertions.Expect(SwitchList.Locator("[data-slot=selection-bar]")).ToBeVisibleAsync();
 
-        // Switch back to Table view and toggle Summary view with BxDataListViewToggle.
+        // Switch back to Table view and toggle Summary view with LxDataListViewToggle.
         await SwitchList.Locator("button[data-slot=layout-option][data-layout=table]").ClickAsync();
         await Assertions.Expect(SwitchList.Locator("[data-slot=table]")).ToHaveCountAsync(1);
         var viewToggle = SwitchList.Locator("button[data-slot=view-toggle]");
@@ -179,7 +179,7 @@ public class DataListGridTests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task Layout_and_sort_apply_after_an_enhanced_navigation(string mode)
     {
         await Page.GotoAsync($"/{mode}/components/button");
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
         if (mode != "ssr") await Assertions.Expect(Page.GetByTestId("renderer")).ToHaveAttributeAsync("data-interactive", "true", new() { Timeout = 30_000 });
         await Page.EvaluateAsync("() => { window.__enhanced = new Promise((r) => { Blazor.addEventListener('enhancedload', () => setTimeout(r, 50), { once: true }); setTimeout(r, 8000); }); }");
         await Page.EvaluateAsync("address => Blazor.navigateTo(address)", $"/{mode}/components/data-list-grid?grid.l=grid&grid.s=customer");

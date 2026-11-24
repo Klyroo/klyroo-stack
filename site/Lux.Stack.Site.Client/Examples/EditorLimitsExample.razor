@@ -1,11 +1,11 @@
 <div class="flex w-full max-w-2xl flex-col gap-3">
-    <BxFormField Label="Short note" Help="At most 200 characters of HTML. Links take https and mailto addresses, images https addresses.">
-        <BxEditor @bind-Value="_html" MaxLength="200" OnLimit="OnLimit" ImageSchemes="_https" LinkSchemes="_links" Placeholder="Write a short note..." data-testid="limit-editor">
-            <BxEditorToolbar Items="_items" />
-        </BxEditor>
-    </BxFormField>
-    <p class="text-sm text-(--blux-text-muted)" role="status" data-testid="limit-state">@_state</p>
-    <p class="break-all font-mono text-xs text-(--blux-text-muted)" data-testid="limit-html">@(string.IsNullOrEmpty(_html) ? "(empty)" : _html)</p>
+    <LxFormField Label="Short note" Help="At most 200 characters of HTML. Links take https and mailto addresses, images https addresses.">
+        <LxEditor @bind-Value="_html" MaxLength="200" OnLimit="OnLimit" ImageSchemes="_https" LinkSchemes="_links" Placeholder="Write a short note..." data-testid="limit-editor">
+            <LxEditorToolbar Items="_items" />
+        </LxEditor>
+    </LxFormField>
+    <p class="text-sm text-(--lux-text-muted)" role="status" data-testid="limit-state">@_state</p>
+    <p class="break-all font-mono text-xs text-(--lux-text-muted)" data-testid="limit-html">@(string.IsNullOrEmpty(_html) ? "(empty)" : _html)</p>
 </div>
 
 @code {
@@ -21,6 +21,6 @@
     private string _state = "Within the limit";
 
     // The editor does not send a text that is over the limit: _html stays the last one that fit.
-    private void OnLimit(BxLimitEventArgs e) =>
+    private void OnLimit(LxLimitEventArgs e) =>
         _state = e.Exceeded ? $"Too long: {e.Length} of {e.Max} characters, not kept" : "Within the limit";
 }

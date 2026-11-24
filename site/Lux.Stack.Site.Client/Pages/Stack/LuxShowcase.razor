@@ -17,22 +17,22 @@
 
 <div class="mx-auto max-w-(--breakpoint-2xl) px-4 py-10 sm:px-6 lg:px-8">
     @* Header *@
-    <div class="flex flex-col gap-4 border-b border-(--blux-border) pb-6 lg:flex-row lg:items-end lg:justify-between">
+    <div class="flex flex-col gap-4 border-b border-(--lux-border) pb-6 lg:flex-row lg:items-end lg:justify-between">
         <div>
             <p class="pg-eyebrow-mono">Live Full-Stack Showcase · All 8 LuxStack Libraries Working Together</p>
-            <h1 class="mt-2 text-3xl font-semibold tracking-tight text-(--blux-text-highlighted) sm:text-5xl">
+            <h1 class="mt-2 text-3xl font-semibold tracking-tight text-(--lux-text-highlighted) sm:text-5xl">
                 Revenue Ops <span class="pg-accent">Backoffice.</span>
             </h1>
-            <p class="mt-2 max-w-2xl text-sm text-(--blux-text-muted)">
+            <p class="mt-2 max-w-2xl text-sm text-(--lux-text-muted)">
                 One unified interactive app combining <strong>Lux.Dashboard</strong> (3-wave KPIs), <strong>Lux.Query</strong> + <strong>Lux.Table</strong> (schema-driven grid),
                 <strong>Lux.Form</strong> (reactive drawer CRUD), <strong>Lux.Spreadsheet</strong> (CSV bulk import), <strong>Lux.Display</strong> (inspector &amp; lightbox),
                 <strong>Lux.Agent</strong> (AI copilot with AllowPolicy &amp; UndoStack), and <strong>Lux.UI</strong>.
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
-            <BxButton Label="New Account (Lux.Form Drawer)" Size="BxSize.Md" OnClick="@OpenCreateAccountDrawerAsync" />
-            <BxButton Label="Preview CSV (Lux.Display)" Size="BxSize.Md" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@OpenCsvLightbox" />
-            <BxButton Label="@(_showAgent ? "Hide AI Copilot" : "Open AI Copilot (Lux.Agent)")" Size="BxSize.Md" Color="BxColor.Primary" Variant="ButtonVariant.Soft" OnClick="@(() => _showAgent = !_showAgent)" />
+            <LxButton Label="New Account (Lux.Form Drawer)" Size="LxSize.Md" OnClick="@OpenCreateAccountDrawerAsync" />
+            <LxButton Label="Preview CSV (Lux.Display)" Size="LxSize.Md" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@OpenCsvLightbox" />
+            <LxButton Label="@(_showAgent ? "Hide AI Copilot" : "Open AI Copilot (Lux.Agent)")" Size="LxSize.Md" Color="LxColor.Primary" Variant="ButtonVariant.Soft" OnClick="@(() => _showAgent = !_showAgent)" />
         </div>
     </div>
 
@@ -41,25 +41,25 @@
         <div class="flex flex-wrap items-center gap-2">
             @foreach (var tab in new[] { ("overview", "1. Overview (Dashboard)"), ("accounts", "2. Accounts (Query + Table)"), ("import", "3. Bulk Import (Spreadsheet)"), ("inspector", "4. Inspector (Display)") })
             {
-                <BxButton Label="@tab.Item2"
-                          Size="BxSize.Sm"
-                          Color="@(_activeTab == tab.Item1 ? BxColor.Primary : BxColor.Neutral)"
+                <LxButton Label="@tab.Item2"
+                          Size="LxSize.Sm"
+                          Color="@(_activeTab == tab.Item1 ? LxColor.Primary : LxColor.Neutral)"
                           Variant="@(_activeTab == tab.Item1 ? ButtonVariant.Solid : ButtonVariant.Outline)"
                           OnClick="@(() => SwitchTab(tab.Item1))" />
             }
         </div>
         <div class="flex flex-wrap items-center gap-2 font-mono text-xs">
-            <span class="text-(--blux-text-muted)">Region Filter:</span>
+            <span class="text-(--lux-text-muted)">Region Filter:</span>
             @foreach (var r in new[] { "EU", "US", "APAC" })
             {
                 var active = _regionFilter.Values.Contains(r);
-                <BxButton Label="@r" Size="BxSize.Xs" Color="@(active ? BxColor.Primary : BxColor.Neutral)" Variant="@(active ? ButtonVariant.Solid : ButtonVariant.Soft)" OnClick="@(() => ToggleRegion(r))" />
+                <LxButton Label="@r" Size="LxSize.Xs" Color="@(active ? LxColor.Primary : LxColor.Neutral)" Variant="@(active ? ButtonVariant.Solid : ButtonVariant.Soft)" OnClick="@(() => ToggleRegion(r))" />
             }
             @if (_dashboard.Filtered)
             {
-                <BxButton Label="Reset" Size="BxSize.Xs" Color="BxColor.Neutral" Variant="ButtonVariant.Ghost" OnClick="@ResetAllFilters" />
+                <LxButton Label="Reset" Size="LxSize.Xs" Color="LxColor.Neutral" Variant="ButtonVariant.Ghost" OnClick="@ResetAllFilters" />
             }
-            <BxBadge Label="@($"{FilteredAccounts.Count} accounts · €{FilteredAccounts.Sum(a => a.Arr):N0} ARR")" Color="BxColor.Neutral" Variant="BxVariant.Subtle" Size="BxSize.Sm" />
+            <LxBadge Label="@($"{FilteredAccounts.Count} accounts · €{FilteredAccounts.Sum(a => a.Arr):N0} ARR")" Color="LxColor.Neutral" Variant="LxVariant.Subtle" Size="LxSize.Sm" />
         </div>
     </div>
 
@@ -68,92 +68,92 @@
         <div class="min-w-0 space-y-6">
             @if (_activeTab == "overview")
             {
-                <BxDashboardStats Title="Executive Metrics (Live from Filtered Accounts)" Items="@BuildStats()" />
+                <LxDashboardStats Title="Executive Metrics (Live from Filtered Accounts)" Items="@BuildStats()" />
 
                 <div class="grid gap-6 lg:grid-cols-2">
-                    <BxDashboardGauge Title="Annual Target Attainment"
+                    <LxDashboardGauge Title="Annual Target Attainment"
                                       Value="@Math.Min(100, Math.Round((double)FilteredAccounts.Sum(a => a.Arr) / 750_000.0 * 100.0, 1))"
                                       Max="100" Target="85"
                                       Format="DashboardFormatPreset.Percent"
                                       Caption="@($"€{FilteredAccounts.Sum(a => a.Arr):N0} / €750,000 target")" />
-                    <BxDashboardBars Title="ARR by Region" Items="@BuildRegionBars()" Format="DashboardFormatPreset.Compact" />
+                    <LxDashboardBars Title="ARR by Region" Items="@BuildRegionBars()" Format="DashboardFormatPreset.Compact" />
                 </div>
 
                 <div class="grid gap-6 lg:grid-cols-2">
-                    <BxDashboardAlerts Title="Actionable Operational Alerts" Items="@([
+                    <LxDashboardAlerts Title="Actionable Operational Alerts" Items="@([
                         new DashboardAlertItem(DashboardAlertSeverity.Warning, $"{_accounts.Count(a => a.Status == "At Risk")} accounts flagged At Risk", "Click 'Accounts' tab to filter and inspect churn risk."),
                         new DashboardAlertItem(DashboardAlertSeverity.Success, $"3-Wave DashboardController · Essential: {_kpiWave.State}", "Filters synchronize across Dashboard, Table, and AgentBridge.")
                     ])" />
-                    <div class="rounded-2xl border border-(--blux-border) bg-(--blux-bg-muted)/30 p-5">
-                        <p class="font-mono text-xs uppercase text-(--blux-text-muted)">Lux.Query Live URL Codec Output (DataListStateQuery.ToQuery)</p>
-                        <code class="mt-2 block break-all rounded-lg bg-(--pg-code-bg) p-3 font-mono text-xs text-(--blux-primary)">@BuildLiveQueryUrl()</code>
+                    <div class="rounded-2xl border border-(--lux-border) bg-(--lux-bg-muted)/30 p-5">
+                        <p class="font-mono text-xs uppercase text-(--lux-text-muted)">Lux.Query Live URL Codec Output (DataListStateQuery.ToQuery)</p>
+                        <code class="mt-2 block break-all rounded-lg bg-(--pg-code-bg) p-3 font-mono text-xs text-(--lux-primary)">@BuildLiveQueryUrl()</code>
                         <div class="mt-4 flex flex-wrap gap-2">
-                            <BxButton Label="Drill Down into Accounts →" Size="BxSize.Sm" OnClick="@(() => SwitchTab("accounts"))" />
-                            <BxButton Label="Run 3-Wave RefreshAsync()" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => _dashboard.RefreshAsync())" />
+                            <LxButton Label="Drill Down into Accounts →" Size="LxSize.Sm" OnClick="@(() => SwitchTab("accounts"))" />
+                            <LxButton Label="Run 3-Wave RefreshAsync()" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => _dashboard.RefreshAsync())" />
                         </div>
                     </div>
                 </div>
             }
             else if (_activeTab == "accounts")
             {
-                <div class="rounded-2xl border border-(--blux-border) bg-(--blux-bg) p-5 space-y-4">
+                <div class="rounded-2xl border border-(--lux-border) bg-(--lux-bg) p-5 space-y-4">
                     <div class="flex flex-wrap items-center justify-between gap-3">
                         <div class="flex flex-wrap items-center gap-2">
                             <div class="w-60">
-                                <BxInput Value="@_search" ValueChanged="@(v => _search = v)" Placeholder="Search accounts (Lux.Query)..." aria-label="Search accounts" />
+                                <LxInput Value="@_search" ValueChanged="@(v => _search = v)" Placeholder="Search accounts (Lux.Query)..." aria-label="Search accounts" />
                             </div>
-                            <BxButton Label="@(_groupByRegion ? "GroupBy Region: ON" : "GroupBy Region: OFF")" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => _groupByRegion = !_groupByRegion)" />
-                            <BxButton Label="Undo Last Edit" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Soft" Disabled="@(!_history.CanUndo)" OnClick="@UndoAccounts" />
-                            <BxButton Label="Redo" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Ghost" Disabled="@(!_history.CanRedo)" OnClick="@RedoAccounts" />
+                            <LxButton Label="@(_groupByRegion ? "GroupBy Region: ON" : "GroupBy Region: OFF")" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => _groupByRegion = !_groupByRegion)" />
+                            <LxButton Label="Undo Last Edit" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Soft" Disabled="@(!_history.CanUndo)" OnClick="@UndoAccounts" />
+                            <LxButton Label="Redo" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Ghost" Disabled="@(!_history.CanRedo)" OnClick="@RedoAccounts" />
                         </div>
-                        <span class="font-mono text-xs text-(--blux-text-muted)">Showing @FilteredAccounts.Count / @_accounts.Count</span>
+                        <span class="font-mono text-xs text-(--lux-text-muted)">Showing @FilteredAccounts.Count / @_accounts.Count</span>
                     </div>
 
-                    <BxDataList TItem="AccountRecord" Schema="@AccountSchema" Items="@FilteredAccounts" UrlSync="false">
-                        <BxDataListTable TItem="AccountRecord"
+                    <LxDataList TItem="AccountRecord" Schema="@AccountSchema" Items="@FilteredAccounts" UrlSync="false">
+                        <LxDataListTable TItem="AccountRecord"
                                          HeaderMenu="true"
                                          ShowProgressLine="true"
                                          GroupBy="@(_groupByRegion ? AccountGroupBy : null)"
                                          Summaries="@(new DataListSummaries<AccountRecord>())">
-                            <BxDataListColumn TItem="AccountRecord" Field="name" Title="Account" />
-                            <BxDataListColumn TItem="AccountRecord" Field="region" Title="Region" />
-                            <BxDataListColumn TItem="AccountRecord" Field="plan" Title="Plan" />
-                            <BxDataListColumn TItem="AccountRecord" Field="status" Title="Status" />
-                            <BxDataListColumn TItem="AccountRecord" Field="arr" Title="ARR (€)" Summary="DataListSummaryKind.Sum" />
-                        </BxDataListTable>
-                    </BxDataList>
+                            <LxDataListColumn TItem="AccountRecord" Field="name" Title="Account" />
+                            <LxDataListColumn TItem="AccountRecord" Field="region" Title="Region" />
+                            <LxDataListColumn TItem="AccountRecord" Field="plan" Title="Plan" />
+                            <LxDataListColumn TItem="AccountRecord" Field="status" Title="Status" />
+                            <LxDataListColumn TItem="AccountRecord" Field="arr" Title="ARR (€)" Summary="DataListSummaryKind.Sum" />
+                        </LxDataListTable>
+                    </LxDataList>
                 </div>
             }
             else if (_activeTab == "import")
             {
-                <div class="rounded-2xl border border-(--blux-border) bg-(--blux-bg) p-5 space-y-4">
+                <div class="rounded-2xl border border-(--lux-border) bg-(--lux-bg) p-5 space-y-4">
                     <div class="flex flex-wrap items-center justify-between gap-2">
-                        <p class="text-sm text-(--blux-text-muted)">
+                        <p class="text-sm text-(--lux-text-muted)">
                             Preloaded with European semicolon CSV &amp; accented headers (<code>Nom;Région;Offre;Revenu</code>). Complete the wizard to append new accounts directly into the live Backoffice!
                         </p>
                         @if (_importedNotice is not null)
                         {
-                            <BxBadge Label="@_importedNotice" Color="BxColor.Success" Variant="BxVariant.Soft" Size="BxSize.Sm" />
+                            <LxBadge Label="@_importedNotice" Color="LxColor.Success" Variant="LxVariant.Soft" Size="LxSize.Sm" />
                         }
                     </div>
-                    <BxSpreadsheetImport Importer="@_importer" Title="Import New Accounts (Lux.Spreadsheet)" Wizard="true" />
+                    <LxSpreadsheetImport Importer="@_importer" Title="Import New Accounts (Lux.Spreadsheet)" Wizard="true" />
                 </div>
             }
             else if (_activeTab == "inspector")
             {
                 var selected = FilteredAccounts.FirstOrDefault() ?? _accounts[0];
                 <div class="grid gap-6 lg:grid-cols-2">
-                    <BxDisplay Kind="DisplayKind.Facts" Surface="DisplaySurface.Bordered" Title="@($"Account Dossier · {selected.Name}")" Facts="@([
+                    <LxDisplay Kind="DisplayKind.Facts" Surface="DisplaySurface.Bordered" Title="@($"Account Dossier · {selected.Name}")" Facts="@([
                         new DisplayFact { Label = "Account ID", Value = $"ACC-{selected.Id:D4}", Copy = true, Mono = true },
-                        new DisplayFact { Label = "Region", Value = selected.Region, Chip = new DisplayChip(selected.Status, selected.Status == "Active" ? BxColor.Success : BxColor.Warning) },
+                        new DisplayFact { Label = "Region", Value = selected.Region, Chip = new DisplayChip(selected.Status, selected.Status == "Active" ? LxColor.Success : LxColor.Warning) },
                         new DisplayFact { Label = "Plan", Value = selected.Plan },
                         new DisplayFact { Label = "Annual Recurring Revenue", Value = $"€{selected.Arr:N0}" }
                     ])" />
-                    <BxDisplay Kind="DisplayKind.Meter" Surface="DisplaySurface.Bordered" Title="Seat Quota Utilization"
+                    <LxDisplay Kind="DisplayKind.Meter" Surface="DisplaySurface.Bordered" Title="Seat Quota Utilization"
                                MeterValue="@selected.SeatUsagePct" MeterMax="100" WarningThreshold="75" ErrorThreshold="90" />
-                    <BxDisplay Kind="DisplayKind.Code" Surface="DisplaySurface.Bordered" Variant="secret"
+                    <LxDisplay Kind="DisplayKind.Code" Surface="DisplaySurface.Bordered" Variant="secret"
                                Title="Webhook Signing Key (Redacted in Lux.Agent)" Value="@($"sk_live_lux_{selected.Id:D4}_9921")" VisibleChars="4" Copy="true" />
-                    <BxDisplay Kind="DisplayKind.Timeline" Surface="DisplaySurface.Bordered" Title="Lifecycle Audit" TimelineItems="@([
+                    <LxDisplay Kind="DisplayKind.Timeline" Surface="DisplaySurface.Bordered" Title="Lifecycle Audit" TimelineItems="@([
                         new DisplayTimelineItem("Account Provisioned", Time: "Q1 2026", State: DisplayTimelineState.Done),
                         new DisplayTimelineItem("Enterprise Upgrade", Time: "Q3 2026", State: DisplayTimelineState.Done),
                         new DisplayTimelineItem("Annual Renewal Review", Time: "Active", State: DisplayTimelineState.Current)
@@ -165,28 +165,28 @@
         @* Live Lux.Agent AI Copilot Side Panel *@
         @if (_showAgent)
         {
-            <aside class="flex flex-col gap-4 rounded-2xl border border-(--blux-border) bg-(--blux-bg-muted)/30 p-4">
+            <aside class="flex flex-col gap-4 rounded-2xl border border-(--lux-border) bg-(--lux-bg-muted)/30 p-4">
                 <div class="flex items-center justify-between">
-                    <span class="font-mono text-xs font-semibold uppercase tracking-widest text-(--blux-text-highlighted)">Lux.Agent Copilot</span>
-                    <BxBadge Label="@($"{_agent.Snapshot().Count} controls")" Color="BxColor.Primary" Variant="BxVariant.Soft" Size="BxSize.Xs" />
+                    <span class="font-mono text-xs font-semibold uppercase tracking-widest text-(--lux-text-highlighted)">Lux.Agent Copilot</span>
+                    <LxBadge Label="@($"{_agent.Snapshot().Count} controls")" Color="LxColor.Primary" Variant="LxVariant.Soft" Size="LxSize.Xs" />
                 </div>
-                <p class="text-xs text-(--blux-text-muted)">
+                <p class="text-xs text-(--lux-text-muted)">
                     Connected to <code>DashboardController</code>, <code>FormController</code>, and <code>SpreadsheetImporter</code> via <code>AgentBridgeService</code>.
                 </p>
 
                 <div class="flex flex-col gap-2">
-                    <BxButton Label="AI: Filter Region -> EU Only" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@AgentFilterEuAsync" />
-                    <BxButton Label="AI: Reset Dashboard Filters" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@AgentResetDashAsync" />
-                    <BxButton Label="AI: Prefill Quick Deal Form" Size="BxSize.Sm" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@AgentPrefillDealAsync" />
-                    <BxButton Label="AI: Submit Deal (Triggers AllowPolicy!)" Size="BxSize.Sm" Color="BxColor.Warning" Variant="ButtonVariant.Soft" OnClick="@AgentSubmitDealAsync" />
+                    <LxButton Label="AI: Filter Region -> EU Only" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@AgentFilterEuAsync" />
+                    <LxButton Label="AI: Reset Dashboard Filters" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@AgentResetDashAsync" />
+                    <LxButton Label="AI: Prefill Quick Deal Form" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@AgentPrefillDealAsync" />
+                    <LxButton Label="AI: Submit Deal (Triggers AllowPolicy!)" Size="LxSize.Sm" Color="LxColor.Warning" Variant="ButtonVariant.Soft" OnClick="@AgentSubmitDealAsync" />
                 </div>
 
-                <div class="rounded-xl border border-(--blux-border) bg-(--blux-bg) p-3">
-                    <p class="mb-2 font-mono text-[11px] uppercase text-(--blux-text-muted)">Quick Deal Form (Watched by Agent)</p>
-                    <BxFormEngine Form="@_quickDealForm" SubmitLabel="Add Deal" ShowReset="false" OnSubmit="@HandleQuickDealSubmit" />
+                <div class="rounded-xl border border-(--lux-border) bg-(--lux-bg) p-3">
+                    <p class="mb-2 font-mono text-[11px] uppercase text-(--lux-text-muted)">Quick Deal Form (Watched by Agent)</p>
+                    <LxFormEngine Form="@_quickDealForm" SubmitLabel="Add Deal" ShowReset="false" OnSubmit="@HandleQuickDealSubmit" />
                 </div>
 
-                <div class="rounded-xl border border-(--blux-border) bg-(--pg-code-bg) p-3 font-mono text-[11px] text-[#d7dcde]">
+                <div class="rounded-xl border border-(--lux-border) bg-(--pg-code-bg) p-3 font-mono text-[11px] text-[#d7dcde]">
                     <p class="mb-1 text-[#94a3b8]">Observe() Audit &amp; Agent Status</p>
                     <pre class="max-h-36 overflow-auto whitespace-pre-wrap">@_agentLog</pre>
                 </div>
@@ -196,16 +196,16 @@
 </div>
 
 @* Human-in-the-loop AllowPolicy Modal (Lux.UI + Lux.Agent) *@
-<BxModal @bind-Open="_confirmModalOpen" Title="Approve Consequential AI Action?">
-    <p class="text-sm text-(--blux-text-muted)">
+<LxModal @bind-Open="_confirmModalOpen" Title="Approve Consequential AI Action?">
+    <p class="text-sm text-(--lux-text-muted)">
         <strong>Lux.Agent</strong> requested to execute <code>@_pendingStep?.Action</code> on <strong>@_pendingStep?.Ref</strong>.
         Because <code>confirmSubmit: true</code> is enabled, <code>AllowPolicy</code> paused execution for your approval.
     </p>
     <div class="mt-5 flex justify-end gap-2">
-        <BxButton Label="Refuse" Color="BxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => ResolvePolicy(false))" />
-        <BxButton Label="Approve & Execute" Color="BxColor.Primary" OnClick="@(() => ResolvePolicy(true))" />
+        <LxButton Label="Refuse" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => ResolvePolicy(false))" />
+        <LxButton Label="Approve & Execute" Color="LxColor.Primary" OnClick="@(() => ResolvePolicy(true))" />
     </div>
-</BxModal>
+</LxModal>
 
 @code {
     private sealed record AccountRecord(int Id, string Name, string Region, string Plan, string Status, decimal Arr, double SeatUsagePct);

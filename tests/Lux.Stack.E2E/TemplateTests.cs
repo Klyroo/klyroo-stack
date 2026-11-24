@@ -8,21 +8,21 @@ namespace Lux.Stack.E2E;
 /// <summary>
 /// A project template as a user ships it: the output of <c>dotnet publish -c Release</c>, run in Production (static web assets from the publish
 /// folder, trimmed WebAssembly), at the root and below a path base. Started by <c>build/verify-templates.mjs</c>, which sets
-/// <c>BLUX_TEMPLATE_PUBLISHED</c> (the publish folder), <c>BLUX_TEMPLATE_ASSEMBLY</c> (for example Starter.Web.dll) and <c>BLUX_TEMPLATE_PROBE</c>
+/// <c>LUX_TEMPLATE_PUBLISHED</c> (the publish folder), <c>LUX_TEMPLATE_ASSEMBLY</c> (for example Starter.Web.dll) and <c>LUX_TEMPLATE_PROBE</c>
 /// (CSS only the template's own pages produce); without them the tests are skipped.
 /// </summary>
 public class TemplateTests(PlaygroundServer server)
 {
-    private static string? Published => Environment.GetEnvironmentVariable("BLUX_TEMPLATE_PUBLISHED");
-    private static string? AssemblyName => Environment.GetEnvironmentVariable("BLUX_TEMPLATE_ASSEMBLY");
-    private static string? Probe => Environment.GetEnvironmentVariable("BLUX_TEMPLATE_PROBE");
+    private static string? Published => Environment.GetEnvironmentVariable("LUX_TEMPLATE_PUBLISHED");
+    private static string? AssemblyName => Environment.GetEnvironmentVariable("LUX_TEMPLATE_ASSEMBLY");
+    private static string? Probe => Environment.GetEnvironmentVariable("LUX_TEMPLATE_PROBE");
 
     [Theory]
     [InlineData(null)]
     [InlineData("/demo/starter")]
     public async Task Published_app_becomes_interactive_and_hands_off_to_WebAssembly(string? pathBase)
     {
-        Assert.SkipWhen(string.IsNullOrEmpty(Published) || string.IsNullOrEmpty(AssemblyName), "BLUX_TEMPLATE_PUBLISHED and BLUX_TEMPLATE_ASSEMBLY are not set.");
+        Assert.SkipWhen(string.IsNullOrEmpty(Published) || string.IsNullOrEmpty(AssemblyName), "LUX_TEMPLATE_PUBLISHED and LUX_TEMPLATE_ASSEMBLY are not set.");
 
         var port = FreePort();
         var host = $"http://127.0.0.1:{port}";

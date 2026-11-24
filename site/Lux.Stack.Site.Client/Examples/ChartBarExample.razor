@@ -1,13 +1,13 @@
 @* Series differ by fill pattern as well as by color. The data table of the first chart is shown behind a disclosure. *@
 <div class="grid w-full gap-8 md:grid-cols-2">
     <div>
-        <p class="mb-2 text-sm font-medium text-(--blux-text-highlighted)">Grouped</p>
-        <BxChart TItem="Sale" Data="_data" Index="@(s => s.Quarter)" Categories="_categories" Type="BxChartType.Bar"
-                 Format="Money" Table="BxChartTable.Toggle" Width="420" Height="260" data-testid="chart-bar" />
+        <p class="mb-2 text-sm font-medium text-(--lux-text-highlighted)">Grouped</p>
+        <LxChart TItem="Sale" Data="_data" Index="@(s => s.Quarter)" Categories="_categories" Type="LxChartType.Bar"
+                 Format="Money" Table="LxChartTable.Toggle" Width="420" Height="260" data-testid="chart-bar" />
     </div>
     <div>
-        <p class="mb-2 text-sm font-medium text-(--blux-text-highlighted)">Stacked and horizontal</p>
-        <BxChart TItem="Sale" Data="_data" Index="@(s => s.Quarter)" Categories="_categories" Type="BxChartType.Bar"
+        <p class="mb-2 text-sm font-medium text-(--lux-text-highlighted)">Stacked and horizontal</p>
+        <LxChart TItem="Sale" Data="_data" Index="@(s => s.Quarter)" Categories="_categories" Type="LxChartType.Bar"
                  Stacked Horizontal Format="Money" Width="420" Height="260" data-testid="chart-bar-horizontal" />
     </div>
 </div>
@@ -22,9 +22,9 @@
         new("Q1", 4200, 3100), new("Q2", 5100, 2800), new("Q3", 4700, 3600), new("Q4", 6900, 4100),
     ];
 
-    private static readonly BxChartCategory<Sale>[] _categories =
+    private static readonly LxChartCategory<Sale>[] _categories =
     [
         new("online", s => s.Online) { Label = "Online" },
-        new("store", s => s.Store) { Label = "Store", Color = BxColor.Info },
+        new("store", s => s.Store) { Label = "Store", Color = LxColor.Info },
     ];
 }

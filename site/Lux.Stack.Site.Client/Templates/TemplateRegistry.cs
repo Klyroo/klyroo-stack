@@ -28,7 +28,7 @@ public sealed record TemplateInfo(
     public string DemoPath => $"templates/{Name}/demo/";
 
     /// <summary>The name of the repository the template is published as, below <see cref="TemplateSettings.RepositoryBase"/>.</summary>
-    public string RepositoryName => $"blux-template-{Name}";
+    public string RepositoryName => $"lux-template-{Name}";
 
     /// <summary>The path of the screenshot in the static files of the site, for "light" or "dark".</summary>
     public string Screenshot(string mode) => $"img/template-{Name}-{mode}.png";

@@ -5,7 +5,7 @@ using ModelContextProtocol.Server;
 namespace Lux.Stack.Mcp;
 
 /// <summary>Options of the Lux.UI documentation server.</summary>
-public sealed class BluxDocsOptions
+public sealed class LuxDocsOptions
 {
     /// <summary>What to serve; defaults to the bundle embedded at build time.</summary>
     public DocsBundle? Bundle { get; set; }
@@ -23,9 +23,9 @@ public static class LuxDocsServerExtensions
     /// Registers the docs bundle, its tools, prompts and resources. Add a transport on the returned builder:
     /// <c>WithStdioServerTransport()</c> for the local tool, <c>WithHttpTransport()</c> for the docs site.
     /// </summary>
-    public static IMcpServerBuilder AddBluxDocsServer(this IServiceCollection services, Action<BluxDocsOptions>? configure = null)
+    public static IMcpServerBuilder AddLuxDocsServer(this IServiceCollection services, Action<LuxDocsOptions>? configure = null)
     {
-        var options = new BluxDocsOptions();
+        var options = new LuxDocsOptions();
         configure?.Invoke(options);
         var bundle = options.Bundle ?? DocsBundleLoader.Embedded;
 

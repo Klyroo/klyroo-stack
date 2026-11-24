@@ -18,19 +18,19 @@ public class ToolsTests(PlaygroundServer server) : PlaygroundTest(server)
         var icon = Empty.Locator("svg");
         await Assertions.Expect(icon).ToHaveCountAsync(1);
         await Assertions.Expect(icon.Locator("path").First).ToBeAttachedAsync();
-        await Assertions.Expect(icon).Not.ToHaveAttributeAsync("data-bx-missing-icon", new Regex(".*"));
+        await Assertions.Expect(icon).Not.ToHaveAttributeAsync("data-lx-missing-icon", new Regex(".*"));
         await Assertions.Expect(Page.GetByTestId("package-note")).ToContainTextAsync("dotnet add package Lux.Table --prerelease");
         await Assertions.Expect(Page.GetByTestId("empty-actions").GetByRole(AriaRole.Button, new() { Name = "Clear filters" })).ToBeVisibleAsync();
     }
 
     [Theory]
     [MemberData(nameof(AllModes))]
-    public async Task The_second_javascript_initializer_loads_next_to_the_one_of_Blux_UI(string mode)
+    public async Task The_second_javascript_initializer_loads_next_to_the_one_of_Lux_UI(string mode)
     {
         await Open(mode, "data-list-empty");
 
         // Both initializers merge into the same global, whichever runs first.
-        await Page.WaitForFunctionAsync("() => !!globalThis.Blux?.tools && typeof globalThis.Blux.setColorMode === 'function'");
+        await Page.WaitForFunctionAsync("() => !!globalThis.Lux?.tools && typeof globalThis.Lux.setColorMode === 'function'");
         var response = await Page.APIRequest.GetAsync("/_content/Lux.Table/Lux.Table.lib.module.js");
         Assert.True(response.Ok, $"the initializer is not served: {response.Status}");
     }
@@ -44,7 +44,7 @@ public class ToolsTests(PlaygroundServer server) : PlaygroundTest(server)
         var page = await context.NewPageAsync();
         await Open(page, "server", "data-list-empty");
 
-        await page.WaitForFunctionAsync("() => !!globalThis.Blux?.tools && typeof globalThis.Blux.setColorMode === 'function'");
+        await page.WaitForFunctionAsync("() => !!globalThis.Lux?.tools && typeof globalThis.Lux.setColorMode === 'function'");
         await Assertions.Expect(page.GetByTestId("empty-default").Locator("svg path").First).ToBeAttachedAsync();
     }
 
@@ -67,8 +67,8 @@ public class ToolsTests(PlaygroundServer server) : PlaygroundTest(server)
         var theme = await Page.APIRequest.GetAsync("/_content/Lux.Table/lux-table.theme.css");
         Assert.True(theme.Ok, $"lux-table.theme.css: {theme.Status}");
         // A precompiled sheet after lux.css would override the variants of Lux.UI: the package ships none.
-        var precompiled = await Page.APIRequest.GetAsync("/_content/Lux.Table/blux-tools.css");
-        Assert.False(precompiled.Ok, "blux-tools.css must not exist");
+        var precompiled = await Page.APIRequest.GetAsync("/_content/Lux.Table/lux-tools.css");
+        Assert.False(precompiled.Ok, "lux-tools.css must not exist");
     }
 
     [Theory]

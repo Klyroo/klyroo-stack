@@ -2,17 +2,17 @@
 
 <div class="flex w-full max-w-md flex-col gap-3">
     <div role="region" aria-label="Activity feed" tabindex="0" data-testid="infinite-feed"
-         class="h-64 overflow-y-auto rounded-lg border border-(--blux-border) bg-(--blux-bg)">
+         class="h-64 overflow-y-auto rounded-lg border border-(--lux-border) bg-(--lux-bg)">
         <ul>
             @for (var i = 1; i <= Shown; i++)
             {
-                <li class="border-b border-(--blux-border) px-3 py-2 text-sm">Event @i</li>
+                <li class="border-b border-(--lux-border) px-3 py-2 text-sm">Event @i</li>
             }
         </ul>
-        <BxInfiniteScroll HasMore="HasMore" OnLoadMore="LoadAsync" Href="@NextHref" ShowEnd data-testid="infinite-more" />
+        <LxInfiniteScroll HasMore="HasMore" OnLoadMore="LoadAsync" Href="@NextHref" ShowEnd data-testid="infinite-more" />
     </div>
-    <p class="text-sm text-(--blux-text-muted)" data-testid="infinite-count">Showing @Shown of @Total</p>
-    <p class="text-sm text-(--blux-text-muted)" data-testid="infinite-requests">Load requests: @_requests</p>
+    <p class="text-sm text-(--lux-text-muted)" data-testid="infinite-count">Showing @Shown of @Total</p>
+    <p class="text-sm text-(--lux-text-muted)" data-testid="infinite-requests">Load requests: @_requests</p>
 </div>
 
 @code {

@@ -12,7 +12,7 @@ public class DesignSystemTests(PlaygroundServer server) : PlaygroundTest(server)
     private async Task<string> PreviewPrimary()
     {
         var css = await Page.Locator("#palette-demo style").First.TextContentAsync() ?? "";
-        var match = Regex.Match(css, @"^#palette-demo\{[^}]*--blux-primary:(#[0-9a-f]{6});");
+        var match = Regex.Match(css, @"^#palette-demo\{[^}]*--lux-primary:(#[0-9a-f]{6});");
         Assert.True(match.Success, css);
         return Rgb(match.Groups[1].Value);
     }
@@ -42,9 +42,9 @@ public class DesignSystemTests(PlaygroundServer server) : PlaygroundTest(server)
     {
         await Open("ssr", "theme-style");
 
-        var page = await Page.EvaluateAsync<string>("() => getComputedStyle(document.documentElement).getPropertyValue('--blux-primary').trim()");
+        var page = await Page.EvaluateAsync<string>("() => getComputedStyle(document.documentElement).getPropertyValue('--lux-primary').trim()");
         Assert.Equal("#ffd23f", page);
-        var inside = await Page.GetByTestId("palette-demo").EvaluateAsync<string>("e => getComputedStyle(e).getPropertyValue('--blux-primary').trim()");
+        var inside = await Page.GetByTestId("palette-demo").EvaluateAsync<string>("e => getComputedStyle(e).getPropertyValue('--lux-primary').trim()");
         Assert.NotEqual("#ffd23f", inside);
     }
 
@@ -75,7 +75,7 @@ public class DesignSystemTests(PlaygroundServer server) : PlaygroundTest(server)
 
         await Assertions.Expect(PrimaryButton).Not.ToHaveCSSAsync("background-color", light);
         var css = await Page.Locator("#palette-demo style").First.TextContentAsync() ?? "";
-        var dark = Regex.Match(css, @"\.dark #palette-demo,#palette-demo\.dark\{[^}]*--blux-primary:(#[0-9a-f]{6});");
+        var dark = Regex.Match(css, @"\.dark #palette-demo,#palette-demo\.dark\{[^}]*--lux-primary:(#[0-9a-f]{6});");
         Assert.True(dark.Success, css);
         await Assertions.Expect(PrimaryButton).ToHaveCSSAsync("background-color", Rgb(dark.Groups[1].Value));
     }
@@ -101,15 +101,15 @@ public class DesignSystemTests(PlaygroundServer server) : PlaygroundTest(server)
     {
         await Open("ssr", "chart");
         var series = Page.GetByTestId("chart-line").Locator("g[data-series][data-color='chart-1']").First;
-        Assert.Equal("#ffd23f", await series.EvaluateAsync<string>("e => getComputedStyle(e).getPropertyValue('--bx-color').trim()"));
+        Assert.Equal("#ffd23f", await series.EvaluateAsync<string>("e => getComputedStyle(e).getPropertyValue('--lx-color').trim()"));
 
-        // The chart tokens are not fixed on :root: the series resolve --blux-primary at their own element.
-        await Page.GetByTestId("chart-line").EvaluateAsync("e => e.style.setProperty('--blux-primary', '#ff0000')");
-        Assert.Equal("#ff0000", await series.EvaluateAsync<string>("e => getComputedStyle(e).getPropertyValue('--bx-color').trim()"));
+        // The chart tokens are not fixed on :root: the series resolve --lux-primary at their own element.
+        await Page.GetByTestId("chart-line").EvaluateAsync("e => e.style.setProperty('--lux-primary', '#ff0000')");
+        Assert.Equal("#ff0000", await series.EvaluateAsync<string>("e => getComputedStyle(e).getPropertyValue('--lx-color').trim()"));
 
-        // A global --blux-chart-1 still wins over the semantic color.
-        await Page.GetByTestId("chart-line").EvaluateAsync("e => e.style.setProperty('--blux-chart-1', '#00ff00')");
-        Assert.Equal("#00ff00", await series.EvaluateAsync<string>("e => getComputedStyle(e).getPropertyValue('--bx-color').trim()"));
+        // A global --lux-chart-1 still wins over the semantic color.
+        await Page.GetByTestId("chart-line").EvaluateAsync("e => e.style.setProperty('--lux-chart-1', '#00ff00')");
+        Assert.Equal("#00ff00", await series.EvaluateAsync<string>("e => getComputedStyle(e).getPropertyValue('--lx-color').trim()"));
     }
 
     [Fact]
@@ -126,7 +126,7 @@ public class DesignSystemTests(PlaygroundServer server) : PlaygroundTest(server)
               };
               const outside = make(document.body);
               const wrapper = document.createElement('div');
-              wrapper.style.setProperty('--blux-radius', '2rem');
+              wrapper.style.setProperty('--lux-radius', '2rem');
               document.body.appendChild(wrapper);
               const inside = make(wrapper);
               return [getComputedStyle(outside).borderTopLeftRadius, getComputedStyle(inside).borderTopLeftRadius];

@@ -10,7 +10,7 @@ namespace Lux.Stack.Site.Tests;
 public class WatchdogTests : IDisposable
 {
     private readonly List<Process> _started = [];
-    private readonly string _folder = Path.Combine(Path.GetTempPath(), "blux-watchdog-tests-" + Guid.NewGuid().ToString("N"));
+    private readonly string _folder = Path.Combine(Path.GetTempPath(), "lux-watchdog-tests-" + Guid.NewGuid().ToString("N"));
 
     public WatchdogTests() => DemoHarness.CopyDirectory(DemoHarness.FakeDemoOutput(), _folder);
 
@@ -96,8 +96,8 @@ public class WatchdogTests : IDisposable
         var parent = await StartDemoAsync(env => { env.Remove("DOTNET_STARTUP_HOOKS"); return env; }, redirectInput: false);
         var demo = await StartDemoAsync(env =>
         {
-            env.Remove("BLUX_WATCHDOG_STDIN");
-            env["BLUX_WATCHDOG_PARENT_PID"] = parent.Id.ToString();
+            env.Remove("LUX_WATCHDOG_STDIN");
+            env["LUX_WATCHDOG_PARENT_PID"] = parent.Id.ToString();
             return env;
         }, redirectInput: false);
         Assert.False(demo.HasExited);
@@ -112,8 +112,8 @@ public class WatchdogTests : IDisposable
     {
         var demo = await StartDemoAsync(env =>
         {
-            env.Remove("BLUX_WATCHDOG_STDIN");
-            env.Remove("BLUX_WATCHDOG_PARENT_PID");
+            env.Remove("LUX_WATCHDOG_STDIN");
+            env.Remove("LUX_WATCHDOG_PARENT_PID");
             return env;
         }, redirectInput: false);
 

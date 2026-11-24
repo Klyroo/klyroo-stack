@@ -84,9 +84,9 @@ public class BundleTests
     {
         var table = TestSupport.Service.FindComponent("table")!;
 
-        Assert.Equal("BxTable<TItem>", table.Api[0].Name);
+        Assert.Equal("LxTable<TItem>", table.Api[0].Name);
         Assert.Contains(table.Api[0].Parameters, p => p.Name == "Items" && p.Type == "IEnumerable<TItem>");
-        Assert.Equal(table, TestSupport.Service.FindComponent("BxColumn"));
+        Assert.Equal(table, TestSupport.Service.FindComponent("LxColumn"));
     }
 
     [Fact]
@@ -105,7 +105,7 @@ public class BundleTests
     [Fact]
     public void The_theme_of_a_component_that_names_it_differently_is_found_through_its_source()
     {
-        // BxToaster resolves Options.Toast.
+        // LxToaster resolves Options.Toast.
         Assert.Equal("Toast", TestSupport.Service.FindComponent("toast")!.Api[0].Theme!.Property);
     }
 
@@ -156,18 +156,18 @@ public class BundleTests
         public Lux.UI.Theming.ComponentTheme Button { get; } = new Lux.UI.Theming.ComponentTheme("sister-button", "root").Slot("root", "grid");
     }
 
-    public sealed class FakeGauge : Lux.UI.Theming.BxComponentBase;
+    public sealed class FakeGauge : Lux.UI.Theming.LxComponentBase;
 
-    public sealed class FakeButton : Lux.UI.Theming.BxComponentBase;
+    public sealed class FakeButton : Lux.UI.Theming.LxComponentBase;
 
-    public sealed class FakeNamedSister : Lux.UI.Theming.BxComponentBase;
+    public sealed class FakeNamedSister : Lux.UI.Theming.LxComponentBase;
 
-    public sealed class FakePrefixed : Lux.UI.Theming.BxComponentBase;
+    public sealed class FakePrefixed : Lux.UI.Theming.LxComponentBase;
 
     [Fact]
     public void A_prefixed_options_property_names_an_extension_theme_that_is_not_named_after_the_component()
     {
-        var root = Path.Combine(Path.GetTempPath(), "blux-bundle-" + Guid.NewGuid().ToString("N"));
+        var root = Path.Combine(Path.GetTempPath(), "lux-bundle-" + Guid.NewGuid().ToString("N"));
         var components = Path.Combine(root, "src", typeof(FakePrefixed).Assembly.GetName().Name!, "Components");
         Directory.CreateDirectory(components);
         try
@@ -190,7 +190,7 @@ public class BundleTests
     [Fact]
     public void A_component_of_an_extension_assembly_maps_to_its_own_theme_even_when_core_has_one_of_the_same_name()
     {
-        var root = Path.Combine(Path.GetTempPath(), "blux-bundle-" + Guid.NewGuid().ToString("N"));
+        var root = Path.Combine(Path.GetTempPath(), "lux-bundle-" + Guid.NewGuid().ToString("N"));
         var components = Path.Combine(root, "src", typeof(FakeGauge).Assembly.GetName().Name!, "Components");
         Directory.CreateDirectory(components);
         try
@@ -227,7 +227,7 @@ public class BundleTests
     [Fact]
     public void A_core_component_still_maps_to_its_core_theme_when_an_extension_has_the_same_name()
     {
-        var button = BundleBuilder.ThemeFor(typeof(Lux.UI.BxButton), TestSupport.RepoRoot, [typeof(SisterOptions)]);
+        var button = BundleBuilder.ThemeFor(typeof(Lux.UI.LxButton), TestSupport.RepoRoot, [typeof(SisterOptions)]);
 
         Assert.Equal("Button", button!.Property);
         Assert.NotEqual("sister-button", button.Name);

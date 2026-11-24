@@ -16,12 +16,12 @@
     <CodeBlock Title="app.css" Code="@Tokens" />
 
     <h2>Custom colors</h2>
-    <p>The easy way is <code>o.Colors.Add("tertiary", palette)</code> with <code>BxThemeStyle</code>. By hand, define the three variables for a name and pass it as a <code>Color</code>; this works with and without Tailwind.</p>
+    <p>The easy way is <code>o.Colors.Add("tertiary", palette)</code> with <code>LxThemeStyle</code>. By hand, define the three variables for a name and pass it as a <code>Color</code>; this works with and without Tailwind.</p>
     <CodeBlock Code="@CustomColor" />
 
     <h2>Global theme</h2>
     <p>Every component has slots, variants and defaults declared in C#. Classes you add win over the defaults.</p>
-    <p>Configure themes in <code>AddLuxUi</code>, which may be called more than once (a library, then the app). A theme becomes read-only the first time a component renders with it, because resolved classes are cached: changing it afterwards throws an <code>InvalidOperationException</code>. The <code>Slots</code>, <code>Variants</code>, <code>CompoundVariants</code> and <code>DefaultVariants</code> properties are read-only views; use <code>Slot</code>, <code>Variant</code>, <code>Compound</code> and <code>Default</code> to configure. <code>BxTheme</code> scopes are unaffected, they only add classes per subtree. The palettes and the defaults of <code>o.Colors</code> and <code>o.Defaults</code> freeze the same way.</p>
+    <p>Configure themes in <code>AddLuxUi</code>, which may be called more than once (a library, then the app). A theme becomes read-only the first time a component renders with it, because resolved classes are cached: changing it afterwards throws an <code>InvalidOperationException</code>. The <code>Slots</code>, <code>Variants</code>, <code>CompoundVariants</code> and <code>DefaultVariants</code> properties are read-only views; use <code>Slot</code>, <code>Variant</code>, <code>Compound</code> and <code>Default</code> to configure. <code>LxTheme</code> scopes are unaffected, they only add classes per subtree. The palettes and the defaults of <code>o.Colors</code> and <code>o.Defaults</code> freeze the same way.</p>
     <CodeBlock Title="Program.cs" Code="@Global" />
 
     <h2>Per instance</h2>
@@ -33,28 +33,28 @@
     private const string Palettes = """
         builder.Services.AddLuxUi(o =>
         {
-            o.Colors.Primary = BxPalette.Blue;
-            o.Colors.Neutral = BxPalette.Zinc;
-            o.Colors.Add("tertiary", BxPalette.Indigo);
+            o.Colors.Primary = LxPalette.Blue;
+            o.Colors.Neutral = LxPalette.Zinc;
+            o.Colors.Add("tertiary", LxPalette.Indigo);
         });
         """;
 
     private const string Tokens = """
         :root {
-          --blux-radius: 0.5rem;
-          --blux-primary: var(--color-teal-700);
-          --blux-primary-text: var(--color-teal-800);
+          --lux-radius: 0.5rem;
+          --lux-primary: var(--color-teal-700);
+          --lux-primary-text: var(--color-teal-800);
         }
         .dark {
-          --blux-primary: var(--color-teal-400);
-          --blux-primary-text: var(--color-teal-300);
+          --lux-primary: var(--color-teal-400);
+          --lux-primary-text: var(--color-teal-300);
         }
         """;
 
     private const string CustomColor = """
-        [data-color='brand'] { --bx-color: #0f766e; --bx-color-text: #115e59; --bx-color-contrast: #fff; }
+        [data-color='brand'] { --lx-color: #0f766e; --lx-color-text: #115e59; --lx-color-contrast: #fff; }
 
-        <BxButton Label="Brand button" Color="@("brand")" />
+        <LxButton Label="Brand button" Color="@("brand")" />
         """;
 
     private const string Global = """
@@ -66,6 +66,6 @@
         """;
 
     private const string Instance = """
-        <BxButton Label="Save" Class="px-6" Ui="@(new ButtonUi { Label = "uppercase tracking-wide" })" />
+        <LxButton Label="Save" Class="px-6" Ui="@(new ButtonUi { Label = "uppercase tracking-wide" })" />
         """;
 }

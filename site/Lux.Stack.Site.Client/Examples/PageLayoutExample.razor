@@ -1,24 +1,24 @@
 @* The side columns show from the lg breakpoint. In a real layout the asides sit at the top level of the page. *@
-<div class="w-full overflow-hidden rounded-lg border border-(--blux-border) bg-(--blux-bg) px-6">
-    <BxPage>
+<div class="w-full overflow-hidden rounded-lg border border-(--lux-border) bg-(--lux-bg) px-6">
+    <LxPage>
         <Left>
-            <BxPageAside As="div" Class="static">
-                <BxPageLinks Title="Guides" Links="_guides" />
-            </BxPageAside>
+            <LxPageAside As="div" Class="static">
+                <LxPageLinks Title="Guides" Links="_guides" />
+            </LxPageAside>
         </Left>
         <ChildContent>
-            <BxPageHeader Headline="Guides" Title="Deploying to production" HeadingLevel="3"
+            <LxPageHeader Headline="Guides" Title="Deploying to production" HeadingLevel="3"
                           Description="Ship your Blazor app with a release build, a health check and a rollback plan." />
-            <BxPageBody Class="mt-6 pb-8">
+            <LxPageBody Class="mt-6 pb-8">
                 <p>Publish in Release mode, then run the container behind a reverse proxy that terminates TLS.</p>
-            </BxPageBody>
+            </LxPageBody>
         </ChildContent>
         <Right>
-            <BxPageAside As="div" Class="static">
-                <BxPageAnchors Links="_anchors" />
-            </BxPageAside>
+            <LxPageAside As="div" Class="static">
+                <LxPageAnchors Links="_anchors" />
+            </LxPageAside>
         </Right>
-    </BxPage>
+    </LxPage>
 </div>
 
 @code {

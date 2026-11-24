@@ -168,34 +168,34 @@ public static partial class LuxLibraryDocs
                     new("layout-kpi", "Page, Grid, Card, Stat, Stats & SVG Gauge",
                         Paragraphs: ["Every block automatically renders its matched DashboardSkeletonKind (13 shapes: Rows, Stat, Stats, Gauge, Details, Bars, Paired, Funnel, Stack, Table, Feed, Lines, Donut) while its linked IDashboardSource is loading."],
                         LiveDemoKey: "dashboard-kpi",
-                        LiveDemoTitle: "BxDashboardStats, BxDashboardGauge & BxDashboardBars",
+                        LiveDemoTitle: "LxDashboardStats, LxDashboardGauge & LxDashboardBars",
                         CodeSamples:
                         [
                             new("KpiBlocks.razor", """
-                                <BxDashboardPage Dashboard="@_dashboard" Title="Revenue Analytics">
-                                    <BxDashboardGrid Menu="true" Freshness="true">
-                                        <BxDashboardStats Title="Executive KPIs" Items="@([
+                                <LxDashboardPage Dashboard="@_dashboard" Title="Revenue Analytics">
+                                    <LxDashboardGrid Menu="true" Freshness="true">
+                                        <LxDashboardStats Title="Executive KPIs" Items="@([
                                             new DashboardStatsItem("mrr", "MRR", 148900, DashboardFormatPreset.Compact, Delta: 14.2, Progress: 0.86),
                                             new DashboardStatsItem("churn", "Churn", 1.8, DashboardFormatPreset.Percent, Delta: -0.4, InvertDelta: true)
                                         ])" />
-                                        <BxDashboardGauge Title="Q4 ARR Target" Value="86" Min="0" Max="100" Target="90"
+                                        <LxDashboardGauge Title="Q4 ARR Target" Value="86" Min="0" Max="100" Target="90"
                                                           Format="DashboardFormatPreset.Percent" Caption="86% reached" />
-                                        <BxDashboardBars Title="Traffic by Platform" Items="@([
+                                        <LxDashboardBars Title="Traffic by Platform" Items="@([
                                             new DashboardBarItem("Blazor Web", 14200, Tag: "Web", Meta: "57%"),
                                             new DashboardBarItem(".NET MAUI Mobile", 7850, Tag: "iOS/Android", Meta: "32%")
                                         ])" Format="DashboardFormatPreset.Compact" />
-                                    </BxDashboardGrid>
-                                </BxDashboardPage>
+                                    </LxDashboardGrid>
+                                </LxDashboardPage>
                                 """)
                         ]),
                     new("table-alerts", "Table, Alerts, Feed, Details, List & Chart",
-                        Paragraphs: ["BxDashboardTable supports sortable columns (Type: \"text\" | \"number\" | \"bar\" | \"delta\") and built-in CSV export; BxDashboardAlerts displays Error, Warning, Info, and Success severity items."],
+                        Paragraphs: ["LxDashboardTable supports sortable columns (Type: \"text\" | \"number\" | \"bar\" | \"delta\") and built-in CSV export; LxDashboardAlerts displays Error, Warning, Info, and Success severity items."],
                         LiveDemoKey: "dashboard-table-alerts",
-                        LiveDemoTitle: "BxDashboardTable, BxDashboardAlerts & CSV Export",
+                        LiveDemoTitle: "LxDashboardTable, LxDashboardAlerts & CSV Export",
                         CodeSamples:
                         [
                             new("TablesAndAlerts.razor", """
-                                <BxDashboardTable Title="Top Regions" Menu="true"
+                                <LxDashboardTable Title="Top Regions" Menu="true"
                                                   Columns="@([
                                                       new DashboardTableColumn("region", "Region", Type: "text"),
                                                       new DashboardTableColumn("revenue", "Revenue", Type: "bar"),
@@ -203,7 +203,7 @@ public static partial class LuxLibraryDocs
                                                   ])"
                                                   Rows="@_regionRows" />
 
-                                <BxDashboardAlerts Title="Operational Alerts" Items="@([
+                                <LxDashboardAlerts Title="Operational Alerts" Items="@([
                                     new DashboardAlertItem(DashboardAlertSeverity.Success, "EU latency within SLA", "P95 at 24ms"),
                                     new DashboardAlertItem(DashboardAlertSeverity.Warning, "Cache eviction spike in us-east", "Raise memory tier")
                                 ])" />
@@ -241,7 +241,7 @@ public static partial class LuxLibraryDocs
                                 """)
                         ]),
                     new("table-drilldown", "2. Lux.Dashboard + Lux.Table (Deferred Drill-Down Tab)",
-                        Paragraphs: ["Mount a full <BxDataList> inside a secondary dashboard view tab and trigger its data load only when ActiveView == \"details\", sharing the exact same region/period filter predicates."])
+                        Paragraphs: ["Mount a full <LxDataList> inside a secondary dashboard view tab and trigger its data load only when ActiveView == \"details\", sharing the exact same region/period filter predicates."])
                 ]),
             new("integrations-agent-form", "Integration: Lux.Agent & Lux.Form", "Integrations",
                 "Control dashboards conversationally with Lux.Agent (RegisterDashboard) and let users create custom alert rules or saved views using Lux.Form overlays.",
@@ -326,17 +326,17 @@ public static partial class LuxLibraryDocs
                 "5 interactive analytics playgrounds covering KPI strips & gauges, 3-wave staged loading, sortable tables & CSV export, badged views & multi-select filters, and leap-year comparison formatting.",
                 [
                     new("kpi-strip", "1. Executive KPI Strip, Circular SVG Gauge & Category Bars",
-                        Paragraphs: ["Combine BxDashboardStats (with InvertDelta on Churn), BxDashboardGauge with target marker, and BxDashboardBars with compact formatting."],
+                        Paragraphs: ["Combine LxDashboardStats (with InvertDelta on Churn), LxDashboardGauge with target marker, and LxDashboardBars with compact formatting."],
                         LiveDemoKey: "dashboard-kpi",
-                        LiveDemoTitle: "BxDashboardStats, BxDashboardGauge & BxDashboardBars",
+                        LiveDemoTitle: "LxDashboardStats, LxDashboardGauge & LxDashboardBars",
                         CodeSamples:
                         [
                             new("KpiStrip.razor", """
-                                <BxDashboardStats Title="Executive KPIs" Items="@([
+                                <LxDashboardStats Title="Executive KPIs" Items="@([
                                     new DashboardStatsItem("mrr", "MRR", 148900, DashboardFormatPreset.Compact, Delta: 14.2, Progress: 0.86),
                                     new DashboardStatsItem("churn", "Churn", 1.8, DashboardFormatPreset.Percent, Delta: -0.4, InvertDelta: true)
                                 ])" />
-                                <BxDashboardGauge Title="Q4 ARR Target" Value="86" Max="100" Target="90" Format="DashboardFormatPreset.Percent" Caption="86% reached" />
+                                <LxDashboardGauge Title="Q4 ARR Target" Value="86" Max="100" Target="90" Format="DashboardFormatPreset.Percent" Caption="86% reached" />
                                 """)
                         ]),
                     new("staged-waves", "2. 3-Wave Staged Loading (Essential · Background · Deferred)",
@@ -356,14 +356,14 @@ public static partial class LuxLibraryDocs
                                 """)
                         ]),
                     new("tables-alerts", "3. Analytical Table, Severity Alerts & fr-FR BOM CSV Export",
-                        Paragraphs: ["Sort BxDashboardTable columns with inline bars and deltas, view severity-coded BxDashboardAlerts, and generate an Excel-safe fr-FR CSV with UTF-8 BOM."],
+                        Paragraphs: ["Sort LxDashboardTable columns with inline bars and deltas, view severity-coded LxDashboardAlerts, and generate an Excel-safe fr-FR CSV with UTF-8 BOM."],
                         LiveDemoKey: "dashboard-table-alerts",
-                        LiveDemoTitle: "BxDashboardTable, BxDashboardAlerts & CSV Export",
+                        LiveDemoTitle: "LxDashboardTable, LxDashboardAlerts & CSV Export",
                         CodeSamples:
                         [
                             new("OpsOverview.razor", """
-                                <BxDashboardTable Title="Top Regions" Columns="@_columns" Rows="@_rows" Menu="true" />
-                                <BxDashboardAlerts Title="Operational Alerts" Items="@([
+                                <LxDashboardTable Title="Top Regions" Columns="@_columns" Rows="@_rows" Menu="true" />
+                                <LxDashboardAlerts Title="Operational Alerts" Items="@([
                                     new DashboardAlertItem(DashboardAlertSeverity.Success, "EU cluster latency within SLA", "P95 at 24ms"),
                                     new DashboardAlertItem(DashboardAlertSeverity.Warning, "Cache eviction spike in us-east", "Raise memory tier")
                                 ])" />
@@ -397,6 +397,6 @@ public static partial class LuxLibraryDocs
             new("api", "API Reference", "Reference",
                 "Complete public API reference for Lux.Dashboard.Core and Lux.Dashboard.",
                 [],
-                ApiTypes: [typeof(BxDashboardPage), typeof(BxDashboardStats), typeof(BxDashboardStat), typeof(BxDashboardGauge), typeof(BxDashboardBars), typeof(BxDashboardTable), typeof(BxDashboardAlerts), typeof(DashboardController), typeof(DashboardFilterControl)])
+                ApiTypes: [typeof(LxDashboardPage), typeof(LxDashboardStats), typeof(LxDashboardStat), typeof(LxDashboardGauge), typeof(LxDashboardBars), typeof(LxDashboardTable), typeof(LxDashboardAlerts), typeof(DashboardController), typeof(DashboardFilterControl)])
         ]);
 }

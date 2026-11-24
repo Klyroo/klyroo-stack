@@ -10,21 +10,21 @@ namespace Lux.Stack.Site.Templates;
 /// process of the docs host that <see cref="TemplateDemoSupervisor"/> keeps running. The demos are separate programs: the docs host never references a
 /// template project, so their <c>_framework</c> and static assets cannot collide with its own.
 /// <para>
-/// Configuration under <c>Blux:Templates</c>, see <see cref="TemplateDemoOptions"/>; <c>Blux:Templates:RepositoryBase</c> is what the /templates page
-/// links its "Source" buttons to. <c>GET /_blux/templates/status</c> lists the state of each demo and <c>GET /_blux/templates/ready</c> answers 200
+/// Configuration under <c>Lux:Templates</c>, see <see cref="TemplateDemoOptions"/>; <c>Lux:Templates:RepositoryBase</c> is what the /templates page
+/// links its "Source" buttons to. <c>GET /_lux/templates/status</c> lists the state of each demo and <c>GET /_lux/templates/ready</c> answers 200
 /// once every demo that can be started answers (503 before). Both are answered to loopback clients only, and neither is a health check of the
-/// site: <c>GET /_blux/health</c> is (it only says the host is up). The E2E suite waits on <c>ready</c>.
+/// site: <c>GET /_lux/health</c> is (it only says the host is up). The E2E suite waits on <c>ready</c>.
 /// </para>
 /// </summary>
 public static class TemplateDemos
 {
     /// <summary>
     /// Registers the demos of <paramref name="templates"/> (the registry when null). Nothing but the settings and a "no demos" state is registered when
-    /// <c>Blux:Templates:Enabled</c> is false.
+    /// <c>Lux:Templates:Enabled</c> is false.
     /// </summary>
     public static IServiceCollection AddTemplateDemos(this IServiceCollection services, IConfiguration configuration, IReadOnlyList<TemplateInfo>? templates = null)
     {
-        var section = configuration.GetSection("Blux:Templates");
+        var section = configuration.GetSection("Lux:Templates");
         services.Configure<TemplateDemoOptions>(section);
         var options = section.Get<TemplateDemoOptions>() ?? new TemplateDemoOptions();
         services.AddSingleton(new TemplateSettings(options.RepositoryBase));
@@ -88,13 +88,13 @@ public static class TemplateDemos
     public static WebApplication MapTemplateDemos(this WebApplication app)
     {
         // The host answers its own health check whatever the demos do.
-        app.MapGet("/_blux/health", () => Results.Text("ok"));
+        app.MapGet("/_lux/health", () => Results.Text("ok"));
         var supervisor = app.Services.GetService<TemplateDemoSupervisor>();
         if (supervisor is null) return app;
         app.MapReverseProxy();
-        app.MapGet("/_blux/templates/status", (HttpContext context) =>
+        app.MapGet("/_lux/templates/status", (HttpContext context) =>
             IsLoopback(context) ? Results.Json(supervisor.Statuses) : Results.NotFound());
-        app.MapGet("/_blux/templates/ready", (HttpContext context) =>
+        app.MapGet("/_lux/templates/ready", (HttpContext context) =>
             !IsLoopback(context) ? Results.NotFound()
             : Results.Json(supervisor.Statuses, statusCode: supervisor.AllReady ? StatusCodes.Status200OK : StatusCodes.Status503ServiceUnavailable));
         return app;

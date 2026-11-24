@@ -17,7 +17,7 @@ public class DataListFacetsTests(PlaygroundServer server) : PlaygroundTest(serve
 
     private async Task WaitForPage(string mode)
     {
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
         if (mode != "ssr")
         {
             await Assertions.Expect(Page.GetByTestId("renderer")).ToHaveAttributeAsync("data-interactive", "true", new() { Timeout = 30_000 });
@@ -138,7 +138,7 @@ public class DataListFacetsTests(PlaygroundServer server) : PlaygroundTest(serve
     public async Task The_counts_are_there_after_an_enhanced_navigation(string mode)
     {
         await Page.GotoAsync($"/{mode}/components/button");
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-popover')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-popover')");
         if (mode != "ssr") await Assertions.Expect(Page.GetByTestId("renderer")).ToHaveAttributeAsync("data-interactive", "true", new() { Timeout = 30_000 });
         await Page.EvaluateAsync("() => { window.__enhanced = new Promise((r) => { Blazor.addEventListener('enhancedload', () => setTimeout(r, 50), { once: true }); setTimeout(r, 8000); }); }");
         await Page.EvaluateAsync("address => Blazor.navigateTo(address)", $"/{mode}/components/data-list-facets?fct.f.reviewed=true");

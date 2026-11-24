@@ -78,7 +78,7 @@ public class ChatTests(PlaygroundServer server) : PlaygroundTest(server)
         await Assertions.Expect(Page.GetByTestId("chat-prompt-reply")).ToBeVisibleAsync();
         Assert.EndsWith("/ssr/components/chat-prompt", new Uri(Page.Url).AbsolutePath);
         // Alive again after the post: Enter still sends.
-        await Page.WaitForFunctionAsync("() => !!customElements.get('bx-chat-prompt')");
+        await Page.WaitForFunctionAsync("() => !!customElements.get('lx-chat-prompt')");
         await Textarea("chat-prompt").FillAsync("Second");
         await Textarea("chat-prompt").PressAsync("Enter");
         await Assertions.Expect(Page.GetByTestId("chat-prompt-sent")).ToHaveTextAsync("Second", new() { Timeout = 15_000 });
@@ -163,8 +163,8 @@ public class ChatTests(PlaygroundServer server) : PlaygroundTest(server)
     {
         await Open(mode, "chat-messages");
         var root = Page.GetByTestId("chat-messages-demo");
-        var viewport = root.Locator("[data-bx-chat-viewport]");
-        var jump = root.Locator("[data-bx-chat-jump]");
+        var viewport = root.Locator("[data-lx-chat-viewport]");
+        var jump = root.Locator("[data-lx-chat-jump]");
 
         await WaitAtBottom(viewport);
         Assert.True(await viewport.EvaluateAsync<bool>("v => v.scrollHeight > v.clientHeight"));
@@ -185,18 +185,18 @@ public class ChatTests(PlaygroundServer server) : PlaygroundTest(server)
     {
         await Open(mode, "chat-messages");
         var root = Page.GetByTestId("chat-messages-demo");
-        var viewport = root.Locator("[data-bx-chat-viewport]");
-        var jump = root.Locator("[data-bx-chat-jump]");
+        var viewport = root.Locator("[data-lx-chat-viewport]");
+        var jump = root.Locator("[data-lx-chat-jump]");
         await WaitAtBottom(viewport);
 
         await Page.GetByTestId("chat-messages-reply").ClickAsync();
-        await Assertions.Expect(root.Locator("[data-bx-chat-content]").GetByText("New answer")).ToHaveCountAsync(1);
+        await Assertions.Expect(root.Locator("[data-lx-chat-content]").GetByText("New answer")).ToHaveCountAsync(1);
         await WaitAtBottom(viewport);
 
         await viewport.EvaluateAsync("v => { v.scrollTop = 0; }");
         await Assertions.Expect(jump).ToBeVisibleAsync();
         await Page.GetByTestId("chat-messages-reply").ClickAsync();
-        await Assertions.Expect(root.Locator("[data-bx-chat-content]").GetByText("New answer")).ToHaveCountAsync(2);
+        await Assertions.Expect(root.Locator("[data-lx-chat-content]").GetByText("New answer")).ToHaveCountAsync(2);
         await Page.WaitForTimeoutAsync(300);
         Assert.True(await viewport.EvaluateAsync<double>("v => v.scrollTop") < 40, "an answer must not pull a user who scrolled up");
         await Assertions.Expect(jump).ToBeVisibleAsync();
@@ -213,7 +213,7 @@ public class ChatTests(PlaygroundServer server) : PlaygroundTest(server)
     {
         await Open(mode, "chat-messages");
         var root = Page.GetByTestId("chat-messages-demo");
-        var announce = root.Locator("[data-bx-chat-announce]");
+        var announce = root.Locator("[data-lx-chat-announce]");
         var log = root.GetByRole(AriaRole.Log);
 
         await Assertions.Expect(log).ToHaveAttributeAsync("aria-live", "off");
@@ -233,14 +233,14 @@ public class ChatTests(PlaygroundServer server) : PlaygroundTest(server)
 
     // ---- ChatPalette: streaming
 
-    private ILocator Assistant => Page.GetByTestId("chat-palette-messages").Locator("[data-bx-chat-message][data-role=assistant]");
+    private ILocator Assistant => Page.GetByTestId("chat-palette-messages").Locator("[data-lx-chat-message][data-role=assistant]");
 
     /// <summary>The text of the latest answer, without the avatar's initials.</summary>
     // A prompt that gets the longest canned reply (about five seconds of streaming), for tests that act while it streams.
     private static readonly string LongPrompt = Enumerable.Range(1, 50).Select(i => $"Tell me more {i}")
         .First(p => Lux.Stack.Site.Client.Examples.ChatDemo.Reply(p) == Lux.Stack.Site.Client.Examples.ChatDemo.LongestReply);
 
-    private ILocator LastAnswer =>Assistant.Last.Locator("[data-bx-chat-content]");
+    private ILocator LastAnswer =>Assistant.Last.Locator("[data-lx-chat-content]");
 
     [Theory]
     [MemberData(nameof(InteractiveModes))]
@@ -249,7 +249,7 @@ public class ChatTests(PlaygroundServer server) : PlaygroundTest(server)
         await Open(mode, "chat-palette");
         var messages = Page.GetByTestId("chat-palette-messages");
         var prompt = Page.GetByTestId("chat-palette-prompt");
-        var announce = messages.Locator("[data-bx-chat-announce]");
+        var announce = messages.Locator("[data-lx-chat-announce]");
         await Assertions.Expect(prompt.GetByRole(AriaRole.Button, new() { Name = "Send" })).ToBeVisibleAsync();
         await Assertions.Expect(announce).ToBeEmptyAsync();
 
@@ -279,7 +279,7 @@ public class ChatTests(PlaygroundServer server) : PlaygroundTest(server)
         await Textarea("chat-palette-prompt").FillAsync("Another one");
         await Assertions.Expect(prompt).ToHaveAttributeAsync("data-busy", new Regex(".*"));
         await Textarea("chat-palette-prompt").PressAsync("Enter");
-        await Assertions.Expect(messages.Locator("[data-bx-chat-message][data-role=user]")).ToHaveCountAsync(1);
+        await Assertions.Expect(messages.Locator("[data-lx-chat-message][data-role=user]")).ToHaveCountAsync(1);
         // Tokens arrive, but none of them is announced.
         await Assertions.Expect(announce).ToBeEmptyAsync();
 
@@ -326,7 +326,7 @@ public class ChatTests(PlaygroundServer server) : PlaygroundTest(server)
         await Textarea("chat-palette-prompt").FillAsync("Static please");
         await Textarea("chat-palette-prompt").PressAsync("Enter");
 
-        await Assertions.Expect(Page.GetByTestId("chat-palette-messages").Locator("[data-bx-chat-message][data-role=user]")).ToHaveTextAsync("Static please", new() { Timeout = 30_000 });
+        await Assertions.Expect(Page.GetByTestId("chat-palette-messages").Locator("[data-lx-chat-message][data-role=user]")).ToHaveTextAsync("Static please", new() { Timeout = 30_000 });
         await Assertions.Expect(Assistant).ToHaveCountAsync(2);
         Assert.True((await LastAnswer.InnerTextAsync()).Length > 100);
         await Assertions.Expect(Page.GetByTestId("chat-palette-messages")).ToHaveAttributeAsync("data-status", "idle");
@@ -340,15 +340,15 @@ public class ChatTests(PlaygroundServer server) : PlaygroundTest(server)
     {
         await Open("ssr", "chat-messages");
         var root = Page.GetByTestId("chat-messages-demo");
-        var viewport = root.Locator("[data-bx-chat-viewport]");
+        var viewport = root.Locator("[data-lx-chat-viewport]");
         await WaitAtBottom(viewport);
 
         await EnhancedReload();
 
         await WaitAtBottom(viewport);
         await viewport.EvaluateAsync("v => { v.scrollTop = 0; }");
-        await Assertions.Expect(root.Locator("[data-bx-chat-jump]")).ToBeVisibleAsync();
-        await root.Locator("[data-bx-chat-jump]").ClickAsync();
+        await Assertions.Expect(root.Locator("[data-lx-chat-jump]")).ToBeVisibleAsync();
+        await root.Locator("[data-lx-chat-jump]").ClickAsync();
         await WaitAtBottom(viewport);
 
         await Open("ssr", "chat-prompt");
@@ -378,11 +378,11 @@ public class ChatTests(PlaygroundServer server) : PlaygroundTest(server)
 
         await Assertions.Expect(trigger).ToHaveAttributeAsync("aria-expanded", "true", new() { Timeout = 10_000 });
         await Assertions.Expect(trigger).ToContainTextAsync("Thinking...");
-        await Assertions.Expect(block.Locator("[data-bx-chat-shimmer]")).ToBeVisibleAsync();
+        await Assertions.Expect(block.Locator("[data-lx-chat-shimmer]")).ToBeVisibleAsync();
         await Assertions.Expect(block.GetByRole(AriaRole.Region)).ToBeVisibleAsync();
         await Assertions.Expect(trigger).ToContainTextAsync(new Regex("Thought for [0-9]+ seconds"), new() { Timeout = 30_000 });
         await Assertions.Expect(trigger).ToHaveAttributeAsync("aria-expanded", "false", new() { Timeout = 5_000 });
-        await Assertions.Expect(block.Locator("[data-bx-disclosure-content]")).ToBeHiddenAsync();
+        await Assertions.Expect(block.Locator("[data-lx-disclosure-content]")).ToBeHiddenAsync();
     }
 
     [Theory]
@@ -495,7 +495,7 @@ public class ChatTests(PlaygroundServer server) : PlaygroundTest(server)
     {
         await Open(mode, "chat-shimmer");
         var shimmer = Page.GetByTestId("chat-shimmer");
-        await Assertions.Expect(shimmer).ToHaveCSSAsync("animation-name", "bx-chat-shimmer");
+        await Assertions.Expect(shimmer).ToHaveCSSAsync("animation-name", "lx-chat-shimmer");
 
         await Page.EmulateMediaAsync(new() { ReducedMotion = ReducedMotion.Reduce });
 
@@ -513,7 +513,7 @@ public class ChatTests(PlaygroundServer server) : PlaygroundTest(server)
         var root = Page.GetByTestId("chat-messages-demo");
         await Page.EvaluateAsync("""
             () => {
-                const host = document.querySelector('[data-testid=chat-messages-demo]').closest('bx-chat-messages') ?? document.querySelector('bx-chat-messages');
+                const host = document.querySelector('[data-testid=chat-messages-demo]').closest('lx-chat-messages') ?? document.querySelector('lx-chat-messages');
                 window.__scans = 0;
                 const original = host.querySelectorAll.bind(host);
                 host.querySelectorAll = (selector) => {
@@ -524,7 +524,7 @@ public class ChatTests(PlaygroundServer server) : PlaygroundTest(server)
             """);
 
         // Twenty tokens arrive, one per task, in the text of the message being streamed.
-        await root.Locator("[data-bx-chat-message][data-role=assistant] [data-bx-chat-content]").Last.EvaluateAsync("""
+        await root.Locator("[data-lx-chat-message][data-role=assistant] [data-lx-chat-content]").Last.EvaluateAsync("""
             async (content) => {
                 const walker = document.createTreeWalker(content, NodeFilter.SHOW_TEXT);
                 const text = walker.nextNode();

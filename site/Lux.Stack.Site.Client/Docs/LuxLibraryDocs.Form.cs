@@ -17,7 +17,7 @@ public static partial class LuxLibraryDocs
                         Paragraphs:
                         [
                             "Lux.Form replaces hand-coded Razor form markup and fragile validation state with a declarative FormSchema and a 100% headless, NativeAOT FormController. Every rule — conditional visibility, dynamic required/disabled predicates, watch side-effects, password checklists, array row mutations, dirty diffing, server error injection, and wizard step skipping — executes in plain C# with zero UI dependencies.",
-                            "Render any FormController inline with <BxFormEngine>, organize long settings pages with <BxFormPage>, or launch Modal, Drawer, and Fullscreen forms imperatively from anywhere via FormService.CreateFormAsync()."
+                            "Render any FormController inline with <LxFormEngine>, organize long settings pages with <LxFormPage>, or launch Modal, Drawer, and Fullscreen forms imperatively from anywhere via FormService.CreateFormAsync()."
                         ],
                         LiveDemoKey: "form-reactive",
                         LiveDemoTitle: "Lux.Form · Live Reactive Condition, Password Rules & Dirty Tracking"),
@@ -36,11 +36,11 @@ public static partial class LuxLibraryDocs
                         TableRows:
                         [
                             new("Lux.Form.Core", "FormSchema, FormFieldSchema, FormStepSchema, FormPageSectionSchema, FormController, FormService, FormSubmitOutcome", "Headless C# · IsAotCompatible=true"),
-                            new("Lux.Form", "BxFormEngine, BxFormPage, BxFormProvider, AddLuxForm()", "browser, ios, android, maccatalyst, windows")
+                            new("Lux.Form", "LxFormEngine, LxFormPage, LxFormProvider, AddLuxForm()", "browser, ios, android, maccatalyst, windows")
                         ])
                 ]),
             new("installation", "Installation & Setup", "Getting Started",
-                "Install Lux.Form, register FormService, and mount BxFormProvider once for programmatic Modal, Drawer, and Fullscreen overlays.",
+                "Install Lux.Form, register FormService, and mount LxFormProvider once for programmatic Modal, Drawer, and Fullscreen overlays.",
                 [
                     new("nuget", "1. Install Packages",
                         CodeSamples:
@@ -51,11 +51,11 @@ public static partial class LuxLibraryDocs
                                 """)
                         ]),
                     new("di", "2. Register Services & Mount Overlay Provider",
-                        Paragraphs: ["AddLuxForm() registers FormService as a scoped service. Mount <BxFormProvider /> once in your root layout so FormService.CreateFormAsync() can open Modal, Drawer, or Fullscreen forms from any page or service."],
+                        Paragraphs: ["AddLuxForm() registers FormService as a scoped service. Mount <LxFormProvider /> once in your root layout so FormService.CreateFormAsync() can open Modal, Drawer, or Fullscreen forms from any page or service."],
                         CodeSamples:
                         [
                             new("Program.cs / MauiProgram.cs", "builder.Services.AddLuxForm();"),
-                            new("MainLayout.razor", "<BxFormProvider />"),
+                            new("MainLayout.razor", "<LxFormProvider />"),
                             new("_Imports.razor", "@using Lux.Form")
                         ])
                 ]),
@@ -176,7 +176,7 @@ public static partial class LuxLibraryDocs
                                 """)
                         ])
                 ]),
-            new("wizards-and-pages", "Wizards, BxFormPage & FormService", "UI Components",
+            new("wizards-and-pages", "Wizards, LxFormPage & FormService", "UI Components",
                 "Build stepped wizards with SkipWhen, sectioned settings pages with completion badges, and imperative Modal/Drawer/Fullscreen overlays.",
                 [
                     new("wizard", "Multi-Step Wizards with SkipWhen & OnBeforeNext",
@@ -208,8 +208,8 @@ public static partial class LuxLibraryDocs
                                 };
                                 """)
                         ]),
-                    new("sections-service", "BxFormPage Section Statuses & FormService.CreateFormAsync",
-                        Paragraphs: ["Define Sections on FormSchema and render <BxFormPage Form=\"@_controller\" /> to track Complete, Pending, Invalid, and Optional statuses per section. Use FormService.CreateFormAsync() to open any schema in a Modal, Drawer, or Fullscreen overlay."],
+                    new("sections-service", "LxFormPage Section Statuses & FormService.CreateFormAsync",
+                        Paragraphs: ["Define Sections on FormSchema and render <LxFormPage Form=\"@_controller\" /> to track Complete, Pending, Invalid, and Optional statuses per section. Use FormService.CreateFormAsync() to open any schema in a Modal, Drawer, or Fullscreen overlay."],
                         LiveDemoKey: "form-sections-errors",
                         LiveDemoTitle: "Interactive FormPageSectionStatus & Server Blocking Errors",
                         CodeSamples:
@@ -293,7 +293,7 @@ public static partial class LuxLibraryDocs
                                 """)
                         ]),
                     new("dashboard-config", "2. Lux.Form + Lux.Dashboard (Saved Dashboard Views & Alert Rules)",
-                        Paragraphs: ["Use FormService.CreateFormAsync(..., FormShellMode.Modal) from a BxDashboardPage toolbar action to create custom saved views or configure alert thresholds, then add the new view to DashboardController."])
+                        Paragraphs: ["Use FormService.CreateFormAsync(..., FormShellMode.Modal) from a LxDashboardPage toolbar action to create custom saved views or configure alert thresholds, then add the new view to DashboardController."])
                 ]),
             new("integrations-display-api", "Integration: Lux.Display, API Validation & Persistence", "Integrations",
                 "Preview form changes with Lux.Display Diff cards before submission and map ASP.NET Core ProblemDetails / ValidationProblemDetails errors back onto FormController.",
@@ -306,7 +306,7 @@ public static partial class LuxLibraryDocs
                                 @using Lux.Display
 
                                 @* Show a clean side-by-side Lux.Display Diff of every DirtyPath before saving *@
-                                <BxDisplay Kind="DisplayKind.Diff"
+                                <LxDisplay Kind="DisplayKind.Diff"
                                            Title="Pending Changes"
                                            DiffItems="@([.. _form.DirtyPaths.Select(k =>
                                                new DisplayDiffItem(k, _initial.GetValueOrDefault(k)?.ToString(), _form.GetValue<object>(k)?.ToString(), Changed: true))])" />
@@ -342,7 +342,7 @@ public static partial class LuxLibraryDocs
                     new("reactive-form", "1. Conditional Visibility, Password Checklist & Live Dirty Status",
                         Paragraphs: ["Set Age below 21 to watch Company hide and drop from validation, and type into Password to test live PasswordRequirements rules."],
                         LiveDemoKey: "form-reactive",
-                        LiveDemoTitle: "BxFormEngine · Conditional Rules & Password Checklist",
+                        LiveDemoTitle: "LxFormEngine · Conditional Rules & Password Checklist",
                         CodeSamples:
                         [
                             new("ProfileForm.cs", """
@@ -364,7 +364,7 @@ public static partial class LuxLibraryDocs
                     new("wizard-steps", "2. Multi-Step Onboarding Wizard with SkipWhen",
                         Paragraphs: ["Select 'Free' vs 'Pro' on Step 1 to see Step 2 (Billing) skipped dynamically via FormStepSchema.SkipWhen."],
                         LiveDemoKey: "form-wizard",
-                        LiveDemoTitle: "BxFormEngine · Multi-Step FormStepSchema Wizard",
+                        LiveDemoTitle: "LxFormEngine · Multi-Step FormStepSchema Wizard",
                         CodeSamples:
                         [
                             new("OnboardingWizard.cs", """
@@ -423,6 +423,6 @@ public static partial class LuxLibraryDocs
             new("api", "API Reference", "Reference",
                 "Complete public API reference for Lux.Form.Core and Lux.Form.",
                 [],
-                ApiTypes: [typeof(BxFormEngine), typeof(BxFormPage), typeof(BxFormProvider), typeof(FormController), typeof(FormSchema), typeof(FormFieldSchema), typeof(FormStepSchema), typeof(FormPageSectionSchema), typeof(FormService)])
+                ApiTypes: [typeof(LxFormEngine), typeof(LxFormPage), typeof(LxFormProvider), typeof(FormController), typeof(FormSchema), typeof(FormFieldSchema), typeof(FormStepSchema), typeof(FormPageSectionSchema), typeof(FormService)])
         ]);
 }

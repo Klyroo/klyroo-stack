@@ -18,6 +18,6 @@ builder.Services.AddLuxStack();
 Resolve any component or controller dynamically to its owning repository and package:
 
 ```csharp
-var module = LuxStackCatalog.ResolveComponentModule("BxFormEngine");
+var module = LuxStackCatalog.ResolveComponentModule("LxFormEngine");
 // module.Name == "Lux.Form", module.CorePackage == "Lux.Form.Core", module.LandingPagePath == ".../lux-form/site/index.html"
 ```

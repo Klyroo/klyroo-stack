@@ -2,10 +2,10 @@ using System.Text.RegularExpressions;
 
 namespace Lux.Stack.E2E;
 
-/// <summary>BxSelectMenu with an OptionsProvider: debounced search, paging while scrolling, restored values, loading and error states.</summary>
+/// <summary>LxSelectMenu with an OptionsProvider: debounced search, paging while scrolling, restored values, loading and error states.</summary>
 public class RemoteSelectMenuTests(PlaygroundServer server) : PlaygroundTest(server)
 {
-    private ILocator Menu(string testId) => Page.Locator($"bx-select-menu:has([data-testid={testId}])");
+    private ILocator Menu(string testId) => Page.Locator($"lx-select-menu:has([data-testid={testId}])");
     private ILocator Trigger(string testId) => Page.GetByTestId(testId);
     private static ILocator Search(ILocator menu) => menu.Locator("[data-slot=search]");
     private static ILocator Options(ILocator menu) => menu.GetByRole(AriaRole.Option);
