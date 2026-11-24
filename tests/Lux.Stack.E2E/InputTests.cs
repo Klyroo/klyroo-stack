@@ -317,8 +317,8 @@ public class InputTests(PlaygroundServer server) : PlaygroundTest(server)
         // arrives after the second report was sent.
         await Page.AddInitScriptAsync(@"(() => {
             const Native = window.WebSocket;
-            window.__bxDelay = 0;
-            const wrap = (self, fn) => (event) => { const d = window.__bxDelay; if (d) setTimeout(() => fn.call(self, event), d); else fn.call(self, event); };
+            window.__lxDelay = 0;
+            const wrap = (self, fn) => (event) => { const d = window.__lxDelay; if (d) setTimeout(() => fn.call(self, event), d); else fn.call(self, event); };
             window.WebSocket = class extends Native {
                 set onmessage(fn) { super.onmessage = fn ? wrap(this, fn) : null; }
                 get onmessage() { return super.onmessage; }
@@ -326,7 +326,7 @@ public class InputTests(PlaygroundServer server) : PlaygroundTest(server)
             };
         })();");
         await Open("server", "input");
-        await Page.EvaluateAsync("() => { window.__bxDelay = 900; }");
+        await Page.EvaluateAsync("() => { window.__lxDelay = 900; }");
 
         await Debounced.PressSequentiallyAsync("a", new() { Delay = 20 });
         await Page.WaitForTimeoutAsync(550); // report 1 is sent at 400 ms; its render is in transit until about 1300 ms

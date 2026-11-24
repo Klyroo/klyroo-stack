@@ -64,7 +64,7 @@ public sealed partial class DocsService
 
     private static readonly HashSet<string> StopWords = new(StringComparer.Ordinal)
     {
-        "a", "an", "the", "to", "for", "of", "in", "on", "with", "and", "or", "i", "need", "want", "how", "do", "can", "use", "using", "component", "components", "blazor", "bx", "lux", "ui",
+        "a", "an", "the", "to", "for", "of", "in", "on", "with", "and", "or", "i", "need", "want", "how", "do", "can", "use", "using", "component", "components", "blazor", "lx", "lux", "ui",
     };
 
     /// <summary>Longest query or name looked at, in characters; the rest is ignored so the cost of a lookup does not grow with the input.</summary>
@@ -107,7 +107,7 @@ public sealed partial class DocsService
     public static string Normalize(string name)
     {
         var key = new string([.. name.Where(char.IsLetterOrDigit).Select(char.ToLowerInvariant)]);
-        return key.Length > 2 && key.StartsWith("bx", StringComparison.Ordinal) ? key[2..] : key;
+        return key.Length > 2 && key.StartsWith("lx", StringComparison.Ordinal) ? key[2..] : key;
     }
 
     private static string TypeKey(string typeName)

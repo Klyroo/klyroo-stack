@@ -652,14 +652,14 @@ public class DataListTests(PlaygroundServer server) : PlaygroundTest(server)
     {
         await OpenList("ssr");
         // A marker that survives only when the page is not reloaded.
-        await Page.EvaluateAsync("() => { window.__bxMarker = 'same-document'; }");
+        await Page.EvaluateAsync("() => { window.__lxMarker = 'same-document'; }");
 
         await UrlSearch.FillAsync("hooli");
         await UrlSearch.PressAsync("Enter");
 
         await WaitForQuery("?q=hooli");
         await Assertions.Expect(Cell(Url, 0, 1)).ToHaveTextAsync("Hooli");
-        Assert.Equal("same-document", await Page.EvaluateAsync<string?>("() => window.__bxMarker ?? null"));
+        Assert.Equal("same-document", await Page.EvaluateAsync<string?>("() => window.__lxMarker ?? null"));
     }
 
     [Theory]

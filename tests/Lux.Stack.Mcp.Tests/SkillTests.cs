@@ -63,7 +63,7 @@ public partial class SkillTests
 
     [Theory]
     [MemberData(nameof(Files))]
-    public void Every_Bx_type_the_skill_names_exists_in_the_library(string file)
+    public void Every_Lx_type_the_skill_names_exists_in_the_library(string file)
     {
         var missing = LxName().Matches(Read(file)).Select(m => m.Value).Distinct()
             .Where(name => !LibraryTypes.ContainsKey(name) && name is not ("LxIcons" or "LxColor"))
@@ -164,7 +164,7 @@ public partial class SkillTests
     [GeneratedRegex(@"references/[a-z-]+\.md")]
     private static partial Regex ReferenceLink();
 
-    [GeneratedRegex(@"\bBx[A-Z][A-Za-z]+")]
+    [GeneratedRegex(@"\bLx[A-Z][A-Za-z]+")]
     private static partial Regex LxName();
 
     [GeneratedRegex(@"\b[A-Z][A-Za-z]+Ui\b")]

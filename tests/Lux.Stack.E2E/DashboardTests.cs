@@ -389,7 +389,7 @@ public class DashboardTests(PlaygroundServer server) : PlaygroundTest(server)
 
     [Theory]
     [MemberData(nameof(InteractiveModes))]
-    public async Task Bound_group_ignores_a_bx_change_that_a_component_inside_it_reports(string mode)
+    public async Task Bound_group_ignores_a_lx_change_that_a_component_inside_it_reports(string mode)
     {
         await Open(mode, "dashboard-group");
         var sizes = Page.GetByTestId("dashboard-bound-sizes");

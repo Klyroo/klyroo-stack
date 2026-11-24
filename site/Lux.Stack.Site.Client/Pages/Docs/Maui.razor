@@ -31,7 +31,7 @@
     <h2>What a web view changes</h2>
     <ul>
         <li>The renderer is <code>RendererInfo.Name == "WebView"</code>: always interactive, no prerendering, no <code>HttpContext</code>, no server to render the <code>&lt;head&gt;</code>. <code>LuxHost.IsHybrid(RendererInfo)</code> tells, and every component that depends on a server degrades by itself.</li>
-        <li>Only the classic JS initializer exports run (<code>beforeStart</code> and <code>afterStarted</code>). Lux.UI exports both, next to <code>afterWebStarted</code> for Blazor Web Apps, so custom elements, the <code>bxtoggle</code> and <code>bxchange</code> events and the color mode are set up in every host.</li>
+        <li>Only the classic JS initializer exports run (<code>beforeStart</code> and <code>afterStarted</code>). Lux.UI exports both, next to <code>afterWebStarted</code> for Blazor Web Apps, so custom elements, the <code>lxtoggle</code> and <code>lxchange</code> events and the color mode are set up in every host.</li>
         <li>Static web assets of the library are served at <code>_content/Lux.UI/...</code> from the app's <code>wwwroot/index.html</code>, like in a browser.</li>
     </ul>
 
