@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Lux.Stack.Core/Lux.Stack.Core.csproj" />
+    <Project Path="src/Lux.Stack/Lux.Stack.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Lux.Stack.Tests/Lux.Stack.Tests.csproj" />
+  </Folder>
+</Solution>

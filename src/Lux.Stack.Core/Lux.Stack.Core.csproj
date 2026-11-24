@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Lux.Stack</RootNamespace>
+    <PackageId>Lux.Stack.Core</PackageId>
+    <Description>LuxStack Core Meta-Package: aggregates all headless, NativeAOT-compatible Core engines of LuxStack (Query, Table, Form, Dashboard, Display, Spreadsheet, Agent) and the LuxStackCatalog router.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <IsTrimmable>true</IsTrimmable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\lux-query\src\Lux.Query.Core\Lux.Query.Core.csproj" />
+    <ProjectReference Include="..\..\..\lux-table\src\Lux.Table.Core\Lux.Table.Core.csproj" />
+    <ProjectReference Include="..\..\..\lux-form\src\Lux.Form.Core\Lux.Form.Core.csproj" />
+    <ProjectReference Include="..\..\..\lux-dashboard\src\Lux.Dashboard.Core\Lux.Dashboard.Core.csproj" />
+    <ProjectReference Include="..\..\..\lux-display\src\Lux.Display.Core\Lux.Display.Core.csproj" />
+    <ProjectReference Include="..\..\..\lux-spreadsheet\src\Lux.Spreadsheet.Core\Lux.Spreadsheet.Core.csproj" />
+    <ProjectReference Include="..\..\..\lux-agent\src\Lux.Agent.Core\Lux.Agent.Core.csproj" />
+  </ItemGroup>
+</Project>
