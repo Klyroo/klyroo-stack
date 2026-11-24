@@ -1,60 +1,51 @@
-# LuxStack (`lux.stack`) — Hub Central de l'Écosystème
+# LuxStack (`lux.stack`)
 
-**`LuxStack`** (`/home/gpoumarat/lux.stack`) est le repository fédérateur de la stack (architecturée sur le modèle **TanStack** et **`ui-sdk.dev`**). Il synthétise tout l'écosystème et fournit :
-1. **Un annuaire global et des redirections directes** vers les **8 repositories spécialisés** (`/home/gpoumarat/lux-*`), leurs moteurs Headless `.Core` (100 % C# / NativeAOT), leurs composants Blazor Web & .NET MAUI Hybrid (`Bx*`), leurs exemples, leurs templates `dotnet new` et leurs skills Agent.
-2. **Deux méta-packages NuGet** :
-   - **`Lux.Stack.Core`** ([Lux.Stack.Core.csproj](file:///home/gpoumarat/lux.stack/src/Lux.Stack.Core/Lux.Stack.Core.csproj)) : agrège tous les moteurs **100 % Headless C# / NativeAOT** + le routeur de composants [LuxStackCatalog.cs](file:///home/gpoumarat/lux.stack/src/Lux.Stack.Core/LuxStackCatalog.cs).
-   - **`Lux.Stack`** ([Lux.Stack.csproj](file:///home/gpoumarat/lux.stack/src/Lux.Stack/Lux.Stack.csproj)) : agrège toute la stack Blazor Web & .NET MAUI Hybrid et expose `services.AddLuxStack()` ([LuxStackServiceCollectionExtensions.cs](file:///home/gpoumarat/lux.stack/src/Lux.Stack/LuxStackServiceCollectionExtensions.cs)).
+> **The TanStack architecture, engineered for .NET 10, Blazor, and .NET MAUI.**
 
----
+**LuxStack** is a modular ecosystem of 8 specialized repositories sharing a strict two-layer architecture:
+- **`Lux.<Product>.Core`** — 100% headless C#, zero UI dependencies, `<IsAotCompatible>true</IsAotCompatible>`, `<IsTrimmable>true</IsTrimmable>`.
+- **`Lux.<Product>`** — Multiplatform Blazor Web (Static SSR, Interactive Server, WebAssembly, Auto) and `.NET MAUI Blazor Hybrid` (`browser`, `ios`, `android`, `maccatalyst`, `windows`).
 
-## 1. Annuaire & Redirections vers les 8 Repositories de LuxStack
+## Install the Entire Stack (or Pick One Library)
 
-| Domaine | Repository & Solution | Moteur Headless (`.Core`) | Package UI Blazor & MAUI | Tests | Exemples | Template `dotnet new` | Skill Agent |
-|---|---|---|---|---|---|---|---|
-| **1. Design System & Primitives** | [lux-ui](file:///home/gpoumarat/lux-ui) ([blux-ui](file:///home/gpoumarat/blux-ui))<br>[Blux.UI.slnx](file:///home/gpoumarat/blux-ui/Blux.UI.slnx) | [Blux.UI.Build.Tasks](file:///home/gpoumarat/blux-ui/src/Blux.UI.Build.Tasks/Blux.UI.Build.Tasks.csproj) | [Blux.UI](file:///home/gpoumarat/blux-ui/src/Blux.UI/Blux.UI.csproj)<br>[Blux.UI.Server](file:///home/gpoumarat/blux-ui/src/Blux.UI.Server/Blux.UI.Server.csproj)<br>[Blux.UI.Images](file:///home/gpoumarat/blux-ui/src/Blux.UI.Images/Blux.UI.Images.csproj) | [Blux.UI.Tests](file:///home/gpoumarat/blux-ui/tests/Blux.UI.Tests/Blux.UI.Tests.csproj) | [Playground](file:///home/gpoumarat/blux-ui/playground/Blux.Playground/Blux.Playground/Blux.Playground.csproj) | [templates/](file:///home/gpoumarat/blux-ui/templates) | [SKILL.md](file:///home/gpoumarat/blux-ui/skills/blux-ui/SKILL.md) |
-| **2. Query & URL State** | [lux-query](file:///home/gpoumarat/lux-query)<br>[Lux.Query.slnx](file:///home/gpoumarat/lux-query/Lux.Query.slnx) | [Lux.Query.Core](file:///home/gpoumarat/lux-query/src/Lux.Query.Core/Lux.Query.Core.csproj) | [Lux.Query](file:///home/gpoumarat/lux-query/src/Lux.Query/Lux.Query.csproj)<br>[Lux.Query.EntityFrameworkCore](file:///home/gpoumarat/lux-query/src/Lux.Query.EntityFrameworkCore/Lux.Query.EntityFrameworkCore.csproj) | [QueryRepoTests.cs](file:///home/gpoumarat/lux-query/tests/Lux.Query.Tests/QueryRepoTests.cs) | [AotQueryExample](file:///home/gpoumarat/lux-query/examples/AotQueryExample/Program.cs) | [lux-query](file:///home/gpoumarat/lux-query/templates/query-starter/.template.config/template.json) | [SKILL.md](file:///home/gpoumarat/lux-query/skills/lux-query/SKILL.md) |
-| **3. DataList Table & Grid** | [lux-table](file:///home/gpoumarat/lux-table)<br>[Lux.Table.slnx](file:///home/gpoumarat/lux-table/Lux.Table.slnx) | [Lux.Table.Core](file:///home/gpoumarat/lux-table/src/Lux.Table.Core/Lux.Table.Core.csproj) | [Lux.Table](file:///home/gpoumarat/lux-table/src/Lux.Table/Lux.Table.csproj) | [TableRepoTests.cs](file:///home/gpoumarat/lux-table/tests/Lux.Table.Tests/TableRepoTests.cs) | [HeadlessTableExample](file:///home/gpoumarat/lux-table/examples/HeadlessTableExample/Program.cs) | [lux-table-admin](file:///home/gpoumarat/lux-table/templates/crud-admin/.template.config/template.json) | [SKILL.md](file:///home/gpoumarat/lux-table/skills/lux-table/SKILL.md) |
-| **4. Schema Form Engine** | [lux-form](file:///home/gpoumarat/lux-form)<br>[Lux.Form.slnx](file:///home/gpoumarat/lux-form/Lux.Form.slnx) | [Lux.Form.Core](file:///home/gpoumarat/lux-form/src/Lux.Form.Core/Lux.Form.Core.csproj) | [Lux.Form](file:///home/gpoumarat/lux-form/src/Lux.Form/Lux.Form.csproj) | [FormEngineTests.cs](file:///home/gpoumarat/lux-form/tests/Lux.Form.Tests/FormEngineTests.cs) | [HeadlessFormExample](file:///home/gpoumarat/lux-form/examples/HeadlessFormExample/Program.cs) | [lux-form-wizard](file:///home/gpoumarat/lux-form/templates/onboarding-wizard/.template.config/template.json) | [SKILL.md](file:///home/gpoumarat/lux-form/skills/lux-form/SKILL.md) |
-| **5. Analytical Dashboard** | [lux-dashboard](file:///home/gpoumarat/lux-dashboard)<br>[Lux.Dashboard.slnx](file:///home/gpoumarat/lux-dashboard/Lux.Dashboard.slnx) | [Lux.Dashboard.Core](file:///home/gpoumarat/lux-dashboard/src/Lux.Dashboard.Core/Lux.Dashboard.Core.csproj) | [Lux.Dashboard](file:///home/gpoumarat/lux-dashboard/src/Lux.Dashboard/Lux.Dashboard.csproj) | [DashboardTests.cs](file:///home/gpoumarat/lux-dashboard/tests/Lux.Dashboard.Tests/DashboardTests.cs) | [HeadlessDashboardExample](file:///home/gpoumarat/lux-dashboard/examples/HeadlessDashboardExample/Program.cs) | [lux-analytics](file:///home/gpoumarat/lux-dashboard/templates/analytics-dashboard/.template.config/template.json) | [SKILL.md](file:///home/gpoumarat/lux-dashboard/skills/lux-dashboard/SKILL.md) |
-| **6. Display, Media & FilePreview** | [lux-display](file:///home/gpoumarat/lux-display)<br>[Lux.Display.slnx](file:///home/gpoumarat/lux-display/Lux.Display.slnx) | [Lux.Display.Core](file:///home/gpoumarat/lux-display/src/Lux.Display.Core/Lux.Display.Core.csproj) | [Lux.Display](file:///home/gpoumarat/lux-display/src/Lux.Display/Lux.Display.csproj) | [DisplayMediaFilePreviewTests.cs](file:///home/gpoumarat/lux-display/tests/Lux.Display.Tests/DisplayMediaFilePreviewTests.cs) | [FilePreviewCoreExample](file:///home/gpoumarat/lux-display/examples/FilePreviewCoreExample/Program.cs) | [lux-display-portal](file:///home/gpoumarat/lux-display/templates/document-portal/.template.config/template.json) | [SKILL.md](file:///home/gpoumarat/lux-display/skills/lux-display/SKILL.md) |
-| **7. Spreadsheet Import** | [lux-spreadsheet](file:///home/gpoumarat/lux-spreadsheet)<br>[Lux.Spreadsheet.slnx](file:///home/gpoumarat/lux-spreadsheet/Lux.Spreadsheet.slnx) | [Lux.Spreadsheet.Core](file:///home/gpoumarat/lux-spreadsheet/src/Lux.Spreadsheet.Core/Lux.Spreadsheet.Core.csproj) | [Lux.Spreadsheet](file:///home/gpoumarat/lux-spreadsheet/src/Lux.Spreadsheet/Lux.Spreadsheet.csproj) | [SpreadsheetTests.cs](file:///home/gpoumarat/lux-spreadsheet/tests/Lux.Spreadsheet.Tests/SpreadsheetTests.cs) | [HeadlessSpreadsheetExample](file:///home/gpoumarat/lux-spreadsheet/examples/HeadlessSpreadsheetExample/Program.cs) | [lux-spreadsheet-app](file:///home/gpoumarat/lux-spreadsheet/templates/data-onboarding/.template.config/template.json) | [SKILL.md](file:///home/gpoumarat/lux-spreadsheet/skills/lux-spreadsheet/SKILL.md) |
-| **8. Agent Bridge & Behaviors** | [lux-agent](file:///home/gpoumarat/lux-agent)<br>[Lux.Agent.slnx](file:///home/gpoumarat/lux-agent/Lux.Agent.slnx) | [Lux.Agent.Core](file:///home/gpoumarat/lux-agent/src/Lux.Agent.Core/Lux.Agent.Core.csproj) | [Lux.Agent](file:///home/gpoumarat/lux-agent/src/Lux.Agent/Lux.Agent.csproj)<br>[@lux/behaviors](file:///home/gpoumarat/lux-agent/packages/behaviors/index.js)<br>[@lux/agent](file:///home/gpoumarat/lux-agent/packages/agent/index.js) | [AgentUiSdkTests.cs](file:///home/gpoumarat/lux-agent/tests/Lux.Agent.Tests/AgentUiSdkTests.cs) | [HeadlessAgentExample](file:///home/gpoumarat/lux-agent/examples/HeadlessAgentExample/Program.cs) | [lux-agent-copilot](file:///home/gpoumarat/lux-agent/templates/ai-copilot-app/.template.config/template.json) | [SKILL.md](file:///home/gpoumarat/lux-agent/skills/lux-agent/SKILL.md) |
+```bash
+dotnet add package Lux.Stack        # Full Blazor Web + .NET MAUI Hybrid suite
+dotnet add package Lux.Stack.Core   # All 7 headless NativeAOT Core engines + LuxStackCatalog
+```
 
----
+```csharp
+builder.Services.AddLuxStack();
+```
 
-## 2. Redirections Directes vers les Composants & Moteurs
+## Ecosystem Directory & Exhaustive Documentation
 
-### Table & DataList (`lux-table`)
-- [BxDataList.razor](file:///home/gpoumarat/lux-table/src/Lux.Table/Components/DataList/BxDataList.razor) — Conteneur racine DataList
-- [BxDataListTable.razor](file:///home/gpoumarat/lux-table/src/Lux.Table/Components/DataList/BxDataListTable.razor) — Table (tri, pinning, resize, grouping, tree, summary rows, footer summaries, header menu, skeletons)
-- [BxDataListGrid.razor](file:///home/gpoumarat/lux-table/src/Lux.Table/Components/DataList/BxDataListGrid.razor) — Vue Grille responsive
-- [DataListTree.cs](file:///home/gpoumarat/lux-table/src/Lux.Table.Core/DataListTree.cs) — Moteur headless d'arborescence hiérarchique
-- [DataListGroupBy.cs](file:///home/gpoumarat/lux-table/src/Lux.Table/Components/DataList/DataListGroupBy.cs) — Groupement visuel de lignes
-- [DataListSummaries.cs](file:///home/gpoumarat/lux-table/src/Lux.Table/Components/DataList/DataListSummaries.cs) — Agrégations de pied de table (`Sum`, `Average`, `Count`, `Min`, `Max`)
+| Library | Headless Core (NativeAOT) | Blazor & MAUI UI | Documentation & Landing Page |
+| :--- | :--- | :--- | :--- |
+| **Lux.UI** | `Blux.UI.Build.Tasks` | `Blux.UI` | [README](../blux-ui/README.md) · [Playground Docs](../blux-ui/playground/Blux.Playground/Blux.Playground.Client/Pages/Docs/Introduction.razor) · [Landing](../blux-ui/site/index.html) |
+| **Lux.Query** | `Lux.Query.Core` | `Lux.Query` | [README](../lux-query/README.md) · [Docs](../lux-query/docs/getting-started.md) · [API](../lux-query/docs/api-reference.md) · [Landing](../lux-query/site/index.html) |
+| **Lux.Table** | `Lux.Table.Core` | `Lux.Table` | [README](../lux-table/README.md) · [Docs](../lux-table/docs/getting-started.md) · [API](../lux-table/docs/api-reference.md) · [Landing](../lux-table/site/index.html) |
+| **Lux.Form** | `Lux.Form.Core` | `Lux.Form` | [README](../lux-form/README.md) · [Docs](../lux-form/docs/getting-started.md) · [API](../lux-form/docs/api-reference.md) · [Landing](../lux-form/site/index.html) |
+| **Lux.Dashboard** | `Lux.Dashboard.Core` | `Lux.Dashboard` | [README](../lux-dashboard/README.md) · [Docs](../lux-dashboard/docs/getting-started.md) · [API](../lux-dashboard/docs/api-reference.md) · [Landing](../lux-dashboard/site/index.html) |
+| **Lux.Display** | `Lux.Display.Core` | `Lux.Display` | [README](../lux-display/README.md) · [Docs](../lux-display/docs/getting-started.md) · [API](../lux-display/docs/api-reference.md) · [Landing](../lux-display/site/index.html) |
+| **Lux.Spreadsheet** | `Lux.Spreadsheet.Core` | `Lux.Spreadsheet` | [README](../lux-spreadsheet/README.md) · [Docs](../lux-spreadsheet/docs/getting-started.md) · [API](../lux-spreadsheet/docs/api-reference.md) · [Landing](../lux-spreadsheet/site/index.html) |
+| **Lux.Agent** | `Lux.Agent.Core` | `Lux.Agent` | [README](../lux-agent/README.md) · [Docs](../lux-agent/docs/getting-started.md) · [API](../lux-agent/docs/api-reference.md) · [Landing](../lux-agent/site/index.html) |
 
-### Schema Form Engine (`lux-form`)
-- [FormEngineModels.cs](file:///home/gpoumarat/lux-form/src/Lux.Form.Core/FormEngineModels.cs) — `FormSchema`, `FormController`, `FormService` (Headless)
-- [BxFormEngine.razor](file:///home/gpoumarat/lux-form/src/Lux.Form/BxFormEngine.razor) — Rendu de formulaire par schéma (inline, modal, drawer, fullscreen, multi-step wizard)
-- [BxFormPage.razor](file:///home/gpoumarat/lux-form/src/Lux.Form/BxFormPage.razor) — Page de formulaire multi-sections avec barre de progression
-- [BxFormProvider.razor](file:///home/gpoumarat/lux-form/src/Lux.Form/BxFormProvider.razor) — Hôte d'overlays programmatiques (`FormService.CreateFormAsync`)
+## Hub Documentation
 
-### Analytical Dashboard (`lux-dashboard`)
-- [DashboardModels.cs](file:///home/gpoumarat/lux-dashboard/src/Lux.Dashboard.Core/DashboardModels.cs) — `DashboardController`, `DashboardResource<T>`, `DashboardFilterControl`, `DashboardFormat` (Headless)
-- [BxDashboardPage.razor](file:///home/gpoumarat/lux-dashboard/src/Lux.Dashboard/BxDashboardPage.razor) — Page analytique avec barre d'outils sticky
-- [BxDashboardCard.razor](file:///home/gpoumarat/lux-dashboard/src/Lux.Dashboard/BxDashboardCard.razor) — Carte avec machine d'états (`Idle`, `Loading`, `Error`, `Empty`, `Content`), bascule Table et export CSV
-- [BxDashboardStat.razor](file:///home/gpoumarat/lux-dashboard/src/Lux.Dashboard/BxDashboardStat.razor), [BxDashboardStats.razor](file:///home/gpoumarat/lux-dashboard/src/Lux.Dashboard/BxDashboardStats.razor), [BxDashboardGauge.razor](file:///home/gpoumarat/lux-dashboard/src/Lux.Dashboard/BxDashboardGauge.razor), [BxDashboardChart.razor](file:///home/gpoumarat/lux-dashboard/src/Lux.Dashboard/BxDashboardChart.razor), [BxDashboardBars.razor](file:///home/gpoumarat/lux-dashboard/src/Lux.Dashboard/BxDashboardBars.razor), [BxDashboardTable.razor](file:///home/gpoumarat/lux-dashboard/src/Lux.Dashboard/BxDashboardTable.razor), [BxDashboardAlerts.razor](file:///home/gpoumarat/lux-dashboard/src/Lux.Dashboard/BxDashboardAlerts.razor), [BxDashboardFeed.razor](file:///home/gpoumarat/lux-dashboard/src/Lux.Dashboard/BxDashboardFeed.razor)
+- [Getting Started with LuxStack](./docs/getting-started.md)
+- [Architecture & Multi-Repo Strategy](./docs/architecture.md)
+- [Catalog & Component Routing API](./docs/api-reference.md)
+- [.NET MAUI & NativeAOT Matrix](./docs/maui-and-aot.md)
+- [Interactive Hub Landing Page](./site/index.html)
 
-### Display, Media & File Preview (`lux-display`)
-- [BxDisplay.razor](file:///home/gpoumarat/lux-display/src/Lux.Display/BxDisplay.razor) — Composant de lecture à 19 kinds
-- [BxAudioPlayer.razor](file:///home/gpoumarat/lux-display/src/Lux.Display/BxAudioPlayer.razor) & [BxVideoPlayer.razor](file:///home/gpoumarat/lux-display/src/Lux.Display/BxVideoPlayer.razor) — Lecteurs avec règles de clip et quotas
-- [FilePreviewService.cs](file:///home/gpoumarat/lux-display/src/Lux.Display.Core/FilePreviewService.cs) & [BxFilePreviewProvider.razor](file:///home/gpoumarat/lux-display/src/Lux.Display/BxFilePreviewProvider.razor) — Prévisualisation multi-formats
+## Building & Testing
 
-### Spreadsheet Import (`lux-spreadsheet`)
-- [SpreadsheetModels.cs](file:///home/gpoumarat/lux-spreadsheet/src/Lux.Spreadsheet.Core/SpreadsheetModels.cs) — `SpreadsheetImporter` & `SpreadsheetSchema` (Headless)
-- [BxSpreadsheetImport.razor](file:///home/gpoumarat/lux-spreadsheet/src/Lux.Spreadsheet/BxSpreadsheetImport.razor) — Wizard d'import (Fichier, Colonnes avec suggestions à 80 %, Valeurs inconnues, Revue & Édition inline, Inspecteur de ligne, Soumission par lots)
+```bash
+dotnet build
+dotnet test
+dotnet pack -c Release
+```
 
-### Agent Bridge & Composable Behaviors (`lux-agent`)
-- [AgentBridgeService.cs](file:///home/gpoumarat/lux-agent/src/Lux.Agent/AgentBridgeService.cs) & [AgentBridgeModels.cs](file:///home/gpoumarat/lux-agent/src/Lux.Agent.Core/AgentBridgeModels.cs) — `Snapshot`, `Query`, `ActAsync`, `Observe` (avec masquage `[redacted]`), `UndoStack<T>`
-- [packages/behaviors/index.js](file:///home/gpoumarat/lux-agent/packages/behaviors/index.js) — `@lux/behaviors`
-- [packages/agent/index.js](file:///home/gpoumarat/lux-agent/packages/agent/index.js) — `@lux/agent`
+## License
+
+MIT — see [LICENSE](./LICENSE).

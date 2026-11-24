@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr" data-theme="dark">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -185,7 +185,11 @@ footer { padding: 36px 0; font-size: 12.5px; color: var(--text-muted); display: 
           <h1>The TanStack architecture,<br /><span class="accent">engineered for .NET.</span></h1>
         </div>
         <div>
-          <p class="lead">Huit bibliothèques focalisées avec une séparation stricte en deux couches : <code>Lux.&lt;Produit&gt;.Core</code> (100% C# Headless / NativeAOT, zéro UI) et <code>Lux.&lt;Produit&gt;</code> (Blazor Web &amp; .NET MAUI Blazor Hybrid).</p>
+          <p class="lead">Eight focused libraries with a strict two-layer contract: <code>Lux.&lt;Product&gt;.Core</code> (100% headless C# / NativeAOT, zero UI) and <code>Lux.&lt;Product&gt;</code> (Blazor Web &amp; .NET MAUI Blazor Hybrid).</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px">
+            <a class="btn btn-accent" href="../docs/getting-started.md">Read Hub Docs →</a>
+            <a class="btn" href="http://localhost:5180/stack">Open Live Blazor Hub</a>
+          </div>
           <div class="install-stack">
             <button class="cmd mono" type="button" onclick="copyCmd(this,'dotnet add package Lux.Stack')">
               <span>$ dotnet add package <strong>Lux.Stack</strong> <span class="comment"># Full Blazor + MAUI suite</span></span>
@@ -203,107 +207,121 @@ footer { padding: 36px 0; font-size: 12.5px; color: var(--text-muted); display: 
 
   <section class="band">
     <div class="wrap">
-      <div class="eyebrow mono">Ecosystem Products</div>
+      <div class="eyebrow mono">Ecosystem Products &amp; Documentation</div>
       <h2>Eight libraries. <span style="color:var(--accent)">Pick one or the stack.</span></h2>
       <div class="grid-4">
-        <a class="card" href="../../lux-ui/site/index.html" style="border-top:3px solid #10b981;transition:transform .15s ease" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+        <div class="card" style="border-top:3px solid #10b981">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <span class="mono" style="font-size:11.5px;color:var(--text-muted);display:flex;align-items:center;gap:6px"><span class="dot" style="background:#10b981"></span>lux-ui</span>
-            <span class="mono" style="font-size:11px;color:#10b981">Open page →</span>
+            <a class="mono" href="../../lux-ui/site/index.html" style="font-size:11px;color:#10b981">Landing →</a>
           </div>
-          <h3 style="font-size:22px">Lux.<span style="color:#10b981">UI</span></h3>
+          <h3 style="font-size:22px"><a href="../../lux-ui/site/index.html">Lux.<span style="color:#10b981">UI</span></a></h3>
           <p style="color:var(--text-strong);font-size:13px" class="mono">125+ zero-roundtrip primitives &amp; composable DOM behaviors</p>
-          <p style="flex:1">Design system complet pour Blazor (Server, WASM, Auto, SSR) et .NET MAUI Blazor Hybrid. Les menus, dialogues, popovers et onglets répondent instantanément à 60fps dans le navigateur via Web Components natifs et Behaviors composables (dialog, popup, rovingTabindex, formAssociated).</p>
-          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"><span class="plat mono">BxButton</span><span class="plat mono">BxModal</span><span class="plat mono">BxSelect</span></div>
-        </a>
-        <a class="card" href="../../lux-query/site/index.html" style="border-top:3px solid #ff4154;transition:transform .15s ease" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+          <p style="flex:1">Complete design system for Blazor (Server, WebAssembly, Auto, Static SSR) and .NET MAUI Blazor Hybrid. Menus, dialogs, popovers, and tabs answer instantaneously at 60fps in the browser via native Web Components and composable behaviors (dialog, popup, rovingTabindex, formAssociated).</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px" class="mono">
+            <a class="plat" href="../../lux-ui/README.md">README</a>
+            <a class="plat" href="../../lux-ui/ECOSYSTEM.md">Docs</a>
+            <a class="plat" href="../../lux-ui/README.md">API Reference</a>
+          </div>
+        </div>
+        <div class="card" style="border-top:3px solid #ff4154">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <span class="mono" style="font-size:11.5px;color:var(--text-muted);display:flex;align-items:center;gap:6px"><span class="dot" style="background:#ff4154"></span>lux-query</span>
-            <span class="mono" style="font-size:11px;color:#ff4154">Open page →</span>
+            <a class="mono" href="../../lux-query/site/index.html" style="font-size:11px;color:#ff4154">Landing →</a>
           </div>
-          <h3 style="font-size:22px">Lux.<span style="color:#ff4154">Query</span></h3>
+          <h3 style="font-size:22px"><a href="../../lux-query/site/index.html">Lux.<span style="color:#ff4154">Query</span></a></h3>
           <p style="color:var(--text-strong);font-size:13px" class="mono">Headless NativeAOT Query AST, URL codecs, IQueryable applier, EF Core &amp; QueryState</p>
-          <p style="flex:1">Moteur de requêtage fortement typé et 100% NativeAOT : AST de filtres composables (DataListSchema, DataListRequest, DataListFilterGroup), codecs d&#x27;URL réversibles, exécuteur InMemory et traduction SQL Entity Framework Core (EfAsyncQueryExecutor), accompagné de QueryState pour Blazor et MAUI.</p>
-          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"><span class="plat mono">DataListSchema</span><span class="plat mono">DataListRequest</span><span class="plat mono">QueryCodecs</span></div>
-        </a>
-        <a class="card" href="../../lux-table/site/index.html" style="border-top:3px solid #00d8ff;transition:transform .15s ease" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+          <p style="flex:1">Strongly typed, 100% NativeAOT query engine: composable filter AST (DataListSchema, DataListRequest, DataListFilterGroup), reversible URL query codecs, InMemory &amp; IQueryable evaluators, Entity Framework Core async SQL executor (EfAsyncQueryExecutor), and reactive QueryState for Blazor and .NET MAUI Hybrid.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px" class="mono">
+            <a class="plat" href="../../lux-query/README.md">README</a>
+            <a class="plat" href="../../lux-query/docs/getting-started.md">Docs</a>
+            <a class="plat" href="../../lux-query/docs/api-reference.md">API Reference</a>
+          </div>
+        </div>
+        <div class="card" style="border-top:3px solid #00d8ff">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <span class="mono" style="font-size:11.5px;color:var(--text-muted);display:flex;align-items:center;gap:6px"><span class="dot" style="background:#00d8ff"></span>lux-table</span>
-            <span class="mono" style="font-size:11px;color:#00d8ff">Open page →</span>
+            <a class="mono" href="../../lux-table/site/index.html" style="font-size:11px;color:#00d8ff">Landing →</a>
           </div>
-          <h3 style="font-size:22px">Lux.<span style="color:#00d8ff">Table</span></h3>
-          <p style="color:var(--text-strong);font-size:13px" class="mono">Headless tree/grouping models &amp; high-density enterprise BxDataList</p>
-          <p style="flex:1">L&#x27;équivalent .NET de TanStack Table allié à la finition de Nuxt UI Tools : vue table, grille de cartes, hiérarchie arborescente NativeAOT (DataListTree), regroupement, agrégations de pied de page, barre de progression fine 2px, menu d&#x27;en-tête Tri/Masquer et lignes résumées mobiles.</p>
-          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"><span class="plat mono">DataListTree&lt;TItem&gt;</span><span class="plat mono">BxDataList&lt;TItem&gt;</span><span class="plat mono">BxDataListTable&lt;TItem&gt;</span></div>
-        </a>
-        <a class="card" href="../../lux-form/site/index.html" style="border-top:3px solid #f59e0b;transition:transform .15s ease" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+          <h3 style="font-size:22px"><a href="../../lux-table/site/index.html">Lux.<span style="color:#00d8ff">Table</span></a></h3>
+          <p style="color:var(--text-strong);font-size:13px" class="mono">Headless tree hierarchy engine &amp; high-density enterprise BxDataList</p>
+          <p style="flex:1">The .NET counterpart to TanStack Table paired with Nuxt UI Tools polish: table and card grid layouts, NativeAOT tree hierarchy (DataListTree&lt;TItem&gt;), visual grouping, footer aggregations, 2px loading progress line, automatic Sort/Hide HeaderMenu, 60fps virtualization, and responsive mobile summary rows.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px" class="mono">
+            <a class="plat" href="../../lux-table/README.md">README</a>
+            <a class="plat" href="../../lux-table/docs/getting-started.md">Docs</a>
+            <a class="plat" href="../../lux-table/docs/api-reference.md">API Reference</a>
+          </div>
+        </div>
+        <div class="card" style="border-top:3px solid #f59e0b">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <span class="mono" style="font-size:11.5px;color:var(--text-muted);display:flex;align-items:center;gap:6px"><span class="dot" style="background:#f59e0b"></span>lux-form</span>
-            <span class="mono" style="font-size:11px;color:#f59e0b">Open page →</span>
+            <a class="mono" href="../../lux-form/site/index.html" style="font-size:11px;color:#f59e0b">Landing →</a>
           </div>
-          <h3 style="font-size:22px">Lux.<span style="color:#f59e0b">Form</span></h3>
+          <h3 style="font-size:22px"><a href="../../lux-form/site/index.html">Lux.<span style="color:#f59e0b">Form</span></a></h3>
           <p style="color:var(--text-strong);font-size:13px" class="mono">31-kind schema-driven form engine, reactive conditions, dirty diffing &amp; wizards</p>
-          <p style="flex:1">Moteur de formulaires déclaratif 100% NativeAOT dans Lux.Form.Core : 31 types de champs (FormFieldKind), visibilité conditionnelle réactive, suivi dirty/touched précis, transformations de sortie, assistants multi-étapes avec SkipWhen, FormPage et modales programmatiques via FormService.</p>
-          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"><span class="plat mono">FormSchema</span><span class="plat mono">FormController</span><span class="plat mono">FormService</span></div>
-        </a>
-        <a class="card" href="../../lux-dashboard/site/index.html" style="border-top:3px solid #8b5cf6;transition:transform .15s ease" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+          <p style="flex:1">Declarative, 100% NativeAOT form engine in Lux.Form.Core: 31 field kinds (FormFieldKind), reactive conditional visibility, dirty/touched diffing, output transforms, multi-step wizards with SkipWhen, sectioned FormPage layouts, and programmatic modal/drawer overlays via FormService.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px" class="mono">
+            <a class="plat" href="../../lux-form/README.md">README</a>
+            <a class="plat" href="../../lux-form/docs/getting-started.md">Docs</a>
+            <a class="plat" href="../../lux-form/docs/api-reference.md">API Reference</a>
+          </div>
+        </div>
+        <div class="card" style="border-top:3px solid #8b5cf6">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <span class="mono" style="font-size:11.5px;color:var(--text-muted);display:flex;align-items:center;gap:6px"><span class="dot" style="background:#8b5cf6"></span>lux-dashboard</span>
-            <span class="mono" style="font-size:11px;color:#8b5cf6">Open page →</span>
+            <a class="mono" href="../../lux-dashboard/site/index.html" style="font-size:11px;color:#8b5cf6">Landing →</a>
           </div>
-          <h3 style="font-size:22px">Lux.<span style="color:#8b5cf6">Dashboard</span></h3>
+          <h3 style="font-size:22px"><a href="../../lux-dashboard/site/index.html">Lux.<span style="color:#8b5cf6">Dashboard</span></a></h3>
           <p style="color:var(--text-strong);font-size:13px" class="mono">Staged 3-wave analytical queries, global filters, comparison ranges &amp; 13 KPI blocks</p>
-          <p style="flex:1">Orchestrateur de tableaux de bord analytiques avec chargement étagé en 3 vagues (Essential → Background → Deferred), barre de filtres et vues réactives, plages de comparaison (année bissextile gérée), export CSV UTF-8 BOM et 13 composants analytiques prêts à l&#x27;emploi.</p>
-          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"><span class="plat mono">DashboardController</span><span class="plat mono">DashboardFormat</span><span class="plat mono">BxDashboardPage</span></div>
-        </a>
-        <a class="card" href="../../lux-display/site/index.html" style="border-top:3px solid #ec4899;transition:transform .15s ease" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+          <p style="flex:1">Analytical dashboard orchestrator with 3-wave staged query loading (Essential -&gt; Background -&gt; Deferred), reactive global filter toolbar and views, leap-year-safe comparison date ranges, RFC 4180 UTF-8 BOM CSV export, and 13 ready-to-use KPI &amp; visualization blocks.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px" class="mono">
+            <a class="plat" href="../../lux-dashboard/README.md">README</a>
+            <a class="plat" href="../../lux-dashboard/docs/getting-started.md">Docs</a>
+            <a class="plat" href="../../lux-dashboard/docs/api-reference.md">API Reference</a>
+          </div>
+        </div>
+        <div class="card" style="border-top:3px solid #ec4899">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <span class="mono" style="font-size:11.5px;color:var(--text-muted);display:flex;align-items:center;gap:6px"><span class="dot" style="background:#ec4899"></span>lux-display</span>
-            <span class="mono" style="font-size:11px;color:#ec4899">Open page →</span>
+            <a class="mono" href="../../lux-display/site/index.html" style="font-size:11px;color:#ec4899">Landing →</a>
           </div>
-          <h3 style="font-size:22px">Lux.<span style="color:#ec4899">Display</span></h3>
+          <h3 style="font-size:22px"><a href="../../lux-display/site/index.html">Lux.<span style="color:#ec4899">Display</span></a></h3>
           <p style="color:var(--text-strong);font-size:13px" class="mono">19 read-only display blocks, constrained audio/video players &amp; modal file preview</p>
-          <p style="flex:1">19 blocs d&#x27;affichage en lecture seule dans &lt;BxDisplay&gt; (Heading, Alert, Facts, Stat avec sparkline, Breakdown, Meter à seuils, Diff, Code/Secret masqué, Timeline, Accordion…), lecteurs Audio/Vidéo avec découpage Start/End et quota MaxPlays, et prévisualiseur modal de fichiers.</p>
-          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"><span class="plat mono">FilePreviewService</span><span class="plat mono">BxDisplay</span><span class="plat mono">BxAudioPlayer</span></div>
-        </a>
-        <a class="card" href="../../lux-spreadsheet/site/index.html" style="border-top:3px solid #14b8a6;transition:transform .15s ease" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+          <p style="flex:1">19 read-only presentation blocks inside &lt;BxDisplay&gt; (Heading, Alert, Facts, Stat with sparkline, Breakdown, Meter with thresholds, Diff, masked Code/Secret, Timeline, Accordion…), constrained Audio/Video players with clip Start/End bounds and MaxPlays quotas, plus a modal multi-format file previewer.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px" class="mono">
+            <a class="plat" href="../../lux-display/README.md">README</a>
+            <a class="plat" href="../../lux-display/docs/getting-started.md">Docs</a>
+            <a class="plat" href="../../lux-display/docs/api-reference.md">API Reference</a>
+          </div>
+        </div>
+        <div class="card" style="border-top:3px solid #14b8a6">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <span class="mono" style="font-size:11.5px;color:var(--text-muted);display:flex;align-items:center;gap:6px"><span class="dot" style="background:#14b8a6"></span>lux-spreadsheet</span>
-            <span class="mono" style="font-size:11px;color:#14b8a6">Open page →</span>
+            <a class="mono" href="../../lux-spreadsheet/site/index.html" style="font-size:11px;color:#14b8a6">Landing →</a>
           </div>
-          <h3 style="font-size:22px">Lux.<span style="color:#14b8a6">Spreadsheet</span></h3>
+          <h3 style="font-size:22px"><a href="../../lux-spreadsheet/site/index.html">Lux.<span style="color:#14b8a6">Spreadsheet</span></a></h3>
           <p style="color:var(--text-strong);font-size:13px" class="mono">Headless CSV/TSV importer, 20-row header detection, 80%-pass suggestions &amp; batch retry</p>
-          <p style="flex:1">Moteur d&#x27;importation de tableurs 100% NativeAOT dans Lux.Spreadsheet.Core : détection heuristique de la ligne d&#x27;en-tête sur 20 lignes, normalisation NFD sans accents, suggestion de colonnes validées à ≥80 %, questions de valeurs inconnues, gestion des doublons/upserts, édition en ligne et soumission par lots avec relance des rejets.</p>
-          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"><span class="plat mono">SpreadsheetSchema</span><span class="plat mono">SpreadsheetImporter</span><span class="plat mono">BxSpreadsheetImport</span></div>
-        </a>
-        <a class="card" href="../../lux-agent/site/index.html" style="border-top:3px solid #6366f1;transition:transform .15s ease" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+          <p style="flex:1">100% NativeAOT spreadsheet import engine in Lux.Spreadsheet.Core: 20-row heuristic header layout detection, NFD accent-insensitive normalization, ≥80% pass-rate column suggestions, unknown value resolution questions, duplicate &amp; existing record upsert policies, inline cell edits, and batched submission with rejected-row retry.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px" class="mono">
+            <a class="plat" href="../../lux-spreadsheet/README.md">README</a>
+            <a class="plat" href="../../lux-spreadsheet/docs/getting-started.md">Docs</a>
+            <a class="plat" href="../../lux-spreadsheet/docs/api-reference.md">API Reference</a>
+          </div>
+        </div>
+        <div class="card" style="border-top:3px solid #6366f1">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <span class="mono" style="font-size:11.5px;color:var(--text-muted);display:flex;align-items:center;gap:6px"><span class="dot" style="background:#6366f1"></span>lux-agent</span>
-            <span class="mono" style="font-size:11px;color:#6366f1">Open page →</span>
+            <a class="mono" href="../../lux-agent/site/index.html" style="font-size:11px;color:#6366f1">Landing →</a>
           </div>
-          <h3 style="font-size:22px">Lux.<span style="color:#6366f1">Agent</span></h3>
+          <h3 style="font-size:22px"><a href="../../lux-agent/site/index.html">Lux.<span style="color:#6366f1">Agent</span></a></h3>
           <p style="color:var(--text-strong);font-size:13px" class="mono">Semantic AI Agent Bridge (snapshot/query/act), WebMCP tools, observe stream &amp; UndoStack</p>
-          <p style="flex:1">Inspiré de ui-sdk.dev : rend vos formulaires (Lux.Form), tableaux de bord (Lux.Dashboard) et imports (Lux.Spreadsheet) directement pilotables par des agents IA sans sélecteurs CSS fragiles. Expose Snapshot/Query/Act sémantique, politique d&#x27;autorisation, redaction [redacted] des secrets, WebMCP et UndoStack&lt;T&gt;.</p>
-          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px"><span class="plat mono">AgentComponentSnapshot</span><span class="plat mono">UndoStack&lt;T&gt;</span><span class="plat mono">AgentBridgeService</span></div>
-        </a></div>
-    </div>
-  </section>
-
-  <section class="band">
-    <div class="wrap">
-      <div style="display:flex;justify-content:space-between;align-items:end;flex-wrap:wrap;gap:16px">
-        <div>
-          <div class="eyebrow mono">LuxStackCatalog.ResolveComponentModule</div>
-          <h2>Component Redirections</h2>
-        </div>
-        <input id="hub-filter" class="input mono" style="max-width:360px" placeholder="Search BxDataList, FormController, Agent..." oninput="renderRedirs()" />
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Component / Controller</th><th>Layer</th><th>Product Landing Page</th><th>NuGet Package</th></tr></thead>
-          <tbody id="hub-rows"></tbody>
-        </table>
-      </div>
+          <p style="flex:1">Inspired by ui-sdk.dev: makes Lux.Form, Lux.Dashboard, and Lux.Spreadsheet immediately inspectable and operable by AI agents without brittle CSS selectors. Provides semantic Snapshot/Query/Act, global permission policies, automatic [redacted] secret masking, WebMCP browser assets, and UndoStack&lt;T&gt;.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px" class="mono">
+            <a class="plat" href="../../lux-agent/README.md">README</a>
+            <a class="plat" href="../../lux-agent/docs/getting-started.md">Docs</a>
+            <a class="plat" href="../../lux-agent/docs/api-reference.md">API Reference</a>
+          </div>
+        </div></div>
     </div>
   </section>
 
@@ -313,15 +331,6 @@ footer { padding: 36px 0; font-size: 12.5px; color: var(--text-muted); display: 
       <span>Blazor Server · WASM · Auto · SSR · .NET MAUI Blazor Hybrid · NativeAOT</span>
     </footer>
   </div>
-  <script>
-    const ALL=[{"name": "BxButton", "layer": "UI", "pkg": "Blux.UI", "desc": "7 couleurs, 6 variantes, \u00e9tats loading et lien.", "product": "Lux.UI", "accent": "#10b981", "href": "../../lux-ui/site/index.html"}, {"name": "BxModal", "layer": "UI", "pkg": "Blux.UI", "desc": "Dialogue natif <dialog>, pi\u00e8ge \u00e0 focus et fermeture Escape.", "product": "Lux.UI", "accent": "#10b981", "href": "../../lux-ui/site/index.html"}, {"name": "BxSelect", "layer": "UI", "pkg": "Blux.UI", "desc": "Navigation clavier, typeahead et soumission formulaire native.", "product": "Lux.UI", "accent": "#10b981", "href": "../../lux-ui/site/index.html"}, {"name": "BxTabs", "layer": "UI", "pkg": "Blux.UI", "desc": "Fl\u00e8ches clavier et activation instantan\u00e9e c\u00f4t\u00e9 navigateur.", "product": "Lux.UI", "accent": "#10b981", "href": "../../lux-ui/site/index.html"}, {"name": "BxCommandPalette", "layer": "UI", "pkg": "Blux.UI", "desc": "Palette de commandes Ctrl+K avec raccourcis et groupes.", "product": "Lux.UI", "accent": "#10b981", "href": "../../lux-ui/site/index.html"}, {"name": "BxChatMessages", "layer": "UI", "pkg": "Blux.UI", "desc": "Flux IA streaming avec raisonnement et appels d'outils.", "product": "Lux.UI", "accent": "#10b981", "href": "../../lux-ui/site/index.html"}, {"name": "DataListSchema", "layer": "Core", "pkg": "Lux.Query.Core", "desc": "Builder typ\u00e9 des champs recherchables, triables et filtrables.", "product": "Lux.Query", "accent": "#ff4154", "href": "../../lux-query/site/index.html"}, {"name": "DataListRequest", "layer": "Core", "pkg": "Lux.Query.Core", "desc": "AST immuable : pagination Offset/Cursor, tris, filtres et recherche.", "product": "Lux.Query", "accent": "#ff4154", "href": "../../lux-query/site/index.html"}, {"name": "QueryCodecs", "layer": "Core", "pkg": "Lux.Query.Core", "desc": "S\u00e9rialisation r\u00e9versible des filtres et tris vers la query-string.", "product": "Lux.Query", "accent": "#ff4154", "href": "../../lux-query/site/index.html"}, {"name": "EfAsyncQueryExecutor", "layer": "Core", "pkg": "Lux.Query.EntityFrameworkCore", "desc": "Ex\u00e9cution SQL asynchrone traduite via Entity Framework Core.", "product": "Lux.Query", "accent": "#ff4154", "href": "../../lux-query/site/index.html"}, {"name": "QueryState", "layer": "UI", "pkg": "Lux.Query", "desc": "Synchronisation r\u00e9active d'URL pour Blazor Web et MAUI Hybrid.", "product": "Lux.Query", "accent": "#ff4154", "href": "../../lux-query/site/index.html"}, {"name": "DataListTree<TItem>", "layer": "Core", "pkg": "Lux.Table.Core", "desc": "Moteur d'arbre hi\u00e9rarchique 100% NativeAOT avec rails d'indentation.", "product": "Lux.Table", "accent": "#00d8ff", "href": "../../lux-table/site/index.html"}, {"name": "BxDataList<TItem>", "layer": "UI", "pkg": "Lux.Table", "desc": "Conteneur complet : table, grille, barre de filtres et pagination.", "product": "Lux.Table", "accent": "#00d8ff", "href": "../../lux-table/site/index.html"}, {"name": "BxDataListTable<TItem>", "layer": "UI", "pkg": "Lux.Table", "desc": "Table haute densit\u00e9 avec HeaderMenu, totaux, arbre et redimensionnement.", "product": "Lux.Table", "accent": "#00d8ff", "href": "../../lux-table/site/index.html"}, {"name": "DataListRowSummary<TItem>", "layer": "UI", "pkg": "Lux.Table", "desc": "Pr\u00e9sentation mobile compacte automatique sous le breakpoint md.", "product": "Lux.Table", "accent": "#00d8ff", "href": "../../lux-table/site/index.html"}, {"name": "FormSchema", "layer": "Core", "pkg": "Lux.Form.Core", "desc": "Sch\u00e9ma d\u00e9claratif : 31 kinds, \u00e9tapes, sections, r\u00e8gles & transforms.", "product": "Lux.Form", "accent": "#f59e0b", "href": "../../lux-form/site/index.html"}, {"name": "FormController", "layer": "Core", "pkg": "Lux.Form.Core", "desc": "Machine \u00e0 \u00e9tats NativeAOT : valeurs, erreurs, dirty paths et wizard.", "product": "Lux.Form", "accent": "#f59e0b", "href": "../../lux-form/site/index.html"}, {"name": "FormService", "layer": "Core", "pkg": "Lux.Form.Core", "desc": "Service programmatique pour ouvrir des formulaires en modale/tiroir.", "product": "Lux.Form", "accent": "#f59e0b", "href": "../../lux-form/site/index.html"}, {"name": "BxFormEngine", "layer": "UI", "pkg": "Lux.Form", "desc": "Rendu automatique Blazor/MAUI de FormSchema et wizards.", "product": "Lux.Form", "accent": "#f59e0b", "href": "../../lux-form/site/index.html"}, {"name": "BxFormPage", "layer": "UI", "pkg": "Lux.Form", "desc": "Page formulaire \u00e0 sections avec suivi d'avancement en direct.", "product": "Lux.Form", "accent": "#f59e0b", "href": "../../lux-form/site/index.html"}, {"name": "DashboardController", "layer": "Core", "pkg": "Lux.Dashboard.Core", "desc": "Coordinateur 3 vagues (Essential/Background/Deferred), filtres & vues.", "product": "Lux.Dashboard", "accent": "#8b5cf6", "href": "../../lux-dashboard/site/index.html"}, {"name": "DashboardFormat", "layer": "Core", "pkg": "Lux.Dashboard.Core", "desc": "Formateurs Compact/Delta/Points/Ratio, plages bissextiles & CSV BOM.", "product": "Lux.Dashboard", "accent": "#8b5cf6", "href": "../../lux-dashboard/site/index.html"}, {"name": "BxDashboardPage", "layer": "UI", "pkg": "Lux.Dashboard", "desc": "Shell analytique complet avec barre de filtres, vues et fra\u00eecheur.", "product": "Lux.Dashboard", "accent": "#8b5cf6", "href": "../../lux-dashboard/site/index.html"}, {"name": "BxDashboardStats", "layer": "UI", "pkg": "Lux.Dashboard", "desc": "Grille multi-KPI avec badges delta, barres de progression et statuts.", "product": "Lux.Dashboard", "accent": "#8b5cf6", "href": "../../lux-dashboard/site/index.html"}, {"name": "BxDashboardGauge", "layer": "UI", "pkg": "Lux.Dashboard", "desc": "Jauge circulaire SVG avec marqueur d'objectif et formatage central.", "product": "Lux.Dashboard", "accent": "#8b5cf6", "href": "../../lux-dashboard/site/index.html"}, {"name": "BxDashboardTable", "layer": "UI", "pkg": "Lux.Dashboard", "desc": "Tableau analytique triable avec barres inline, deltas et export CSV.", "product": "Lux.Dashboard", "accent": "#8b5cf6", "href": "../../lux-dashboard/site/index.html"}, {"name": "FilePreviewService", "layer": "Core", "pkg": "Lux.Display.Core", "desc": "D\u00e9tecteur MIME headless, parseur CSV RFC-4180 et file de pr\u00e9visualisation.", "product": "Lux.Display", "accent": "#ec4899", "href": "../../lux-display/site/index.html"}, {"name": "BxDisplay", "layer": "UI", "pkg": "Lux.Display", "desc": "19 blocs de lecture (Stat, Facts, Meter, Diff, Code/Secret, Timeline).", "product": "Lux.Display", "accent": "#ec4899", "href": "../../lux-display/site/index.html"}, {"name": "BxAudioPlayer", "layer": "UI", "pkg": "Lux.Display", "desc": "Lecteur audio avec bornes Start/End, quota MaxPlays & garde Seekable.", "product": "Lux.Display", "accent": "#ec4899", "href": "../../lux-display/site/index.html"}, {"name": "BxVideoPlayer", "layer": "UI", "pkg": "Lux.Display", "desc": "Lecteur vid\u00e9o avec pistes sous-titres, clip Start/End et verrouillage.", "product": "Lux.Display", "accent": "#ec4899", "href": "../../lux-display/site/index.html"}, {"name": "BxFilePreviewProvider", "layer": "UI", "pkg": "Lux.Display", "desc": "Lightbox modale zoomable pour images, PDF, audio, vid\u00e9o et CSV.", "product": "Lux.Display", "accent": "#ec4899", "href": "../../lux-display/site/index.html"}, {"name": "SpreadsheetSchema", "layer": "Core", "pkg": "Lux.Spreadsheet.Core", "desc": "Colonnes typ\u00e9es, r\u00e8gles, options, politiques de doublons et upsert.", "product": "Lux.Spreadsheet", "accent": "#14b8a6", "href": "../../lux-spreadsheet/site/index.html"}, {"name": "SpreadsheetImporter", "layer": "Core", "pkg": "Lux.Spreadsheet.Core", "desc": "Moteur NativeAOT : parseur CSV/TSV, d\u00e9tection en-t\u00eates, mapping & lots.", "product": "Lux.Spreadsheet", "accent": "#14b8a6", "href": "../../lux-spreadsheet/site/index.html"}, {"name": "BxSpreadsheetImport", "layer": "UI", "pkg": "Lux.Spreadsheet", "desc": "Assistant Blazor/MAUI en 5 \u00e9tapes avec \u00e9dition inline des cellules.", "product": "Lux.Spreadsheet", "accent": "#14b8a6", "href": "../../lux-spreadsheet/site/index.html"}, {"name": "AgentComponentSnapshot", "layer": "Core", "pkg": "Lux.Agent.Core", "desc": "Mod\u00e8le NativeAOT compact : \u00e9tat, actions et indicateurs de confirmation.", "product": "Lux.Agent", "accent": "#6366f1", "href": "../../lux-agent/site/index.html"}, {"name": "UndoStack<T>", "layer": "Core", "pkg": "Lux.Agent.Core", "desc": "Pile Undo/Redo g\u00e9n\u00e9rique born\u00e9e avec libell\u00e9s et \u00e9v\u00e9nements.", "product": "Lux.Agent", "accent": "#6366f1", "href": "../../lux-agent/site/index.html"}, {"name": "AgentBridgeService", "layer": "UI", "pkg": "Lux.Agent", "desc": "Relie FormController, DashboardController et SpreadsheetImporter aux agents IA.", "product": "Lux.Agent", "accent": "#6366f1", "href": "../../lux-agent/site/index.html"}, {"name": "lux-agent.js & lux-behaviors.js", "layer": "UI", "pkg": "Lux.Agent", "desc": "Assets statiques WebMCP (navigator.modelContext) et behaviors DOM.", "product": "Lux.Agent", "accent": "#6366f1", "href": "../../lux-agent/site/index.html"}];
-    function renderRedirs(){
-      const q=(document.getElementById('hub-filter').value||'').trim().toLowerCase();
-      const rows=ALL.filter(x=>!q||x.name.toLowerCase().includes(q)||x.product.toLowerCase().includes(q)||x.pkg.toLowerCase().includes(q)||x.desc.toLowerCase().includes(q));
-      document.getElementById('hub-rows').innerHTML=rows.map(r=>'<tr><td class="mono" style="font-weight:600;color:var(--text-strong)">'+r.name+'<div style="font-family:Inter,sans-serif;font-weight:400;font-size:12px;color:var(--text-muted);margin-top:2px">'+r.desc+'</div></td><td><span class="mono '+(r.layer==='Core'?'layer-core':'layer-ui')+'">'+r.layer+'</span></td><td class="mono"><a href="'+r.href+'" style="display:inline-flex;align-items:center;gap:6px;font-weight:600"><span class="dot" style="background:'+r.accent+'"></span>'+r.product+' →</a></td><td class="mono">'+r.pkg+'</td></tr>').join('');
-    }
-    renderRedirs();
-  </script>
   
 <script>
 function toggleTheme(){
