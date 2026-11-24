@@ -40,9 +40,33 @@
   }
 
   /* Background and text color of the page come from lux.theme.css. */
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: var(--lux-border-accented) transparent;
+    scroll-behavior: smooth;
+  }
+
   body {
     font-feature-settings: 'ss01', 'cv11';
     -webkit-font-smoothing: antialiased;
+    caret-color: var(--lux-primary);
+  }
+
+  h1, h2, h3 {
+    text-wrap: balance;
+  }
+
+  a {
+    text-underline-offset: 0.2em;
+  }
+
+  table {
+    font-variant-numeric: tabular-nums;
+  }
+
+  :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--lux-primary);
+    outline-offset: 2px;
   }
 
   /* FocusOnNavigate focuses the page title for screen readers; it is not a control, so no ring. */
@@ -51,7 +75,8 @@
   }
 
   ::selection {
-    background: color-mix(in oklab, var(--lux-primary) 35%, transparent);
+    background: color-mix(in oklab, var(--lux-primary) 32%, transparent);
+    color: var(--lux-text-highlighted);
   }
 }
 

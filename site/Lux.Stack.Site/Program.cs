@@ -53,6 +53,7 @@ app.UseRequestLocalization(new RequestLocalizationOptions()
     .AddSupportedUICultures(uiCultures));
 app.UseAntiforgery();
 
+app.MapGet("/favicon.ico", () => Results.File(Path.Combine(app.Environment.WebRootPath, "favicon.svg"), "image/svg+xml"));
 app.MapStaticAssets();
 app.MapLuxAi();
 app.MapLuxImages();
