@@ -31,13 +31,13 @@
                     <a href="/#libraries" class="@NavClass("/")">Libraries</a>
                     <a href="/showcase" aria-current="@(_currentPath == "/showcase" ? "page" : null)" class="@NavClass("/showcase")">Showcase</a>
                     <a href="/why" aria-current="@(_currentPath == "/why" ? "page" : null)" class="@NavClass("/why")">Why LuxStack?</a>
-                    <a href="/#redirections" class="text-(--lux-text-muted) transition-colors hover:text-(--lux-text-highlighted)">Catalog</a>
+                    <a href="/#redirections" class="inline-flex min-h-7 items-center text-(--lux-text-muted) transition-colors hover:text-(--lux-text-highlighted)">Catalog</a>
                 }
                 else if (_activeProduct.Slug == "ui")
                 {
                     <a href="/ui" aria-current="@(_currentPath == "/ui" ? "page" : null)" class="@NavClass("/ui")">Overview</a>
                     <a href="/ui/docs" aria-current="@(_currentPath.StartsWith("/ui/docs", StringComparison.OrdinalIgnoreCase) ? "page" : null)" class="@NavClass("/ui/docs")">Docs</a>
-                    <a href="@($"{_prefix}/components/button")" class="text-(--lux-text-muted) transition-colors hover:text-(--lux-text-highlighted)">Components</a>
+                    <a href="@($"{_prefix}/components/button")" class="inline-flex min-h-7 items-center text-(--lux-text-muted) transition-colors hover:text-(--lux-text-highlighted)">Components</a>
                     <a href="/docs/theming" aria-current="@(_currentPath == "/docs/theming" ? "page" : null)" class="@NavClass("/docs/theming")">Theming</a>
                     <a href="templates" aria-current="@(_currentPath == "/templates" ? "page" : null)" class="@NavClass("/templates")">Templates</a>
                 }
@@ -57,19 +57,19 @@
         </div>
 
         @* Compact mobile navigation so Showcase, Why LuxStack? & active library routes stay one tap away on phones *@
-        <nav aria-label="Mobile" class="flex items-center gap-4 overflow-x-auto border-t border-(--lux-border) px-4 py-2 text-xs md:hidden">
+        <nav aria-label="Mobile" class="flex items-center gap-4 overflow-x-auto border-t border-(--lux-border) px-4 py-1.5 text-xs md:hidden">
             @if (_activeProduct is null)
             {
-                <a href="/#libraries" class="shrink-0 text-(--lux-text-muted) hover:text-(--lux-text-highlighted)">Libraries</a>
+                <a href="/#libraries" class="inline-flex min-h-7 shrink-0 items-center text-(--lux-text-muted) hover:text-(--lux-text-highlighted)">Libraries</a>
                 <a href="/showcase" aria-current="@(_currentPath == "/showcase" ? "page" : null)" class="@($"shrink-0 {NavClass("/showcase")}")">Showcase</a>
                 <a href="/why" aria-current="@(_currentPath == "/why" ? "page" : null)" class="@($"shrink-0 {NavClass("/why")}")">Why LuxStack?</a>
-                <a href="/#redirections" class="shrink-0 text-(--lux-text-muted) hover:text-(--lux-text-highlighted)">Catalog</a>
+                <a href="/#redirections" class="inline-flex min-h-7 shrink-0 items-center text-(--lux-text-muted) hover:text-(--lux-text-highlighted)">Catalog</a>
             }
             else if (_activeProduct.Slug == "ui")
             {
                 <a href="/ui" class="@($"shrink-0 {NavClass("/ui")}")">Overview</a>
                 <a href="/ui/docs" class="@($"shrink-0 {NavClass("/ui/docs")}")">Docs</a>
-                <a href="@($"{_prefix}/components/button")" class="shrink-0 text-(--lux-text-muted) hover:text-(--lux-text-highlighted)">Components</a>
+                <a href="@($"{_prefix}/components/button")" class="inline-flex min-h-7 shrink-0 items-center text-(--lux-text-muted) hover:text-(--lux-text-highlighted)">Components</a>
                 <a href="templates" class="@($"shrink-0 {NavClass("/templates")}")">Templates</a>
             }
             else
@@ -142,8 +142,8 @@
 
     private string NavClass(string href) =>
         string.Equals(_currentPath, href, StringComparison.OrdinalIgnoreCase)
-            ? "font-medium text-(--lux-text-highlighted)"
-            : "text-(--lux-text-muted) transition-colors hover:text-(--lux-text-highlighted)";
+            ? "inline-flex min-h-7 items-center font-medium text-(--lux-text-highlighted)"
+            : "inline-flex min-h-7 items-center text-(--lux-text-muted) transition-colors hover:text-(--lux-text-highlighted)";
 
     public void Dispose() => Navigation.LocationChanged -= OnLocationChanged;
 }

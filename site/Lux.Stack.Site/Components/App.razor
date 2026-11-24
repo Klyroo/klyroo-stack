@@ -24,8 +24,8 @@
 <body>
     <Routes @rendermode="_mode" />
     <ReconnectModal />
-    <script src="@Assets["_framework/blazor.web.js"]"></script>
-    <script src="@Assets["site.js"]"></script>
+    <script src="@Assets["_framework/blazor.web.js"]" defer></script>
+    <script src="@Assets["site.js"]" defer></script>
 </body>
 
 </html>
@@ -45,13 +45,15 @@
     {
         // lang and dir of the page follow the culture of the request, like the components do.
         _locale = LxLocales.Resolve(System.Globalization.CultureInfo.CurrentUICulture);
-        // A page that opts out of interactive routing (ExcludeFromInteractiveRouting, like /templates) renders on the server only.
+        // InteractiveServer is the default so first-visit loads stay lightweight (no 30 MB WASM boot on arrival),
+        // while /ssr, /server, /wasm and /auto prefixes explicitly exercise every Blazor render mode.
         _mode = !HttpContext.AcceptsInteractiveRouting() ? null : PlaygroundServices.ModeFromPath(HttpContext.Request.Path) switch
         {
             "ssr" => null,
             "server" => InteractiveServer,
             "wasm" => InteractiveWebAssembly,
-            _ => InteractiveAuto,
+            "auto" => InteractiveAuto,
+            _ => InteractiveServer,
         };
     }
 }

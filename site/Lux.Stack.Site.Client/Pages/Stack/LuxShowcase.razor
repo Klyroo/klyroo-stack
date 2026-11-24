@@ -68,6 +68,7 @@
     <div class="@(_showAgent ? "mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]" : "mt-6")">
         @* Main Workspace *@
         <div class="min-w-0 space-y-6">
+            <h2 class="sr-only">Workspace</h2>
             @if (_activeTab == "overview")
             {
                 <LxDashboardStats Title="Executive Metrics" Items="@BuildStats()" Span="1" />

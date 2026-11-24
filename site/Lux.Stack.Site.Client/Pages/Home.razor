@@ -71,7 +71,7 @@
 
                     <h3 class="mt-3 text-2xl font-semibold tracking-[-0.02em] text-(--lux-text-highlighted)">
                         <a href="@($"/{product.Slug}")" class="hover:underline" style="@($"text-decoration-color:{product.AccentHex}")">
-                            Lux.<span style="@($"color:{product.AccentHex}")">@product.ShortName</span>
+                            Lux.@product.ShortName
                         </a>
                     </h3>
 
@@ -161,7 +161,11 @@
             </div>
         </div>
 
-        @{ var rows = FilteredComponents.ToList(); }
+        @{
+            var rows = FilteredComponents.ToList();
+            var limitApplied = string.IsNullOrWhiteSpace(_filter) && !_showAllComponents && rows.Count > DefaultCatalogLimit;
+            var visibleRows = limitApplied ? rows.Take(DefaultCatalogLimit).ToList() : rows;
+        }
         <div class="mt-10 overflow-hidden rounded-2xl border border-(--lux-border) bg-(--lux-bg)">
             @if (rows.Count == 0)
             {
@@ -185,7 +189,7 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-(--lux-border)">
-                            @foreach (var (product, comp) in rows)
+                            @foreach (var (product, comp) in visibleRows)
                             {
                                 <tr class="transition-colors hover:bg-(--lux-bg-muted)/40">
                                     <td class="px-4 py-3 font-mono font-medium text-(--lux-text-highlighted)">
@@ -218,13 +222,22 @@
                         </tbody>
                     </table>
                 </div>
+                @if (limitApplied)
+                {
+                    <div class="flex flex-wrap items-center justify-between gap-3 border-t border-(--lux-border) bg-(--lux-bg-muted)/40 px-4 py-3 text-xs text-(--lux-text-muted)">
+                        <span class="font-mono tabular-nums">Showing @visibleRows.Count of @rows.Count components &amp; services</span>
+                        <LxButton Label="@($"Show all {rows.Count}")" Size="LxSize.Sm" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => _showAllComponents = true)" />
+                    </div>
+                }
             }
         </div>
     </div>
 </section>
 
 @code {
+    private const int DefaultCatalogLimit = 16;
     private string _filter = "";
+    private bool _showAllComponents;
 
     private IEnumerable<(LuxProductInfo Product, LuxProductComponentLink Component)> FilteredComponents =>
         from p in LuxStackProducts.All

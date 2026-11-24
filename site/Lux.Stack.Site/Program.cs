@@ -1,11 +1,31 @@
+using System.IO.Compression;
 using Lux.Stack.Site;
 using Lux.Stack.Site.Client;
 using Lux.UI;
 using Lux.UI.Server;
 using Lux.Stack.Site.Components;
 using Lux.Stack.Site.Templates;
+using Microsoft.AspNetCore.ResponseCompression;
 
 var builder = WebApplication.CreateBuilder(args);
+// Allow running Release builds in Production environment directly from the repo checkout without missing RCL/font static web assets.
+builder.WebHost.UseStaticWebAssets();
+
+// Compress HTML, CSS, JS, JSON, SVG, and WASM payloads (Brotli + Gzip) for low-latency mobile loads.
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+    options.Providers.Add<BrotliCompressionProvider>();
+    options.Providers.Add<GzipCompressionProvider>();
+    options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat([
+        "image/svg+xml",
+        "application/wasm",
+        "application/json",
+        "text/plain"
+    ]);
+});
+builder.Services.Configure<BrotliCompressionProviderOptions>(o => o.Level = CompressionLevel.Fastest);
+builder.Services.Configure<GzipCompressionProviderOptions>(o => o.Level = CompressionLevel.Optimal);
 
 // Add services to the container.
 builder.Services.AddLuxSite();
@@ -31,6 +51,13 @@ if (builder.Configuration["PathBase"] is { Length: > 0 } pathBase)
     app.UsePathBase("/" + pathBase.Trim('/'));
     app.UseRouting();
 }
+app.UseResponseCompression();
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.TryAdd("X-Content-Type-Options", "nosniff");
+    context.Response.Headers.TryAdd("Referrer-Policy", "strict-origin-when-cross-origin");
+    await next();
+});
 app.UseLuxAi();
 if (app.Environment.IsDevelopment())
 {
