@@ -42,7 +42,10 @@ public sealed record BundleComponent(
     /// Its options object is the one that configures the theme of the component, null for a component of Lux.UI.
     /// </summary>
     public string? RegistrationMethod() =>
-        Package is not null && Package.StartsWith("Lux.UI.", StringComparison.Ordinal) ? "AddLuxUi" + Package["Lux.UI.".Length..].Replace(".", "") : null;
+        Package is null ? null
+        : Package.StartsWith("Lux.UI.", StringComparison.Ordinal) ? "AddLuxUi" + Package["Lux.UI.".Length..].Replace(".", "")
+        : Package.StartsWith("Lux.", StringComparison.Ordinal) ? "Add" + Package.Replace(".", "")
+        : null;
 }
 
 /// <summary>A live example of the docs site. <see cref="Id"/> is the name of its Razor component.</summary>

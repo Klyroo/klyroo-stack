@@ -49,7 +49,7 @@ public class ToolsPackageTests
         Assert.Contains(root.Parameters, p => p.Name == "ResultJson" && p.Description is not null);
         Assert.Equal("DataList", root.Theme!.Property);
         Assert.Contains("tableRoot", root.Theme.Slots.Keys);
-        Assert.Contains("### DataList", File.ReadAllText(Path.Combine(TestSupport.RepoRoot, SkillReference.RelativePath)));
+        Assert.Contains("### DataList", File.ReadAllText(Path.Combine(TestSupport.UiRepoRoot, SkillReference.RelativePath)));
     }
 
     [Fact]
@@ -74,7 +74,7 @@ public class ToolsPackageTests
         var selection = TestSupport.Service.FindComponent("data-list-selection")!;
         Assert.Contains(selection.Api[0].Parameters, p => p.Name == "MaxVisible" && p.Description is not null);
         Assert.Contains(TestSupport.Service.FindComponent("data-list")!.Api[0].Parameters, p => p.Name == "SelectedKeys" && p.Description is not null);
-        Assert.Contains("### DataListSelection", File.ReadAllText(Path.Combine(TestSupport.RepoRoot, SkillReference.RelativePath)));
+        Assert.Contains("### DataListSelection", File.ReadAllText(Path.Combine(TestSupport.UiRepoRoot, SkillReference.RelativePath)));
     }
 
     [Fact]
@@ -99,7 +99,7 @@ public class ToolsPackageTests
     [Fact]
     public void The_committed_skill_reference_has_the_package()
     {
-        var committed = File.ReadAllText(Path.Combine(TestSupport.RepoRoot, SkillReference.RelativePath)).Replace("\r\n", "\n");
+        var committed = File.ReadAllText(Path.Combine(TestSupport.UiRepoRoot, SkillReference.RelativePath)).Replace("\r\n", "\n");
 
         Assert.Contains("### DataListEmpty", committed);
         Assert.Contains("`dotnet add package Lux.Table --prerelease`", committed);

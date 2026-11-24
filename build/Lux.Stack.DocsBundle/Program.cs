@@ -26,7 +26,8 @@ if (output is not null)
 }
 if (skill)
 {
-    var path = Path.Combine(repo, SkillReference.RelativePath);
+    var uiRoot = Path.GetFullPath(Path.Combine(repo, "..", "lux-ui"));
+    var path = Path.Combine(Directory.Exists(uiRoot) ? uiRoot : repo, SkillReference.RelativePath);
     Directory.CreateDirectory(Path.GetDirectoryName(path)!);
     File.WriteAllText(path, SkillReference.Components(bundle));
     Console.WriteLine($"skill reference -> {path}");
@@ -43,7 +44,7 @@ static string FindRepoRoot()
 {
     for (var dir = new DirectoryInfo(Directory.GetCurrentDirectory()); dir is not null; dir = dir.Parent)
     {
-        if (File.Exists(Path.Combine(dir.FullName, "Lux.UI.slnx"))) return dir.FullName;
+        if (File.Exists(Path.Combine(dir.FullName, "Lux.Stack.slnx"))) return dir.FullName;
     }
-    throw new DirectoryNotFoundException("Lux.UI.slnx not found above the current directory; pass --repo.");
+    throw new DirectoryNotFoundException("Lux.Stack.slnx not found above the current directory; pass --repo.");
 }

@@ -13,6 +13,8 @@ internal static class TestSupport
 
     public static string RepoRoot { get; } = FindRepoRoot();
 
+    public static string UiRepoRoot { get; } = Path.GetFullPath(Path.Combine(RepoRoot, "..", "lux-ui"));
+
     private static string FindRepoRoot()
     {
         for (var dir = new DirectoryInfo(AppContext.BaseDirectory); dir is not null; dir = dir.Parent)

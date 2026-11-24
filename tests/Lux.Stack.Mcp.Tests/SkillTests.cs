@@ -10,7 +10,7 @@ namespace Lux.Stack.Mcp.Tests;
 /// </summary>
 public partial class SkillTests
 {
-    private static readonly string SkillDirectory = Path.Combine(TestSupport.RepoRoot, "skills", "lux-ui");
+    private static readonly string SkillDirectory = Path.Combine(TestSupport.UiRepoRoot, "skills", "lux-ui");
 
     // Lux.UI and the sister package whose components the generated reference lists.
     private static readonly Dictionary<string, Type> LibraryTypes = new[] { typeof(LxButton).Assembly, typeof(Lux.Table.LxDataListEmpty).Assembly }

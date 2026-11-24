@@ -249,7 +249,7 @@ public class BundleTests
     [Fact]
     public void The_skill_component_reference_is_up_to_date()
     {
-        var committed = File.ReadAllText(Path.Combine(TestSupport.RepoRoot, SkillReference.RelativePath)).Replace("\r\n", "\n");
+        var committed = File.ReadAllText(Path.Combine(TestSupport.UiRepoRoot, SkillReference.RelativePath)).Replace("\r\n", "\n");
 
         Assert.True(
             committed == SkillReference.Components(TestSupport.Bundle),
