@@ -35,7 +35,7 @@ public static class LuxStackCatalog
             Summary: "Foundation Design System (100+ Blazor components, Tailwind v4 engine, 12 locales, SSR/WASM/MAUI Hybrid, Images & Server cookies).",
             KeyComponents: ["BxApp", "BxButton", "BxInput", "BxSelect", "BxModal", "BxDrawer", "BxTabs", "BxCard", "BxCalendar", "BxChart", "BxChat", "BxEditor"],
             AccentHex: "#10b981",
-            LandingPagePath: "/home/gpoumarat/lux-ui/site/index.html"),
+            LandingPagePath: "/ui"),
 
         new(
             Id: "lux-query",
@@ -49,7 +49,7 @@ public static class LuxStackCatalog
             Summary: "Headless NativeAOT query AST, URL search parameter codecs, IQueryable applier, InMemory engine, Blazor QueryState and EF Core async executor.",
             KeyComponents: ["DataListSchema", "DataListRequest", "DataListFilterGroup", "QueryCodec", "QueryState", "EfAsyncQueryExecutor"],
             AccentHex: "#ff4154",
-            LandingPagePath: "/home/gpoumarat/lux-query/site/index.html"),
+            LandingPagePath: "/query"),
 
         new(
             Id: "lux-table",
@@ -63,7 +63,7 @@ public static class LuxStackCatalog
             Summary: "Full-featured DataList (Table, Grid, Virtualization, Pinning, Resizing, Grouping, Tree hierarchy, Summary rows, Footer aggregations, Saved Views, Export).",
             KeyComponents: ["BxDataList", "BxDataListTable", "BxDataListGrid", "BxDataListColumn", "BxDataListToolbar", "BxDataListFilterBar", "BxDataListPagination", "DataListTree", "DataListGroupBy", "DataListSummaries"],
             AccentHex: "#00d8ff",
-            LandingPagePath: "/home/gpoumarat/lux-table/site/index.html"),
+            LandingPagePath: "/table"),
 
         new(
             Id: "lux-form",
@@ -77,7 +77,7 @@ public static class LuxStackCatalog
             Summary: "Schema-driven Form Engine (31 field kinds, reactive conditions, dirty diffing, validation triggers, multi-step wizard with SkipWhen, FormPage sections & overlay FormService).",
             KeyComponents: ["FormSchema", "FormController", "FormService", "BxFormEngine", "BxFormPage", "BxFormProvider"],
             AccentHex: "#f59e0b",
-            LandingPagePath: "/home/gpoumarat/lux-form/site/index.html"),
+            LandingPagePath: "/form"),
 
         new(
             Id: "lux-dashboard",
@@ -91,7 +91,7 @@ public static class LuxStackCatalog
             Summary: "Analytical Dashboard Engine (staged Essential/Background/Deferred queries, filters & presets, views, comparison date ranges, CSV export, KPI & chart cards).",
             KeyComponents: ["DashboardController", "DashboardResource", "DashboardFilterControl", "DashboardFormat", "BxDashboardPage", "BxDashboardGrid", "BxDashboardCard", "BxDashboardStat", "BxDashboardStats", "BxDashboardGauge", "BxDashboardTable", "BxDashboardChart", "BxDashboardBars", "BxDashboardList", "BxDashboardAlerts", "BxDashboardFeed"],
             AccentHex: "#8b5cf6",
-            LandingPagePath: "/home/gpoumarat/lux-dashboard/site/index.html"),
+            LandingPagePath: "/dashboard"),
 
         new(
             Id: "lux-display",
@@ -105,7 +105,7 @@ public static class LuxStackCatalog
             Summary: "19-kind read-only Display blocks, Audio/Video media players with clip & play-quota rules, and multi-format FilePreview overlay provider.",
             KeyComponents: ["BxDisplay", "BxAudioPlayer", "BxVideoPlayer", "BxFilePreviewProvider", "FilePreviewService"],
             AccentHex: "#ec4899",
-            LandingPagePath: "/home/gpoumarat/lux-display/site/index.html"),
+            LandingPagePath: "/display"),
 
         new(
             Id: "lux-spreadsheet",
@@ -119,7 +119,7 @@ public static class LuxStackCatalog
             Summary: "Headless workbook/CSV/TSV importer (layout detection, NFD header normalization, 80%-pass column suggestions, unknown value questions, duplicates/upsert, inline edits & wizard).",
             KeyComponents: ["SpreadsheetSchema", "SpreadsheetImporter", "BxSpreadsheetImport"],
             AccentHex: "#14b8a6",
-            LandingPagePath: "/home/gpoumarat/lux-spreadsheet/site/index.html"),
+            LandingPagePath: "/spreadsheet"),
 
         new(
             Id: "lux-agent",
@@ -133,7 +133,7 @@ public static class LuxStackCatalog
             Summary: "Composable headless UI behaviors (@lux/behaviors) and Semantic Agent Bridge (snapshot, query, act, observe with secret redaction, WebMCP & UndoStack) inspired by ui-sdk.dev.",
             KeyComponents: ["AgentBridgeService", "UndoStack", "ObservedChange", "AgentComponentSnapshot", "AgentActStep"],
             AccentHex: "#6366f1",
-            LandingPagePath: "/home/gpoumarat/lux-agent/site/index.html"),
+            LandingPagePath: "/agent"),
     ];
 
     /// <summary>Finds the owning <see cref="LuxStackModule"/> for a given component or controller name (case-insensitive).</summary>
