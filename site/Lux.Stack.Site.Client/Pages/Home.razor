@@ -1,46 +1,72 @@
 @page "/"
 @page "/stack"
 @using Lux.Stack.Site.Client.Docs
+@using Lux.Stack.Site.Client.Components.Stages
 
 <PageTitle>LuxStack · High-quality open-source libraries for .NET, Blazor &amp; MAUI</PageTitle>
 
-@* LuxStack Umbrella Hero *@
+@* LuxStack Hero + Drizzle-Resource Inspired Interactive Workbench *@
 <section class="relative isolate overflow-hidden border-b border-(--lux-border)">
     <div class="pg-dots absolute inset-0 -z-10 [mask-image:linear-gradient(to_bottom,black,transparent_85%)]" aria-hidden="true"></div>
     <div class="pg-glow absolute inset-0 -z-10" aria-hidden="true"></div>
     <Rain />
 
-    <div class="mx-auto grid max-w-(--breakpoint-2xl) gap-10 px-4 pt-16 pb-16 sm:px-6 sm:pt-24 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] lg:items-end lg:px-8 lg:pb-20">
+    <div class="mx-auto grid max-w-(--breakpoint-2xl) gap-8 px-4 pt-12 pb-10 sm:px-6 sm:pt-16 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)] lg:items-end lg:px-8">
         <div>
-            <h1 class="text-5xl font-semibold leading-[0.98] tracking-[-0.03em] text-(--lux-text-highlighted) sm:text-7xl xl:text-[4.75rem]">
+            <h1 class="text-5xl font-semibold leading-[0.98] tracking-[-0.03em] text-(--lux-text-highlighted) sm:text-6xl xl:text-[4.25rem]">
                 High-quality open-source<br />
                 <span class="pg-accent">libraries for .NET.</span>
             </h1>
-            <p class="mt-6 font-mono text-xs text-(--lux-text-muted)">
+            <p class="mt-4 font-mono text-xs text-(--lux-text-muted)">
                 8 headless + UI libraries <span aria-hidden="true">·</span> .NET 10 &amp; MAUI <span aria-hidden="true">·</span> NativeAOT <span aria-hidden="true">·</span> MIT
             </p>
         </div>
         <div class="lg:pb-1">
-            <p class="max-w-prose text-lg leading-relaxed text-(--lux-text-muted) text-pretty">
-                Headless, type-safe, NativeAOT-ready C# engines paired with zero-roundtrip Blazor Web &amp; .NET MAUI Blazor Hybrid UI.
-                Adopt a single library or install the entire stack in one package.
+            <p class="max-w-prose text-base leading-relaxed text-(--lux-text-muted) text-pretty sm:text-lg">
+                Wire <code class="font-mono text-sm text-(--lux-text-highlighted)">AddLuxStack()</code> once or pick any single package.
+                Select a library below to trace its NativeAOT core, C# code, runtimes, and live UI.
             </p>
-            <div class="mt-7 flex flex-wrap items-center gap-3">
-                <LxButton Label="Live 8-Library Showcase" Href="/showcase" Size="LxSize.Xl" Class="rounded-lg px-5">
+            <div class="mt-5 flex flex-wrap items-center gap-2.5">
+                <LxButton Label="Live 8-Library Showcase" Href="/showcase" Size="LxSize.Lg" Class="rounded-lg px-5">
                     <TrailingIcon><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14m-6-6 6 6-6 6" /></svg></TrailingIcon>
                 </LxButton>
-                <LxButton Label="Why LuxStack?" Href="/why" Size="LxSize.Xl" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" Class="rounded-lg px-5" />
-                <LxButton Label="Browse Libraries" Href="#libraries" Size="LxSize.Xl" Color="LxColor.Neutral" Variant="ButtonVariant.Ghost" Class="rounded-lg px-4" />
-            </div>
-            <div class="mt-4">
                 <button type="button" data-copy-text="dotnet add package Lux.Stack"
-                        class="group inline-flex w-full items-center justify-between gap-3 rounded-lg border border-(--lux-border-accented) bg-(--lux-bg) px-4 py-2.5 font-mono text-sm text-(--lux-text-highlighted) transition-colors hover:border-(--lux-primary-text) sm:w-auto">
+                        class="group inline-flex min-h-10 items-center justify-between gap-3 rounded-lg border border-(--lux-border-accented) bg-(--lux-bg) px-4 py-2 font-mono text-xs text-(--lux-text-highlighted) transition-colors hover:border-(--lux-primary-text)">
                     <span><span class="text-(--lux-text-muted)">$</span> dotnet add package Lux.Stack</span>
                     <span class="text-[11px] uppercase tracking-wider text-(--lux-text-muted) group-hover:text-(--lux-primary-text)" data-copy-label>Copy</span>
                 </button>
+                <LxButton Label="Why LuxStack?" Href="/why" Size="LxSize.Lg" Color="LxColor.Neutral" Variant="ButtonVariant.Ghost" Class="rounded-lg px-3" />
             </div>
         </div>
     </div>
+
+    @* Interactive Workbench directly inside the Hero *@
+    <div class="mx-auto max-w-(--breakpoint-2xl) px-4 pb-14 sm:px-6 lg:px-8 lg:pb-16">
+        <h2 class="sr-only">Interactive LuxStack Workbench</h2>
+        <StackHeroWorkbench />
+    </div>
+</section>
+
+@* Measured Proof Strip (hairline editorial typography, zero card boxes) *@
+<section aria-label="Measured performance and test coverage" class="border-b border-(--lux-border) bg-(--lux-bg-muted)/30">
+    <dl class="mx-auto grid max-w-(--breakpoint-2xl) grid-cols-2 divide-y divide-(--lux-border) px-4 sm:px-6 lg:grid-cols-4 lg:divide-x lg:divide-y-0 lg:px-8">
+        <div class="py-6 lg:pe-6">
+            <dt class="font-mono text-xs text-(--lux-text-muted)">Lux.Query · 100k rows + 5 facets</dt>
+            <dd class="mt-1 font-pixel text-3xl font-bold tabular-nums text-(--lux-text-highlighted)">16.6 ms</dd>
+        </div>
+        <div class="py-6 lg:px-6">
+            <dt class="font-mono text-xs text-(--lux-text-muted)">Lux.Spreadsheet · 10k CSV rows</dt>
+            <dd class="mt-1 font-pixel text-3xl font-bold tabular-nums text-(--lux-text-highlighted)">23.0 ms</dd>
+        </div>
+        <div class="py-6 lg:px-6">
+            <dt class="font-mono text-xs text-(--lux-text-muted)">All 8 Headless Core DLLs</dt>
+            <dd class="mt-1 font-pixel text-3xl font-bold tabular-nums text-(--lux-text-highlighted)">536 KB</dd>
+        </div>
+        <div class="py-6 lg:ps-6">
+            <dt class="font-mono text-xs text-(--lux-text-muted)">Automated tests across 9 repos</dt>
+            <dd class="mt-1 font-pixel text-3xl font-bold tabular-nums text-(--lux-text-highlighted)">4,853</dd>
+        </div>
+    </dl>
 </section>
 
 @* Open Source Libraries Grid (8-library catalog) *@
