@@ -17,9 +17,9 @@ internal static class TestSupport
     {
         for (var dir = new DirectoryInfo(AppContext.BaseDirectory); dir is not null; dir = dir.Parent)
         {
-            if (File.Exists(Path.Combine(dir.FullName, "Lux.UI.slnx"))) return dir.FullName;
+            if (File.Exists(Path.Combine(dir.FullName, "Lux.Stack.slnx"))) return dir.FullName;
         }
-        throw new DirectoryNotFoundException("Lux.UI.slnx not found above the test output directory.");
+        throw new DirectoryNotFoundException("Lux.Stack.slnx not found above the test output directory.");
     }
 
     /// <summary>The built stdio tool, next to the configuration of this test assembly.</summary>

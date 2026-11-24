@@ -125,7 +125,7 @@ public sealed class DemoHarness : IAsyncDisposable
     {
         for (var dir = new DirectoryInfo(AppContext.BaseDirectory); dir is not null; dir = dir.Parent)
         {
-            if (File.Exists(Path.Combine(dir.FullName, "Lux.UI.slnx")))
+            if (File.Exists(Path.Combine(dir.FullName, "Lux.Stack.slnx")))
             {
                 var bin = Path.Combine(dir.FullName, "tests", "Lux.Stack.FakeDemo", "bin");
                 var dll = Directory.EnumerateFiles(bin, "FakeDemo.dll", SearchOption.AllDirectories).FirstOrDefault()
@@ -133,7 +133,7 @@ public sealed class DemoHarness : IAsyncDisposable
                 return Path.GetDirectoryName(dll)!;
             }
         }
-        throw new DirectoryNotFoundException("Lux.UI.slnx not found above the test output directory.");
+        throw new DirectoryNotFoundException("Lux.Stack.slnx not found above the test output directory.");
     }
 
     public static void CopyDirectory(string from, string to)
