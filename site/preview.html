@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: transparent; color: var(--foreground); font-family: var(--font-sans); }
+  .bar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .tab {
+    display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px;
+    border-radius: 999px; border: 1px solid var(--border); background: var(--card);
+    color: var(--muted-foreground); font-family: var(--font-mono); font-size: 11.5px; cursor: pointer;
+    transition: border-color .15s, color .15s;
+  }
+  .tab:hover { color: var(--foreground); }
+  .tab.active { color: var(--foreground); font-weight: 600; border-color: var(--p-accent); }
+  .dot { width: 7px; height: 7px; border-radius: 999px; flex-shrink: 0; }
+  .panel {
+    border: 1px solid var(--border); border-top: 3px solid var(--p-accent);
+    border-radius: var(--radius); background: var(--card); padding: 16px;
+  }
+  .eyebrow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 11px; color: var(--muted-foreground); }
+  .pill { padding: 2px 8px; border-radius: 999px; font-weight: 600; font-size: 10.5px; color: var(--p-accent); border: 1px solid color-mix(in srgb, var(--p-accent) 45%, transparent); background: color-mix(in srgb, var(--p-accent) 12%, transparent); }
+  h2 { margin: 10px 0 6px; font-size: 24px; line-height: 1.08; letter-spacing: -0.03em; }
+  h2 span { color: var(--p-accent); }
+  .desc { margin: 0; font-size: 13px; color: var(--muted-foreground); line-height: 1.5; }
+  .cmds { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px; margin-top: 12px; }
+  .cmd {
+    padding: 8px 10px; border-radius: calc(var(--radius) - 2px); border: 1px solid var(--border);
+    background: var(--code-background); font-family: var(--font-mono); font-size: 11px; color: var(--foreground);
+    display: flex; justify-content: space-between; align-items: center; gap: 8px; overflow-x: auto; white-space: nowrap;
+  }
+  .cmd .tag { color: var(--muted-foreground); font-size: 10px; white-space: nowrap; }
+  .feats { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 8px; margin-top: 12px; }
+  .feat { padding: 10px; border-radius: calc(var(--radius) - 2px); border: 1px solid var(--border); background: var(--secondary); }
+  .feat .ftag { font-family: var(--font-mono); font-size: 10px; color: var(--p-accent); text-transform: uppercase; letter-spacing: .06em; }
+  .feat .ftitle { font-size: 12px; font-weight: 600; margin-top: 4px; color: var(--foreground); }
+  .feat .fdesc { font-size: 11px; color: var(--muted-foreground); margin-top: 3px; line-height: 1.4; }
+  .codes { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; margin-top: 12px; }
+  .codebox { border: 1px solid var(--border); border-radius: calc(var(--radius) - 2px); background: var(--code-background); overflow: hidden; }
+  .codehead { padding: 6px 10px; border-bottom: 1px solid var(--border); font-family: var(--font-mono); font-size: 10.5px; color: var(--muted-foreground); display: flex; justify-content: space-between; }
+  pre { margin: 0; padding: 10px; font-family: var(--font-mono); font-size: 10.5px; line-height: 1.45; overflow-x: auto; color: var(--foreground); }
+  .hubgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; margin-top: 12px; }
+  .hubcard {
+    text-align: left; cursor: pointer; padding: 10px; border-radius: calc(var(--radius) - 2px);
+    border: 1px solid var(--border); background: var(--secondary); color: var(--foreground);
+  }
+  .hubcard:hover { border-color: var(--ring); }
+  .hubcard .hname { font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+  .hubcard .hsub { font-size: 11px; color: var(--muted-foreground); margin-top: 4px; line-height: 1.35; }
+  .hubcard .hpkg { font-family: var(--font-mono); font-size: 10px; color: var(--muted-foreground); margin-top: 6px; }
+</style>
+</head>
+<body>
+  <div id="bar" class="bar"></div>
+  <div id="view" class="panel"></div>
+
+<script>
+const ITEMS = [
+  {
+    id: 'hub', name: 'LuxStack Hub', accent: '#ffd23f', repo: 'lux.stack',
+    h1: 'The TanStack architecture,', h2: 'engineered for .NET.',
+    desc: '8 dépôts indépendants avec séparation stricte : Lux.&lt;Produit&gt;.Core (100% C# Headless / NativeAOT, zéro dépendance UI) et Lux.&lt;Produit&gt; (Blazor Web &amp; .NET MAUI Blazor Hybrid). Cliquez sur un produit ci-dessous pour inspecter sa landing page.',
+    uiPkg: 'Lux.Stack', corePkg: 'Lux.Stack.Core', isHub: true
+  },
+  {
+    id: 'ui', name: 'Lux.UI', accent: '#10b981', repo: 'lux-ui',
+    h1: 'Accessible primitives,', h2: 'zero SignalR lag.',
+    desc: '125+ composants Blazor (Server/WASM/Auto/SSR) & MAUI Hybrid, Tailwind v4, 12 locales, popovers/dialogs natifs et behaviors JS composables.',
+    uiPkg: 'Blux.UI', corePkg: 'Blux.UI.Build.Tasks',
+    feats: [['DOM Native','Zero-Roundtrip','API HTML Popover & <dialog> gérées dans le navigateur.'],['Behaviors','ui-sdk.dev','dialog(), popup(), rovingTabindex(), formAssociated().'],['Tailwind v4','CSS Tokens','Un seul thème CSS, mode sombre instantané.'],['Multiplatform','Web + MAUI + TV','Zones tactiles 44px et focus D-pad Android TV.']],
+    cTitle: 'js/behaviors.js (Headless)', cCode: `import { dialog, rovingTabindex } from './behaviors.js';\ndialog(el, { closeOnBackdrop: true });\nrovingTabindex(tabsEl, { selector: '[role="tab"]' });`,
+    uTitle: 'App.razor (Blazor / MAUI)', uCode: `<BxModal Title="Deploy">\n  <ChildContent><BxButton Label="Deploy" /></ChildContent>\n  <Body><BxSelect Items="@Envs" @bind-Value="_env" /></Body>\n</BxModal>`
+  },
+  {
+    id: 'query', name: 'Lux.Query', accent: '#ff4154', repo: 'lux-query',
+    h1: 'Headless query engine', h2: '& reactive URL state.',
+    desc: 'AST de filtres/tris NativeAOT (DataListSchema, DataListRequest), codecs URL, exécuteur InMemory, SQL EF Core (EfAsyncQueryExecutor) et QueryState Blazor/MAUI.',
+    uiPkg: 'Lux.Query', corePkg: 'Lux.Query.Core',
+    feats: [['Typed AST','DataListSchema','Champs triables, filtres et recherche sans magic strings.'],['Any Backend','InMemory + EF Core','Exécution mémoire ou traduction SQL asynchrone.'],['URL Sync','QueryState','Query-string réactive sur Web et MAUI WebView.'],['NativeAOT','Zéro UI dans .Core','Utilisable en APIs, Workers et ViewModels MAUI.']],
+    cTitle: 'Lux.Query.Core (NativeAOT)', cCode: `var schema = DataListSchema.For<Product>(s => s\n  .RowKey(p => p.Id).Search(p => p.Name)\n  .Field(p => p.Price, f => f.Key("price").Sortable()));\nvar res = schema.ExecuteInMemory(items, req);`,
+    uTitle: 'Lux.Query (Blazor / MAUI)', uCode: `@inject QueryState Query\n@code {\n  void Next() => Query.Set("page", "3");\n}`
+  },
+  {
+    id: 'table', name: 'Lux.Table', accent: '#00d8ff', repo: 'lux-table',
+    h1: 'Supercharged tables', h2: '& headless datagrids.',
+    desc: 'Table, grille, hiérarchie arborescente NativeAOT (DataListTree<T>), regroupement, totaux de pied de tableau, HeaderMenu Tri/Masquer et lignes résumées mobiles.',
+    uiPkg: 'Lux.Table', corePkg: 'Lux.Table.Core',
+    feats: [['Headless Tree','DataListTree<T>','Arbre hiérarchique 100% NativeAOT dans .Core.'],['UX Polish','Nuxt UI Tools','Barre 2px, HeaderMenu, skeletons & EmptyState.'],['Enterprise','Groupes & Totaux','Sum/Avg/Min/Max, pinning et resizing.'],['Mobile','Summary Rows','Passage auto en cartes compactes sous 768px.']],
+    cTitle: 'Lux.Table.Core (NativeAOT)', cCode: `var tree = new DataListTree<Employee> {\n  Children = e => e.Reports, DefaultExpandedDepth = 1\n};\nvar (roots, all) = tree.BuildTree(employees, schema);`,
+    uTitle: 'Lux.Table (BxDataList)', uCode: `<BxDataList TItem="Employee" Schema="@_s" Items="@_rows">\n  <BxDataListTable TItem="Employee" HeaderMenu="true">\n    <BxDataListColumn TItem="Employee" Field="salary" Summary="DataListSummaryKind.Sum" />\n  </BxDataListTable>\n</BxDataList>`
+  },
+  {
+    id: 'form', name: 'Lux.Form', accent: '#f59e0b', repo: 'lux-form',
+    h1: 'Schema-driven forms', h2: 'without boilerplate.',
+    desc: '31 types de champs déclaratifs (FormFieldKind), visibilité conditionnelle réactive, dirty diffing, transformations de sortie, wizards avec SkipWhen et FormService modal.',
+    uiPkg: 'Lux.Form', corePkg: 'Lux.Form.Core',
+    feats: [['31 Kinds','FormSchema','Text, Password, Select, Slider, Arrays & Tabs.'],['Reactive','Condition & Transform','Skip auto de validation sur champs masqués.'],['Wizard','Steps + SkipWhen','Assistants multi-étapes et reset dirty au submit.'],['Overlay','FormService','Ouverture modale/tiroir via BxFormProvider.']],
+    cTitle: 'Lux.Form.Core (NativeAOT)', cCode: `var form = new FormController(new FormSchema {\n  Title = "Profile", Fields = [\n    new() { Key = "age", Kind = FormFieldKind.Number },\n    new() { Key = "company", Condition = f => f.GetValue<double>("age") >= 21 }\n  ]\n});`,
+    uTitle: 'Lux.Form (BxFormEngine)', uCode: `<BxFormEngine Form="@_form"\n              SubmitLabel="Save profile"\n              ShowReset="true" />`
+  },
+  {
+    id: 'dashboard', name: 'Lux.Dashboard', accent: '#8b5cf6', repo: 'lux-dashboard',
+    h1: 'Analytical dashboards', h2: 'staged for speed.',
+    desc: 'Chargement étagé 3 vagues (Essential → Background → Deferred), filtres globaux, plages de comparaison bissextiles, export CSV UTF-8 BOM et 13 blocs KPI.',
+    uiPkg: 'Lux.Dashboard', corePkg: 'Lux.Dashboard.Core',
+    feats: [['3 Waves','Staged Queries','Essential puis Background, Deferred paresseux.'],['Filters','Global & Views','Filtres synchronisés avec reset & badges.'],['13 Blocks','Stats, Gauge, Table','SVG Gauge, Bars, Feed, Alerts, Chart & Table.'],['Export','CSV RFC-4180','Formatage Compact/Delta/Ratio + CSV BOM.']],
+    cTitle: 'Lux.Dashboard.Core (NativeAOT)', cCode: `var dash = new DashboardController("analytics");\ndash.RegisterResource(new DashboardResource<int>(\n  "kpis", LoadKpisAsync, DashboardQueryStage.Essential));\nawait dash.RefreshAsync();`,
+    uTitle: 'Lux.Dashboard (BxDashboardPage)', uCode: `<BxDashboardPage Dashboard="@_dash" Title="Revenue">\n  <BxDashboardGrid Menu="true">\n    <BxDashboardStats Items="@_stats" />\n    <BxDashboardGauge Value="86" Max="100" Target="90" />\n  </BxDashboardGrid>\n</BxDashboardPage>`
+  },
+  {
+    id: 'display', name: 'Lux.Display', accent: '#ec4899', repo: 'lux-display',
+    h1: 'Rich display blocks', h2: '& constrained media.',
+    desc: '19 blocs lecture seule (<BxDisplay>), lecteurs Audio/Vidéo avec segment Start/End, quota MaxPlays & Seekable=false, et prévisualiseur modal de fichiers multi-format.',
+    uiPkg: 'Lux.Display', corePkg: 'Lux.Display.Core',
+    feats: [['19 Blocks','BxDisplay','Stat+sparkline, Facts, Meter, Diff, Code/Secret.'],['Media','Quota MaxPlays','Clip Start/End et blocage seek pour examens.'],['Lightbox','FilePreviewService','Image zoomable, PDF, Audio, Vidéo & CSV.'],['Security','Secret Mask','Masquage ••••3210 avec bouton Révéler/Copier.']],
+    cTitle: 'Lux.Display.Core (NativeAOT)', cCode: `filePreview.Open(\n  new FilePreviewItem("spec.pdf", "/spec.pdf"));\nvar csv = FilePreviewService.ParseCsv("A,B\\n1,2");`,
+    uTitle: 'Lux.Display (BxDisplay + Audio)', uCode: `<BxDisplay Kind="DisplayKind.Code" Variant="secret" Value="sk_live_9876" />\n<BxAudioPlayer Src="/clip.mp3" Start="15" End="45" MaxPlays="2" Seekable="false" />`
+  },
+  {
+    id: 'spreadsheet', name: 'Lux.Spreadsheet', accent: '#14b8a6', repo: 'lux-spreadsheet',
+    h1: 'Intelligent CSV import', h2: '& row reconciliation.',
+    desc: 'Détection d’en-tête sur 20 lignes, normalisation NFD, suggestions validées à ≥80%, questions de valeurs inconnues, doublons/upsert, édition inline et relance des rejets.',
+    uiPkg: 'Lux.Spreadsheet', corePkg: 'Lux.Spreadsheet.Core',
+    feats: [['Auto Header','20-Row Detector','Ignore les titres d’export Excel/CSV.'],['Smart Map','NFD + ≥80% Pass','Propose un mapping fiable sans l’imposer.'],['Questions','Unknowns & Upsert','Résout les énumérations et doublons avant envoi.'],['Batch','Retry Rejected','Corrige et relance uniquement les rejets API.']],
+    cTitle: 'Lux.Spreadsheet.Core (NativeAOT)', cCode: `var importer = new SpreadsheetImporter(schema);\nimporter.LoadText(csvText, "rates.csv");\n// Détecte HeaderRowNumber=2 & suggestions ≥80%`,
+    uTitle: 'Lux.Spreadsheet (5-Step Wizard)', uCode: `<BxSpreadsheetImport Importer="@_importer"\n                     Title="Import Rates"\n                     Wizard="true" />`
+  },
+  {
+    id: 'agent', name: 'Lux.Agent', accent: '#6366f1', repo: 'lux-agent',
+    h1: 'AI-ready interfaces', h2: '& semantic WebMCP.',
+    desc: 'Pont sémantique ui-sdk.dev (Snapshot, Query, Act, Observe), redaction automatique [redacted] des secrets, garde de permissions AllowPolicy, assets WebMCP et UndoStack<T>.',
+    uiPkg: 'Lux.Agent', corePkg: 'Lux.Agent.Core',
+    feats: [['Bridge','Snapshot/Query/Act','Pilote Form, Dashboard & Spreadsheet sans CSS.'],['Policy','AllowPolicy Guard','Valide ou bloque les actions ConfirmRequired.'],['Privacy','Auto [redacted]','Masque Password & OneTimeCode dans Observe.'],['WebMCP','Assets + UndoStack','lux-agent.js + lux-behaviors.js + UndoStack<T>.']],
+    cTitle: 'Lux.Agent (AgentBridgeService)', cCode: `agent.RegisterForm(form, confirmSubmit: true);\nvar res = await agent.ActAsync([\n  new AgentActStep("Project", "setValue", ["Atlas"])\n]);`,
+    uTitle: 'wwwroot/lux-agent.js (WebMCP)', uCode: `const snap = window.Blux.agent.snapshot();\nawait window.Blux.agent.act([{ ref: 'Project', action: 'setValue', args: ['Atlas'] }]);`
+  }
+];
+
+let active = 'hub';
+function render() {
+  const cur = ITEMS.find(x => x.id === active) || ITEMS[0];
+  document.documentElement.style.setProperty('--p-accent', cur.accent);
+  document.getElementById('bar').innerHTML = ITEMS.map(x =>
+    `<button type="button" class="tab ${x.id===cur.id?'active':''}" onclick="selectTab('${x.id}')"><span class="dot" style="background:${x.accent}"></span>${x.name}</button>`
+  ).join('');
+
+  if (cur.isHub) {
+    const cards = ITEMS.slice(1).map(p =>
+      `<button type="button" class="hubcard" style="border-top:2px solid ${p.accent}" onclick="selectTab('${p.id}')">
+        <div class="hname"><span class="dot" style="background:${p.accent}"></span>${p.name}</div>
+        <div class="hsub">${p.h1} ${p.h2}</div>
+        <div class="hpkg">${p.corePkg} · ${p.uiPkg}</div>
+      </button>`
+    ).join('');
+    document.getElementById('view').innerHTML = `
+      <div class="eyebrow"><span class="pill">LuxStack HUB</span><span>8 repos · 17 packages NuGet · NativeAOT + MAUI Hybrid</span></div>
+      <h2>${cur.h1} <span>${cur.h2}</span></h2>
+      <p class="desc">${cur.desc}</p>
+      <div class="cmds">
+        <div class="cmd"><span>$ dotnet add package ${cur.uiPkg}</span><span class="tag">Blazor + MAUI</span></div>
+        <div class="cmd"><span>$ dotnet add package ${cur.corePkg}</span><span class="tag">7 NativeAOT Cores</span></div>
+      </div>
+      <div class="hubgrid">${cards}</div>`;
+  } else {
+    const feats = cur.feats.map(([t, ti, d]) =>
+      `<div class="feat"><div class="ftag">${t}</div><div class="ftitle">${ti}</div><div class="fdesc">${d}</div></div>`
+    ).join('');
+    document.getElementById('view').innerHTML = `
+      <div class="eyebrow"><span class="pill">${cur.name}</span><span>${cur.repo}/site/index.html</span><span>·</span><span>/stack/${cur.id}</span></div>
+      <h2>${cur.h1} <span>${cur.h2}</span></h2>
+      <p class="desc">${cur.desc}</p>
+      <div class="cmds">
+        <div class="cmd"><span>$ dotnet add package ${cur.uiPkg}</span><span class="tag">Blazor + MAUI Hybrid</span></div>
+        <div class="cmd"><span>$ dotnet add package ${cur.corePkg}</span><span class="tag">Headless NativeAOT</span></div>
+      </div>
+      <div class="feats">${feats}</div>
+      <div class="codes">
+        <div class="codebox"><div class="codehead"><span>${cur.cTitle}</span><span>Core</span></div><pre>${cur.cCode.replace(/</g,'&lt;')}</pre></div>
+        <div class="codebox"><div class="codehead"><span>${cur.uTitle}</span><span>UI</span></div><pre>${cur.uCode.replace(/</g,'&lt;')}</pre></div>
+      </div>`;
+  }
+}
+function selectTab(id){ active = id; render(); }
+render();
+</script>
+</body>
+</html>
