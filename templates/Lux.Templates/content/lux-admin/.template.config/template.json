@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "LuxStack Contributors",
+  "classifications": ["Web", "Blazor", "Admin", "LuxStack"],
+  "identity": "Lux.Templates.Admin",
+  "name": "LuxStack Admin Backoffice",
+  "shortName": "lux-admin",
+  "sourceName": "LuxAdminApp",
+  "tags": { "language": "C#", "type": "project" },
+  "preferNameDirectory": true
+}

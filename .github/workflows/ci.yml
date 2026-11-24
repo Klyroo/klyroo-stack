@@ -17,9 +17,46 @@ jobs:
         run: dotnet build Lux.Stack.slnx -c Release --nologo
       - name: Run Tests
         run: dotnet test Lux.Stack.slnx -c Release --no-build --nologo
+      - name: Verify Trim & NativeAOT Analyzers on Core Libraries
+        run: |
+          for core in src/*.Core/*.csproj; do
+            [ -f "$core" ] && dotnet build "$core" -c Release -p:EnableAotAnalyzer=true -p:EnableTrimAnalyzer=true --nologo
+          done
+
       - name: Pack NuGet Artifacts
         run: dotnet pack Lux.Stack.slnx -c Release --no-build -o ./artifacts/nupkgs --nologo
       - uses: actions/upload-artifact@v4
         with:
           name: nupkgs-lux.stack
           path: ./artifacts/nupkgs/*.nupkg
+
+  native-aot-template-verify:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Pack & Verify PublishAot=true lux-headless & lux-admin templates
+        run: |
+          dotnet pack templates/Lux.Templates/Lux.Templates.csproj -c Release -o ./artifacts/nupkgs --nologo
+          dotnet build src/Lux.Stack.Core/Lux.Stack.Core.csproj -c Release -p:EnableAotAnalyzer=true -p:EnableTrimAnalyzer=true --nologo
+
+  accessibility-wcag-audit:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run WCAG 2.1 AA / axe-core audit on Showcase & Docs
+        run: |
+          dotnet build site/Lux.Stack.Site/Lux.Stack.Site.csproj -c Release --nologo
+          npm install --no-save playwright @axe-core/playwright
+          npx playwright install chromium
+          node build/verify-a11y.mjs

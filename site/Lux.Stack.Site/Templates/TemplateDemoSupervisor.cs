@@ -368,6 +368,8 @@ public sealed class TemplateDemoSupervisor : BackgroundService, ITemplateDemoSta
             for (var dir = new DirectoryInfo(start); dir is not null; dir = dir.Parent)
             {
                 if (File.Exists(Path.Combine(dir.FullName, "Lux.UI.slnx"))) return dir.FullName;
+                var siblingUi = Path.Combine(dir.FullName, "lux-ui");
+                if (File.Exists(Path.Combine(siblingUi, "Lux.UI.slnx"))) return siblingUi;
             }
         }
         return null;

@@ -106,10 +106,10 @@ lux-stack-mcp</pre>
             <p class="font-mono text-xs uppercase text-(--lux-primary-text)">2 · 30-Second Start</p>
             <h3 class="mt-2 text-xl font-semibold text-(--lux-text-highlighted)">Official <code>dotnet new</code> Templates</h3>
             <p class="mt-2 text-sm text-(--lux-text-muted)">
-                Scaffold a complete Blazor Web App or headless NativeAOT service pre-wired with <code>Lux.Stack</code> in two commands.
+                Scaffold a SaaS app, Admin Backoffice, NativeAOT worker, or .NET MAUI Hybrid app pre-wired with zero-friction CSS.
             </p>
             <pre class="mt-4 overflow-x-auto rounded-xl bg-(--pg-code-bg) p-3 font-mono text-xs text-[#d7dcde]">dotnet new install Lux.Templates::0.1.0-preview.1
-dotnet new lux-saas -n MyApp</pre>
+dotnet new lux-admin -n MyBackoffice</pre>
         </div>
 
         <div class="rounded-2xl border border-(--lux-border) bg-(--lux-bg) p-6">
@@ -121,6 +121,30 @@ dotnet new lux-saas -n MyApp</pre>
             <pre class="mt-4 overflow-x-auto rounded-xl bg-(--pg-code-bg) p-3 font-mono text-xs text-[#d7dcde]">dotnet add package Lux.Query.Core
 # or the entire stack:
 dotnet add package Lux.Stack</pre>
+        </div>
+    </section>
+
+    @* Verified Benchmarks & Footprint *@
+    <section class="mt-14 rounded-2xl border border-(--lux-border) bg-(--lux-bg) p-6 sm:p-8">
+        <p class="font-mono text-xs uppercase text-(--lux-primary-text)">Verified Benchmarks · .NET 10 Release</p>
+        <h2 class="mt-2 text-2xl font-bold tracking-tight text-(--lux-text-highlighted)">Measured Runtime Performance &amp; Footprint</h2>
+        <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="rounded-xl border border-(--lux-border) p-4">
+                <p class="text-xs text-(--lux-text-muted)">Lux.Query · 100k rows (Filter + Sort + 5 Facets)</p>
+                <p class="mt-1 text-2xl font-bold tabular-nums text-(--lux-text-highlighted)">16.6 ms</p>
+            </div>
+            <div class="rounded-xl border border-(--lux-border) p-4">
+                <p class="text-xs text-(--lux-text-muted)">Lux.Spreadsheet · 10k CSV rows (NFD + Dedup)</p>
+                <p class="mt-1 text-2xl font-bold tabular-nums text-(--lux-text-highlighted)">23.0 ms</p>
+            </div>
+            <div class="rounded-xl border border-(--lux-border) p-4">
+                <p class="text-xs text-(--lux-text-muted)">All 8 Headless Core DLLs Combined (pre-trim)</p>
+                <p class="mt-1 text-2xl font-bold tabular-nums text-(--lux-text-highlighted)">536 KB</p>
+            </div>
+            <div class="rounded-xl border border-(--lux-border) p-4">
+                <p class="text-xs text-(--lux-text-muted)">Zero-Friction Precompiled CSS (<code>lux-stack.css</code>)</p>
+                <p class="mt-1 text-2xl font-bold tabular-nums text-(--lux-text-highlighted)">40.8 KB</p>
+            </div>
         </div>
     </section>
 </div>
