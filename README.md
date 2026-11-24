@@ -1,6 +1,6 @@
 # LuxStack (`lux.stack`)
 
-> **The TanStack architecture, engineered for .NET 10, Blazor, and .NET MAUI.**
+> **Modular headless-first architecture, engineered for .NET 10, Blazor, and .NET MAUI.**
 
 **LuxStack** is a modular ecosystem of 8 specialized repositories sharing a strict two-layer architecture:
 - **`Lux.<Product>.Core`** — 100% headless C#, zero UI dependencies, `<IsAotCompatible>true</IsAotCompatible>`, `<IsTrimmable>true</IsTrimmable>`.
