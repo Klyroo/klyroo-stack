@@ -97,10 +97,13 @@ public sealed partial class DocsService
         _passages = new(BuildPassages);
     }
 
+    /// <summary>The documentation this service answers from.</summary>
     public DocsBundle Bundle { get; }
 
+    /// <summary>The base address put in front of page paths in answers, or null for relative paths.</summary>
     public string? SiteUrl { get; }
 
+    /// <summary>Every component of the bundle.</summary>
     public IReadOnlyList<BundleComponent> Components => Bundle.Components;
 
     /// <summary><c>KlyButton</c>, <c>button</c>, <c>Button</c> and <c>dropdown_menu</c> all become a key of letters and digits without the <c>Kly</c> prefix.</summary>
@@ -282,6 +285,7 @@ public sealed partial class DocsService
 
     // ---- Examples ----
 
+    /// <summary>Every example of every component, paired with the component it belongs to.</summary>
     public IEnumerable<(BundleComponent Component, BundleExample Example)> AllExamples =>
         Bundle.Components.SelectMany(c => c.Examples.Select(e => (Component: c, Example: e)));
 
@@ -298,6 +302,10 @@ public sealed partial class DocsService
         return null;
     }
 
+    /// <summary>Examples whose id is close to <paramref name="name"/>, best first: for the "did you mean" of an unknown example.</summary>
+    /// <param name="name">The id that was not found.</param>
+    /// <param name="count">Most results to return.</param>
+    /// <returns>The closest examples, possibly empty.</returns>
     public IReadOnlyList<(BundleComponent Component, BundleExample Example)> CloseExamples(string name, int count = 5)
     {
         var key = Normalize(Clip(name));
@@ -310,6 +318,10 @@ public sealed partial class DocsService
 
     // ---- Icons ----
 
+    /// <summary>Searches the names of the built-in icons.</summary>
+    /// <param name="query">A word of the icon name; null or blank lists the icons.</param>
+    /// <param name="limit">Most results to return.</param>
+    /// <returns>The matching icon names.</returns>
     public IReadOnlyList<string> SearchIcons(string? query, int limit)
     {
         if (string.IsNullOrWhiteSpace(query)) return [.. Bundle.Icons.Take(limit)];
@@ -351,6 +363,7 @@ public sealed partial class DocsService
         return Bundle.Guides.FirstOrDefault(g => Normalize(g.Title) == Normalize(path));
     }
 
+    /// <summary>The searchable passages of every guide and component page, built on first use.</summary>
     public IReadOnlyList<DocPassage> Passages => _passages.Value;
 
     private IReadOnlyList<DocPassage> BuildPassages()

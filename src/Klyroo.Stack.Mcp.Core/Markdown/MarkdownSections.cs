@@ -38,6 +38,9 @@ public static class MarkdownSections
         return string.Join("\n\n", picked.Select(s => $"## {s.Heading}\n\n{s.Text}".TrimEnd())) + "\n";
     }
 
+    /// <summary>The level-2 headings of a Markdown document, in order.</summary>
+    /// <param name="markdown">The document.</param>
+    /// <returns>The heading texts, without the leading hashes.</returns>
     public static IReadOnlyList<string> Headings(string markdown) =>
         [.. Split(markdown).Where(s => s.Heading.Length > 0).Select(s => s.Heading)];
 

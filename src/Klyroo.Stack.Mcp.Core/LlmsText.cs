@@ -10,6 +10,7 @@ namespace Klyroo.Stack.Mcp;
 /// </summary>
 public static class LlmsText
 {
+    /// <summary>The one-paragraph description that opens both <c>llms.txt</c> files.</summary>
     public const string Summary =
         "Accessible, themable Blazor components styled with Tailwind CSS v4. " +
         "Every component works in Interactive Server, WebAssembly, Auto and static server rendering: UI state (open, focus, keyboard navigation) runs in the browser, and .NET only hears about state you bind. " +

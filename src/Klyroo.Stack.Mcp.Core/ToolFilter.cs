@@ -8,6 +8,7 @@ namespace Klyroo.Stack.Mcp;
 /// </summary>
 public static class ToolFilter
 {
+    /// <summary>The HTTP header that lists the tools a request may use.</summary>
     public const string HeaderName = "X-MCP-Tools";
 
     /// <summary>The names in a header value or option, trimmed and case-insensitive; null when there is no restriction.</summary>
@@ -21,6 +22,9 @@ public static class ToolFilter
         return names.Count == 0 ? null : names;
     }
 
+    /// <summary>Parses one header or option value; see <see cref="Parse(IEnumerable{string?}?)"/>.</summary>
+    /// <param name="value">A comma-separated list of tool names, or null.</param>
+    /// <returns>The names, or null when there is no restriction.</returns>
     public static HashSet<string>? Parse(string? value) => Parse([value]);
 
     /// <summary>Removes from the server options every tool whose name is not in <paramref name="allowed"/>. Null keeps them all.</summary>

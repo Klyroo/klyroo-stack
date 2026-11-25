@@ -15,6 +15,7 @@ public sealed record DocsBundle(
     IReadOnlyList<BundleGuide> Guides,
     IReadOnlyList<string> Icons)
 {
+    /// <summary>The JSON settings the bundle is written and read with: web defaults, null values left out.</summary>
     public static JsonSerializerOptions JsonOptions { get; } = new(JsonSerializerDefaults.Web)
     {
         DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
@@ -74,6 +75,9 @@ public sealed record BundleParameter(
 /// <summary>The per-instance <c>Ui</c> record of a component: one property per slot.</summary>
 public sealed record BundleUi(string Type, IReadOnlyList<BundleUiSlot> Slots);
 
+/// <summary>One slot of the <c>Ui</c> record of a component.</summary>
+/// <param name="Name">The property name of the slot (<c>Root</c>, <c>Label</c>).</param>
+/// <param name="Description">What the slot styles, or null when the source has no description.</param>
 public sealed record BundleUiSlot(string Name, string? Description);
 
 /// <summary>
@@ -88,6 +92,9 @@ public sealed record BundleTheme(
     IReadOnlyDictionary<string, string> Defaults,
     IReadOnlyList<BundleCompound> Compounds);
 
+/// <summary>A compound variant of a theme: classes applied only when every variant value in <see cref="When"/> is active.</summary>
+/// <param name="When">The variant names and the values that must all match.</param>
+/// <param name="Classes">The classes to add, by slot name.</param>
 public sealed record BundleCompound(IReadOnlyDictionary<string, string> When, IReadOnlyDictionary<string, string> Classes);
 
 /// <summary>A guide page of the docs site, converted to Markdown.</summary>

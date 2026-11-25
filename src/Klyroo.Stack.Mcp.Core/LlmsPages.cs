@@ -36,10 +36,17 @@ public sealed class LlmsPages
     /// <summary>The configured address without a trailing slash, or null.</summary>
     public string? SiteUrl { get; }
 
+    /// <summary>How many request origins are cached right now.</summary>
     public int CachedOrigins => _byOrigin.Count;
 
+    /// <summary>The <c>llms.txt</c> overview.</summary>
+    /// <param name="requestOrigin">The origin of the request, used for links when no site URL is configured.</param>
+    /// <returns>The text of the file.</returns>
     public string Index(string requestOrigin) => _index?.Value ?? Get(requestOrigin).Index;
 
+    /// <summary>The <c>llms-full.txt</c> documentation.</summary>
+    /// <param name="requestOrigin">The origin of the request, used for links when no site URL is configured.</param>
+    /// <returns>The text of the file.</returns>
     public string Full(string requestOrigin) => _full?.Value ?? Get(requestOrigin).Full;
 
     private (string Index, string Full) Get(string origin)

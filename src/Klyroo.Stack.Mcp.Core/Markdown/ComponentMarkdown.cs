@@ -7,8 +7,14 @@ namespace Klyroo.Stack.Mcp;
 /// <summary>The sections of a component page, rendered as Markdown (and the metadata as JSON) for tools, resources and llms-full.txt.</summary>
 public static class ComponentMarkdown
 {
+    /// <summary>The section names a component page can be asked for.</summary>
     public static readonly string[] Sections = ["usage", "examples", "api", "theme"];
 
+    /// <summary>Renders the requested sections of a component page as one Markdown document.</summary>
+    /// <param name="component">The component to describe.</param>
+    /// <param name="sections">Section names from <see cref="Sections"/>, rendered in the order given.</param>
+    /// <param name="siteUrl">Base address for links, or null for relative ones.</param>
+    /// <returns>The Markdown page.</returns>
     public static string Page(BundleComponent component, IEnumerable<string> sections, string? siteUrl = null)
     {
         var sb = new StringBuilder();
@@ -28,8 +34,16 @@ public static class ComponentMarkdown
         return sb.ToString().TrimEnd() + "\n";
     }
 
+    /// <summary>The address of the docs page of a component.</summary>
+    /// <param name="component">The component.</param>
+    /// <param name="siteUrl">Base address, or null for a path only.</param>
+    /// <returns>The URL or path.</returns>
     public static string Link(BundleComponent component, string? siteUrl) => $"{siteUrl?.TrimEnd('/')}/components/{component.Slug}";
 
+    /// <summary>The usage section: description and a minimal example.</summary>
+    /// <param name="component">The component to describe.</param>
+    /// <param name="siteUrl">Base address for links, or null.</param>
+    /// <returns>Markdown text.</returns>
     public static string Usage(BundleComponent component, string? siteUrl = null)
     {
         var sb = new StringBuilder();
@@ -63,6 +77,9 @@ public static class ComponentMarkdown
         return sb.ToString();
     }
 
+    /// <summary>The examples section: every example with its source.</summary>
+    /// <param name="component">The component to describe.</param>
+    /// <returns>Markdown text.</returns>
     public static string Examples(BundleComponent component)
     {
         var sb = new StringBuilder("## Examples\n");
@@ -75,6 +92,9 @@ public static class ComponentMarkdown
         return sb.ToString();
     }
 
+    /// <summary>The API section: parameters, events, slots and <c>Ui</c> slots of each component class of the page.</summary>
+    /// <param name="component">The component to describe.</param>
+    /// <returns>Markdown text.</returns>
     public static string Api(BundleComponent component)
     {
         var sb = new StringBuilder("## API\n");
@@ -110,6 +130,9 @@ public static class ComponentMarkdown
         sb.Append('\n');
     }
 
+    /// <summary>The theme section: slots, variants and defaults that restyle the component globally.</summary>
+    /// <param name="component">The component to describe.</param>
+    /// <returns>Markdown text.</returns>
     public static string Theme(BundleComponent component)
     {
         var themes = component.Api.Where(a => a.Theme is not null).ToList();

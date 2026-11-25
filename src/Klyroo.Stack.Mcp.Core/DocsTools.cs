@@ -20,6 +20,12 @@ public sealed class DocsTools(DocsService docs)
             .Select(m => m.GetCustomAttribute<McpServerToolAttribute>()?.Name)
             .OfType<string>()];
 
+    /// <summary>Tool <c>search-components</c>: finds components by name, family, alternate name or intent.</summary>
+    /// <param name="query">A name, family or description of the need; omit to list every component.</param>
+    /// <param name="group">Restricts the search to one family.</param>
+    /// <param name="limit">Most results for a query.</param>
+    /// <returns>A Markdown list.</returns>
+    /// <exception cref="McpException">The family does not exist.</exception>
     [McpServerTool(Name = "search-components", Title = "Search components", ReadOnly = true, Idempotent = true, OpenWorld = false)]
     [Description("Find Klyroo.UI components by name, family, alternate name (dialog = Modal) or intent (\"date picker\", \"confirm before deleting\"). Exact names rank first. Without a query it lists every component by family.")]
     public string SearchComponents(
@@ -58,6 +64,11 @@ public sealed class DocsTools(DocsService docs)
         return sb.ToString();
     }
 
+    /// <summary>Tool <c>get-component</c>: the documentation of one component, by section.</summary>
+    /// <param name="name">A component name or slug.</param>
+    /// <param name="sections">Comma-separated sections (usage, examples, api, theme).</param>
+    /// <returns>A Markdown page.</returns>
+    /// <exception cref="McpException">The component or a section is unknown.</exception>
     [McpServerTool(Name = "get-component", Title = "Get a component", ReadOnly = true, Idempotent = true, OpenWorld = false)]
     [Description("The documentation of one component as Markdown, by section: usage (description and a minimal example), examples (every example with its source), api (parameters, events, slots, Ui slots), theme (slots, variants and defaults to restyle it).")]
     public string GetComponent(
@@ -69,6 +80,11 @@ public sealed class DocsTools(DocsService docs)
         return ComponentMarkdown.Page(component, wanted, docs.SiteUrl);
     }
 
+    /// <summary>Tool <c>get-component-metadata</c>: parameters, events and slots of a component as JSON.</summary>
+    /// <param name="name">A component name or slug.</param>
+    /// <param name="full">True for full objects instead of the compact form.</param>
+    /// <returns>A JSON document.</returns>
+    /// <exception cref="McpException">The component is unknown.</exception>
     [McpServerTool(Name = "get-component-metadata", Title = "Get component metadata", ReadOnly = true, Idempotent = true, OpenWorld = false)]
     [Description("The parameters, events, slots and Ui slots of a component as JSON, without prose. Compact by default (one string per member: Name: type = default); pass full:true for descriptions, allowed values, required and bindable flags and the theme slots and variants.")]
     public string GetComponentMetadata(
@@ -76,6 +92,11 @@ public sealed class DocsTools(DocsService docs)
         [Description("Return full objects instead of the compact form.")] bool full = false) =>
         ComponentMarkdown.Metadata(Resolve(name), full);
 
+    /// <summary>Tool <c>list-examples</c>: lists examples by component or by words of their title.</summary>
+    /// <param name="component">A component name or slug.</param>
+    /// <param name="query">Words that must all appear in the example text.</param>
+    /// <returns>A Markdown list.</returns>
+    /// <exception cref="McpException">The component is unknown.</exception>
     [McpServerTool(Name = "list-examples", Title = "List examples", ReadOnly = true, Idempotent = true, OpenWorld = false)]
     [Description("Lists the live examples of the docs site, with the id to pass to `get-example`. Filter by component, or by words of the title.")]
     public string ListExamples(
@@ -111,6 +132,10 @@ public sealed class DocsTools(DocsService docs)
         return sb.ToString();
     }
 
+    /// <summary>Tool <c>get-example</c>: the Razor source of one example.</summary>
+    /// <param name="name">An example id; the <c>Example</c> suffix is optional.</param>
+    /// <returns>Markdown that holds the source.</returns>
+    /// <exception cref="McpException">No example has that id.</exception>
     [McpServerTool(Name = "get-example", Title = "Get an example", ReadOnly = true, Idempotent = true, OpenWorld = false)]
     [Description("The Razor source of one example of the docs site. Examples are complete components: copy them and change the content.")]
     public string GetExample(
@@ -131,6 +156,12 @@ public sealed class DocsTools(DocsService docs)
         return sb.ToString();
     }
 
+    /// <summary>Tool <c>search-documentation</c>: full-text search of the guides and component pages.</summary>
+    /// <param name="query">What to look for.</param>
+    /// <param name="section">guides, components or all.</param>
+    /// <param name="limit">Most results.</param>
+    /// <returns>A Markdown list of paths and snippets.</returns>
+    /// <exception cref="McpException">The section is not one of the accepted values.</exception>
     [McpServerTool(Name = "search-documentation", Title = "Search the documentation", ReadOnly = true, Idempotent = true, OpenWorld = false)]
     [Description("Full-text search of the guides (installation, theming, render modes, AI tooling) and of the component pages. Returns paths to pass to `get-documentation-page`.")]
     public string SearchDocumentation(
@@ -154,6 +185,11 @@ public sealed class DocsTools(DocsService docs)
         return sb.ToString();
     }
 
+    /// <summary>Tool <c>get-documentation-page</c>: a guide or component page as Markdown.</summary>
+    /// <param name="path">The page path, such as <c>/docs/theming</c> or <c>/components/button</c>.</param>
+    /// <param name="headings">Comma-separated headings to keep (guides only).</param>
+    /// <returns>The Markdown page.</returns>
+    /// <exception cref="McpException">The page, component or headings do not exist.</exception>
     [McpServerTool(Name = "get-documentation-page", Title = "Get a documentation page", ReadOnly = true, Idempotent = true, OpenWorld = false)]
     [Description("A page of the docs site as Markdown: a guide (/docs/installation, /docs/theming, /docs/render-modes, /docs/mcp...) or a component page (/components/button). Pass headings to get only some sections of a guide.")]
     public string GetDocumentationPage(
@@ -187,6 +223,10 @@ public sealed class DocsTools(DocsService docs)
         return $"Source: {guide.Path}\n\n{markdown}";
     }
 
+    /// <summary>Tool <c>search-icons</c>: searches the built-in Lucide icons.</summary>
+    /// <param name="query">A word of the icon name; omit to list them.</param>
+    /// <param name="limit">Most results.</param>
+    /// <returns>A Markdown list.</returns>
     [McpServerTool(Name = "search-icons", Title = "Search icons", ReadOnly = true, Idempotent = true, OpenWorld = false)]
     [Description("Searches the Lucide icons built into Klyroo.UI, usable as `<KlyIcon Name=\"search\" />` (or `i-lucide-search`, `lucide:search`) with no setup. Any other Iconify icon (200,000+ in 280 collections, browse https://icones.js.org) works by name too, as `i-{collection}-{name}` or `{collection}:{name}` (`ph:house`, `mdi:home`, `simple-icons:github`): the app's build downloads the icons it writes as literals and bundles them (see the Icons guide). The icons components draw (close, check, chevrons...) are replaced with `o.Icons.Close = \"ph:x\"` in AddKlyrooUi.")]
     public string SearchIcons(
@@ -199,6 +239,10 @@ public sealed class DocsTools(DocsService docs)
             + string.Join('\n', icons.Select(i => $"- {i}")) + "\n";
     }
 
+    /// <summary>Tool <c>get-installation-guide</c>: setup steps for one render mode and one stylesheet mode.</summary>
+    /// <param name="renderMode">auto, server, wasm or ssr.</param>
+    /// <param name="css">precompiled or tailwind.</param>
+    /// <returns>A Markdown guide.</returns>
     [McpServerTool(Name = "get-installation-guide", Title = "Get the installation guide", ReadOnly = true, Idempotent = true, OpenWorld = false)]
     [Description("Step-by-step setup of Klyroo.UI in a Blazor app, for one render mode and one CSS mode: package, AddKlyrooUi registration (server and client), stylesheet, imports.")]
     public string GetInstallationGuide(

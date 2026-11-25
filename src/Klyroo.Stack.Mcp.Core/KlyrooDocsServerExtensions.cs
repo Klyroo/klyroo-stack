@@ -17,6 +17,7 @@ public sealed class KlyrooDocsOptions
     public ISet<string>? Tools { get; set; }
 }
 
+/// <summary>Dependency injection extensions that add the Klyroo.UI documentation server.</summary>
 public static class KlyrooDocsServerExtensions
 {
     /// <summary>

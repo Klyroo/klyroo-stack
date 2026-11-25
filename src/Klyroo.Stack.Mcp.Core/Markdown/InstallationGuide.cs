@@ -9,7 +9,9 @@ namespace Klyroo.Stack.Mcp;
 /// </summary>
 public static class InstallationGuide
 {
+    /// <summary>The render modes <see cref="Render"/> accepts.</summary>
     public static readonly string[] RenderModes = ["auto", "server", "wasm", "ssr"];
+    /// <summary>The stylesheet modes <see cref="Render"/> accepts.</summary>
     public static readonly string[] CssModes = ["precompiled", "tailwind"];
 
     internal const string ServerSetup = "builder.Services.AddKlyrooUi();";
@@ -27,6 +29,12 @@ public static class InstallationGuide
         @import "../obj/klyroo/klyroo.theme.css";
         """;
 
+    /// <summary>Renders the setup steps for one render mode and one stylesheet mode.</summary>
+    /// <param name="renderMode">auto, server, wasm or ssr; null means auto.</param>
+    /// <param name="cssMode">precompiled or tailwind; null means precompiled.</param>
+    /// <param name="version">The Klyroo.UI version to put in the title.</param>
+    /// <returns>The Markdown guide.</returns>
+    /// <exception cref="ModelContextProtocol.McpException">A mode is not one of the accepted values.</exception>
     public static string Render(string? renderMode, string? cssMode, string version)
     {
         var mode = (renderMode ?? "auto").Trim().ToLowerInvariant();

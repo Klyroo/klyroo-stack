@@ -7,7 +7,7 @@ tests, versions and releases, so a change usually belongs to exactly one of them
 ## Prerequisites
 
 - **.NET SDK 10** (`global.json` pins the feature band and rolls forward). Install from [dot.net](https://dot.net).
-- **Node.js 22** for the JavaScript assets (`npm ci` then `npm run build` regenerates what is committed under `wwwroot`).
+- **Node.js 22**, only to regenerate the stylesheet of the documentation site with `npm run site:css`, which uses the Tailwind CLI installed in `../klyroo-ui`.
 - Some projects reference sibling Klyroo repositories by relative path (`../klyroo-ui`, ...). Clone the
   repositories you need next to each other:
 

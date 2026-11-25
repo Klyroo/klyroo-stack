@@ -9,6 +9,9 @@ namespace Klyroo.Stack.Mcp;
 [McpServerPromptType]
 public sealed class DocsPrompts(DocsService docs)
 {
+    /// <summary>Builds the prompt that asks the model to pick a component for a use case, seeded with the best matches of a first search.</summary>
+    /// <param name="useCase">What the user is trying to build, in their own words.</param>
+    /// <returns>The prompt text.</returns>
     [McpServerPrompt(Name = "find-component-for-usecase", Title = "Find the component for a use case")]
     [Description("Finds the Klyroo.UI component that fits a use case and explains how to use it.")]
     public string FindComponentForUsecase([Description("What the user is trying to build, in their own words.")] string useCase)
@@ -30,6 +33,11 @@ public sealed class DocsPrompts(DocsService docs)
         return sb.ToString();
     }
 
+    /// <summary>Builds the prompt that asks the model to write the markup of a component for a requirement, with the component API inlined as JSON.</summary>
+    /// <param name="component">A component name or slug.</param>
+    /// <param name="requirements">What the component must do or show.</param>
+    /// <returns>The prompt text.</returns>
+    /// <exception cref="McpException">No component has that name.</exception>
     [McpServerPrompt(Name = "implement-component-with-props", Title = "Implement a component with its parameters")]
     [Description("Writes the Razor markup of a Klyroo.UI component for a stated requirement, using only parameters that exist.")]
     public string ImplementComponentWithProps(

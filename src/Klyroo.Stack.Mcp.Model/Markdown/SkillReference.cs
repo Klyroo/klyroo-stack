@@ -10,8 +10,12 @@ namespace Klyroo.Stack.Mcp.Markdown;
 /// </summary>
 public static class SkillReference
 {
+    /// <summary>Where the generated component reference lives, relative to the <c>klyroo-ui</c> repository root.</summary>
     public const string RelativePath = "skills/klyroo-ui/references/components.md";
 
+    /// <summary>Renders the quick reference of every component of <paramref name="bundle"/> as Markdown.</summary>
+    /// <param name="bundle">The bundle to describe.</param>
+    /// <returns>The Markdown text of the reference file.</returns>
     public static string Components(DocsBundle bundle)
     {
         var sb = new StringBuilder();

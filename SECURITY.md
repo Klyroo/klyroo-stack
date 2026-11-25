@@ -33,6 +33,6 @@ Include what you can of the following, it speeds up the fix:
 
 ## Scope
 
-In scope: the code of this repository and the NuGet / npm packages built from it. Out of scope: vulnerabilities
+In scope: the code of this repository and the NuGet packages built from it. Out of scope: vulnerabilities
 of third-party dependencies that are already public (report them upstream; Dependabot tracks their updates here),
 and the demo and documentation sites unless the issue comes from a Klyroo package.
