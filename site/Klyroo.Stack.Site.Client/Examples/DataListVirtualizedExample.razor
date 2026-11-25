@@ -1,0 +1,22 @@
+@using Klyroo.Query
+
+@* Virtualized table with PagingMode.None: 200 rows loaded at once, only the rows around the scroll viewport are mounted in the DOM (with tr spacers, sticky header, aria-rowcount and aria-rowindex).
+   Statically rendered, virtualization stays off and the regular table rows are drawn. *@
+<div class="w-full" data-testid="list-virtualized">
+    <KlyDataList TItem="Invoice" Label="Virtualized invoices" Schema="InvoiceData.Schema" Items="_items" PagingMode="DataListPagingMode.None" UrlKey="virt">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+            <KlyDataListSearch />
+            <KlyDataListResultCount />
+        </div>
+        <KlyDataListTable Caption="Virtualized invoices" Virtualize="true">
+            <KlyDataListColumn Field="id" Title="No." Align="DataListAlign.End" />
+            <KlyDataListColumn Field="customer" />
+            <KlyDataListColumn Field="status" />
+            <KlyDataListColumn Field="amount" Align="DataListAlign.End" Format="C2" />
+        </KlyDataListTable>
+    </KlyDataList>
+</div>
+
+@code {
+    private static readonly Invoice[] _items = InvoiceLargeData.All[..200];
+}

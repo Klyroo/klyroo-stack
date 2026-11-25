@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Klyroo.Stack.Site</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <NoDefaultLaunchSettingsFile>True</NoDefaultLaunchSettingsFile>
+    <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Klyroo.Stack.Site.Client\Klyroo.Stack.Site.Client.csproj" />
+    <ProjectReference Include="..\..\..\klyroo-ui\src\Klyroo.UI.Images.Local\Klyroo.UI.Images.Local.csproj" />
+    <ProjectReference Include="..\..\..\klyroo-ui\src\Klyroo.UI.Server\Klyroo.UI.Server.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" />
+    <ProjectReference Include="..\..\src\Klyroo.Stack.Mcp.Core\Klyroo.Stack.Mcp.Core.csproj" />
+    <PackageReference Include="ModelContextProtocol.AspNetCore" />
+    <PackageReference Include="Yarp.ReverseProxy" />
+    <ProjectReference Include="..\Klyroo.Stack.Site.DemoWatchdog\Klyroo.Stack.Site.DemoWatchdog.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\klyroo-ui\src\Klyroo.UI.Build.Tasks\Klyroo.UI.Build.Tasks.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+  <PropertyGroup>
+    <KlyrooBuildTasksAssembly>$(MSBuildThisFileDirectory)..\..\..\klyroo-ui\src\Klyroo.UI.Build.Tasks\bin\$(Configuration)\netstandard2.0\Klyroo.UI.Build.Tasks.dll</KlyrooBuildTasksAssembly>
+    <KlyrooFontsCacheDir Condition="'$(KlyrooFontsCacheDir)' == ''">$(MSBuildThisFileDirectory)obj\klyroo\fonts-cache\</KlyrooFontsCacheDir>
+  </PropertyGroup>
+  <Import Project="..\..\..\klyroo-ui\src\Klyroo.UI\buildTransitive\Klyroo.UI.Tasks.targets" />
+  <Import Project="..\..\..\klyroo-ui\src\Klyroo.UI\buildTransitive\Klyroo.UI.Fonts.targets" />
+  <Import Project="..\..\..\klyroo-ui\src\Klyroo.UI\buildTransitive\Klyroo.UI.Icons.targets" />
+
+  <ItemGroup>
+    <KlyrooFont Include="Inter" Role="sans" Weights="400..700" Subsets="latin;latin-ext" />
+    <KlyrooFont Include="JetBrains Mono" Role="mono" Weights="400..600" Subsets="latin;latin-ext" />
+    <KlyrooFont Include="Plus Jakarta Sans" Weights="600..800" Subsets="latin;latin-ext" Preload="false" Category="sans" />
+  </ItemGroup>
+
+</Project>

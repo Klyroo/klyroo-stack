@@ -1,0 +1,17 @@
+<div class="h-72 w-full overflow-hidden rounded-xl border border-(--klyroo-border)" data-testid="dashboard-panels">
+    <KlyDashboardGroup StorageKey="playground-dashboard-panels">
+        <KlyDashboardPanel Resizable Size="25" MinSize="15" MaxSize="40" ResizeLabel="Resize list" data-testid="dashboard-panel-list">
+            <Header><KlyDashboardNavbar Title="List" Toggle="false" /></Header>
+            <Body><p class="text-sm text-(--klyroo-text-muted)">Between 15% and 40%.</p></Body>
+        </KlyDashboardPanel>
+        <KlyDashboardPanel Resizable Size="50" MinSize="30" ResizeLabel="Resize detail" data-testid="dashboard-panel-detail">
+            <Header><KlyDashboardNavbar Title="Detail" Toggle="false" /></Header>
+            <Body><p class="text-sm text-(--klyroo-text-muted)">At least 30%. Focus a handle and use the arrow keys, Home and End.</p></Body>
+            <Footer><p class="px-4 py-2 text-xs text-(--klyroo-text-muted)">Footer</p></Footer>
+        </KlyDashboardPanel>
+        <KlyDashboardPanel data-testid="dashboard-panel-aside">
+            <Header><KlyDashboardNavbar Title="Aside" Toggle="false" /></Header>
+            <Body><p class="text-sm text-(--klyroo-text-muted)">Takes what is left.</p></Body>
+        </KlyDashboardPanel>
+    </KlyDashboardGroup>
+</div>

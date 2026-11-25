@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Klyroo Contributors",
+  "classifications": ["Web", "Blazor", "Klyroo"],
+  "identity": "Klyroo.Templates.SaaS",
+  "name": "Klyroo SaaS Web App",
+  "shortName": "klyroo-saas",
+  "sourceName": "KlyrooSaaSApp",
+  "tags": { "language": "C#", "type": "project" },
+  "preferNameDirectory": true
+}

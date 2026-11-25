@@ -1,0 +1,19 @@
+<div class="h-64 w-full overflow-hidden rounded-xl border border-(--klyroo-border)">
+    <KlyDashboardGroup>
+        <KlyDashboardPanel>
+            <Header>
+                <KlyDashboardNavbar Title="Orders" Toggle="false" />
+                <KlyDashboardToolbar data-testid="dashboard-toolbar">
+                    <Left>
+                        <KlyButton Label="Filter" Size="KlySize.Sm" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" LeadingIcon="@(KlyIcons.Named("list", "size-4"))" />
+                        <KlyButton Label="Export" Size="KlySize.Sm" Variant="ButtonVariant.Ghost" Color="KlyColor.Neutral" />
+                    </Left>
+                    <Right>
+                        <span class="text-sm text-(--klyroo-text-muted)">24 orders</span>
+                    </Right>
+                </KlyDashboardToolbar>
+            </Header>
+            <Body><p class="text-sm text-(--klyroo-text-muted)">A secondary bar under the navbar.</p></Body>
+        </KlyDashboardPanel>
+    </KlyDashboardGroup>
+</div>

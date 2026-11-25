@@ -1,0 +1,10 @@
+<div class="flex w-full max-w-xs flex-col gap-3">
+    <KlyFormField Label="Birthday">
+        <KlyInputDate @bind-Value="_date" Max="new DateOnly(2026, 12, 31)" data-testid="birthday" />
+    </KlyFormField>
+    <p class="text-sm text-(--klyroo-text-muted)" data-testid="birthday-state">Selected: @(_date?.ToString("yyyy-MM-dd") ?? "none")</p>
+</div>
+
+@code {
+    private DateOnly? _date;
+}

@@ -1,0 +1,22 @@
+<div class="flex h-72 w-full flex-col overflow-hidden rounded-xl border border-(--klyroo-border) lg:flex-row">
+    <KlySidebar Id="playground-sidebar-resizable" Resizable Collapsible="false" Width="224" As="div" data-testid="sidebar-resizable">
+        <Header>
+            <span class="font-semibold text-(--klyroo-text-highlighted)">Acme</span>
+        </Header>
+        <ChildContent>
+            <KlyNavigationMenu Items="_items" Orientation="KlyOrientation.Vertical" AriaLabel="Workspace, resizable" />
+        </ChildContent>
+    </KlySidebar>
+    <div class="min-w-0 flex-1 p-6 text-sm text-(--klyroo-text-muted)">
+        Drag the edge of the sidebar, or focus it and use the arrow keys, Home and End.
+    </div>
+</div>
+
+@code {
+    private static readonly KlyNavigationItem[] _items =
+    [
+        new("Home") { Href = "/", Exact = true },
+        new("Inbox") { Href = "/components/sidebar" },
+        new("Settings") { Href = "/docs/theming" },
+    ];
+}

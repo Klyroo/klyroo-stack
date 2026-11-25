@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Klyroo Contributors",
+  "classifications": ["Web", "Blazor", "Admin", "Klyroo"],
+  "identity": "Klyroo.Templates.Admin",
+  "name": "Klyroo Admin Backoffice",
+  "shortName": "klyroo-admin",
+  "sourceName": "KlyrooAdminApp",
+  "tags": { "language": "C#", "type": "project" },
+  "preferNameDirectory": true
+}

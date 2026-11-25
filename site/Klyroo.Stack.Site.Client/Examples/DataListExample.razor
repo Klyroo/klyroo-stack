@@ -1,0 +1,19 @@
+@* Rows in memory, described by a schema: the list sorts and pages them itself. The state lives in the URL under the prefix "mem" (mem.q, mem.s, mem.p, mem.ps). *@
+<div class="w-full" data-testid="list-memory">
+    <KlyDataList TItem="Invoice" Label="Invoices in memory" Schema="InvoiceData.Schema" Items="InvoiceData.All" UrlKey="mem" ResultJson="DemoJson.Default.DataListResultInvoice">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+            <KlyDataListSearch data-testid="mem-search" />
+            <KlyDataListResultCount />
+            <KlyDataListRefresh />
+        </div>
+        <KlyDataListErrorState />
+        <KlyDataListTable Caption="Invoices">
+            <KlyDataListColumn Field="id" Title="No." Align="DataListAlign.End" />
+            <KlyDataListColumn Field="customer" />
+            <KlyDataListColumn Field="status" />
+            <KlyDataListColumn Field="amount" Align="DataListAlign.End" Format="C2" />
+            <KlyDataListColumn Field="issued" Format="d" />
+        </KlyDataListTable>
+        <KlyDataListPagination />
+    </KlyDataList>
+</div>

@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Klyroo Contributors",
+  "classifications": ["Console", "NativeAOT", "Klyroo"],
+  "identity": "Klyroo.Templates.Headless",
+  "name": "Klyroo Headless NativeAOT App",
+  "shortName": "klyroo-headless",
+  "sourceName": "KlyrooHeadlessApp",
+  "tags": { "language": "C#", "type": "project" },
+  "preferNameDirectory": true
+}

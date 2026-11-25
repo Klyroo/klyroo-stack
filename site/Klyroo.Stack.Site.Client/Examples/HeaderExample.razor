@@ -1,0 +1,25 @@
+<div class="w-full overflow-hidden rounded-xl border border-(--klyroo-border)">
+    <KlyHeader Title="Acme" Items="_items" Sticky="false" AriaLabel="Site" MenuTitle="Site menu" data-testid="header">
+        <Right>
+            <KlyButton Label="Sign in" Size="KlySize.Sm" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" />
+        </Right>
+    </KlyHeader>
+    <p class="p-6 text-sm text-(--klyroo-text-muted)">Page content. Narrow the window below the lg breakpoint to get the menu button.</p>
+</div>
+
+@code {
+    private static readonly KlyNavigationItem[] _items =
+    [
+        new("Home") { Href = "/", Exact = true },
+        new("Components")
+        {
+            Children =
+            [
+                new("Button") { Href = "/components/button" },
+                new("Header") { Href = "/components/header" },
+                new("Sidebar") { Href = "/components/sidebar" },
+            ],
+        },
+        new("Docs") { Href = "/docs" },
+    ];
+}

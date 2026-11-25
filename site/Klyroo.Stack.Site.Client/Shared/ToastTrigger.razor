@@ -1,0 +1,12 @@
+@inject IToastService Toasts
+
+<KlyButton Label="Deploy to production" Size="KlySize.Sm" OnClick="Deploy" />
+
+@code {
+    private async Task Deploy() => await Toasts.Add(new KlyToast
+    {
+        Title = "Deployed",
+        Description = "klyroo-ui is live on production.",
+        Color = KlyColor.Success,
+    });
+}

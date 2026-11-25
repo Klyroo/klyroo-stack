@@ -1,0 +1,40 @@
+<div class="flex flex-col gap-3">
+    <div class="h-72 w-full overflow-hidden rounded-xl border border-(--klyroo-border)" data-testid="dashboard-bound">
+        <KlyDashboardGroup StorageKey="playground-dashboard-bound" @bind-Sizes="_sizes">
+            <KlyDashboardSidebar As="div" @bind-Collapsed="_collapsed" data-testid="dashboard-bound-sidebar">
+                <Header><span class="font-semibold text-(--klyroo-text-highlighted)">Acme</span></Header>
+                <ChildContent>
+                    <KlyNavigationMenu Items="_items" Orientation="KlyOrientation.Vertical" AriaLabel="Workspace, bound" Ui="_navUi" />
+                </ChildContent>
+            </KlyDashboardSidebar>
+            <KlyDashboardPanel Resizable Size="40" MinSize="15" MaxSize="85" ResizeLabel="Resize list">
+                <Header>
+                    <KlyDashboardNavbar Title="List">
+                        <Leading><KlyDashboardSidebarCollapse data-testid="dashboard-bound-collapse" /></Leading>
+                    </KlyDashboardNavbar>
+                </Header>
+            </KlyDashboardPanel>
+            <KlyDashboardPanel>
+                <Header><KlyDashboardNavbar Title="Detail" Toggle="false" /></Header>
+            </KlyDashboardPanel>
+        </KlyDashboardGroup>
+    </div>
+    <div class="flex flex-wrap items-center gap-3 text-sm text-(--klyroo-text-muted)">
+        <p data-testid="dashboard-bound-sizes">Sizes: @string.Join(",", _sizes.Select(s => Math.Round(s)))</p>
+        <p data-testid="dashboard-bound-collapsed">Collapsed: @(_collapsed ? "true" : "false")</p>
+        <KlyButton Label="Set 25 / 75" Size="KlySize.Sm" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" OnClick="() => _sizes = [25, 75]" data-testid="dashboard-bound-set" />
+    </div>
+</div>
+
+@code {
+    private IReadOnlyList<double> _sizes = [40, 60];
+    private bool _collapsed;
+
+    private static readonly NavigationMenuUi _navUi = new() { Label = "group-data-[state=collapsed]/sidebar:sr-only" };
+
+    private static readonly KlyNavigationItem[] _items =
+    [
+        new("Home") { Href = "/", Exact = true, Icon = KlyIcons.Named("home", "size-5") },
+        new("Inbox") { Href = "/components/dashboard-group", Icon = KlyIcons.Named("inbox", "size-5") },
+    ];
+}

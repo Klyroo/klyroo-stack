@@ -1,0 +1,10 @@
+<div class="flex flex-col items-center gap-3">
+    <KlyFormField Label="Brand color">
+        <KlyColorPicker @bind-Value="_color" data-testid="brand" />
+    </KlyFormField>
+    <p class="text-sm text-(--klyroo-text-muted)" data-testid="brand-state">Color: @(_color ?? "none")</p>
+</div>
+
+@code {
+    private string? _color = "#ffd23f";
+}

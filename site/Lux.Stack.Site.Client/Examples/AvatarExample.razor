@@ -1,9 +1,0 @@
-<div class="flex flex-wrap items-center gap-3">
-    @foreach (var size in Enum.GetValues<LxSize>())
-    {
-        <LxAvatar Size="size" Alt="Grace Hopper" />
-    }
-    <LxAvatar Size="LxSize.Lg" Src="https://i.pravatar.cc/80?img=47" Alt="Profile photo" />
-    @* A broken image falls back to the initials. *@
-    <LxAvatar Size="LxSize.Lg" Src="/missing.png" Alt="Ada Lovelace" />
-</div>

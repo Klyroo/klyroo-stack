@@ -1,0 +1,23 @@
+@inject IToastService Toasts
+
+<div class="flex flex-wrap gap-2">
+    <KlyButton Label="Show toast" OnClick="Saved" data-testid="toast-trigger" />
+    <KlyButton Label="Show error" Color="KlyColor.Error" Variant="ButtonVariant.Soft" OnClick="Failed" />
+</div>
+
+@code {
+    private async Task Saved() => await Toasts.Add(new KlyToast
+    {
+        Title = "Changes saved",
+        Description = "Your profile is up to date.",
+        Color = KlyColor.Success,
+    });
+
+    private async Task Failed() => await Toasts.Add(new KlyToast
+    {
+        Title = "Upload failed",
+        Description = "The file is larger than 10 MB.",
+        Color = KlyColor.Error,
+        Duration = TimeSpan.FromSeconds(8),
+    });
+}

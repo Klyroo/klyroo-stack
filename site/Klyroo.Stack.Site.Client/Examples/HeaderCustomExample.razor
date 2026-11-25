@@ -1,0 +1,28 @@
+<div class="w-full overflow-hidden rounded-xl border border-(--klyroo-border)">
+    <KlyHeader Sticky="false" MenuTitle="Product menu" MenuSide="SlideoverSide.Left" data-testid="header-custom">
+        <Left>
+            <a href="/" class="inline-flex items-center gap-2 font-mono text-sm font-semibold text-(--klyroo-text-highlighted)">
+                <Logo Class="size-6" />
+                <span>acme/app</span>
+            </a>
+        </Left>
+        <ChildContent>
+            <nav aria-label="Product" class="flex items-center gap-5 text-sm text-(--klyroo-text-muted)">
+                <a href="/components/header" class="hover:text-(--klyroo-text-highlighted)">Features</a>
+                <a href="/components/footer" class="hover:text-(--klyroo-text-highlighted)">Pricing</a>
+                <a href="/docs" class="hover:text-(--klyroo-text-highlighted)">Changelog</a>
+            </nav>
+        </ChildContent>
+        <Right>
+            <KlyColorModeButton />
+            <KlyButton Label="Get started" Size="KlySize.Sm" />
+        </Right>
+        <Body>
+            <nav aria-label="Product menu" class="flex flex-col gap-3 text-sm">
+                <a href="/components/header" class="text-(--klyroo-text)">Features</a>
+                <a href="/components/footer" class="text-(--klyroo-text)">Pricing</a>
+                <a href="/docs" class="text-(--klyroo-text)">Changelog</a>
+            </nav>
+        </Body>
+    </KlyHeader>
+</div>

@@ -1,0 +1,23 @@
+@* Changing the Locale parameter of KlyApp re-renders every component below it, in the new language and direction.
+   The buttons need interactivity (they render disabled until the page is interactive); to follow the language of the
+   user on every load, rely on the automatic locale and KlyLocaleSelect instead. *@
+<div class="flex w-full flex-col gap-4">
+    <div class="flex flex-wrap gap-2" role="group" aria-label="Locale">
+        @foreach (var locale in _locales)
+        {
+            <KlyButton Label="@locale.Name" Variant="@(locale == _locale ? ButtonVariant.Solid : ButtonVariant.Outline)" OnClick="() => Select(locale)" data-testid="@($"locale-switch-{locale.Code}")" />
+        }
+    </div>
+    <KlyApp Locale="_locale" Toaster="false" Class="flex flex-col gap-3 rounded-lg border border-(--klyroo-border) p-4" data-testid="locale-switch-panel">
+        <p>Locale: <code data-testid="locale-switch-code">@_locale.Code</code>, direction: <code data-testid="locale-switch-dir">@_locale.DirAttribute</code></p>
+        <KlyFileUpload MaxSize="2048" />
+        <KlyPagination Total="50" Page="2" />
+    </KlyApp>
+</div>
+
+@code {
+    private static readonly KlyLocale[] _locales = [KlyLocales.En, KlyLocales.Fr, KlyLocales.Ar];
+    private KlyLocale _locale = KlyLocales.En;
+
+    private void Select(KlyLocale locale) => _locale = locale;
+}

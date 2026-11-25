@@ -1,0 +1,38 @@
+@using Klyroo.Query
+@inject NavigationManager Navigation
+
+@* Automatic infinite scroll inside a scrollable container: scrolling near the bottom loads the next cursor page.
+   Adding ?failmore=1 makes the first load-more request fail once so the inline error and Retry button can be tried while keeping the loaded rows. *@
+<div class="w-full" data-testid="list-cursor-auto">
+    <KlyDataList TItem="Invoice" Label="Invoices with infinite scroll" Schema="InvoiceData.Schema" Provider="LoadAsync" PagingMode="DataListPagingMode.Cursor" UrlKey="inf">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+            <KlyDataListResultCount />
+            <KlyDataListRefresh />
+        </div>
+        <KlyDataListErrorState />
+        <div class="max-h-72 overflow-y-auto rounded-(--klyroo-radius) border border-(--klyroo-border)" data-testid="cursor-scroll">
+            <KlyDataListTable Caption="Invoices with infinite scroll" Class="border-0 rounded-none">
+                <KlyDataListColumn Field="id" Title="No." Align="DataListAlign.End" />
+                <KlyDataListColumn Field="customer" />
+                <KlyDataListColumn Field="status" />
+                <KlyDataListColumn Field="amount" Align="DataListAlign.End" Format="C2" />
+            </KlyDataListTable>
+            <KlyDataListInfiniteLoader Root="[data-testid='cursor-scroll']" RootMargin="0px 0px 40px 0px" ShowEnd="true" />
+        </div>
+    </KlyDataList>
+</div>
+
+@code {
+    private static readonly Invoice[] _items = InvoiceData.All[..35];
+    private bool _failedOnce;
+
+    private ValueTask<DataListResult<Invoice>> LoadAsync(DataListRequest request, CancellationToken cancellationToken)
+    {
+        if (request.Paging is DataListPaging.Cursor { After: not null } && !_failedOnce && new Uri(Navigation.Uri).Query.Contains("failmore=1", StringComparison.Ordinal))
+        {
+            _failedOnce = true;
+            throw new InvalidOperationException("Temporary load-more error.");
+        }
+        return ValueTask.FromResult(InvoiceData.Schema.ExecuteInMemory(_items, request));
+    }
+}

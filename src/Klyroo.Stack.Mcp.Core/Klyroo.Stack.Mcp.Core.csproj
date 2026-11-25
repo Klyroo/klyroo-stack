@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Klyroo.Stack.Mcp</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ModelContextProtocol" />
+    <ProjectReference Include="..\Klyroo.Stack.Mcp.Model\Klyroo.Stack.Mcp.Model.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Klyroo.Stack.Mcp.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\build\Klyroo.Stack.DocsBundle\Klyroo.Stack.DocsBundle.csproj" ReferenceOutputAssembly="false" Private="false" OutputItemType="DocsBundleGenerator" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <RepoRoot>$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)', '..', '..'))</RepoRoot>
+    <DocsBundleFile>$([MSBuild]::NormalizePath('$(MSBuildProjectDirectory)', '$(BaseIntermediateOutputPath)', 'docs-bundle.json'))</DocsBundleFile>
+    <DotNetHost Condition="'$(DOTNET_HOST_PATH)' != ''">$(DOTNET_HOST_PATH)</DotNetHost>
+    <DotNetHost Condition="'$(DotNetHost)' == ''">dotnet</DotNetHost>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <_DocsBundleInput Include="$(RepoRoot)site/Klyroo.Stack.Site.Client/**/*.cs;$(RepoRoot)site/Klyroo.Stack.Site.Client/**/*.razor"
+                      Exclude="$(RepoRoot)site/**/bin/**;$(RepoRoot)site/**/obj/**" />
+    <_DocsBundleInput Include="$(RepoRoot)../klyroo-ui/src/Klyroo.UI/**/*.cs;$(RepoRoot)../klyroo-ui/src/Klyroo.UI/**/*.razor"
+                      Exclude="$(RepoRoot)../klyroo-ui/src/Klyroo.UI/bin/**;$(RepoRoot)../klyroo-ui/src/Klyroo.UI/obj/**" />
+  </ItemGroup>
+
+  <Target Name="GenerateDocsBundle" Condition="'$(DesignTimeBuild)' != 'true'" Inputs="@(DocsBundleGenerator);@(_DocsBundleInput)" Outputs="$(DocsBundleFile)">
+    <MakeDir Directories="$([System.IO.Path]::GetDirectoryName('$(DocsBundleFile)'))" />
+    <Exec Command="&quot;$(DotNetHost)&quot; &quot;@(DocsBundleGenerator)&quot; --repo &quot;$(RepoRoot)&quot; --out &quot;$(DocsBundleFile)&quot;" />
+  </Target>
+
+  <Target Name="EmbedDocsBundle" AfterTargets="ResolveProjectReferences" BeforeTargets="PrepareResourceNames" DependsOnTargets="GenerateDocsBundle">
+    <ItemGroup>
+      <EmbeddedResource Include="$(DocsBundleFile)" Condition="Exists('$(DocsBundleFile)')" LogicalName="docs-bundle.json" />
+    </ItemGroup>
+  </Target>
+
+</Project>

@@ -1,0 +1,22 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Klyroo.Stack.Core/Klyroo.Stack.Core.csproj" />
+    <Project Path="src/Klyroo.Stack/Klyroo.Stack.csproj" />
+    <Project Path="src/Klyroo.Stack.Mcp.Model/Klyroo.Stack.Mcp.Model.csproj" />
+    <Project Path="src/Klyroo.Stack.Mcp.Core/Klyroo.Stack.Mcp.Core.csproj" />
+    <Project Path="src/Klyroo.Stack.Mcp/Klyroo.Stack.Mcp.csproj" />
+  </Folder>
+  <Folder Name="/site/">
+    <Project Path="site/Klyroo.Stack.Site/Klyroo.Stack.Site.csproj" />
+    <Project Path="site/Klyroo.Stack.Site.Client/Klyroo.Stack.Site.Client.csproj" />
+    <Project Path="site/Klyroo.Stack.Site.DemoWatchdog/Klyroo.Stack.Site.DemoWatchdog.csproj" />
+  </Folder>
+  <Folder Name="/build/">
+    <Project Path="build/Klyroo.Stack.DocsBundle/Klyroo.Stack.DocsBundle.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Klyroo.Stack.Tests/Klyroo.Stack.Tests.csproj" />
+    <Project Path="tests/Klyroo.Stack.Mcp.Tests/Klyroo.Stack.Mcp.Tests.csproj" />
+    <Project Path="tests/Klyroo.Stack.Site.Tests/Klyroo.Stack.Site.Tests.csproj" />
+  </Folder>
+</Solution>

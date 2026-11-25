@@ -1,0 +1,21 @@
+<div class="flex w-full flex-col gap-6 sm:flex-row sm:gap-12">
+    <div class="w-full max-w-xs">
+        <KlyFormField Label="Fruit">
+            <KlyListbox Items="Fruits" @bind-Value="_fruit" />
+        </KlyFormField>
+        <p class="mt-2 text-sm text-(--klyroo-text-muted)" data-testid="listbox-state">Fruit: @(_fruit.Count > 0 ? _fruit[0] : "none")</p>
+    </div>
+    <div class="w-full max-w-xs">
+        <KlyFormField Label="Toppings">
+            <KlyListbox Items="Toppings" Multiple @bind-Value="_toppings" />
+        </KlyFormField>
+    </div>
+</div>
+
+@code {
+    private IReadOnlyList<string> _fruit = [];
+    private IReadOnlyList<string> _toppings = ["cheese"];
+
+    private static readonly KlySelectItem[] Fruits = [new("apple", "Apple"), new("banana", "Banana"), new("cherry", "Cherry"), new("grape", "Grape")];
+    private static readonly KlySelectItem[] Toppings = [new("cheese", "Cheese"), new("ham", "Ham"), new("olives", "Olives"), new("pepper", "Pepper")];
+}

@@ -1,0 +1,17 @@
+<div class="flex flex-col items-center gap-3">
+    @foreach (var variant in Enum.GetValues<KlyVariant>())
+    {
+        <div class="flex flex-wrap gap-2">
+            @foreach (var color in new[] { KlyColor.Primary, KlyColor.Success, KlyColor.Warning, KlyColor.Error, KlyColor.Neutral })
+            {
+                <KlyBadge Color="color" Variant="variant" Label="@color.Value" />
+            }
+        </div>
+    }
+    <div class="flex flex-wrap items-center gap-2">
+        @foreach (var size in Enum.GetValues<KlySize>())
+        {
+            <KlyBadge Size="size" Label="@size.ToString()" Variant="KlyVariant.Subtle" />
+        }
+    </div>
+</div>

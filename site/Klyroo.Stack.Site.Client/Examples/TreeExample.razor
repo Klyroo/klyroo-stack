@@ -1,0 +1,26 @@
+<div class="w-full max-w-xs">
+    <KlyTree Items="Items" @bind-Value="_selected" AriaLabel="Project files" />
+    <p class="mt-3 text-sm text-(--klyroo-text-muted)" data-testid="tree-state">Selected: @(_selected ?? "none")</p>
+</div>
+
+@code {
+    private string? _selected;
+
+    private static readonly KlyTreeItem[] Items =
+    [
+        new("src")
+        {
+            Expanded = true,
+            Children =
+            [
+                new("components")
+                {
+                    Children = [new("Button.razor"), new("Tabs.razor")],
+                },
+                new("index.js"),
+            ],
+        },
+        new("tests") { Children = [new("ButtonTests.cs")] },
+        new("README.md"),
+    ];
+}

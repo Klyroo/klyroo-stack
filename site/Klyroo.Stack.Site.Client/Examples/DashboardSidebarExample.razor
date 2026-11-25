@@ -1,0 +1,33 @@
+@* The collapse button and the mobile toggle sit in the navbar, not in the sidebar: they find the sidebar through the
+   group. Below the lg breakpoint the sidebar is replaced by the toggle, which opens it as an off-canvas panel. *@
+<div class="h-72 w-full overflow-hidden rounded-xl border border-(--klyroo-border)" data-testid="dashboard-sidebar-frame">
+    <KlyDashboardGroup StorageKey="playground-dashboard-sidebar">
+        <KlyDashboardSidebar As="div" Width="224" Resizable data-testid="dashboard-sidebar-only" MobileTitle="Workspace">
+            <Header><span class="font-semibold text-(--klyroo-text-highlighted)">Acme</span></Header>
+            <ChildContent>
+                <KlyNavigationMenu Items="_items" Orientation="KlyOrientation.Vertical" AriaLabel="Sections" Ui="_navUi" />
+            </ChildContent>
+        </KlyDashboardSidebar>
+        <KlyDashboardPanel>
+            <Header>
+                <KlyDashboardNavbar Title="Settings">
+                    <Leading><KlyDashboardSidebarCollapse data-testid="dashboard-sidebar-collapse" /></Leading>
+                </KlyDashboardNavbar>
+            </Header>
+            <Body>
+                <p class="text-sm text-(--klyroo-text-muted)">Collapse the sidebar with the button next to the title, or drag its edge. Both are remembered in the browser.</p>
+            </Body>
+        </KlyDashboardPanel>
+    </KlyDashboardGroup>
+</div>
+
+@code {
+    private static readonly NavigationMenuUi _navUi = new() { Label = "group-data-[state=collapsed]/sidebar:sr-only" };
+
+    private static readonly KlyNavigationItem[] _items =
+    [
+        new("Home") { Href = "/", Exact = true, Icon = KlyIcons.Named("home", "size-5") },
+        new("Messages") { Href = "/components/dashboard-sidebar", Icon = KlyIcons.Named("mail", "size-5") },
+        new("Settings") { Href = "/docs/theming", Icon = KlyIcons.Named("user", "size-5") },
+    ];
+}

@@ -1,0 +1,14 @@
+<div class="flex flex-col items-start gap-4">
+    <KlyFormField Label="Your rating">
+        <KlyInputRating @bind-Value="_rating" />
+    </KlyFormField>
+    <KlyFormField Label="With halves">
+        <KlyInputRating AllowHalf Value="3.5" Color="KlyColor.Warning" />
+    </KlyFormField>
+    <KlyInputRating ReadOnly Value="4" AriaLabel="Average rating" Size="KlySize.Sm" />
+    <p class="text-sm text-(--klyroo-text-muted)" data-testid="rating-state">Rating: @_rating</p>
+</div>
+
+@code {
+    private double _rating = 2;
+}

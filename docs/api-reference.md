@@ -1,29 +1,29 @@
-# API Reference — Lux.Stack
+# API Reference — Klyroo.Stack
 
-Complete public API for `Lux.Stack.Core` and `Lux.Stack`.
+Complete public API for `Klyroo.Stack.Core` and `Klyroo.Stack`.
 
-## `record LuxStackModule`
-*Package*: `Lux.Stack.Core` · *Source*: `src/Lux.Stack.Core/LuxStackCatalog.cs`
+## `record KlyrooStackModule`
+*Package*: `Klyroo.Stack.Core` · *Source*: `src/Klyroo.Stack.Core/KlyrooStackCatalog.cs`
 
-Describes one repository/module in the LuxStack ecosystem.
+Describes one repository/module in the Klyroo ecosystem.
 
-## `class LuxStackCatalog`
-*Package*: `Lux.Stack.Core` · *Source*: `src/Lux.Stack.Core/LuxStackCatalog.cs`
+## `class KlyrooStackCatalog`
+*Package*: `Klyroo.Stack.Core` · *Source*: `src/Klyroo.Stack.Core/KlyrooStackCatalog.cs`
 
-Central registry and router for the 8 repositories of the LuxStack ecosystem. Resolves any component, headless controller, landing page, template, or skill to its owning repository and package.
-
-| Member | Type | Description |
-| :--- | :--- | :--- |
-| `Modules` | `IReadOnlyList<LuxStackModule>` | — |
-| `ResolveComponentModule(string componentOrControllerName)` | `LuxStackModule?` | Finds the owning `LuxStackModule` for a given component or controller name (case-insensitive). |
-| `GetModule(string idOrName)` | `LuxStackModule?` | Finds a module by its repository ID (e.g. `"lux-table"`) or package name (e.g. `"Lux.Table"`). |
-
-## `class LuxStackServiceCollectionExtensions`
-*Package*: `Lux.Stack` · *Source*: `src/Lux.Stack/LuxStackServiceCollectionExtensions.cs`
+Central registry and router for the 8 repositories of the Klyroo ecosystem. Resolves any component, headless controller, landing page, template, or skill to its owning repository and package.
 
 | Member | Type | Description |
 | :--- | :--- | :--- |
-| `AddLuxStack(
+| `Modules` | `IReadOnlyList<KlyrooStackModule>` | — |
+| `ResolveComponentModule(string componentOrControllerName)` | `KlyrooStackModule?` | Finds the owning `KlyrooStackModule` for a given component or controller name (case-insensitive). |
+| `GetModule(string idOrName)` | `KlyrooStackModule?` | Finds a module by its repository ID (e.g. `"klyroo-table"`) or package name (e.g. `"Klyroo.Table"`). |
+
+## `class KlyrooStackServiceCollectionExtensions`
+*Package*: `Klyroo.Stack` · *Source*: `src/Klyroo.Stack/KlyrooStackServiceCollectionExtensions.cs`
+
+| Member | Type | Description |
+| :--- | :--- | :--- |
+| `AddKlyrooStack(
         this IServiceCollection services,
-        Action<LuxOptions>? configureUi = null,
-        Action<LuxTableOptions>? configureTable = null)` | `IServiceCollection` | Registers the entire LuxStack ecosystem in one call: `Lux.UI`, `Lux.Query`, `Lux.Table`, `Lux.Form`, `Lux.Dashboard`, `Lux.Display`, `Lux.Spreadsheet`, and `Lux.Agent`. Works in Blazor Web App (SSR / Interactive Server / WebAssembly) and .NET MAUI Blazor Hybrid. |
+        Action<KlyrooOptions>? configureUi = null,
+        Action<KlyrooTableOptions>? configureTable = null)` | `IServiceCollection` | Registers the entire Klyroo ecosystem in one call: `Klyroo.UI`, `Klyroo.Query`, `Klyroo.Table`, `Klyroo.Form`, `Klyroo.Dashboard`, `Klyroo.Display`, `Klyroo.Spreadsheet`, and `Klyroo.Agent`. Works in Blazor Web App (SSR / Interactive Server / WebAssembly) and .NET MAUI Blazor Hybrid. |

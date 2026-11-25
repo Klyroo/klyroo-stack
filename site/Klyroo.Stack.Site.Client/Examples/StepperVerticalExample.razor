@@ -1,0 +1,12 @@
+<div class="w-full max-w-xs">
+    <KlyStepper Items="Items" Current="1" Orientation="KlyOrientation.Vertical" Color="KlyColor.Success" AriaLabel="Onboarding" />
+</div>
+
+@code {
+    private static readonly KlyStepperItem[] Items =
+    [
+        new("Create account") { Description = "Email and password" },
+        new("Verify email") { Description = "Check your inbox" },
+        new("Set up profile") { Description = "Name and avatar" },
+    ];
+}

@@ -1,0 +1,28 @@
+<div class="flex flex-col items-center gap-3">
+    <KlyModal AriaLabel="Command palette" Close="false" Ui="@(new ModalUi { Body = "p-0 sm:p-0" })">
+        <ChildContent>
+            <KlyButton Label="Search" Color="KlyColor.Neutral" Variant="ButtonVariant.Outline" data-kly-hotkey="mod+k" data-testid="palette-modal-trigger">
+                <TrailingIcon><kbd class="text-xs">Ctrl K</kbd></TrailingIcon>
+            </KlyButton>
+        </ChildContent>
+        <Body>
+            <KlyCommandPalette Groups="Groups" CloseOnSelect OnSelect="item => _last = item.Label" Placeholder="Type a command or search..." />
+        </Body>
+    </KlyModal>
+    <p class="text-sm text-(--klyroo-text-muted)" data-testid="palette-modal-state">Last command: @(_last ?? "none")</p>
+</div>
+
+@code {
+    private string? _last;
+
+    private static readonly KlyCommandGroup[] Groups =
+    [
+        new(null,
+        [
+            new() { Label = "Go to dashboard", Keywords = "home" },
+            new() { Label = "Go to settings", Keywords = "preferences" },
+            new() { Label = "Switch theme", Keywords = "dark light color mode" },
+            new() { Label = "Sign out", Keywords = "logout" },
+        ]),
+    ];
+}

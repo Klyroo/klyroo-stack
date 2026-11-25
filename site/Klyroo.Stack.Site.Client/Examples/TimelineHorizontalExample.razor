@@ -1,0 +1,13 @@
+<div class="w-full max-w-2xl">
+    <KlyTimeline Items="Items" Active="2" Orientation="KlyOrientation.Horizontal" Color="KlyColor.Secondary" AriaLabel="Order tracking" />
+</div>
+
+@code {
+    private static readonly KlyTimelineItem[] Items =
+    [
+        new("Ordered") { Date = "Mon" },
+        new("Shipped") { Date = "Tue" },
+        new("Out for delivery") { Date = "Wed" },
+        new("Delivered") { Date = "Thu" },
+    ];
+}

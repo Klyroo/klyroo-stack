@@ -1,0 +1,20 @@
+<div class="flex w-full max-w-2xl flex-col gap-3">
+    <KlyFormField Label="Custom toolbar" Help="Arrow keys move between buttons, Alt+F10 reaches the toolbar from the text.">
+        <KlyEditor Value="@("<p>First block</p><p>Second block</p>")" Name="custom" data-testid="editor-toolbar">
+            <KlyEditorToolbar Items="Items" Size="KlySize.Md" />
+        </KlyEditor>
+    </KlyFormField>
+</div>
+
+@code {
+    private static readonly EditorToolbarItem[] Items =
+    [
+        new(EditorAction.Bold), new(EditorAction.Italic), new(EditorAction.Underline),
+        EditorToolbarItem.Separator,
+        new(EditorAction.Paragraph), EditorToolbarItem.Heading(2), new(EditorAction.BulletList),
+        EditorToolbarItem.Separator,
+        new(EditorAction.MoveUp), new(EditorAction.MoveDown),
+        EditorToolbarItem.Separator,
+        new(EditorAction.ClearFormatting), new(EditorAction.Undo), new(EditorAction.Redo),
+    ];
+}

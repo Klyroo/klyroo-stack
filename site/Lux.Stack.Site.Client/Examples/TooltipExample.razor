@@ -1,8 +1,0 @@
-<div class="flex flex-wrap items-center gap-3">
-    @foreach (var placement in new[] { "top", "right", "bottom", "left" })
-    {
-        <LxTooltip Text="@($"Tooltip on the {placement}")" Placement="@placement">
-            <LxButton Label="@placement" Color="LxColor.Neutral" Variant="ButtonVariant.Outline" />
-        </LxTooltip>
-    }
-</div>

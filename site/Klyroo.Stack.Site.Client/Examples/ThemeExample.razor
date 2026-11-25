@@ -1,0 +1,12 @@
+@using Klyroo.UI.Theming
+<div class="flex flex-wrap items-center gap-3">
+    <KlyButton Label="Default" data-testid="theme-default" />
+    <KlyTheme For="typeof(KlyButton)" Ui="_bold">
+        <KlyButton Label="Themed" data-testid="theme-button" />
+        <KlyButton Label="Instance wins" Ui='new ButtonUi { Base = "font-normal normal-case tracking-normal" }' data-testid="theme-instance" />
+    </KlyTheme>
+</div>
+
+@code {
+    private readonly ButtonUi _bold = new() { Base = "font-extrabold uppercase tracking-wider" };
+}

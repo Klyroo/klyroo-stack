@@ -1,0 +1,147 @@
+@namespace Klyroo.Stack.Site.Client.Components.Stages
+@using Klyroo.Form
+@inject FormService FormService
+
+@* Reactive Field Graph & Shell Switcher: change Region to watch conditional EU VAT ID appear, animated dependency wires glow, Dirty Diff update live, or launch the exact same FormSchema in a live Drawer or Modal. *@
+<div class="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_32px_minmax(0,0.95fr)] xl:items-stretch">
+    @* Left: Live KlyFormEngine *@
+    <div class="flex min-w-0 flex-col overflow-hidden rounded-2xl border border-(--klyroo-border) bg-(--klyroo-bg)">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-(--klyroo-border) bg-(--klyroo-bg-muted)/50 px-5 py-3">
+            <span class="flex items-center gap-2 font-mono text-xs font-semibold text-(--klyroo-text-highlighted)">
+                <span class="size-2 rounded-full lib-pulse-dot" style="background:var(--lib-accent)"></span>
+                KlyFormEngine · Reactive Graph
+            </span>
+            <div class="flex items-center gap-1.5">
+                <button type="button"
+                        class="inline-flex min-h-7 items-center rounded-md border border-(--klyroo-border) bg-(--klyroo-bg) px-2.5 py-1 font-mono text-[11px] text-(--klyroo-text-highlighted) hover:border-(--klyroo-border-accented)"
+                        @onclick="@(() => OpenInShellAsync(FormShellMode.Drawer))">
+                    Open as Drawer
+                </button>
+                <button type="button"
+                        class="inline-flex min-h-7 items-center rounded-md border border-(--klyroo-border) bg-(--klyroo-bg) px-2.5 py-1 font-mono text-[11px] text-(--klyroo-text-highlighted) hover:border-(--klyroo-border-accented)"
+                        @onclick="@(() => OpenInShellAsync(FormShellMode.Modal))">
+                    Open as Modal
+                </button>
+            </div>
+        </div>
+        <div class="flex-1 p-5">
+            <KlyFormEngine Form="@_controller" SubmitLabel="Validate & Submit" ShowReset="true" OnSubmit="@HandleSubmit" />
+            @if (_submitNotice is not null)
+            {
+                <p class="lib-flash mt-3 rounded-lg border border-(--klyroo-border) bg-(--klyroo-bg-muted)/60 px-3 py-2 font-mono text-xs text-(--klyroo-text-highlighted)">
+                    @_submitNotice
+                </p>
+            }
+        </div>
+    </div>
+
+    @* Center: Reactive Condition Wire *@
+    <div class="relative hidden xl:flex items-center justify-center" aria-hidden="true">
+        <svg class="h-full w-8 overflow-visible" viewBox="0 0 32 340" preserveAspectRatio="none" fill="none">
+            <path d="M 0 110 C 16 110, 16 110, 32 110" stroke="var(--lib-accent)" stroke-width="1.75" class="lib-wire-flow" />
+            <path d="M 0 230 C 16 230, 16 230, 32 230" stroke="@(IsEu ? "var(--lib-accent)" : "var(--klyroo-border-accented)")" stroke-width="1.75" class="@(IsEu ? "lib-wire-flow" : "")" />
+            <circle cx="0" cy="110" r="3.5" fill="var(--lib-accent)" />
+            <circle cx="32" cy="110" r="3" fill="var(--lib-accent)" />
+            <circle cx="0" cy="230" r="3.5" fill="@(IsEu ? "var(--lib-accent)" : "var(--klyroo-border-accented)")" />
+            <circle cx="32" cy="230" r="3" fill="@(IsEu ? "var(--lib-accent)" : "var(--klyroo-border-accented)")" />
+        </svg>
+    </div>
+
+    @* Right: Live FormController Inspector (Conditions + Dirty Diff) *@
+    <div class="flex min-w-0 flex-col divide-y divide-(--klyroo-border) overflow-hidden rounded-2xl border border-(--klyroo-border) bg-(--klyroo-bg)">
+        <div class="p-4">
+            <div class="flex items-center justify-between gap-2 font-mono text-[11px]">
+                <span class="font-semibold uppercase tracking-wider text-(--klyroo-text-highlighted)">Reactive Conditions</span>
+                <span class="rounded-md px-2 py-0.5 font-semibold" style="@(IsEu ? "background:var(--lib-pill-bg);color:#ffffff" : "background:var(--klyroo-bg-muted);color:var(--klyroo-text-muted)")">
+                    @(IsEu ? "EU VAT ACTIVE" : "EU VAT HIDDEN")
+                </span>
+            </div>
+            <pre class="mt-2.5 overflow-x-auto rounded-lg bg-(--pg-code-bg) p-3 font-mono text-[11.5px] leading-5 text-[#d7dcde]"><code>Condition: f =&gt; f.GetValue&lt;string&gt;("region") == "EU"
+// live evaluation: <span style="color:var(--lib-accent-bright)">@(IsEu ? "true → field visible & required" : "false → field hidden & skipped")</span></code></pre>
+        </div>
+
+        <div class="flex-1 p-4">
+            <div class="flex items-center justify-between gap-2 font-mono text-[11px]">
+                <span class="font-semibold uppercase tracking-wider text-(--klyroo-text-highlighted)">Live Dirty Diff</span>
+                <span class="tabular-nums text-(--klyroo-text-muted)">@(_controller.IsDirty ? "Modified" : "Clean")</span>
+            </div>
+            @{ var output = _controller.BuildOutput(); }
+            <pre class="mt-2.5 overflow-x-auto rounded-lg bg-(--pg-code-bg) p-3 font-mono text-[11.5px] leading-5 text-[#d7dcde]"><code>{
+  "workspace": "@output.GetValueOrDefault("name")",
+  "region": "@output.GetValueOrDefault("region")",
+  "tier": "@output.GetValueOrDefault("tier")",@if (IsEu) {
+<text>
+  "vatId": "@(output.GetValueOrDefault("vat") ?? "")",</text>
+}
+  "mauiHybrid": @((output.GetValueOrDefault("maui") is true).ToString().ToLowerInvariant()),
+  "isDirty": @_controller.IsDirty.ToString().ToLowerInvariant()
+}</code></pre>
+            <p class="mt-2.5 text-xs text-(--klyroo-text-muted)">
+                Switch <strong>Region</strong> between Europe and US to watch the conditional field and JSON payload react live.
+            </p>
+        </div>
+    </div>
+</div>
+
+@code {
+    private readonly FormSchema _schema;
+    private readonly FormController _controller;
+    private string? _submitNotice;
+
+    private bool IsEu => string.Equals(_controller.GetValue<string>("region"), "EU", StringComparison.OrdinalIgnoreCase);
+
+    public FormHeroStage()
+    {
+        _schema = new FormSchema
+        {
+            FormKey = "klyroo-form-stage",
+            Title = "Provision Workspace",
+            Fields =
+            [
+                new FormFieldSchema { Key = "name", Label = "Workspace Name", Required = true, DefaultValue = "Helios Cloud" },
+                new FormFieldSchema
+                {
+                    Key = "region",
+                    Label = "Billing Region",
+                    Kind = FormFieldKind.Select,
+                    DefaultValue = "EU",
+                    Options = [new("EU", "Europe (triggers EU VAT)"), new("US", "United States"), new("APAC", "Asia-Pacific")]
+                },
+                new FormFieldSchema
+                {
+                    Key = "vat",
+                    Label = "EU VAT ID",
+                    Placeholder = "FR40303265045",
+                    DefaultValue = "FR40303265045",
+                    Condition = f => f.GetValue<string>("region") == "EU",
+                    RequiredWhen = f => f.GetValue<string>("region") == "EU"
+                },
+                new FormFieldSchema
+                {
+                    Key = "tier",
+                    Label = "Plan Tier",
+                    Kind = FormFieldKind.Select,
+                    DefaultValue = "pro",
+                    Options = [new("starter", "Starter"), new("pro", "Pro"), new("enterprise", "Enterprise")]
+                },
+                new FormFieldSchema { Key = "maui", Label = "Enable .NET MAUI Blazor Hybrid", Kind = FormFieldKind.Switch, DefaultValue = true }
+            ]
+        };
+        _controller = new FormController(_schema);
+        _controller.Changed += () => InvokeAsync(StateHasChanged);
+    }
+
+    private void HandleSubmit(IReadOnlyDictionary<string, object?> data)
+    {
+        _submitNotice = $"Submitted {data.GetValueOrDefault("name")} ({data.GetValueOrDefault("region")}) · Dirty fields validated.";
+    }
+
+    private async Task OpenInShellAsync(FormShellMode mode)
+    {
+        var outcome = await FormService.CreateFormAsync(_schema, mode: mode);
+        if (outcome.IsCompleted)
+        {
+            _submitNotice = $"{mode} shell completed for {outcome.FormData.GetValueOrDefault("name")}.";
+        }
+    }
+}

@@ -1,0 +1,13 @@
+<div class="flex w-full max-w-md flex-col gap-3">
+    <div class="flex flex-wrap items-center gap-2">
+        <KlyButton Label="@($"Clicked {_clicks} times")" OnClick="() => _clicks++" data-testid="counter" />
+        <KlyButton Label="Disabled" Disabled />
+        <KlyButton Label="Saving" Loading />
+        <KlyButton Label="Read the docs" Href="/docs" Variant="ButtonVariant.Link" />
+    </div>
+    <KlyButton Label="Full width" Block Variant="ButtonVariant.Soft" />
+</div>
+
+@code {
+    private int _clicks;
+}

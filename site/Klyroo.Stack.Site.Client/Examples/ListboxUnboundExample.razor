@@ -1,0 +1,9 @@
+<div class="flex w-full max-w-xs flex-col gap-3">
+    <KlyFormField Label="Color">
+        <KlyListbox Items="Colors" Name="color" Value="@(["green"])" />
+    </KlyFormField>
+</div>
+
+@code {
+    private static readonly KlySelectItem[] Colors = [new("red", "Red"), new("green", "Green"), new("blue", "Blue")];
+}

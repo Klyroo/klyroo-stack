@@ -1,0 +1,40 @@
+@using Klyroo.Query
+
+@* A provider loads the rows: here after a delay, as a database or an API would. While the first rows load the table shows placeholders; later requests keep the previous rows on screen. *@
+<div class="w-full" data-testid="list-provider">
+    <KlyDataList TItem="Invoice" Label="Invoices from a provider" Schema="InvoiceData.Schema" Provider="LoadAsync" UrlKey="prov" ResultJson="DemoJson.Default.DataListResultInvoice" Density="DataListDensity.Compact">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+            <KlyDataListResultCount />
+            <KlyDataListRefresh />
+        </div>
+        <KlyDataListErrorState />
+        <KlyDataListTable Caption="Invoices from a provider">
+            <KlyDataListColumn Field="id" Title="No." Align="DataListAlign.End" />
+            <KlyDataListColumn Field="customer" />
+            <KlyDataListColumn Field="status">
+                <Template Context="invoice">
+                    <KlyBadge Label="@invoice.Status" Variant="KlyVariant.Soft" Color="@StatusColor(invoice.Status)" />
+                </Template>
+            </KlyDataListColumn>
+            <KlyDataListColumn Field="amount" Align="DataListAlign.End" Format="C2" />
+        </KlyDataListTable>
+        <KlyDataListPagination />
+    </KlyDataList>
+</div>
+
+@code {
+    private async ValueTask<DataListResult<Invoice>> LoadAsync(DataListRequest request, CancellationToken cancellationToken)
+    {
+        // The token is cancelled when a newer request replaces this one.
+        await Task.Delay(600, cancellationToken);
+        return InvoiceData.Schema.ExecuteInMemory(InvoiceData.All, request);
+    }
+
+    private static KlyColor StatusColor(string status) => status switch
+    {
+        "Paid" => KlyColor.Success,
+        "Pending" => KlyColor.Warning,
+        "Overdue" => KlyColor.Error,
+        _ => KlyColor.Neutral,
+    };
+}

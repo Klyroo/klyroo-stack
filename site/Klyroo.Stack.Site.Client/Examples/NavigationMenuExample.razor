@@ -1,0 +1,18 @@
+<KlyNavigationMenu Items="Items" AriaLabel="Primary" />
+
+@code {
+    private static readonly KlyNavigationItem[] Items =
+    [
+        new("Home") { Href = "/", Exact = true },
+        new("Components")
+        {
+            Children =
+            [
+                new("Button") { Href = "/components/button" },
+                new("Tabs") { Href = "/components/tabs" },
+                new("Tree") { Href = "/components/tree" },
+            ],
+        },
+        new("Docs") { Href = "/docs" },
+    ];
+}

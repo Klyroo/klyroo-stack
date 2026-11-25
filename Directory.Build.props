@@ -9,22 +9,22 @@
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
     <VersionPrefix Condition="'$(VersionPrefix)' == ''">0.1.0</VersionPrefix>
     <VersionSuffix Condition="'$(VersionSuffix)' == ''">preview.1</VersionSuffix>
-    <Authors>LuxStack Contributors</Authors>
-    <Copyright>Copyright (c) 2026 LuxStack Contributors</Copyright>
+    <Authors>Klyroo Contributors</Authors>
+    <Copyright>Copyright (c) 2026 Klyroo Contributors</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://luxstack.dev</PackageProjectUrl>
-    <PackageTags>luxstack;blazor;maui;dotnet;headless;nativeaot</PackageTags>
+    <PackageProjectUrl>https://klyroo.dev</PackageProjectUrl>
+    <PackageTags>klyroo;blazor;maui;dotnet;headless;nativeaot</PackageTags>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/luxstack/lux.stack</RepositoryUrl>
+    <RepositoryUrl>https://github.com/klyroo/klyroo-stack</RepositoryUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(IsPackable)' != 'false' and '$(MSBuildProjectName)' != 'Lux.Stack.Mcp' and '$(MSBuildProjectName)' != 'Lux.Templates' and Exists('$(MSBuildThisFileDirectory)README.md')">
+  <PropertyGroup Condition="'$(IsPackable)' != 'false' and '$(MSBuildProjectName)' != 'Klyroo.Stack.Mcp' and '$(MSBuildProjectName)' != 'Klyroo.Templates' and Exists('$(MSBuildThisFileDirectory)README.md')">
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
-  <ItemGroup Condition="'$(IsPackable)' != 'false' and '$(MSBuildProjectName)' != 'Lux.Stack.Mcp' and '$(MSBuildProjectName)' != 'Lux.Templates' and Exists('$(MSBuildThisFileDirectory)README.md')">
+  <ItemGroup Condition="'$(IsPackable)' != 'false' and '$(MSBuildProjectName)' != 'Klyroo.Stack.Mcp' and '$(MSBuildProjectName)' != 'Klyroo.Templates' and Exists('$(MSBuildThisFileDirectory)README.md')">
     <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\" Visible="false" />
   </ItemGroup>
 </Project>

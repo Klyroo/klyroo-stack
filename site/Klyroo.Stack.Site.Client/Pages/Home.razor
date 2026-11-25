@@ -1,0 +1,278 @@
+@page "/"
+@page "/stack"
+@using Klyroo.Stack.Site.Client.Docs
+@using Klyroo.Stack.Site.Client.Components.Stages
+
+<PageTitle>Klyroo · High-quality open-source libraries for .NET, Blazor &amp; MAUI</PageTitle>
+
+@* Klyroo Hero + Drizzle-Resource Inspired Interactive Workbench *@
+<section class="relative isolate overflow-hidden border-b border-(--klyroo-border)">
+    <div class="pg-dots absolute inset-0 -z-10 [mask-image:linear-gradient(to_bottom,black,transparent_85%)]" aria-hidden="true"></div>
+    <div class="pg-glow absolute inset-0 -z-10" aria-hidden="true"></div>
+    <Rain />
+
+    <div class="mx-auto grid max-w-(--breakpoint-2xl) gap-8 px-4 pt-12 pb-10 sm:px-6 sm:pt-16 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)] lg:items-end lg:px-8">
+        <div>
+            <h1 class="text-5xl font-semibold leading-[0.98] tracking-[-0.03em] text-(--klyroo-text-highlighted) sm:text-6xl xl:text-[4.25rem]">
+                High-quality open-source<br />
+                <span class="pg-accent">libraries for .NET.</span>
+            </h1>
+            <p class="mt-4 font-mono text-xs text-(--klyroo-text-muted)">
+                8 headless + UI libraries <span aria-hidden="true">·</span> .NET 10 &amp; MAUI <span aria-hidden="true">·</span> NativeAOT <span aria-hidden="true">·</span> MIT
+            </p>
+        </div>
+        <div class="lg:pb-1">
+            <p class="max-w-prose text-base leading-relaxed text-(--klyroo-text-muted) text-pretty sm:text-lg">
+                Wire <code class="font-mono text-sm text-(--klyroo-text-highlighted)">AddKlyrooStack()</code> once or pick any single package.
+                Select a library below to trace its NativeAOT core, C# code, runtimes, and live UI.
+            </p>
+            <div class="mt-5 flex flex-wrap items-center gap-2.5">
+                <KlyButton Label="Live 8-Library Showcase" Href="/showcase" Size="KlySize.Lg" Class="rounded-lg px-5">
+                    <TrailingIcon><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14m-6-6 6 6-6 6" /></svg></TrailingIcon>
+                </KlyButton>
+                <button type="button" data-copy-text="dotnet add package Klyroo.Stack"
+                        class="group inline-flex min-h-10 items-center justify-between gap-3 rounded-lg border border-(--klyroo-border-accented) bg-(--klyroo-bg) px-4 py-2 font-mono text-xs text-(--klyroo-text-highlighted) transition-colors hover:border-(--klyroo-primary-text)">
+                    <span><span class="text-(--klyroo-text-muted)">$</span> dotnet add package Klyroo.Stack</span>
+                    <span class="text-[11px] uppercase tracking-wider text-(--klyroo-text-muted) group-hover:text-(--klyroo-primary-text)" data-copy-label>Copy</span>
+                </button>
+                <KlyButton Label="Why Klyroo?" Href="/why" Size="KlySize.Lg" Color="KlyColor.Neutral" Variant="ButtonVariant.Ghost" Class="rounded-lg px-3" />
+            </div>
+        </div>
+    </div>
+
+    @* Interactive Workbench directly inside the Hero *@
+    <div class="mx-auto max-w-(--breakpoint-2xl) px-4 pb-14 sm:px-6 lg:px-8 lg:pb-16">
+        <h2 class="sr-only">Interactive Klyroo Workbench</h2>
+        <StackHeroWorkbench />
+    </div>
+</section>
+
+@* Measured Proof Strip (hairline editorial typography, zero card boxes) *@
+<section aria-label="Measured performance and test coverage" class="border-b border-(--klyroo-border) bg-(--klyroo-bg-muted)/30">
+    <dl class="mx-auto grid max-w-(--breakpoint-2xl) grid-cols-2 divide-y divide-(--klyroo-border) px-4 sm:px-6 lg:grid-cols-4 lg:divide-x lg:divide-y-0 lg:px-8">
+        <div class="py-6 lg:pe-6">
+            <dt class="font-mono text-xs text-(--klyroo-text-muted)">Klyroo.Query · 100k rows + 5 facets</dt>
+            <dd class="mt-1 font-pixel text-3xl font-bold tabular-nums text-(--klyroo-text-highlighted)">16.6 ms</dd>
+        </div>
+        <div class="py-6 lg:px-6">
+            <dt class="font-mono text-xs text-(--klyroo-text-muted)">Klyroo.Spreadsheet · 10k CSV rows</dt>
+            <dd class="mt-1 font-pixel text-3xl font-bold tabular-nums text-(--klyroo-text-highlighted)">23.0 ms</dd>
+        </div>
+        <div class="py-6 lg:px-6">
+            <dt class="font-mono text-xs text-(--klyroo-text-muted)">All 8 Headless Core DLLs</dt>
+            <dd class="mt-1 font-pixel text-3xl font-bold tabular-nums text-(--klyroo-text-highlighted)">536 KB</dd>
+        </div>
+        <div class="py-6 lg:ps-6">
+            <dt class="font-mono text-xs text-(--klyroo-text-muted)">Automated tests across 9 repos</dt>
+            <dd class="mt-1 font-pixel text-3xl font-bold tabular-nums text-(--klyroo-text-highlighted)">4,853</dd>
+        </div>
+    </dl>
+</section>
+
+@* Open Source Libraries Grid (8-library catalog) *@
+<section id="libraries" aria-labelledby="libraries-heading" class="scroll-mt-28 border-b border-(--klyroo-border)">
+    <div class="mx-auto max-w-(--breakpoint-2xl) px-4 py-20 sm:px-6 lg:px-8 lg:py-24">
+        <div class="grid gap-6 lg:grid-cols-2 lg:items-end">
+            <h2 id="libraries-heading" class="text-4xl font-semibold leading-[1.02] tracking-[-0.03em] text-(--klyroo-text-highlighted) sm:text-6xl">
+                Open Source<br /><span class="pg-accent">Libraries.</span>
+            </h2>
+            <p class="max-w-prose text-lg text-(--klyroo-text-muted) lg:justify-self-end">
+                Every library follows the same strict contract: <code class="font-mono text-sm text-(--klyroo-text-highlighted)">Klyroo.&lt;Product&gt;.Core</code>
+                is 100% headless NativeAOT C#, and <code class="font-mono text-sm text-(--klyroo-text-highlighted)">Klyroo.&lt;Product&gt;</code> ships
+                multiplatform Blazor Web &amp; .NET MAUI Hybrid components with dedicated documentation.
+            </p>
+        </div>
+
+        <div class="mt-14 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+            @foreach (var product in KlyrooStackProducts.All)
+            {
+                <article class="group flex flex-col rounded-2xl border border-(--klyroo-border) bg-(--klyroo-bg) p-6 transition-colors hover:border-(--klyroo-border-accented)">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="inline-flex items-center gap-2 font-mono text-xs text-(--klyroo-text-muted)">
+                            <span class="size-2 rounded-full" style="@($"background:{product.AccentHex}")" aria-hidden="true"></span>
+                            @product.RepoName
+                        </span>
+                        <KlyBadge Label="Core + UI" Color="@product.BadgeColor" Variant="KlyVariant.Subtle" Size="KlySize.Sm" />
+                    </div>
+
+                    <h3 class="mt-3 text-2xl font-semibold tracking-[-0.02em] text-(--klyroo-text-highlighted)">
+                        <a href="@($"/{product.Slug}")" class="hover:underline" style="@($"text-decoration-color:{product.AccentHex}")">
+                            Klyroo.@product.ShortName
+                        </a>
+                    </h3>
+
+                    <p class="mt-1.5 text-xs font-medium text-(--klyroo-text-highlighted)">@product.Tagline</p>
+                    <p class="mt-2.5 flex-1 text-sm leading-relaxed text-(--klyroo-text-muted)">@product.Description</p>
+
+                    <dl class="mt-5 space-y-1.5 border-t border-(--klyroo-border) pt-4 font-mono text-xs">
+                        <div class="flex items-center justify-between gap-2">
+                            <dt class="text-(--klyroo-text-muted)">Core</dt>
+                            <dd class="truncate text-(--klyroo-text-highlighted)">@product.CorePackage</dd>
+                        </div>
+                        <div class="flex items-center justify-between gap-2">
+                            <dt class="text-(--klyroo-text-muted)">UI</dt>
+                            <dd class="truncate text-(--klyroo-text-highlighted)">@product.UiPackage</dd>
+                        </div>
+                    </dl>
+
+                    <div class="mt-5 grid grid-cols-2 gap-2">
+                        <KlyButton Label="Overview"
+                                  Href="@($"/{product.Slug}")"
+                                  Color="KlyColor.Neutral"
+                                  Variant="ButtonVariant.Outline"
+                                  Size="KlySize.Sm"
+                                  Class="justify-center rounded-lg" />
+                        <KlyButton Label="Docs"
+                                  Href="@product.DocsHref"
+                                  Size="KlySize.Sm"
+                                  Class="justify-center rounded-lg">
+                            <TrailingIcon><svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14m-6-6 6 6-6 6" /></svg></TrailingIcon>
+                        </KlyButton>
+                    </div>
+                </article>
+            }
+        </div>
+    </div>
+</section>
+
+@* Architecture Pillars *@
+<section aria-labelledby="pillars-heading" class="border-b border-(--klyroo-border)">
+    <div class="mx-auto max-w-(--breakpoint-2xl) px-4 py-20 sm:px-6 lg:px-8">
+        <h2 id="pillars-heading" class="text-3xl font-semibold tracking-[-0.025em] text-(--klyroo-text-highlighted) sm:text-5xl">
+            One architecture. Every target.
+        </h2>
+
+        <div class="mt-12 grid gap-8 md:grid-cols-3">
+            <div class="border-t border-(--klyroo-border) pt-6">
+                <h3 class="text-xl font-semibold tracking-[-0.015em] text-(--klyroo-text-highlighted)">100% NativeAOT &amp; Zero UI Lock-In</h3>
+                <p class="mt-3 text-sm leading-relaxed text-(--klyroo-text-muted)">
+                    Every <code class="font-mono text-(--klyroo-text-highlighted)">Klyroo.&lt;Product&gt;.Core</code> package compiles cleanly with <code class="font-mono text-(--klyroo-text-highlighted)">IsAotCompatible=true</code>
+                    and zero Razor dependencies — ready for Minimal APIs, workers, unit tests, and native C# .NET MAUI ViewModels.
+                </p>
+            </div>
+            <div class="border-t border-(--klyroo-border) pt-6">
+                <h3 class="text-xl font-semibold tracking-[-0.015em] text-(--klyroo-text-highlighted)">Blazor Web &amp; .NET MAUI Hybrid</h3>
+                <p class="mt-3 text-sm leading-relaxed text-(--klyroo-text-muted)">
+                    Static SSR, Interactive Server, WebAssembly, Auto, iOS, Android, macOS Catalyst, Windows, and Android TV —
+                    with native browser popovers, 44px touch targets, and zero SignalR round-trip lag.
+                </p>
+            </div>
+            <div class="border-t border-(--klyroo-border) pt-6">
+                <h3 class="text-xl font-semibold tracking-[-0.015em] text-(--klyroo-text-highlighted)">Semantic Agent Bridge &amp; WebMCP</h3>
+                <p class="mt-3 text-sm leading-relaxed text-(--klyroo-text-muted)">
+                    <code class="font-mono text-(--klyroo-text-highlighted)">Klyroo.Agent</code> exposes deterministic <code class="font-mono text-(--klyroo-text-highlighted)">snapshot</code>, <code class="font-mono text-(--klyroo-text-highlighted)">query</code>,
+                    and <code class="font-mono text-(--klyroo-text-highlighted)">act</code> tools with automatic <code class="font-mono text-(--klyroo-text-highlighted)">[redacted]</code> secret masking and browser WebMCP registration.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+@* Interactive Component & API Router *@
+<section id="redirections" aria-labelledby="redirections-heading" class="scroll-mt-28">
+    <div class="mx-auto max-w-(--breakpoint-2xl) px-4 py-20 sm:px-6 lg:px-8 lg:py-24">
+        <div class="grid gap-6 lg:grid-cols-2 lg:items-end">
+            <div>
+                <h2 id="redirections-heading" class="text-3xl font-semibold tracking-[-0.025em] text-(--klyroo-text-highlighted) sm:text-5xl">
+                    Find any component or API.
+                </h2>
+                <p class="mt-2 text-sm text-(--klyroo-text-muted)">
+                    Indexed by <code class="font-mono text-(--klyroo-text-highlighted)">KlyrooStackCatalog.ResolveComponentModule</code> across all 8 repositories.
+                </p>
+            </div>
+            <div class="w-full lg:max-w-md lg:justify-self-end">
+                <KlyInput @bind-Value="_filter"
+                         Placeholder="Filter by component, controller, or package (e.g. KlyDataList, Form, Agent)..."
+                         aria-label="Filter components" />
+            </div>
+        </div>
+
+        @{
+            var rows = FilteredComponents.ToList();
+            var limitApplied = string.IsNullOrWhiteSpace(_filter) && !_showAllComponents && rows.Count > DefaultCatalogLimit;
+            var visibleRows = limitApplied ? rows.Take(DefaultCatalogLimit).ToList() : rows;
+        }
+        <div class="mt-10 overflow-hidden rounded-2xl border border-(--klyroo-border) bg-(--klyroo-bg)">
+            @if (rows.Count == 0)
+            {
+                <div class="flex flex-col items-center justify-center gap-3 px-6 py-14 text-center">
+                    <p class="text-base font-medium text-(--klyroo-text-highlighted)">No components match “@_filter”</p>
+                    <p class="text-sm text-(--klyroo-text-muted)">Try searching for a package name like <code>Klyroo.Query</code>, a component like <code>KlyDataList</code>, or clear the filter.</p>
+                    <KlyButton Label="Clear filter" Size="KlySize.Sm" Color="KlyColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => _filter = "")" />
+                </div>
+            }
+            else
+            {
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="border-b border-(--klyroo-border) bg-(--klyroo-bg-muted) font-mono text-xs uppercase text-(--klyroo-text-muted)">
+                            <tr>
+                                <th scope="col" class="px-4 py-3">Component / Service</th>
+                                <th scope="col" class="px-4 py-3">Layer</th>
+                                <th scope="col" class="px-4 py-3">Library</th>
+                                <th scope="col" class="px-4 py-3">NuGet Package</th>
+                                <th scope="col" class="px-4 py-3">Documentation</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-(--klyroo-border)">
+                            @foreach (var (product, comp) in visibleRows)
+                            {
+                                <tr class="transition-colors hover:bg-(--klyroo-bg-muted)/40">
+                                    <td class="px-4 py-3 font-mono font-medium text-(--klyroo-text-highlighted)">
+                                        <a href="@comp.Href" class="hover:underline">@comp.Name</a>
+                                        <p class="mt-0.5 font-sans text-xs font-normal text-(--klyroo-text-muted)">@comp.Description</p>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <KlyBadge Label="@comp.Layer"
+                                                 Color="@(comp.Layer == "Core" ? KlyColor.Info : KlyColor.Success)"
+                                                 Variant="KlyVariant.Subtle"
+                                                 Size="KlySize.Sm" />
+                                    </td>
+                                    <td class="px-4 py-3 font-mono text-xs">
+                                        <a href="@($"/{product.Slug}")" class="inline-flex items-center gap-2 font-semibold text-(--klyroo-text-highlighted) hover:underline">
+                                            <span class="size-2 rounded-full" style="@($"background:{product.AccentHex}")" aria-hidden="true"></span>
+                                            @product.Name
+                                        </a>
+                                    </td>
+                                    <td class="px-4 py-3 font-mono text-xs text-(--klyroo-text)">
+                                        @(comp.Layer == "Core" ? product.CorePackage : product.UiPackage)
+                                    </td>
+                                    <td class="px-4 py-3 text-xs font-medium">
+                                        <a href="@product.DocsHref" class="inline-flex items-center gap-1 text-(--klyroo-primary-text) hover:underline">
+                                            <span>Read docs</span>
+                                            <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                @if (limitApplied)
+                {
+                    <div class="flex flex-wrap items-center justify-between gap-3 border-t border-(--klyroo-border) bg-(--klyroo-bg-muted)/40 px-4 py-3 text-xs text-(--klyroo-text-muted)">
+                        <span class="font-mono tabular-nums">Showing @visibleRows.Count of @rows.Count components &amp; services</span>
+                        <KlyButton Label="@($"Show all {rows.Count}")" Size="KlySize.Sm" Color="KlyColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => _showAllComponents = true)" />
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</section>
+
+@code {
+    private const int DefaultCatalogLimit = 16;
+    private string _filter = "";
+    private bool _showAllComponents;
+
+    private IEnumerable<(KlyrooProductInfo Product, KlyrooProductComponentLink Component)> FilteredComponents =>
+        from p in KlyrooStackProducts.All
+        from c in p.Components
+        where string.IsNullOrWhiteSpace(_filter)
+              || c.Name.Contains(_filter, StringComparison.OrdinalIgnoreCase)
+              || c.Description.Contains(_filter, StringComparison.OrdinalIgnoreCase)
+              || p.Name.Contains(_filter, StringComparison.OrdinalIgnoreCase)
+              || p.CorePackage.Contains(_filter, StringComparison.OrdinalIgnoreCase)
+              || p.UiPackage.Contains(_filter, StringComparison.OrdinalIgnoreCase)
+        select (p, c);
+}

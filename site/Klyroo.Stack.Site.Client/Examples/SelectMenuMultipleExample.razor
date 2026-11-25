@@ -1,0 +1,15 @@
+<div class="flex w-full max-w-xs flex-col gap-3">
+    <KlyFormField Label="Languages">
+        <KlySelectMenu Items="Languages" Multiple Create @bind-Value="_values" Placeholder="Pick languages" />
+    </KlyFormField>
+    <p class="text-sm text-(--klyroo-text-muted)" data-testid="multiple-state">Selected: @(_values.Count > 0 ? string.Join(", ", _values) : "none")</p>
+</div>
+
+@code {
+    private IReadOnlyList<string> _values = ["csharp"];
+
+    private static readonly KlySelectItem[] Languages =
+    [
+        new("csharp", "C#"), new("fsharp", "F#"), new("ts", "TypeScript"), new("rust", "Rust"), new("go", "Go"),
+    ];
+}

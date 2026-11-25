@@ -1,0 +1,16 @@
+@* A small form to move through with a remote control (TV mode): Select/Enter edits a field, Back or Enter leaves it. *@
+<div class="flex w-full max-w-xs flex-col gap-3" data-testid="tv-form">
+    <KlyFormField Label="Name"><KlyInput Value="Ada Lovelace" data-testid="tv-name" /></KlyFormField>
+    <KlyFormField Label="Country">
+        <KlySelect @bind-Value="_country" Items="Countries" Placeholder="Choose a country" data-testid="tv-country" />
+    </KlyFormField>
+    <KlyFormField Label="Bio"><KlyTextarea Rows="3" data-testid="tv-bio" /></KlyFormField>
+    <KlyButton Label="Save" data-testid="tv-save" />
+    <p class="text-sm text-(--klyroo-text-muted)" data-testid="tv-country-state">Selected: @(_country ?? "none")</p>
+</div>
+
+@code {
+    private string? _country;
+
+    private static readonly KlySelectItem[] Countries = [new("fr", "France"), new("de", "Germany"), new("it", "Italy")];
+}

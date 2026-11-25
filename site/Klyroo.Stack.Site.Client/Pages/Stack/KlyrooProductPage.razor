@@ -1,0 +1,206 @@
+@page "/query"
+@page "/table"
+@page "/form"
+@page "/dashboard"
+@page "/display"
+@page "/spreadsheet"
+@page "/agent"
+@page "/stack/{Slug}"
+@using Klyroo.Stack.Site.Client.Docs
+@using Klyroo.Stack.Site.Client.Components.Stages
+@inject NavigationManager Navigation
+
+<PageTitle>@(Product is null ? "Klyroo" : $"{Product.Name} · {Product.Tagline}")</PageTitle>
+
+@if (Product is null)
+{
+    <div class="mx-auto max-w-3xl px-4 py-24 text-center">
+        <h1 class="text-3xl font-semibold text-(--klyroo-text-highlighted)">Unknown Klyroo library</h1>
+        <p class="mt-2 text-(--klyroo-text-muted)">Return to the Klyroo ecosystem hub to pick one of the 8 libraries.</p>
+        <div class="mt-6">
+            <KlyButton Label="Back to Klyroo Hub" Href="/" />
+        </div>
+    </div>
+}
+else
+{
+    <div data-lib="@Product.Slug">
+        @* Product Hero + Bespoke Interactive Stage *@
+        <section class="relative isolate overflow-hidden border-b border-(--klyroo-border)">
+            <div class="pg-dots absolute inset-0 -z-10 [mask-image:linear-gradient(to_bottom,black,transparent_85%)]" aria-hidden="true"></div>
+            <div class="lib-hero-glow absolute inset-0 -z-10" aria-hidden="true"></div>
+            <Rain />
+
+            <div class="mx-auto grid max-w-(--breakpoint-2xl) gap-10 px-4 pt-14 pb-12 sm:px-6 sm:pt-20 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)] lg:items-end lg:px-8">
+                <div>
+                    <h1 class="text-5xl font-semibold leading-[0.98] tracking-[-0.03em] text-(--klyroo-text-highlighted) sm:text-7xl">
+                        @Product.HeroHeadline<br />
+                        <span class="lib-accent-word">@Product.HeroAccent</span>
+                    </h1>
+                    <p class="mt-5 flex flex-wrap items-center gap-x-2.5 gap-y-1 font-mono text-xs text-(--klyroo-text-muted)">
+                        <span class="inline-flex items-center gap-1.5 font-semibold text-(--klyroo-text-highlighted)">
+                            <span class="size-2 rounded-full" style="background:var(--lib-accent)" aria-hidden="true"></span>
+                            @Product.Name
+                        </span>
+                        <span aria-hidden="true">·</span>
+                        <span>@Product.RepoName</span>
+                        <span aria-hidden="true">·</span>
+                        <span>Headless Core + Blazor/MAUI UI</span>
+                        <span aria-hidden="true">·</span>
+                        <span>MIT</span>
+                    </p>
+                </div>
+
+                <div class="lg:pb-1">
+                    <p class="max-w-prose text-lg leading-relaxed text-(--klyroo-text-muted) text-pretty">
+                        @Product.Description
+                    </p>
+
+                    <div class="mt-6 flex flex-wrap items-center gap-3">
+                        <KlyButton Label="@($"Read {Product.Name} docs")" Href="@Product.DocsHref" Size="KlySize.Lg" Class="rounded-lg px-5">
+                            <TrailingIcon><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14m-6-6 6 6-6 6" /></svg></TrailingIcon>
+                        </KlyButton>
+                        <KlyButton Label="Live 8-Library Showcase" Href="/showcase" Color="KlyColor.Neutral" Variant="ButtonVariant.Outline" Size="KlySize.Lg" Class="rounded-lg" />
+                    </div>
+
+                    <div class="mt-4 flex flex-col gap-2">
+                        <button type="button" data-copy-text="@($"dotnet add package {Product.UiPackage}")"
+                                class="group flex min-h-10 items-center justify-between gap-3 rounded-xl border border-(--klyroo-border-accented) bg-(--klyroo-bg) px-4 py-2 font-mono text-xs text-(--klyroo-text-highlighted) transition-colors hover:border-(--klyroo-primary-text)">
+                            <span class="truncate"><span class="text-(--klyroo-text-muted)">$</span> dotnet add package @Product.UiPackage <span class="hidden text-(--klyroo-text-muted) sm:inline"># Blazor + MAUI</span></span>
+                            <span class="shrink-0 uppercase tracking-wider text-(--klyroo-text-muted) group-hover:text-(--klyroo-primary-text)" data-copy-label>Copy</span>
+                        </button>
+                        <button type="button" data-copy-text="@($"dotnet add package {Product.CorePackage}")"
+                                class="group flex min-h-9 items-center justify-between gap-3 rounded-xl border border-(--klyroo-border) bg-(--klyroo-bg-muted)/50 px-4 py-2 font-mono text-xs text-(--klyroo-text) transition-colors hover:border-(--klyroo-border-accented)">
+                            <span class="truncate"><span class="text-(--klyroo-text-muted)">$</span> dotnet add package @Product.CorePackage <span class="hidden text-(--klyroo-text-muted) sm:inline"># NativeAOT Core</span></span>
+                            <span class="shrink-0 uppercase tracking-wider text-(--klyroo-text-muted)" data-copy-label>Copy</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            @* Bespoke Domain-Tailored Interactive Hero Stage *@
+            <div class="mx-auto max-w-(--breakpoint-2xl) px-4 pb-16 sm:px-6 lg:px-8 lg:pb-20">
+                <h2 class="sr-only">Interactive @Product.Name Stage</h2>
+                @switch (Product.Slug)
+                {
+                    case "query":
+                        <QueryHeroStage />
+                        break;
+                    case "table":
+                        <TableHeroStage />
+                        break;
+                    case "form":
+                        <FormHeroStage />
+                        break;
+                    case "dashboard":
+                        <DashboardHeroStage />
+                        break;
+                    case "display":
+                        <DisplayHeroStage />
+                        break;
+                    case "spreadsheet":
+                        <SpreadsheetHeroStage />
+                        break;
+                    case "agent":
+                        <AgentHeroStage />
+                        break;
+                }
+
+                <div class="mt-5 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex flex-wrap gap-1.5">
+                        @foreach (var platform in Product.Platforms)
+                        {
+                            <span class="rounded-md border border-(--klyroo-border) bg-(--klyroo-bg) px-2.5 py-1 font-mono text-[11px] text-(--klyroo-text-muted)">
+                                @platform
+                            </span>
+                        }
+                    </div>
+                    <span class="font-mono text-xs text-(--klyroo-text-muted)">Interactive C# running live · Zero mockups</span>
+                </div>
+            </div>
+        </section>
+
+        @* Editorial Capability Pillars (open typographic grid, zero card bloat) *@
+        <section aria-labelledby="features-heading" class="border-b border-(--klyroo-border)">
+            <div class="mx-auto max-w-(--breakpoint-2xl) px-4 py-20 sm:px-6 lg:px-8">
+                <h2 id="features-heading" class="text-3xl font-semibold tracking-[-0.025em] text-(--klyroo-text-highlighted) sm:text-5xl">
+                    Built for scale, headless first.
+                </h2>
+
+                <div class="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+                    @foreach (var (title, desc, tag) in Product.Features)
+                    {
+                        <div class="flex flex-col border-t border-(--klyroo-border) pt-6">
+                            <span class="font-mono text-xs font-medium" style="color:var(--lib-accent)">@tag</span>
+                            <h3 class="mt-2 text-lg font-semibold text-(--klyroo-text-highlighted)">@title</h3>
+                            <p class="mt-2 flex-1 text-sm leading-relaxed text-(--klyroo-text-muted)">@desc</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+
+        @* Side-by-Side Architecture Split: Headless C# Core vs Blazor & MAUI UI *@
+        <section aria-labelledby="architecture-heading" class="border-b border-(--klyroo-border)">
+            <div class="mx-auto max-w-(--breakpoint-2xl) px-4 py-20 sm:px-6 lg:px-8">
+                <div class="grid gap-6 lg:grid-cols-2 lg:items-end">
+                    <h2 id="architecture-heading" class="text-3xl font-semibold tracking-[-0.025em] text-(--klyroo-text-highlighted) sm:text-5xl">
+                        Headless C# Core.<br />
+                        <span class="lib-accent-word">Declarative Razor UI.</span>
+                    </h2>
+                    <p class="max-w-prose text-base text-(--klyroo-text-muted) lg:justify-self-end">
+                        Use <code class="font-mono text-sm text-(--klyroo-text-highlighted)">@Product.CorePackage</code> directly in C# ViewModels, Console workers or NativeAOT services, or pair it with
+                        <code class="font-mono text-sm text-(--klyroo-text-highlighted)">@Product.UiPackage</code> in Blazor Web and .NET MAUI Blazor Hybrid.
+                    </p>
+                </div>
+
+                <div class="mt-12 grid gap-6 lg:grid-cols-2">
+                    <CodeBlock Title="@Product.CoreCodeTitle" Code="@Product.CoreCode" Class="min-w-0 rounded-2xl border border-(--klyroo-border)" />
+                    <CodeBlock Title="@Product.UiCodeTitle" Code="@Product.UiCode" Class="min-w-0 rounded-2xl border border-(--klyroo-border)" />
+                </div>
+            </div>
+        </section>
+
+        @* Exported Components & Redirections *@
+        <section aria-labelledby="exports-heading">
+            <div class="mx-auto max-w-(--breakpoint-2xl) px-4 py-20 sm:px-6 lg:px-8">
+                <div class="flex flex-wrap items-end justify-between gap-4">
+                    <h2 id="exports-heading" class="text-3xl font-semibold tracking-[-0.025em] text-(--klyroo-text-highlighted)">
+                        Included in @Product.Name
+                    </h2>
+                    <KlyButton Label="View all 8 Klyroo libraries" Href="/" Color="KlyColor.Neutral" Variant="ButtonVariant.Outline" Class="rounded-lg" />
+                </div>
+
+                <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    @foreach (var comp in Product.Components)
+                    {
+                        <a href="@comp.Href" class="group flex flex-col justify-between rounded-xl border border-(--klyroo-border) bg-(--klyroo-bg) p-5 transition-colors hover:border-(--klyroo-border-accented)">
+                            <div>
+                                <div class="flex items-center justify-between gap-2">
+                                    <span class="font-mono text-base font-semibold text-(--klyroo-text-highlighted) group-hover:underline">@comp.Name</span>
+                                    <KlyBadge Label="@comp.Layer" Color="@(comp.Layer == "Core" ? KlyColor.Info : KlyColor.Success)" Variant="KlyVariant.Subtle" Size="KlySize.Sm" />
+                                </div>
+                                <p class="mt-2 text-sm text-(--klyroo-text-muted)">@comp.Description</p>
+                            </div>
+                            <p class="mt-4 inline-flex items-center gap-1.5 font-mono text-xs text-(--klyroo-text-muted)">
+                                <span>Package: <span class="text-(--klyroo-text-highlighted)">@(comp.Layer == "Core" ? Product.CorePackage : Product.UiPackage)</span></span>
+                                <svg class="size-3.5 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg>
+                            </p>
+                        </a>
+                    }
+                </div>
+            </div>
+        </section>
+    </div>
+}
+
+@code {
+    [Parameter] public string? Slug { get; set; }
+
+    private string EffectiveSlug =>
+        !string.IsNullOrWhiteSpace(Slug)
+            ? Slug
+            : Navigation.ToBaseRelativePath(Navigation.Uri).Split('?', '#')[0].Trim('/');
+
+    private KlyrooProductInfo? Product => KlyrooStackProducts.Find(EffectiveSlug);
+}

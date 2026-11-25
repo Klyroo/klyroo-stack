@@ -1,0 +1,10 @@
+@* KlyLocales.Extend derives a locale and overrides only the messages you list; the others are kept. *@
+<KlyApp Locale="_canadian" Toaster="false" Class="flex w-full flex-col gap-3" data-testid="locale-extend">
+    <p>Locale: <code data-testid="locale-extend-code">@_canadian.Code</code></p>
+    <KlyFileUpload MaxSize="1536" />
+</KlyApp>
+
+@code {
+    private static readonly KlyLocale _canadian = KlyLocales.Extend(KlyLocales.Fr, code: "fr-CA", name: "Français (Canada)",
+        messages: m => m with { DropFiles = "Glissez-déposez vos fichiers ici ou cliquez pour parcourir" });
+}

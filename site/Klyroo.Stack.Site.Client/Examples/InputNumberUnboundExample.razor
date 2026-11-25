@@ -1,0 +1,12 @@
+<div class="flex w-full max-w-xs flex-col gap-3">
+    <KlyFormField Label="Seats">
+        <KlyInputNumber Value="2m" Min="0" Max="@_max" Name="seats" />
+    </KlyFormField>
+    <KlyButton Variant="ButtonVariant.Outline" Label="Raise the maximum" OnClick="Raise" />
+</div>
+
+@code {
+    private decimal _max = 20;
+
+    private void Raise() => _max += 5;
+}

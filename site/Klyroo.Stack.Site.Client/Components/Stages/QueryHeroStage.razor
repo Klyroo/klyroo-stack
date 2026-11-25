@@ -1,0 +1,262 @@
+@namespace Klyroo.Stack.Site.Client.Components.Stages
+@using Klyroo.Query
+
+@* Drizzle-Resource inspired interactive workbench: click any schema clause or type a live search to watch animated signal wires illuminate URL Codecs, SQL, Typed AST, and real ExecuteInMemory results simultaneously. *@
+<div class="grid gap-6 xl:grid-cols-[minmax(0,1.02fr)_36px_minmax(0,1.18fr)] xl:items-stretch">
+    @* Left: Interactive Schema Definition *@
+    <div class="flex min-w-0 flex-col overflow-hidden rounded-2xl border border-(--klyroo-border) bg-(--klyroo-bg)">
+        <div class="flex items-center justify-between gap-3 border-b border-(--klyroo-border) bg-(--klyroo-bg-muted)/60 px-4 py-3">
+            <span class="font-mono text-xs font-medium text-(--klyroo-text-highlighted)">OrdersSchema.cs</span>
+            <span class="flex items-baseline gap-1.5 font-mono text-[11px] uppercase tracking-wider text-(--klyroo-text-muted)">
+                <span class="font-pixel text-lg font-bold" style="color:var(--lib-accent)">14</span> lines
+            </span>
+        </div>
+
+        <div class="flex-1 overflow-x-auto bg-(--pg-code-bg) py-3 font-mono text-[12.5px] leading-6 text-[#d7dcde]">
+            @for (var i = 0; i < SchemaLines.Length; i++)
+            {
+                var line = SchemaLines[i];
+                var active = line.Clause == _activeClause;
+                var clickable = line.Clause is not null;
+                <div class="@($"flex items-start px-3 transition-colors {(active ? "lib-code-line-active" : "")} {(clickable ? "cursor-pointer hover:bg-white/[0.04]" : "")}")"
+                     @onclick="@(() => { if (line.Clause is not null) SelectClause(line.Clause); })">
+                    <span class="w-7 shrink-0 select-none text-right pe-3 text-[11px] text-[#6b7280] tabular-nums">@(i + 1)</span>
+                    <span class="whitespace-pre @(active ? "text-white font-medium" : "")">@line.Text</span>
+                </div>
+            }
+        </div>
+
+        <div class="flex flex-wrap items-center gap-1.5 border-t border-(--klyroo-border) bg-(--klyroo-bg-muted)/40 px-4 py-3" role="tablist" aria-label="Schema capabilities">
+            @foreach (var clause in Clauses)
+            {
+                var isSelected = _activeClause == clause.Key;
+                <button type="button"
+                        role="tab"
+                        aria-selected="@isSelected"
+                        class="@($"inline-flex min-h-7 items-center rounded-md border px-2.5 py-1 font-mono text-xs transition-all {(isSelected ? "font-semibold shadow-xs" : "border-(--klyroo-border) bg-(--klyroo-bg) text-(--klyroo-text-muted) hover:border-(--klyroo-border-accented) hover:text-(--klyroo-text-highlighted)")}")"
+                        style="@(isSelected ? "background:var(--lib-pill-bg);border-color:var(--lib-pill-bg);color:#ffffff" : null)"
+                        @onclick="@(() => SelectClause(clause.Key))">
+                    @clause.Label
+                </button>
+            }
+        </div>
+    </div>
+
+    @* Center: Animated SVG Signal Bus (Desktop) *@
+    <div class="relative hidden xl:flex items-center justify-center" aria-hidden="true">
+        <svg class="h-full w-9 overflow-visible" viewBox="0 0 36 420" preserveAspectRatio="none" fill="none">
+            <path d="M 0 @ActiveSourceY C 18 @ActiveSourceY, 18 105, 36 105" stroke="var(--lib-accent)" stroke-width="1.75" class="lib-wire-flow" />
+            <path d="M 0 @ActiveSourceY C 18 @ActiveSourceY, 18 315, 36 315" stroke="var(--lib-accent)" stroke-width="1.75" class="lib-wire-flow" />
+            <circle cx="0" cy="@ActiveSourceY" r="3.5" fill="var(--lib-accent)" class="lib-pulse-dot" />
+            <circle cx="36" cy="105" r="3" fill="var(--lib-accent)" />
+            <circle cx="36" cy="315" r="3" fill="var(--lib-accent)" />
+        </svg>
+    </div>
+
+    @* Right: 4 Synchronized Live Output Panels *@
+    <div class="grid min-w-0 gap-4 sm:grid-cols-2">
+        @* 1. Live URL Codec *@
+        <div class="flex min-w-0 flex-col overflow-hidden rounded-2xl border border-(--klyroo-border) bg-(--klyroo-bg)">
+            <div class="flex items-center justify-between gap-2 border-b border-(--klyroo-border) bg-(--klyroo-bg-muted)/50 px-3.5 py-2.5 font-mono text-[11px]">
+                <span class="flex items-center gap-1.5 font-semibold uppercase tracking-wider text-(--klyroo-text-highlighted)">
+                    <span class="size-1.5 rounded-xs" style="background:var(--lib-accent)"></span>
+                    URL Codec
+                </span>
+                <span class="text-(--klyroo-text-muted)">reversible</span>
+            </div>
+            <div class="flex-1 space-y-2.5 p-3.5 font-mono text-xs">
+                <div class="flex items-center gap-2">
+                    <div class="min-w-0 flex-1">
+                        <KlyInput Value="@_search" ValueChanged="@OnSearchChanged" Placeholder="Filter orders (e.g. Nord)..." aria-label="Filter live query orders" Size="KlySize.Sm" />
+                    </div>
+                    <button type="button"
+                            class="inline-flex min-h-7 shrink-0 items-center rounded-md border border-(--klyroo-border) bg-(--klyroo-bg-muted) px-2.5 py-1 text-[11px] text-(--klyroo-text-highlighted) hover:border-(--klyroo-border-accented)"
+                            @onclick="ToggleSort">
+                        @(_desc ? "DESC" : "ASC")
+                    </button>
+                </div>
+                <div class="break-all rounded-lg bg-(--pg-code-bg) p-2.5 text-[11.5px] leading-relaxed text-[#d7dcde]">
+                    <span class="text-[#8b949e]">/orders?</span><span class="@(_activeClause == "search" ? "rounded-xs px-1 font-semibold text-white" : "")" style="@(_activeClause == "search" ? "background:var(--lib-pill-bg)" : null)">q=@(string.IsNullOrWhiteSpace(_search) ? "nord" : Uri.EscapeDataString(_search))</span><span class="text-[#8b949e]">&amp;</span><span class="@(_activeClause == "sort" ? "rounded-xs px-1 font-semibold text-white" : "")" style="@(_activeClause == "sort" ? "background:var(--lib-pill-bg)" : null)">s=@(_desc ? "-amount" : "amount")</span><span class="text-[#8b949e]">&amp;</span><span class="@(_activeClause == "facets" ? "rounded-xs px-1 font-semibold text-white" : "")" style="@(_activeClause == "facets" ? "background:var(--lib-pill-bg)" : null)">f.region=@(_regionFilter ?? "all")</span><span class="text-[#8b949e]">&amp;</span><span class="@(_activeClause == "cursor" ? "rounded-xs px-1 font-semibold text-white" : "")" style="@(_activeClause == "cursor" ? "background:var(--lib-pill-bg)" : null)">cursor=eyJpZCI6NH0</span>
+                </div>
+                <p class="font-sans text-[11.5px] text-(--klyroo-text-muted)">
+                    Generated live by <code class="font-mono text-(--klyroo-text-highlighted)">DataListStateQuery.ToQuery</code>.
+                </p>
+            </div>
+        </div>
+
+        @* 2. EF Core SQL Translation *@
+        <div class="flex min-w-0 flex-col overflow-hidden rounded-2xl border border-(--klyroo-border) bg-(--klyroo-bg)">
+            <div class="flex items-center justify-between gap-2 border-b border-(--klyroo-border) bg-(--klyroo-bg-muted)/50 px-3.5 py-2.5 font-mono text-[11px]">
+                <span class="flex items-center gap-1.5 font-semibold uppercase tracking-wider text-(--klyroo-text-highlighted)">
+                    <span class="size-1.5 rounded-xs" style="background:var(--lib-accent)"></span>
+                    SQL it runs
+                </span>
+                <span class="text-(--klyroo-text-muted)">EF Core · PostgreSQL</span>
+            </div>
+            <pre class="flex-1 overflow-x-auto bg-(--pg-code-bg) p-3.5 font-mono text-[11.5px] leading-5 text-[#d7dcde]"><code>SELECT "id", "ref", "customer", "amount"
+FROM "orders"
+<span class="@(_activeClause == "filter" ? "lib-code-line-active block -mx-3.5 px-3.5 text-white font-medium" : "")">WHERE "org_id" = @@p0@(_regionFilter is not null ? $" AND \"region\" = '{_regionFilter}'" : "")</span>
+<span class="@(_activeClause == "search" ? "lib-code-line-active block -mx-3.5 px-3.5 text-white font-medium" : "")">  AND ("ref" ILIKE @@p1 OR "customer" ILIKE @@p1)</span>
+<span class="@(_activeClause == "sort" ? "lib-code-line-active block -mx-3.5 px-3.5 text-white font-medium" : "")">ORDER BY "amount" @(_desc ? "DESC" : "ASC"), "id" DESC</span>
+<span class="@(_activeClause == "cursor" ? "lib-code-line-active block -mx-3.5 px-3.5 text-white font-medium" : "")">FETCH NEXT 26 ROWS ONLY -- keyset</span>
+<span class="@(_activeClause == "facets" ? "lib-code-line-active block -mx-3.5 px-3.5 text-white font-medium" : "")">-- facet counts: GROUP BY "region"</span></code></pre>
+        </div>
+
+        @* 3. Typed NativeAOT AST *@
+        <div class="flex min-w-0 flex-col overflow-hidden rounded-2xl border border-(--klyroo-border) bg-(--klyroo-bg)">
+            <div class="flex items-center justify-between gap-2 border-b border-(--klyroo-border) bg-(--klyroo-bg-muted)/50 px-3.5 py-2.5 font-mono text-[11px]">
+                <span class="flex items-center gap-1.5 font-semibold uppercase tracking-wider text-(--klyroo-text-highlighted)">
+                    <span class="size-1.5 rounded-xs" style="background:var(--lib-accent)"></span>
+                    NativeAOT AST
+                </span>
+                <span class="text-(--klyroo-text-muted)">zero reflection</span>
+            </div>
+            <pre class="flex-1 overflow-x-auto bg-(--pg-code-bg) p-3.5 font-mono text-[11.5px] leading-5 text-[#d7dcde]"><code>new DataListRequest(
+<span class="@(_activeClause == "cursor" ? "lib-code-line-active block -mx-3.5 px-3.5 text-white font-medium" : "")">  paging: new DataListPaging.Cursor(25, token),</span>
+<span class="@(_activeClause == "sort" ? "lib-code-line-active block -mx-3.5 px-3.5 text-white font-medium" : "")">  sort: [new("amount", Descending: @_desc.ToString().ToLowerInvariant())],</span>
+<span class="@(_activeClause == "filter" || _activeClause == "facets" ? "lib-code-line-active block -mx-3.5 px-3.5 text-white font-medium" : "")">  filter: FilterGroup.And(regionRule),</span>
+<span class="@(_activeClause == "search" ? "lib-code-line-active block -mx-3.5 px-3.5 text-white font-medium" : "")">  search: new("@(string.IsNullOrWhiteSpace(_search) ? "nord" : _search)")</span>
+);</code></pre>
+        </div>
+
+        @* 4. Real Live ExecuteInMemory Output *@
+        <div class="flex min-w-0 flex-col overflow-hidden rounded-2xl border border-(--klyroo-border) bg-(--klyroo-bg)">
+            <div class="flex items-center justify-between gap-2 border-b border-(--klyroo-border) bg-(--klyroo-bg-muted)/50 px-3.5 py-2.5 font-mono text-[11px]">
+                <span class="flex items-center gap-1.5 font-semibold uppercase tracking-wider text-(--klyroo-text-highlighted)">
+                    <span class="size-1.5 rounded-full lib-pulse-dot" style="background:var(--lib-accent)"></span>
+                    ExecuteInMemory
+                </span>
+                <span class="tabular-nums text-(--klyroo-text-muted)">@_result.TotalCount rows matched</span>
+            </div>
+            <div class="flex-1 p-3.5">
+                <div class="mb-2.5 flex flex-wrap gap-1.5" role="group" aria-label="Live region facets">
+                    @foreach (var reg in new[] { (string?)null, "EU", "US", "APAC" })
+                    {
+                        var label = reg ?? "All";
+                        var count = reg is null ? AllOrders.Length : AllOrders.Count(o => o.Region == reg);
+                        var active = _regionFilter == reg;
+                        <button type="button"
+                                class="@($"inline-flex min-h-6 items-center gap-1.5 rounded-md border px-2 py-0.5 font-mono text-[11px] transition-colors {(active ? "font-semibold" : "border-(--klyroo-border) bg-(--klyroo-bg-muted)/50 text-(--klyroo-text-muted) hover:text-(--klyroo-text-highlighted)")}")"
+                                style="@(active ? "background:var(--lib-pill-bg);border-color:var(--lib-pill-bg);color:#ffffff" : null)"
+                                @onclick="@(() => ToggleRegion(reg))">
+                            <span>@label</span>
+                            <span class="tabular-nums opacity-80">@count</span>
+                        </button>
+                    }
+                </div>
+                <ul class="divide-y divide-(--klyroo-border) font-mono text-xs">
+                    @foreach (var item in _result.Items.Take(4))
+                    {
+                        <li @key="@($"{item.Id}-{_tick}")" class="lib-flash flex items-center justify-between gap-2 py-1.5">
+                            <span class="truncate text-(--klyroo-text-highlighted)">
+                                <span class="text-(--klyroo-text-muted)">@item.Ref</span> · @item.Customer
+                            </span>
+                            <span class="shrink-0 font-semibold tabular-nums" style="color:var(--lib-accent)">€@item.Amount.ToString("N0")</span>
+                        </li>
+                    }
+                    @if (_result.Items.Count == 0)
+                    {
+                        <li class="py-4 text-center font-sans text-xs text-(--klyroo-text-muted)">No matching orders. Try clearing the search filter.</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private sealed record DemoOrder(int Id, string Ref, string Customer, string Region, decimal Amount);
+
+    private static readonly DemoOrder[] AllOrders =
+    [
+        new(1, "ORD-4091", "Nordic Cloud AB", "EU", 14800m),
+        new(2, "ORD-4092", "Halvorsen Freight", "EU", 9420m),
+        new(3, "ORD-4093", "Northwind Labs", "US", 24600m),
+        new(4, "ORD-4094", "Sakura Robotics", "APAC", 18350m),
+        new(5, "ORD-4095", "Nordic Retail SAS", "EU", 6290m),
+        new(6, "ORD-4096", "Pacific Foundry", "US", 31200m),
+    ];
+
+    private static readonly DataListSchema<DemoOrder> Schema = DataListSchema.For<DemoOrder>(s => s
+        .RowKey(o => o.Id)
+        .Search(o => o.Ref, o => o.Customer)
+        .Field(o => o.Region, f => f.Key("region").Sortable().Filter(DataListFilter.Option()))
+        .Field(o => o.Amount, f => f.Key("amount").Sortable().Filter(DataListFilter.Number(min: 0))));
+
+    private static readonly (string Key, string Label, int SourceY)[] Clauses =
+    [
+        ("search", "search", 130),
+        ("filter", "filter", 170),
+        ("sort", "sort", 210),
+        ("facets", "facets", 250),
+        ("cursor", "cursor", 295),
+    ];
+
+    private static readonly (string Text, string? Clause)[] SchemaLines =
+    [
+        ("var schema = DataListSchema.For<Order>(s => s", null),
+        ("  .RowKey(o => o.Id)", null),
+        ("  .Search(o => o.Ref, o => o.Customer)", "search"),
+        ("  .Field(o => o.Region, f => f", "filter"),
+        ("    .Key(\"region\")", "filter"),
+        ("    .Filter(DataListFilter.Option()))", "facets"),
+        ("  .Field(o => o.Amount, f => f", "sort"),
+        ("    .Key(\"amount\")", "sort"),
+        ("    .Sortable()", "sort"),
+        ("    .Filter(DataListFilter.Number(min: 0)))", "filter"),
+        ("  .Paging(DataListPagingMode.KeysetCursor)", "cursor"),
+        ("  .WithUrlCodec(prefix: \"q\")", "cursor"),
+        ("  .WithEfCoreAsyncExecutor()", "facets"),
+        (");", null),
+    ];
+
+    private string _activeClause = "search";
+    private string _search = "";
+    private bool _desc = true;
+    private string? _regionFilter;
+    private int _tick;
+    private DataListResult<DemoOrder> _result = default!;
+
+    private int ActiveSourceY => Clauses.FirstOrDefault(c => c.Key == _activeClause).SourceY is var y && y > 0 ? y : 170;
+
+    public QueryHeroStage() => RunQuery();
+
+    private void SelectClause(string clause) => _activeClause = clause;
+
+    private void OnSearchChanged(string value)
+    {
+        _search = value;
+        _activeClause = "search";
+        RunQuery();
+    }
+
+    private void ToggleSort()
+    {
+        _desc = !_desc;
+        _activeClause = "sort";
+        RunQuery();
+    }
+
+    private void ToggleRegion(string? region)
+    {
+        _regionFilter = region;
+        _activeClause = "facets";
+        RunQuery();
+    }
+
+    private void RunQuery()
+    {
+        _tick++;
+        var rules = _regionFilter is null
+            ? (IReadOnlyList<DataListFilterNode>)[]
+            : [new FilterRule("region", FilterOperator.IsAnyOf, new FilterValue.List([_regionFilter]))];
+
+        var req = new DataListRequest(
+            new DataListPaging.Offset(0, 10),
+            [new DataListSort("amount", Descending: _desc)],
+            rules.Count == 0 ? DataListFilterGroup.Empty : new DataListFilterGroup(FilterCombinator.And, rules),
+            string.IsNullOrWhiteSpace(_search) ? null : new DataListSearch(_search));
+
+        _result = Schema.ExecuteInMemory(AllOrders, req);
+    }
+}

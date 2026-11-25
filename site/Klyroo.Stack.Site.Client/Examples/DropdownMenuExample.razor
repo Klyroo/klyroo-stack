@@ -1,0 +1,23 @@
+<div class="flex flex-col items-center gap-3">
+    <KlyDropdownMenu Items="Items" OnSelect="item => _last = item.Label">
+        <KlyButton Label="Options" Color="KlyColor.Neutral" Variant="ButtonVariant.Outline" data-testid="menu-trigger">
+            <TrailingIcon>@KlyIcons.Named("chevron-down")</TrailingIcon>
+        </KlyButton>
+    </KlyDropdownMenu>
+    <p class="text-sm text-(--klyroo-text-muted)" data-testid="menu-state">Last action: @(_last ?? "none")</p>
+</div>
+
+@code {
+    private string? _last;
+
+    private static readonly KlyMenuItem[] Items =
+    [
+        KlyMenuItem.Heading("My account"),
+        new() { Label = "Profile", Shortcut = "⌘P" },
+        new() { Label = "Billing", Shortcut = "⌘B" },
+        new() { Label = "Documentation", Href = "/docs" },
+        KlyMenuItem.Separator(),
+        new() { Label = "Archive", Disabled = true },
+        new() { Label = "Delete account", Color = KlyColor.Error },
+    ];
+}

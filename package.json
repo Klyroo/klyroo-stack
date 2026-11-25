@@ -1,8 +1,8 @@
 {
-  "name": "lux-stack-site",
+  "name": "klyroo-stack-site",
   "private": true,
   "type": "module",
   "scripts": {
-    "site:css": "../lux-ui/node_modules/.bin/tailwindcss -i site/Lux.Stack.Site/Styles/site.css -o site/Lux.Stack.Site/wwwroot/site.css --minify"
+    "site:css": "../klyroo-ui/node_modules/.bin/tailwindcss -i site/Klyroo.Stack.Site/Styles/site.css -o site/Klyroo.Stack.Site/wwwroot/site.css --minify"
   }
 }

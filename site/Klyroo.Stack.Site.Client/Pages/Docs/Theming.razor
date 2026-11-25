@@ -1,0 +1,71 @@
+@page "/docs/theming"
+@layout Layout.DocsLayout
+
+<PageTitle>Theming · Klyroo.UI</PageTitle>
+<div class="pg-prose">
+    <p class="pg-eyebrow">Getting started</p>
+    <h1>Theming</h1>
+    <p class="pg-lead">Four levels, from the broadest to the most local: the palettes of the design system, the CSS variables, the global theme, and per-instance overrides.</p>
+
+    <h2>Palettes</h2>
+    <p>Map the semantic colors (<code>primary</code>, <code>neutral</code>…) to Tailwind palettes or your own, add colors of your own, and set a default color and size, all in <code>AddKlyrooUi</code>. Klyroo.UI computes the variables so the contrast rules still hold. See <a href="/docs/design-system">Design system</a>.</p>
+    <CodeBlock Title="Program.cs" Code="@Palettes" />
+
+    <h2>Design tokens</h2>
+    <p>Colors, radius and surfaces are CSS variables. Override them in both <code>:root</code> and <code>.dark</code>, with or without Tailwind. <a href="/docs/css-variables">The whole list</a>, with the Tailwind utilities that follow it, is a page of its own.</p>
+    <CodeBlock Title="app.css" Code="@Tokens" />
+
+    <h2>Custom colors</h2>
+    <p>The easy way is <code>o.Colors.Add("tertiary", palette)</code> with <code>KlyThemeStyle</code>. By hand, define the three variables for a name and pass it as a <code>Color</code>; this works with and without Tailwind.</p>
+    <CodeBlock Code="@CustomColor" />
+
+    <h2>Global theme</h2>
+    <p>Every component has slots, variants and defaults declared in C#. Classes you add win over the defaults.</p>
+    <p>Configure themes in <code>AddKlyrooUi</code>, which may be called more than once (a library, then the app). A theme becomes read-only the first time a component renders with it, because resolved classes are cached: changing it afterwards throws an <code>InvalidOperationException</code>. The <code>Slots</code>, <code>Variants</code>, <code>CompoundVariants</code> and <code>DefaultVariants</code> properties are read-only views; use <code>Slot</code>, <code>Variant</code>, <code>Compound</code> and <code>Default</code> to configure. <code>KlyTheme</code> scopes are unaffected, they only add classes per subtree. The palettes and the defaults of <code>o.Colors</code> and <code>o.Defaults</code> freeze the same way.</p>
+    <CodeBlock Title="Program.cs" Code="@Global" />
+
+    <h2>Per instance</h2>
+    <p><code>Class</code> styles the root element; <code>Ui</code> targets any slot. Both take Tailwind utilities, so they need Tailwind compiled by your app.</p>
+    <CodeBlock Code="@Instance" />
+</div>
+
+@code {
+    private const string Palettes = """
+        builder.Services.AddKlyrooUi(o =>
+        {
+            o.Colors.Primary = KlyPalette.Blue;
+            o.Colors.Neutral = KlyPalette.Zinc;
+            o.Colors.Add("tertiary", KlyPalette.Indigo);
+        });
+        """;
+
+    private const string Tokens = """
+        :root {
+          --klyroo-radius: 0.5rem;
+          --klyroo-primary: var(--color-teal-700);
+          --klyroo-primary-text: var(--color-teal-800);
+        }
+        .dark {
+          --klyroo-primary: var(--color-teal-400);
+          --klyroo-primary-text: var(--color-teal-300);
+        }
+        """;
+
+    private const string CustomColor = """
+        [data-color='brand'] { --kly-color: #0f766e; --kly-color-text: #115e59; --kly-color-contrast: #fff; }
+
+        <KlyButton Label="Brand button" Color="@("brand")" />
+        """;
+
+    private const string Global = """
+        builder.Services.AddKlyrooUi(o =>
+        {
+            o.Button.Slot("base", "rounded-full");
+            o.Card.Slot("root", "shadow-sm");
+        });
+        """;
+
+    private const string Instance = """
+        <KlyButton Label="Save" Class="px-6" Ui="@(new ButtonUi { Label = "uppercase tracking-wide" })" />
+        """;
+}

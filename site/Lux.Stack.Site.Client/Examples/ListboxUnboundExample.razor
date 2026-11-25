@@ -1,9 +1,0 @@
-<div class="flex w-full max-w-xs flex-col gap-3">
-    <LxFormField Label="Color">
-        <LxListbox Items="Colors" Name="color" Value="@(["green"])" />
-    </LxFormField>
-</div>
-
-@code {
-    private static readonly LxSelectItem[] Colors = [new("red", "Red"), new("green", "Green"), new("blue", "Blue")];
-}

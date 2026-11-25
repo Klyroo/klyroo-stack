@@ -1,4 +1,4 @@
-// WCAG 2.1 AA accessibility audit for Lux.Stack.Site using Playwright + @axe-core/playwright.
+// WCAG 2.1 AA accessibility audit for Klyroo.Stack.Site using Playwright + @axe-core/playwright.
 // Run in CI or locally: node build/verify-a11y.mjs [--url http://localhost:5180]
 import { chromium } from 'playwright';
 import AxeBuilder from '@axe-core/playwright';
@@ -6,7 +6,7 @@ import AxeBuilder from '@axe-core/playwright';
 const urlArgIdx = process.argv.indexOf('--url');
 const baseUrl = urlArgIdx >= 0 && process.argv[urlArgIdx + 1]
   ? process.argv[urlArgIdx + 1]
-  : process.env.LUX_SITE_URL || 'http://localhost:5180';
+  : process.env.KLYROO_SITE_URL || 'http://localhost:5180';
 
 const routes = ['/', '/showcase', '/why', '/query/docs', '/table/docs', '/form/docs', '/dashboard/docs', '/display/docs', '/spreadsheet/docs', '/agent/docs'];
 

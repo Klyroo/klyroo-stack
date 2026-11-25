@@ -1,0 +1,22 @@
+<div class="flex w-full max-w-md flex-col items-center gap-3">
+    <KlyContextMenu Items="Items" OnSelect="item => _last = item.Label" Label="Document actions" aria-label="Document, press Shift+F10 for actions" Class="w-full">
+        <div class="flex h-36 w-full items-center justify-center rounded-(--klyroo-radius) border border-dashed border-(--klyroo-border-accented) px-4 text-center text-sm text-(--klyroo-text-muted)" data-testid="context-area">
+            Right click, long press, or focus here and press Shift+F10
+        </div>
+    </KlyContextMenu>
+    <p class="text-sm text-(--klyroo-text-muted)" data-testid="context-state">Last action: @(_last ?? "none")</p>
+</div>
+
+@code {
+    private string? _last;
+
+    private static readonly KlyMenuItem[] Items =
+    [
+        new() { Label = "Open", Shortcut = "Enter" },
+        new() { Label = "Rename", Shortcut = "F2" },
+        new() { Label = "Share", Href = "/docs" },
+        KlyMenuItem.Separator(),
+        new() { Label = "Archive", Disabled = true },
+        new() { Label = "Delete", Color = KlyColor.Error },
+    ];
+}

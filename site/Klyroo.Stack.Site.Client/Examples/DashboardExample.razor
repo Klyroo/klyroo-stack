@@ -1,0 +1,90 @@
+@* A complete dashboard in a frame of fixed height, so it does not replace the layout of the site. In an app the group
+   fills the page: give it the whole viewport. As="div": the docs page already has a main landmark.
+   The group-data-[state=collapsed]/sidebar variants keep labels for screen readers while the sidebar shows icons only. *@
+<div class="h-[30rem] w-full overflow-hidden rounded-xl border border-(--klyroo-border)" data-testid="dashboard">
+    <KlyDashboardGroup StorageKey="playground-dashboard">
+        <KlyDashboardSidebar As="div" Resizable data-testid="dashboard-sidebar">
+            <Header>
+                <span class="font-semibold text-(--klyroo-text-highlighted)">Acme</span>
+            </Header>
+            <ChildContent>
+                <KlyDashboardSearchButton data-testid="dashboard-search-button" />
+                <KlyNavigationMenu Items="_items" Orientation="KlyOrientation.Vertical" AriaLabel="Workspace" Ui="_navUi" />
+            </ChildContent>
+            <Footer>
+                <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-(--klyroo-bg-elevated) text-xs font-medium" aria-hidden="true">AL</span>
+                <span class="min-w-0 truncate text-sm group-data-[state=collapsed]/sidebar:sr-only">Ada Lovelace</span>
+            </Footer>
+        </KlyDashboardSidebar>
+
+        <KlyDashboardPanel Resizable Size="35" MinSize="20" MaxSize="60" ResizeLabel="Resize inbox" data-testid="dashboard-inbox">
+            <Header>
+                <KlyDashboardNavbar Title="Inbox">
+                    <Leading><KlyDashboardSidebarCollapse data-testid="dashboard-collapse" /></Leading>
+                </KlyDashboardNavbar>
+                <KlyDashboardToolbar>
+                    <Left>
+                        <KlyButton Label="All" Size="KlySize.Sm" Variant="ButtonVariant.Soft" Color="KlyColor.Neutral" />
+                        <KlyButton Label="Unread" Size="KlySize.Sm" Variant="ButtonVariant.Ghost" Color="KlyColor.Neutral" />
+                    </Left>
+                </KlyDashboardToolbar>
+            </Header>
+            <Body>
+                <ul class="flex flex-col gap-3 text-sm">
+                    @foreach (var subject in _subjects)
+                    {
+                        <li class="truncate text-(--klyroo-text)">@subject</li>
+                    }
+                </ul>
+            </Body>
+        </KlyDashboardPanel>
+
+        <KlyDashboardPanel data-testid="dashboard-detail">
+            <Header>
+                <KlyDashboardNavbar Title="Message" Toggle="false">
+                    <Right>
+                        <KlyButton Label="Reply" Size="KlySize.Sm" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" />
+                    </Right>
+                </KlyDashboardNavbar>
+            </Header>
+            <Body>
+                <p class="text-sm text-(--klyroo-text-muted)">
+                    Press Ctrl+K, or use the search button, to jump to a page or run a command.
+                </p>
+                <p class="text-sm text-(--klyroo-text-muted)" data-testid="dashboard-last">Last command: @(_last ?? "none")</p>
+            </Body>
+        </KlyDashboardPanel>
+
+        <KlyDashboardSearch Groups="_groups" OnSelect="item => _last = item.Label" />
+    </KlyDashboardGroup>
+</div>
+
+@code {
+    private string? _last;
+
+    private static readonly NavigationMenuUi _navUi = new() { Label = "group-data-[state=collapsed]/sidebar:sr-only" };
+
+    private static readonly string[] _subjects = ["Welcome to Acme", "Your invoice is ready", "Design review notes", "Weekly summary", "Password changed"];
+
+    private static readonly KlyNavigationItem[] _items =
+    [
+        new("Home") { Href = "/", Exact = true, Icon = KlyIcons.Named("home", "size-5") },
+        new("Inbox") { Href = "/components/dashboard-group", Icon = KlyIcons.Named("inbox", "size-5") },
+        new("Calendar") { Href = "/components/header", Icon = KlyIcons.Named("calendar", "size-5") },
+        new("Settings") { Href = "/docs/theming", Icon = KlyIcons.Named("user", "size-5") },
+    ];
+
+    private static readonly KlyCommandGroup[] _groups =
+    [
+        new("Go to",
+        [
+            new() { Label = "Inbox", Href = "?view=inbox", Keywords = "mail messages" },
+            new() { Label = "Settings", Href = "?view=settings", Keywords = "preferences account" },
+        ]),
+        new("Actions",
+        [
+            new() { Label = "Compose message", Keywords = "new write" },
+            new() { Label = "Sign out", Keywords = "logout" },
+        ]),
+    ];
+}

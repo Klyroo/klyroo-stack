@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Klyroo.Stack.BundleGenerator</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\site\Klyroo.Stack.Site.Client\Klyroo.Stack.Site.Client.csproj" />
+    <ProjectReference Include="..\..\src\Klyroo.Stack.Mcp.Model\Klyroo.Stack.Mcp.Model.csproj" />
+  </ItemGroup>
+
+</Project>

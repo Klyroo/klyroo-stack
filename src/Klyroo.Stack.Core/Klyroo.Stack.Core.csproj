@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Klyroo.Stack</RootNamespace>
+    <PackageId>Klyroo.Stack.Core</PackageId>
+    <Description>Klyroo Core Meta-Package: aggregates all headless, NativeAOT-compatible Core engines of Klyroo (Query, Table, Form, Dashboard, Display, Spreadsheet, Agent) and the KlyrooStackCatalog router.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <IsTrimmable>true</IsTrimmable>
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\klyroo-query\src\Klyroo.Query.Core\Klyroo.Query.Core.csproj" />
+    <ProjectReference Include="..\..\..\klyroo-table\src\Klyroo.Table.Core\Klyroo.Table.Core.csproj" />
+    <ProjectReference Include="..\..\..\klyroo-form\src\Klyroo.Form.Core\Klyroo.Form.Core.csproj" />
+    <ProjectReference Include="..\..\..\klyroo-dashboard\src\Klyroo.Dashboard.Core\Klyroo.Dashboard.Core.csproj" />
+    <ProjectReference Include="..\..\..\klyroo-display\src\Klyroo.Display.Core\Klyroo.Display.Core.csproj" />
+    <ProjectReference Include="..\..\..\klyroo-spreadsheet\src\Klyroo.Spreadsheet.Core\Klyroo.Spreadsheet.Core.csproj" />
+    <ProjectReference Include="..\..\..\klyroo-agent\src\Klyroo.Agent.Core\Klyroo.Agent.Core.csproj" />
+  </ItemGroup>
+</Project>

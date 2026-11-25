@@ -1,0 +1,11 @@
+<KlyModal Title="Edit invoice" data-testid="outer-modal">
+    <ChildContent><KlyButton Label="Edit invoice" Variant="ButtonVariant.Outline" /></ChildContent>
+    <Body>
+        <KlyModal Title="Discard changes?" Size="KlySize.Sm" Close="false">
+            <ChildContent><KlyButton Label="Discard" Color="KlyColor.Error" Variant="ButtonVariant.Soft" /></ChildContent>
+            <Footer>
+                <KlyButton Label="Keep editing" Color="KlyColor.Neutral" Variant="ButtonVariant.Outline" data-kly-close />
+            </Footer>
+        </KlyModal>
+    </Body>
+</KlyModal>

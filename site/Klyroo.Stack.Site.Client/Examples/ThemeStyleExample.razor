@@ -1,0 +1,47 @@
+@* A live preview: the palettes are rendered by KlyThemeStyle into a scope, so only this block changes color.
+   In your app the same options go in AddKlyrooUi and KlyThemeStyle sits in <head> without parameters.
+   Choosing a palette needs interactivity: in static rendering the buttons stay disabled on Indigo. *@
+<div id="palette-demo" data-testid="palette-demo" class="flex w-full max-w-xl flex-col gap-5">
+    <KlyThemeStyle Colors="_colors" Scope="#palette-demo" />
+
+    <div role="group" aria-label="Primary palette" class="flex flex-wrap gap-2">
+        @foreach (var palette in _palettes)
+        {
+            var current = palette;
+            <KlyButton Label="@current.Name" Size="KlySize.Sm" Color="KlyColor.Neutral"
+                      Variant="@(current == _primary ? ButtonVariant.Solid : ButtonVariant.Outline)"
+                      aria-pressed="@(current == _primary ? "true" : "false")"
+                      data-testid="@($"palette-{current.Name}")"
+                      OnClick="@(() => Select(current))" />
+        }
+    </div>
+
+    <div class="flex flex-wrap items-center gap-3">
+        <KlyButton Label="Primary" data-testid="palette-primary" />
+        <KlyButton Label="Soft" Variant="ButtonVariant.Soft" />
+        <KlyButton Label="Outline" Variant="ButtonVariant.Outline" />
+        <KlyBadge Label="Primary" Variant="KlyVariant.Subtle" />
+        <KlyBadge Label="tertiary" Color="@("tertiary")" Variant="KlyVariant.Solid" data-testid="palette-tertiary" />
+    </div>
+</div>
+
+@code {
+    private static readonly KlyPalette[] _palettes = [KlyPalette.Indigo, KlyPalette.Emerald, KlyPalette.Rose, KlyPalette.Amber, KlyPalette.Sky];
+
+    private KlyPalette _primary = KlyPalette.Indigo;
+    private KlyColorOptions _colors = Build(KlyPalette.Indigo);
+
+    // Like AddKlyrooUi(o => { o.Colors.Primary = ...; o.Colors.Add("tertiary", ...); }), built per choice because options freeze.
+    private static KlyColorOptions Build(KlyPalette primary)
+    {
+        var colors = new KlyColorOptions { Primary = primary };
+        colors.Add("tertiary", primary == KlyPalette.Rose ? KlyPalette.Violet : KlyPalette.Rose);
+        return colors;
+    }
+
+    private void Select(KlyPalette palette)
+    {
+        _primary = palette;
+        _colors = Build(palette);
+    }
+}

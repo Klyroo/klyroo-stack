@@ -1,0 +1,16 @@
+@using Klyroo.UI.Theming
+@* In a real app this wraps @Body in MainLayout.razor and replaces <KlyToaster />:
+   <KlyApp Lang="en" Overrides="_overrides">@Body</KlyApp>
+   The site's layout already has a toaster, so this one turns it off. *@
+<KlyApp Toaster="false" Lang="en" Dir="ltr" Overrides="_overrides" Class="flex flex-wrap items-center gap-3" data-testid="app">
+    <KlyButton Label="Save" />
+    <KlyButton Label="Cancel" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" />
+    <KlyBadge Label="Every button is rounded" Variant="KlyVariant.Subtle" />
+</KlyApp>
+
+@code {
+    private readonly Dictionary<Type, ISlotOverrides> _overrides = new()
+    {
+        [typeof(KlyButton)] = new ButtonUi { Base = "rounded-full" },
+    };
+}

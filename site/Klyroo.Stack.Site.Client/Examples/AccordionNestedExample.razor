@@ -1,0 +1,14 @@
+@* Components inside a panel keep their own behavior: opening the menu does not collapse the item. *@
+<div class="w-full max-w-lg">
+    <KlyAccordion Items="Items" Value="@(["settings"])" />
+</div>
+
+@code {
+    private static readonly KlySelectItem[] Themes = [new("light", "Light"), new("dark", "Dark"), new("system", "System")];
+
+    private static readonly KlyAccordionItem[] Items =
+    [
+        new("Settings") { Value = "settings", Content = @<KlyFormField Label="Theme"><KlySelect Items="Themes" Placeholder="Pick a theme" /></KlyFormField> },
+        new("Danger zone") { Value = "danger", Content = @<p>Delete your account.</p> },
+    ];
+}

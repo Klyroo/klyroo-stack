@@ -1,0 +1,15 @@
+<KlyModal Title="Shipping" Description="Choose where to ship the order.">
+    <ChildContent><KlyButton Label="Ship order" Variant="ButtonVariant.Outline" data-testid="modal-select-trigger" /></ChildContent>
+    <Body>
+        <KlyFormField Label="Country">
+            <KlySelect @bind-Value="_country" Items="Countries" Placeholder="Choose a country" data-testid="modal-country" />
+        </KlyFormField>
+    </Body>
+    <Footer><KlyButton Label="Close" Color="KlyColor.Neutral" Variant="ButtonVariant.Ghost" data-kly-close /></Footer>
+</KlyModal>
+
+@code {
+    private string? _country;
+
+    private static readonly KlySelectItem[] Countries = [new("fr", "France"), new("de", "Germany"), new("it", "Italy")];
+}

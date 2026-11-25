@@ -1,0 +1,12 @@
+@* A handle placed between two panels, instead of Resizable on the first. It resizes the panel before it. *@
+<div class="h-56 w-full overflow-hidden rounded-xl border border-(--klyroo-border)" data-testid="dashboard-handle-frame">
+    <KlyDashboardGroup>
+        <KlyDashboardPanel Size="50" data-testid="dashboard-handle-left">
+            <Body><p class="text-sm text-(--klyroo-text-muted)">Editor</p></Body>
+        </KlyDashboardPanel>
+        <KlyDashboardResizeHandle Label="Resize editor" Value="50" data-testid="dashboard-handle" />
+        <KlyDashboardPanel Size="50" data-testid="dashboard-handle-right">
+            <Body><p class="text-sm text-(--klyroo-text-muted)">Preview</p></Body>
+        </KlyDashboardPanel>
+    </KlyDashboardGroup>
+</div>

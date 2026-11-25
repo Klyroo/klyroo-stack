@@ -1,0 +1,19 @@
+<div class="w-full max-w-2xl">
+    <KlyChangelogVersions>
+        <KlyChangelogVersion Title="v1.2.0" Badge="Latest" Date="@(new DateTimeOffset(2026, 11, 18, 0, 0, 0, TimeSpan.Zero))" Href="/docs"
+                            Description="Marketing components and a faster theme resolver."
+                            Authors="@(new[] { new KlyPostAuthor("Ada Lovelace"), new KlyPostAuthor("Grace Hopper") })">
+            <ul>
+                <li>Added <code>KlyPricingPlans</code>, <code>KlyPricingTable</code> and <code>KlyAuthForm</code>.</li>
+                <li>Theme resolution is cached per variant selection.</li>
+            </ul>
+        </KlyChangelogVersion>
+        <KlyChangelogVersion Title="v1.1.0" Date="@(new DateTimeOffset(2026, 10, 20, 0, 0, 0, TimeSpan.Zero))" Description="Pickers and a color picker.">
+            <p>Calendar, time and color inputs now post in static rendering.</p>
+            <p>See the <a href="/docs">migration notes</a> if you customized the date field.</p>
+        </KlyChangelogVersion>
+        <KlyChangelogVersion Title="v1.0.0" Date="@(new DateTimeOffset(2026, 9, 30, 0, 0, 0, TimeSpan.Zero))" Badge="Stable" Description="General availability.">
+            <p>The first stable release, in all four render modes.</p>
+        </KlyChangelogVersion>
+    </KlyChangelogVersions>
+</div>

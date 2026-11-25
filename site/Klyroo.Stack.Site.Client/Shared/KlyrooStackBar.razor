@@ -1,0 +1,54 @@
+@implements IDisposable
+@using Klyroo.Stack.Site.Client.Docs
+@inject NavigationManager Navigation
+
+<div class="border-b border-(--klyroo-border) bg-(--klyroo-bg-muted)/75 backdrop-blur">
+    <div class="mx-auto flex max-w-(--breakpoint-2xl) items-center gap-2 px-4 py-2 sm:px-6 lg:px-8">
+        <nav aria-label="Klyroo Libraries" class="flex min-w-0 items-center gap-1.5 overflow-x-auto py-0.5">
+            <a href="/"
+               aria-current="@(_isHub ? "page" : null)"
+               class="inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-1 font-mono text-xs transition-colors @(_isHub ? "border-(--klyroo-primary-text) bg-(--klyroo-bg) font-semibold text-(--klyroo-text-highlighted)" : "border-(--klyroo-border) bg-(--klyroo-bg) text-(--klyroo-text-muted) hover:border-(--klyroo-border-accented) hover:text-(--klyroo-text-highlighted)")">
+                <span class="size-2 rounded-full bg-(--klyroo-primary)" aria-hidden="true"></span>
+                <span>Klyroo</span>
+            </a>
+            <span class="px-0.5 text-(--klyroo-border-accented)" aria-hidden="true">/</span>
+            @foreach (var p in KlyrooStackProducts.All)
+            {
+                var isActive = string.Equals(_activeSlug, p.Slug, StringComparison.OrdinalIgnoreCase);
+                <a href="@($"/{p.Slug}")"
+                   aria-current="@(isActive ? "page" : null)"
+                   class="inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-xs transition-colors @(isActive ? "bg-(--klyroo-bg) font-semibold text-(--klyroo-text-highlighted)" : "border-(--klyroo-border) bg-(--klyroo-bg) text-(--klyroo-text-muted) hover:border-(--klyroo-border-accented) hover:text-(--klyroo-text-highlighted)")"
+                   style="@(isActive ? $"border-color:{p.AccentHex}" : "")">
+                    <span class="size-2 rounded-full" style="@($"background:{p.AccentHex}")" aria-hidden="true"></span>
+                    <span>@p.ShortName</span>
+                </a>
+            }
+        </nav>
+    </div>
+</div>
+
+@code {
+    private string? _activeSlug;
+    private bool _isHub;
+
+    protected override void OnInitialized()
+    {
+        UpdateFromUri();
+        Navigation.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        UpdateFromUri();
+        StateHasChanged();
+    }
+
+    private void UpdateFromUri()
+    {
+        var path = "/" + Navigation.ToBaseRelativePath(Navigation.Uri).Split('?', '#')[0].Trim('/');
+        _isHub = path is "/" or "/stack";
+        _activeSlug = KlyrooStackProducts.ResolveFromPath(path)?.Slug;
+    }
+
+    public void Dispose() => Navigation.LocationChanged -= OnLocationChanged;
+}

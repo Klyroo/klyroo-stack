@@ -1,0 +1,21 @@
+@inject NavigationManager Navigation
+
+@* Links to the current page, to its section (a prefix of the path) and to another page. *@
+<nav aria-label="Link states" class="flex flex-wrap items-center gap-4 text-sm">
+    <KlyLink Href="@_here" Label="This page" data-testid="link-current" />
+    <KlyLink Href="@_section" Label="Section" data-testid="link-section" />
+    <KlyLink Href="@_section" Exact Label="Section (exact)" data-testid="link-section-exact" />
+    <KlyLink Href="/docs" Label="Docs" data-testid="link-other" />
+    <KlyLink Href="/docs" Label="Disabled" Disabled data-testid="link-disabled" />
+</nav>
+
+@code {
+    private string _here = "/";
+    private string _section = "/";
+
+    protected override void OnInitialized()
+    {
+        _here = new Uri(Navigation.Uri).AbsolutePath;
+        _section = _here[.._here.LastIndexOf('/')];
+    }
+}

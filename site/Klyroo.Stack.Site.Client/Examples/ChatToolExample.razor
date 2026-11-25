@@ -1,0 +1,27 @@
+@* The default content makes the block collapsible. Actions sit under the name, outside the collapsible part. *@
+<div class="flex w-full max-w-xl flex-col gap-4" data-testid="chat-tool-example">
+    <KlyChatTool Text="Searched the documentation" Suffix='"chat prompt"' Icon="@KlyIcons.Named("search", "size-4")" data-testid="chat-tool-done">
+        <p>Input: {"query": "chat prompt"}</p>
+        <p>Output: 3 results</p>
+    </KlyChatTool>
+    <KlyChatTool Text="Reading a file" Suffix="notes.txt" Loading Streaming data-testid="chat-tool-running" />
+    <KlyChatTool Text="Calling the weather API" Error Variant="ChatToolVariant.Card" data-testid="chat-tool-failed">
+        <p>Error: the service did not answer in time.</p>
+    </KlyChatTool>
+    <KlyChatTool Text="Delete the draft" Suffix="draft.md" Variant="ChatToolVariant.Card" Icon="@KlyIcons.Named("trash", "size-4")" data-testid="chat-tool-approval">
+        <Actions>
+            <KlyButton Label="Allow" Size="KlySize.Xs" OnClick="Allow" data-testid="chat-tool-allow" />
+            <KlyButton Label="Deny" Size="KlySize.Xs" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" OnClick="Deny" data-testid="chat-tool-deny" />
+        </Actions>
+        <ChildContent><p>Arguments: {"path": "draft.md"}</p></ChildContent>
+    </KlyChatTool>
+    <p class="text-sm text-(--klyroo-text-muted)" role="status" data-testid="chat-tool-answer">@(_answer ?? "Waiting for your answer")</p>
+</div>
+
+@code {
+    private string? _answer;
+
+    private void Allow() => _answer = "Allowed";
+
+    private void Deny() => _answer = "Denied";
+}

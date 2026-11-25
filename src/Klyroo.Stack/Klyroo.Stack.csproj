@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Klyroo.Stack</RootNamespace>
+    <PackageId>Klyroo.Stack</PackageId>
+    <Description>Umbrella meta-package for the entire Klyroo ecosystem (UI, Query, Table, Form, Dashboard, Display, Spreadsheet, Agent) for Blazor Web and .NET MAUI Hybrid.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <IsTrimmable>true</IsTrimmable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Klyroo.Stack.Core\Klyroo.Stack.Core.csproj" />
+    <ProjectReference Include="..\..\..\klyroo-ui\src\Klyroo.UI\Klyroo.UI.csproj" />
+    <ProjectReference Include="..\..\..\klyroo-query\src\Klyroo.Query\Klyroo.Query.csproj" />
+    <ProjectReference Include="..\..\..\klyroo-table\src\Klyroo.Table\Klyroo.Table.csproj" />
+    <ProjectReference Include="..\..\..\klyroo-form\src\Klyroo.Form\Klyroo.Form.csproj" />
+    <ProjectReference Include="..\..\..\klyroo-dashboard\src\Klyroo.Dashboard\Klyroo.Dashboard.csproj" />
+    <ProjectReference Include="..\..\..\klyroo-display\src\Klyroo.Display\Klyroo.Display.csproj" />
+    <ProjectReference Include="..\..\..\klyroo-spreadsheet\src\Klyroo.Spreadsheet\Klyroo.Spreadsheet.csproj" />
+    <ProjectReference Include="..\..\..\klyroo-agent\src\Klyroo.Agent\Klyroo.Agent.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+    <SupportedPlatform Include="ios" />
+    <SupportedPlatform Include="android" />
+    <SupportedPlatform Include="maccatalyst" />
+    <SupportedPlatform Include="windows" />
+  </ItemGroup>
+</Project>

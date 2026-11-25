@@ -1,0 +1,18 @@
+<div class="flex w-full flex-col gap-4">
+    <KlyMarquee Duration="25" data-testid="marquee">
+        @foreach (var name in Names)
+        {
+            <KlyBadge Label="@name" Variant="KlyVariant.Subtle" />
+        }
+    </KlyMarquee>
+    <KlyMarquee Reverse="true" Duration="40" Overlay="false">
+        @foreach (var name in Names)
+        {
+            <span class="text-sm text-(--klyroo-text-muted)">@name</span>
+        }
+    </KlyMarquee>
+</div>
+
+@code {
+    private static readonly string[] Names = ["Blazor", "Tailwind", "Accessible", "Themeable", "Server", "WebAssembly", "Auto", "Static SSR"];
+}

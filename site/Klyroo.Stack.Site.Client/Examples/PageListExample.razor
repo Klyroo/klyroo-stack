@@ -1,0 +1,17 @@
+<div class="w-full max-w-xl">
+    <KlyPageList>
+        @foreach (var (name, role) in _people)
+        {
+            <li><KlyUser Name="@name" Description="@role" /></li>
+        }
+    </KlyPageList>
+</div>
+
+@code {
+    private readonly (string Name, string Role)[] _people =
+    [
+        ("Ada Lovelace", "Analyst"),
+        ("Grace Hopper", "Compiler pioneer"),
+        ("Margaret Hamilton", "Flight software"),
+    ];
+}

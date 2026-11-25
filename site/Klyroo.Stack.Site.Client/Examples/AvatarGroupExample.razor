@@ -1,0 +1,15 @@
+<div class="flex flex-wrap items-center gap-8">
+    <KlyAvatarGroup Items="People" Max="3" AriaLabel="Project members" />
+    <KlyAvatarGroup Items="People" Size="KlySize.Lg" AriaLabel="All members" />
+</div>
+
+@code {
+    private static readonly KlyAvatarItem[] People =
+    [
+        new(Alt: "Ada Lovelace"),
+        new(Alt: "Grace Hopper"),
+        new(Alt: "Alan Turing"),
+        new(Alt: "Edsger Dijkstra"),
+        new(Alt: "Barbara Liskov"),
+    ];
+}

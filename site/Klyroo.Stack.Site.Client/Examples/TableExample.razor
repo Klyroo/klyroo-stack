@@ -1,0 +1,27 @@
+<div class="w-full">
+    <KlyTable Items="People" Caption="Team members" Class="rounded-xl border border-(--klyroo-border)">
+        <KlyColumn TItem="Person" Title="Name" Field="p => p.Name" Sortable Class="font-medium text-(--klyroo-text)" />
+        <KlyColumn TItem="Person" Title="Role" Field="p => p.Role" Sortable />
+        <KlyColumn TItem="Person" Title="Joined" Field="p => p.Joined" Sortable>
+            <Template>@context.Joined.ToString("MMM yyyy")</Template>
+        </KlyColumn>
+        <KlyColumn TItem="Person" Title="Status">
+            <Template>
+                <KlyBadge Label="@context.Status" Variant="KlyVariant.Subtle" Size="KlySize.Sm"
+                         Color="@(context.Status == "Active" ? KlyColor.Success : KlyColor.Neutral)" />
+            </Template>
+        </KlyColumn>
+    </KlyTable>
+</div>
+
+@code {
+    private sealed record Person(string Name, string Role, DateOnly Joined, string Status);
+
+    private static readonly Person[] People =
+    [
+        new("Lindsay Walton", "Front-end developer", new(2024, 3, 1), "Active"),
+        new("Courtney Henry", "Designer", new(2023, 11, 15), "Active"),
+        new("Tom Cook", "Director of product", new(2022, 6, 1), "Away"),
+        new("Whitney Francis", "Copywriter", new(2025, 1, 20), "Active"),
+    ];
+}

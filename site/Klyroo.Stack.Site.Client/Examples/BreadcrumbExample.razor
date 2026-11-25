@@ -1,0 +1,10 @@
+<KlyBreadcrumb Items="Items" AriaLabel="You are here" />
+
+@code {
+    private static readonly KlyBreadcrumbItem[] Items =
+    [
+        new("Home") { Href = "/", Icon = KlyIcons.Named("info", "size-4") },
+        new("Components") { Href = "/components/button" },
+        new("Breadcrumb"),
+    ];
+}

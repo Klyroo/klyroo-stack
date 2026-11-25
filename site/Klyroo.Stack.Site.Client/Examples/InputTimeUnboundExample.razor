@@ -1,0 +1,12 @@
+<div class="flex w-full max-w-xs flex-col gap-3">
+    <KlyFormField Label="Pickup time">
+        <KlyInputTime Value="@(new TimeOnly(9, 0))" Hour12="_hour12" Name="pickup" data-testid="unbound-time" />
+    </KlyFormField>
+    <KlyButton Variant="ButtonVariant.Outline" Label="Switch the clock" OnClick="Switch" />
+</div>
+
+@code {
+    private bool _hour12;
+
+    private void Switch() => _hour12 = !_hour12;
+}
