@@ -33,6 +33,8 @@ For static server rendering that reads the user's time zone (data lists cut days
 `Klyroo.Stack` declares the four MAUI platforms, and the `klyroo-maui` template registers it in `MauiProgram.cs`:
 
 ```csharp
+using Klyroo.Stack;
+
 builder.Services.AddMauiBlazorWebView();
 builder.Services.AddKlyrooStack();
 ```
