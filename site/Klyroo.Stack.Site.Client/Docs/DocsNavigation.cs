@@ -84,14 +84,19 @@ public static class DocsNavigation
                 if (activeLibrarySlug is not null && !string.Equals(activeLibrarySlug, "ui", StringComparison.OrdinalIgnoreCase))
                 {
                     var lib = KlyrooLibraryDocs.FindLibrary(activeLibrarySlug);
+                    var prod = KlyrooStackProducts.Find(activeLibrarySlug);
                     pages = lib is null
                         ? []
                         : [
-                            new KlyContentSearchPage($"{lib.LibraryName} Overview", $"/{lib.LibrarySlug}") { Group = lib.LibraryName, Icon = "" },
+                            new KlyContentSearchPage($"{lib.LibraryName} Overview", $"/{lib.LibrarySlug}")
+                            {
+                                Group = lib.LibraryName,
+                                Description = prod?.Tagline ?? $"Overview and live stage for {lib.LibraryName}",
+                            },
                             .. lib.Pages.Select(p => new KlyContentSearchPage(p.Title, KlyrooLibraryDocs.PageHref(lib.LibrarySlug, p.Slug))
                             {
                                 Group = p.Group,
-                                Icon = "",
+                                Description = p.Lead,
                                 Keywords = $"{p.Slug} {p.Lead}",
                             }),
                         ];
@@ -100,14 +105,14 @@ public static class DocsNavigation
                 {
                     pages =
                     [
-                        new KlyContentSearchPage("Klyroo.UI Overview", "/ui") { Group = "Klyroo.UI", Icon = "" },
-                        .. Catalog.Guides.Select(g => new KlyContentSearchPage(g.Title, g.Href) { Group = g.Section, Icon = "" }),
-                        new KlyContentSearchPage("Templates", "templates") { Group = "Gallery", Icon = "", Keywords = "starter dashboard landing live demo" },
+                        new KlyContentSearchPage("Klyroo.UI Overview", "/ui") { Group = "Klyroo.UI", Description = "133 accessible zero-roundtrip Blazor & MAUI components" },
+                        .. Catalog.Guides.Select(g => new KlyContentSearchPage(g.Title, g.Href) { Group = g.Section }),
+                        new KlyContentSearchPage("Templates", "/templates") { Group = "Gallery", Description = "9 live starter apps & 4 official dotnet new templates", Keywords = "starter dashboard landing saas live demo" },
                         .. InSidebarOrder.Select(c => new KlyContentSearchPage(c.Name, $"{prefix}/components/{c.Slug}")
                         {
                             Group = c.Group,
-                            Icon = "",
-                            Keywords = c.Slug.Replace('-', ' '),
+                            Description = c.Description,
+                            Keywords = $"{c.Slug.Replace('-', ' ')} {c.Description}",
                         }),
                     ];
                 }
@@ -115,9 +120,12 @@ public static class DocsNavigation
                 {
                     pages =
                     [
-                        new KlyContentSearchPage("Klyroo Hub", "/") { Group = "Klyroo", Icon = "", Keywords = "klyroo hub libraries" },
-                        .. KlyrooStackProducts.All.Select(p => new KlyContentSearchPage($"{p.Name} Overview", $"/{p.Slug}") { Group = "Libraries", Icon = "", Keywords = $"{p.RepoName} {p.CorePackage} {p.UiPackage} {p.Tagline}" }),
-                        .. KlyrooStackProducts.All.Select(p => new KlyContentSearchPage($"{p.Name} Documentation", p.DocsHref) { Group = "Documentation", Icon = "", Keywords = $"{p.Slug} docs reference" }),
+                        new KlyContentSearchPage("Klyroo Hub", "/") { Group = "Klyroo", Description = "Ecosystem overview & interactive AddKlyrooStack workbench", Keywords = "klyroo hub libraries" },
+                        new KlyContentSearchPage("Live 8-Library Showcase", "/showcase") { Group = "Klyroo", Description = "Interactive Revenue Ops backoffice combining all 8 libraries", Keywords = "showcase demo crm backoffice copilot" },
+                        new KlyContentSearchPage("Why Klyroo?", "/why") { Group = "Klyroo", Description = "Honest Blazor comparison, benchmarks & MCP setup", Keywords = "why compare mudblazor radzen fluentui quickgrid benchmarks mcp" },
+                        new KlyContentSearchPage("Templates", "/templates") { Group = "Klyroo", Description = "9 live runnable apps & dotnet new Klyroo.Templates", Keywords = "templates starter dashboard saas chat editor" },
+                        .. KlyrooStackProducts.All.Select(p => new KlyContentSearchPage($"{p.Name} Overview", $"/{p.Slug}") { Group = "Libraries", Description = p.Tagline, Keywords = $"{p.RepoName} {p.CorePackage} {p.UiPackage} {p.Tagline}" }),
+                        .. KlyrooStackProducts.All.Select(p => new KlyContentSearchPage($"{p.Name} Documentation", p.DocsHref) { Group = "Documentation", Description = $"Guides, examples & API reference for {p.Name}", Keywords = $"{p.Slug} docs reference" }),
                     ];
                 }
 

@@ -65,9 +65,25 @@
     font-variant-numeric: tabular-nums;
   }
 
-  :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  :where(a, button, input, select, textarea, summary, [tabindex]):not(kly-command-palette [data-slot="input"]):focus-visible {
     outline: 2px solid var(--klyroo-primary);
     outline-offset: 2px;
+  }
+
+  /* Clean slim scrollbar without native arrow buttons inside command palette search results. */
+  kly-command-palette [data-slot="listbox"] {
+    scrollbar-width: thin;
+    scrollbar-color: var(--klyroo-border-accented) transparent;
+  }
+  kly-command-palette [data-slot="listbox"]::-webkit-scrollbar {
+    width: 6px;
+  }
+  kly-command-palette [data-slot="listbox"]::-webkit-scrollbar-button {
+    display: none;
+  }
+  kly-command-palette [data-slot="listbox"]::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background: var(--klyroo-border-accented);
   }
 
   /* FocusOnNavigate focuses the page title for screen readers; it is not a control, so no ring. */
