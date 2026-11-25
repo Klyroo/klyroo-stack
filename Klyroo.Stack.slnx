@@ -13,6 +13,8 @@
   </Folder>
   <Folder Name="/build/">
     <Project Path="build/Klyroo.Stack.DocsBundle/Klyroo.Stack.DocsBundle.csproj" />
+    <!-- The site runs the Klyroo.UI build tasks from source: listing the project here builds it in the solution configuration. -->
+    <Project Path="../klyroo-ui/src/Klyroo.UI.Build.Tasks/Klyroo.UI.Build.Tasks.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Klyroo.Stack.Tests/Klyroo.Stack.Tests.csproj" />
