@@ -193,10 +193,10 @@ Install the tool and register it with your client:
 
 ```bash
 dotnet tool install --global Klyroo.Stack.Mcp --prerelease
-claude mcp add --transport stdio klyroo-ui -- klyroo-stack-mcp
+claude mcp add --transport stdio klyroo -- klyroo-stack-mcp
 ```
 
-For a client that reads an `mcpServers` JSON file, use `{ "mcpServers": { "klyroo-ui": { "command": "klyroo-stack-mcp" } } }`. Once connected, the agent finds components with `search-components`, reads their parameters with `get-component-metadata` and copies working markup with `get-example`. The server instructions tell it to use the metadata before writing markup.
+For a client that reads an `mcpServers` JSON file, use `{ "mcpServers": { "klyroo": { "command": "klyroo-stack-mcp" } } }`. Once connected, the agent finds components with `search-components`, reads their parameters with `get-component-metadata` and copies working markup with `get-example`. The server instructions tell it to use the metadata before writing markup.
 
 Two options are worth knowing. `--tools search-components,get-component` limits the tools a client sees, which keeps the tool list short for clients that load every description. `--site-url https://docs.example.com` prefixes page paths in the answers with your own address once the documentation site is deployed. The server answers from the documentation bundled when the tool was built, so update the tool to get newer documentation.
 

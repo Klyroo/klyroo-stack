@@ -4,7 +4,7 @@
     <PackageType>Template</PackageType>
     <PackageId>Klyroo.Templates</PackageId>
     <Title>Klyroo Project Templates</Title>
-    <Description>Official dotnet new templates for Klyroo (klyroo-saas Blazor Web App &amp; klyroo-headless NativeAOT engine).</Description>
+    <Description>dotnet new templates for Klyroo: klyroo-saas (Blazor Web App), klyroo-admin (back office), klyroo-headless (NativeAOT console) and klyroo-maui (.NET MAUI Blazor Hybrid).</Description>
     <PackageTags>dotnet-new;templates;blazor;maui;klyroo;nativeaot</PackageTags>
     <TargetFramework>net10.0</TargetFramework>
     <IncludeContentInPack>true</IncludeContentInPack>

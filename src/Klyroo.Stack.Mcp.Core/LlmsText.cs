@@ -27,7 +27,7 @@ public static class LlmsText
         sb.Append($"{bundle.Components.Count} components in {bundle.Groups.Count} families, version {bundle.Version}. ");
         sb.Append("Components are prefixed `Kly` (`<KlyButton>`), register them with `builder.Services.AddKlyrooUi()` in the server and, for WebAssembly and Auto, the client `Program.cs`. ");
         sb.Append("Bind state with `@bind-Value` or `@bind-Open`; style with `Class` (root) and `Ui` (per slot), globally through `AddKlyrooUi(o => o.Button.Slot(...))`. ");
-        sb.Append($"For exact parameters use the MCP server at {baseUrl}/mcp (or the `klyroo-ui-mcp` dotnet tool) rather than guessing.\n");
+        sb.Append($"For exact parameters use the MCP server at {baseUrl}/mcp (or the `klyroo-stack-mcp` dotnet tool) rather than guessing.\n");
 
         foreach (var section in bundle.Guides.Select(g => g.Section).Distinct())
         {

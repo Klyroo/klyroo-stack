@@ -25,7 +25,7 @@ The overlays render through `KlyFormProvider` and `KlyFilePreviewProvider`. Put 
 **`dotnet new klyroo-maui` creates a project that does not build.**
 The template is incomplete in this preview: `MauiProgram.cs` uses an `App` class that the template does not contain. See [Platforms](platforms.md#net-maui-blazor-hybrid) for what to do instead.
 
-**`klyroo-stack-mcp --help` shows `klyroo-ui-mcp` in its examples.**
+**`klyroo-stack-mcp --help` shows `klyroo-stack-mcp` in its examples.**
 The usage text is out of date. The installed command is `klyroo-stack-mcp`; register that one in your client.
 
 **The MCP server exits immediately with exit code 2.**

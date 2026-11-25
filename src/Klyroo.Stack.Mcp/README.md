@@ -17,7 +17,7 @@ The tool command is `klyroo-stack-mcp`. Run `klyroo-stack-mcp --version` to chec
 Claude Code:
 
 ```bash
-claude mcp add --transport stdio klyroo-ui -- klyroo-stack-mcp
+claude mcp add --transport stdio klyroo -- klyroo-stack-mcp
 ```
 
 Clients that read an `mcpServers` JSON file (Claude Desktop, Cursor) take the same command:
@@ -25,7 +25,7 @@ Clients that read an `mcpServers` JSON file (Claude Desktop, Cursor) take the sa
 ```json
 {
   "mcpServers": {
-    "klyroo-ui": { "command": "klyroo-stack-mcp" }
+    "klyroo": { "command": "klyroo-stack-mcp" }
   }
 }
 ```
@@ -46,6 +46,6 @@ Append arguments with `"args": ["--tools", "search-components,get-component"]`. 
 | `--site-url <url>` | Puts this address in front of page paths in answers, for example `https://docs.example.com/components/modal`. |
 | `--list-tools` | Prints the tool names and exits. |
 | `--version` | Prints the version and exits. |
-| `-h`, `--help` | Prints the usage. The examples in that text say `klyroo-ui-mcp`, but the installed command is `klyroo-stack-mcp`. |
+| `-h`, `--help` | Prints the usage. The examples in that text say `klyroo-stack-mcp`, but the installed command is `klyroo-stack-mcp`. |
 
 See the [repository README](https://github.com/klyroo/klyroo-stack#readme) for the whole ecosystem.

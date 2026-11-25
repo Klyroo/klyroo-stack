@@ -54,7 +54,7 @@ public static class KlyrooStackProducts
             Features:
             [
                 ("Zero-Roundtrip Popovers & Dialogs", "Built on native HTML Popover and <dialog> APIs with light-dismiss, Escape handling, and top-layer stacking managed directly by the browser.", "DOM Native"),
-                ("Composable Behaviors (ui-sdk.dev)", "Standalone JS primitives: dialog(), popup(), rovingTabindex(), formAssociated(), and dismissable() with zero external dependencies.", "Behaviors"),
+                ("Composable Behaviors", "Standalone JS primitives: dialog(), popup(), rovingTabindex(), formAssociated(), and dismissable() with zero external dependencies.", "Behaviors"),
                 ("Tailwind v4 & Design Tokens", "A single stylesheet driven by semantic CSS variables (--klyroo-primary, --klyroo-bg, --klyroo-border), 12 built-in locales, and instant dark mode.", "Tailwind v4"),
                 ("Mobile 44px Touch & TV D-Pad", "44px touch hit targets calibrated for iOS/Android, safe area insets, and directional D-pad focus rings for Android TV.", "Multiplatform")
             ],
@@ -446,7 +446,7 @@ public static class KlyrooStackProducts
             Tagline: "Semantic AI Agent Bridge (snapshot/query/act), WebMCP tools, observe stream & UndoStack",
             HeroHeadline: "AI-ready interfaces",
             HeroAccent: "& semantic WebMCP.",
-            Description: "Inspired by ui-sdk.dev: makes Klyroo.Form, Klyroo.Dashboard, and Klyroo.Spreadsheet immediately inspectable and operable by AI agents without brittle CSS selectors. Provides semantic Snapshot/Query/Act, global permission policies, automatic [redacted] secret masking, WebMCP browser assets, and UndoStack<T>.",
+            Description: "Makes Klyroo.Form, Klyroo.Dashboard, and Klyroo.Spreadsheet immediately inspectable and operable by AI agents without brittle CSS selectors. Provides semantic Snapshot/Query/Act, global permission policies, automatic [redacted] secret masking, WebMCP browser assets, and UndoStack<T>.",
             AccentHex: "#6366f1",
             BadgeColor: KlyColor.Info,
             RepoName: "klyroo-agent",

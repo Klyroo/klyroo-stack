@@ -8,7 +8,7 @@ namespace Klyroo.Stack.Site;
 
 /// <summary>
 /// The AI tooling of the docs site: the MCP server at <c>/mcp</c> and the <c>llms.txt</c> files. All of it is generated from the
-/// docs bundle embedded in Klyroo.Stack.Mcp.Core, the same one the <c>klyroo-ui-mcp</c> dotnet tool serves over stdio.
+/// docs bundle embedded in Klyroo.Stack.Mcp.Core, the same one the <c>klyroo-stack-mcp</c> dotnet tool serves over stdio.
 /// <para>
 /// Configuration: <c>Klyroo:SiteUrl</c> (public address, e.g. <c>https://ui.example.com</c>; links in llms.txt and tool answers use it instead of the
 /// request's Host header), <c>Klyroo:Ai:RequestsPerMinute</c> (per client IP on /mcp, default 120), <c>Klyroo:Ai:RequestTimeoutSeconds</c> (default 30)

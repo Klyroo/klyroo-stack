@@ -4,13 +4,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-// klyroo-ui-mcp [--tools <name,name,...>] [--site-url <https://...>] [--list-tools] [--version] [--help]
+// klyroo-stack-mcp [--tools <name,name,...>] [--site-url <https://...>] [--list-tools] [--version] [--help]
 //
 // Speaks the Model Context Protocol over stdin/stdout, so nothing else may write to stdout: logs go to stderr.
 const string Usage = """
-    klyroo-ui-mcp: MCP server for Klyroo.UI documentation (stdio transport).
+    klyroo-stack-mcp: MCP server for the Klyroo documentation (stdio transport).
 
-    Usage: klyroo-ui-mcp [options]
+    Usage: klyroo-stack-mcp [options]
 
     Options:
       --tools <names>     Expose only these tools, comma-separated (default: all). Same as the X-MCP-Tools header of the HTTP endpoint.
@@ -20,7 +20,7 @@ const string Usage = """
       -h, --help          Show this help.
 
     Register it with an agent, for example:
-      claude mcp add --transport stdio klyroo-ui -- klyroo-ui-mcp
+      claude mcp add --transport stdio klyroo -- klyroo-stack-mcp
     """;
 
 if (args.Contains("-h") || args.Contains("--help"))

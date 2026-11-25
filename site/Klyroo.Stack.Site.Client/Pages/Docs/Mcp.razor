@@ -31,9 +31,9 @@
     <p>The <code>Klyroo.Stack.Mcp</code> dotnet tool runs offline and carries the documentation of the Klyroo.UI version it was built with. It needs the .NET 10 runtime.</p>
     <CodeBlock Code="dotnet tool install --global Klyroo.Stack.Mcp --prerelease" />
     <p>Register it with Claude Code:</p>
-    <CodeBlock Code="claude mcp add --transport stdio klyroo-ui -- klyroo-ui-mcp" />
+    <CodeBlock Code="claude mcp add --transport stdio klyroo -- klyroo-stack-mcp" />
     <p>Add <code>--scope project</code> to share it through the <code>.mcp.json</code> of the repository. Everything after <code>--</code> is the command, so options go there:</p>
-    <CodeBlock Code="claude mcp add --transport stdio klyroo-ui -- klyroo-ui-mcp --tools search-components,get-component,get-component-metadata" />
+    <CodeBlock Code="claude mcp add --transport stdio klyroo -- klyroo-stack-mcp --tools search-components,get-component,get-component-metadata" />
 
     <h2>Remote server, over HTTP</h2>
     <p>This site serves the same server at <code>/mcp</code> (Streamable HTTP, stateless). Replace the address with the host of the site:</p>
@@ -69,7 +69,7 @@
     private const string Cursor = """
         {
           "mcpServers": {
-            "klyroo-ui": { "command": "klyroo-ui-mcp" }
+            "klyroo": { "command": "klyroo-stack-mcp" }
           }
         }
         """;
@@ -77,7 +77,7 @@
     private const string VsCode = """
         {
           "servers": {
-            "klyroo-ui": { "type": "stdio", "command": "klyroo-ui-mcp" },
+            "klyroo": { "type": "stdio", "command": "klyroo-stack-mcp" },
             "klyroo-ui-remote": { "type": "http", "url": "https://your-docs-host/mcp" }
           }
         }
@@ -86,7 +86,7 @@
     private const string Windsurf = """
         {
           "mcpServers": {
-            "klyroo-ui": { "command": "klyroo-ui-mcp" }
+            "klyroo": { "command": "klyroo-stack-mcp" }
           }
         }
         """;

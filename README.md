@@ -89,7 +89,7 @@ Each Blazor package ships its own stylesheet next to the Klyroo.UI one when it h
 
 ```bash
 dotnet tool install --global Klyroo.Stack.Mcp --prerelease
-claude mcp add --transport stdio klyroo-ui -- klyroo-stack-mcp
+claude mcp add --transport stdio klyroo -- klyroo-stack-mcp
 ```
 
 The server covers the components of Klyroo.UI and the Klyroo.Table components that the documentation site describes. It does not document Klyroo.Form, Dashboard, Display, Spreadsheet or Agent: use the skill of each repository for those. See the [package page](src/Klyroo.Stack.Mcp/README.md) for the tools, prompts, resources, options and client configuration.

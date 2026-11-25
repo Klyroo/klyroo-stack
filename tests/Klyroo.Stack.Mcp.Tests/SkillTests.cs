@@ -58,7 +58,7 @@ public partial class SkillTests
         var skill = Read("SKILL.md");
 
         Assert.Contains("get-component-metadata", skill);
-        Assert.Contains("claude mcp add --transport stdio klyroo-ui -- klyroo-ui-mcp", skill);
+        Assert.Contains("claude mcp add --transport stdio klyroo -- klyroo-stack-mcp", skill);
     }
 
     [Theory]
