@@ -5,7 +5,6 @@
     <PackageId>Klyroo.Stack</PackageId>
     <Description>Umbrella meta-package for the entire Klyroo ecosystem (UI, Query, Table, Form, Dashboard, Display, Spreadsheet, Agent) for Blazor Web and .NET MAUI Hybrid.</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
     <IsTrimmable>true</IsTrimmable>
   </PropertyGroup>
   <ItemGroup>

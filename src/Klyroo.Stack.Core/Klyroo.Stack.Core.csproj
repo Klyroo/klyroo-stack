@@ -5,7 +5,6 @@
     <PackageId>Klyroo.Stack.Core</PackageId>
     <Description>Klyroo Core Meta-Package: aggregates all headless, NativeAOT-compatible Core engines of Klyroo (Query, Table, Form, Dashboard, Display, Spreadsheet, Agent) and the KlyrooStackCatalog router.</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
     <IsTrimmable>true</IsTrimmable>
     <IsAotCompatible>true</IsAotCompatible>
   </PropertyGroup>
