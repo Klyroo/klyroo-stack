@@ -227,9 +227,16 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: WCAG 2.1 AA / axe-core audit of the showcase and docs
+      - name: Build and start the docs site
+        env:
+          Klyroo__Templates__Enabled: 'false'
         run: |
           dotnet build site/Klyroo.Stack.Site/Klyroo.Stack.Site.csproj -c Release --nologo
-          npm install --no-save playwright @axe-core/playwright
-          npx playwright install chromium
+          nohup dotnet run --project site/Klyroo.Stack.Site -c Release --no-build --urls http://localhost:5180 > site.log 2>&1 &
+          for i in $(seq 1 90); do curl -sf -o /dev/null http://localhost:5180/ && exit 0; sleep 2; done
+          cat site.log; exit 1
+      - name: WCAG 2.1 AA / axe-core audit of the showcase and docs
+        run: |
+          npm install --no-save playwright@1.65.1 @axe-core/playwright@4.14.1
+          npx playwright install --with-deps chromium
           node build/verify-a11y.mjs

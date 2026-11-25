@@ -11,7 +11,9 @@ const baseUrl = urlArgIdx >= 0 && process.argv[urlArgIdx + 1]
 const routes = ['/', '/showcase', '/why', '/query/docs', '/table/docs', '/form/docs', '/dashboard/docs', '/display/docs', '/spreadsheet/docs', '/agent/docs'];
 
 const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+// @axe-core/playwright needs a page created from an explicit browser context.
+const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+const page = await context.newPage();
 
 let totalViolations = 0;
 for (const route of routes) {
