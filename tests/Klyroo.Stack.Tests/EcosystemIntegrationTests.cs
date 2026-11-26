@@ -37,7 +37,7 @@ public sealed class EcosystemIntegrationTests
             }
         });
         importer.LoadText("Name,Region,Amount\nAcme,EU,100000\nBeta,US,50000\nGamma,EU,75000", "deals.csv");
-        await importer.SubmitAsync();
+        await importer.SubmitAsync(TestContext.Current.CancellationToken);
         Assert.Equal(3, deals.Count);
 
         // 2. Query EU deals via Klyroo.Query
