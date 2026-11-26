@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!--
+    The documentation site of one Klyroo library: it reads the docs/ folder, the README and docs/site.yml of a library repository and renders them as a static
+    site (see docs-site/README.md). The command lines to serve and to export it are in docs-site/README.md.
+    The Klyroo.UI build features come from the sibling klyroo-ui checkout, imported by hand as the other sites of this repository do.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Klyroo.Docs.Site</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
+    <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+    <!-- Tailwind compiled by the build (no Node): Styles/app.css becomes app.css, which App.razor links. -->
+    <KlyrooTailwind>true</KlyrooTailwind>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\klyroo-ui\src\Klyroo.UI\Klyroo.UI.csproj" />
+    <PackageReference Include="Markdig" />
+    <PackageReference Include="YamlDotNet" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\klyroo-ui\src\Klyroo.UI.Build.Tasks\Klyroo.UI.Build.Tasks.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+  <PropertyGroup>
+    <KlyrooBuildTasksAssembly>$(MSBuildThisFileDirectory)..\..\..\klyroo-ui\src\Klyroo.UI.Build.Tasks\bin\$(Configuration)\netstandard2.0\Klyroo.UI.Build.Tasks.dll</KlyrooBuildTasksAssembly>
+  </PropertyGroup>
+  <Import Project="..\..\..\klyroo-ui\src\Klyroo.UI\buildTransitive\Klyroo.UI.Tasks.targets" />
+  <Import Project="..\..\..\klyroo-ui\src\Klyroo.UI\buildTransitive\Klyroo.UI.Fonts.targets" />
+  <Import Project="..\..\..\klyroo-ui\src\Klyroo.UI\buildTransitive\Klyroo.UI.Icons.targets" />
+  <Import Project="..\..\..\klyroo-ui\src\Klyroo.UI\buildTransitive\Klyroo.UI.Tailwind.targets" />
+
+  <!-- Styles/app.css imports obj/klyroo/klyroo.theme.css, which the Klyroo.UI package copies there; from source it is copied by hand. -->
+  <Target Name="KlyrooCopyTailwindTheme" BeforeTargets="BeforeBuild">
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)..\..\..\klyroo-ui\src\Klyroo.UI\wwwroot\klyroo.theme.css"
+          DestinationFolder="$([MSBuild]::NormalizeDirectory($(MSBuildProjectDirectory), $(BaseIntermediateOutputPath), klyroo))"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+  <!-- The list of the Klyroo libraries shown in the header of every site. -->
+  <ItemGroup>
+    <None Update="libraries.yml" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <!-- Fonts are downloaded at build time and served from the site's own origin (KlyFonts in App.razor links them). -->
+  <ItemGroup>
+    <KlyrooFont Include="Geist" Role="sans" Weights="400..700" Subsets="latin" />
+    <KlyrooFont Include="Geist Mono" Role="mono" Weights="400..600" Subsets="latin" />
+  </ItemGroup>
+
+</Project>

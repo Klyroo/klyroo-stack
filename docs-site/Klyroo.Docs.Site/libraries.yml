@@ -1,0 +1,21 @@
+# The Klyroo libraries that have a documentation site, in the order of the header menu. A site lives at https://klyroo.github.io/<repo>/.
+# Add a library here and every site lists it after the next deployment of that site.
+organization: klyroo
+pages: https://klyroo.github.io
+libraries:
+  - repo: klyroo-ui
+    name: Klyroo.UI
+  - repo: klyroo-query
+    name: Klyroo.Query
+  - repo: klyroo-table
+    name: Klyroo.Table
+  - repo: klyroo-form
+    name: Klyroo.Form
+  - repo: klyroo-dashboard
+    name: Klyroo.Dashboard
+  - repo: klyroo-display
+    name: Klyroo.Display
+  - repo: klyroo-spreadsheet
+    name: Klyroo.Spreadsheet
+  - repo: klyroo-agent
+    name: Klyroo.Agent

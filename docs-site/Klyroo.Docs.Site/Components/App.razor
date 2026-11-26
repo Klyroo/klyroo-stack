@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    @* The site is served below the name of the repository (https://klyroo.github.io/klyroo-table/): every relative URL, the stylesheet and the framework included, follows this. *@
+    <base href="@_baseHref" />
+    <KlyColorModeScript />
+    <KlyThemeStyle />
+    @* Self-hosted at build time from the KlyrooFont items of Klyroo.Docs.Site.csproj: no third-party request. *@
+    <KlyFonts />
+    <ResourcePreloader />
+    @* Compiled by the build from Styles/app.css (Tailwind, with the Klyroo theme). *@
+    <link rel="stylesheet" href="@Assets["app.css"]" />
+    <link rel="icon" type="image/png" href="@Assets["favicon.png"]" />
+    <ImportMap />
+    <HeadOutlet />
+</head>
+
+<body data-enhance-nav="false">
+    @* No render mode: every page is rendered once and sent as HTML. The menu, the search, the table of contents, the navigation groups and the color mode run in
+       the browser (Klyroo's own script), and the copy buttons of the code blocks run on the small script below, so there is no circuit and no WebAssembly. Links are plain navigations (data-enhance-nav="false"): a static server answers each page itself, and Blazor's enhanced navigation would fetch every page twice to find out. *@
+    <Routes />
+    <script>@((MarkupString)CodeCopy.Script)</script>
+    <script src="@Assets["_framework/blazor.web.js"]"></script>
+</body>
+
+</html>
+
+@code {
+    [Inject] private IConfiguration Configuration { get; set; } = default!;
+
+    // The PathBase setting as configured, normalized to "/x/": the root when there is none.
+    private string _baseHref => Configuration["PathBase"] is { Length: > 0 } pathBase ? "/" + pathBase.Trim('/') + "/" : "/";
+}

@@ -1,0 +1,80 @@
+@page "/{*Slug}"
+@inject DocsSite Site
+@inject Libraries Libraries
+@inject NavigationManager Navigation
+
+@* One component for every page of docs/: the address is the path of the file below docs/, without .md. *@
+@if (_page is not null)
+{
+    <PageTitle>@_page.Title - @Site.Settings.Title</PageTitle>
+    <HeadContent>
+        <meta name="description" content="@_page.MetaDescription" />
+        <link rel="canonical" href="@(Libraries.SiteUrl(Site.Settings.RepoName) + _page.Slug + "/")" />
+    </HeadContent>
+
+    <KlyContainer Class="py-8 lg:py-10">
+        <KlyPage Ui="_columnsUi" Left="_nav" Right="_toc">
+            <article class="min-w-0" data-testid="article">
+                <KlyPageHeader Title="@_page.Title" Description="@_page.Description" />
+
+                @if (_page.Toc.Count > 0)
+                {
+                    @* Below the lg breakpoint the table of contents is a disclosure above the text; from lg up it is in the right column. *@
+                    <div class="mt-6 lg:hidden">
+                        <div class="docs-toc-scroll">
+                            <KlyContentToc Links="_page.Toc" Title="On this page" />
+                        </div>
+                    </div>
+                }
+
+                @* The prose styles of the Klyroo PageBody, plus the ones in Styles/app.css for what Markdown adds (code blocks, callouts, tables). *@
+                <KlyPageBody Class="markdown-body mt-8 pb-10">@((MarkupString)_page.Html)</KlyPageBody>
+
+                <p class="border-t border-(--klyroo-border) pt-6 text-sm">
+                    <a href="@_editUrl" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 rounded-sm text-(--klyroo-text-muted) underline underline-offset-4 hover:text-(--klyroo-text-highlighted)">
+                        <KlyIcon Name="ph:pencil-simple" Class="size-4" />
+                        Edit this page on GitHub
+                    </a>
+                </p>
+
+                <KlyContentSurround Previous="_previous" Next="_next" Class="mt-6 border-t border-(--klyroo-border) pt-8" />
+            </article>
+        </KlyPage>
+    </KlyContainer>
+}
+
+@code {
+    private static readonly PageUi _columnsUi = new() { Left = "hidden lg:block", Right = "hidden lg:block" };
+
+    private DocPage? _page;
+    private KlyContentSurroundLink? _previous;
+    private KlyContentSurroundLink? _next;
+    private string _editUrl = "";
+
+    [Parameter] public string? Slug { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        _page = Site.Find(Slug);
+        if (_page is null)
+        {
+            // Answers 404 with the page of Pages/NotFound.razor.
+            Navigation.NotFound();
+            return;
+        }
+        (_previous, _next) = Site.Surround(_page);
+        _editUrl = $"{Site.Settings.GithubUrl}/edit/{Uri.EscapeDataString(Site.Settings.Branch)}/{_page.SourcePath}";
+    }
+
+    // The tree in the left column. A complementary landmark inside main would be a mistake, so the aside is a plain div.
+    private RenderFragment? _nav => _page is null ? null : @<KlyPageAside As="PageAsideElement.Div" Class="py-1">
+        <KlyContentNavigation Items="Site.Navigation" AriaLabel="Documentation" />
+    </KlyPageAside>;
+
+    // A page with hundreds of headings (the API reference) scrolls inside its column instead of running past the screen.
+    private RenderFragment? _toc => _page is null || _page.Toc.Count == 0 ? null : @<KlyPageAside As="PageAsideElement.Div">
+        <div class="docs-toc-scroll">
+            <KlyContentToc Links="_page.Toc" Title="On this page" />
+        </div>
+    </KlyPageAside>;
+}

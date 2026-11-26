@@ -11,6 +11,9 @@
     <Project Path="site/Klyroo.Stack.Site.Client/Klyroo.Stack.Site.Client.csproj" />
     <Project Path="site/Klyroo.Stack.Site.DemoWatchdog/Klyroo.Stack.Site.DemoWatchdog.csproj" />
   </Folder>
+  <Folder Name="/docs-site/">
+    <Project Path="docs-site/Klyroo.Docs.Site/Klyroo.Docs.Site.csproj" />
+  </Folder>
   <Folder Name="/build/">
     <Project Path="build/Klyroo.Stack.DocsBundle/Klyroo.Stack.DocsBundle.csproj" />
     <!-- The site runs the Klyroo.UI build tasks from source: listing the project here builds it in the solution configuration. -->
@@ -20,5 +23,6 @@
     <Project Path="tests/Klyroo.Stack.Tests/Klyroo.Stack.Tests.csproj" />
     <Project Path="tests/Klyroo.Stack.Mcp.Tests/Klyroo.Stack.Mcp.Tests.csproj" />
     <Project Path="tests/Klyroo.Stack.Site.Tests/Klyroo.Stack.Site.Tests.csproj" />
+    <Project Path="tests/Klyroo.Docs.Site.Tests/Klyroo.Docs.Site.Tests.csproj" />
   </Folder>
 </Solution>

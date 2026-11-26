@@ -1,0 +1,73 @@
+@page "/"
+@inject DocsSite Site
+@inject Libraries Libraries
+
+<PageTitle>@Site.Settings.Title documentation</PageTitle>
+
+<HeadContent>
+    <meta name="description" content="@Site.Settings.Description" />
+    <link rel="canonical" href="@Libraries.SiteUrl(Site.Settings.RepoName)" />
+</HeadContent>
+
+<KlyPageHero Headline="Documentation"
+            Title="@Site.Settings.Title"
+            Description="@Site.Settings.Tagline"
+            Links="_links"
+            Ui="_heroUi">
+    <Media>
+        @if (_install is not null)
+        {
+            @* The same renderer as the pages: highlighted, with a copy button. *@
+            <div data-testid="hero-snippet" class="mx-auto w-full max-w-[29rem]">@((MarkupString)_install)</div>
+        }
+    </Media>
+</KlyPageHero>
+
+<KlyContainer Class="py-8 lg:py-10">
+    <KlyPage Ui="_columnsUi" Left="_nav" Right="_toc">
+        <article class="min-w-0" data-testid="article">
+            @if (_toc is not null)
+            {
+                <div class="lg:hidden">
+                    <KlyContentToc Links="Site.Home.Toc" Title="On this page" />
+                </div>
+            }
+            @* The README of the repository, as written for GitHub: the prose styles of the Klyroo PageBody, plus the ones in Styles/app.css for what Markdown adds. *@
+            <KlyPageBody Class="markdown-body pb-10">@((MarkupString)Site.Home.Html)</KlyPageBody>
+        </article>
+    </KlyPage>
+</KlyContainer>
+
+@code {
+    private static readonly PageUi _columnsUi = new() { Left = "hidden lg:block", Right = "hidden lg:block" };
+    private static readonly PageHeroUi _heroUi = new()
+    {
+        Container = "gap-12 py-16 sm:py-20 lg:py-24",
+        Title = "text-4xl sm:text-5xl lg:text-6xl",
+    };
+    private static readonly MarkdownRenderer Renderer = new();
+
+    private IReadOnlyList<PageLinkItem> _links = [];
+    private string? _install;
+
+    protected override void OnInitialized()
+    {
+        var start = Site.Pages.FirstOrDefault(p => p.Slug == "getting-started") ?? Site.Find(LibraryDocs.IndexSlug) ?? Site.Pages.FirstOrDefault();
+        var links = new List<PageLinkItem>();
+        if (start is not null)
+        {
+            links.Add(new PageLinkItem(start.Slug == "getting-started" ? "Get started" : "Read the docs", start.Href) { TrailingIcon = "ph:arrow-right" });
+        }
+        links.Add(new PageLinkItem("GitHub", Site.Settings.GithubUrl) { Icon = "ph:github-logo", Target = KlyLinkTarget.Blank, Color = KlyColor.Neutral, Variant = ButtonVariant.Outline });
+        _links = links;
+        _install = Site.Settings.Install is { Length: > 0 } install ? Renderer.Render("```bash\n" + install + "\n```", "", "./").Html : null;
+    }
+
+    private RenderFragment? _nav => @<KlyPageAside As="PageAsideElement.Div" Class="py-1">
+        <KlyContentNavigation Items="Site.Navigation" AriaLabel="Documentation" />
+    </KlyPageAside>;
+
+    private RenderFragment? _toc => Site.Home.Toc.Count == 0 ? null : @<KlyPageAside As="PageAsideElement.Div">
+        <KlyContentToc Links="Site.Home.Toc" Title="On this page" />
+    </KlyPageAside>;
+}
