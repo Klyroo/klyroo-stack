@@ -3,6 +3,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>Klyroo.Stack</RootNamespace>
     <PackageId>Klyroo.Stack.Core</PackageId>
+    <PackageTags>klyroo;catalog;headless;nativeaot</PackageTags>
     <Description>Klyroo Core Meta-Package: aggregates all headless, NativeAOT-compatible Core engines of Klyroo (Query, Table, Form, Dashboard, Display, Spreadsheet, Agent) and the KlyrooStackCatalog router.</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <IsTrimmable>true</IsTrimmable>

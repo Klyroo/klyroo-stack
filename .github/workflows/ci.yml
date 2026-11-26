@@ -227,6 +227,16 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Check that the nine repositories share one version
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          expected=$(grep -oE '<Version(Prefix|Suffix)>[^<]*' klyroo-stack/build/Version.props | tr '\n' ' ')
+          fail=0
+          for r in agent dashboard display form query spreadsheet table ui; do
+            actual=$(grep -oE '<Version(Prefix|Suffix)>[^<]*' "klyroo-$r/build/Version.props" | tr '\n' ' ')
+            if [[ "$actual" != "$expected" ]]; then echo "::error::klyroo-$r has version '$actual', klyroo-stack has '$expected'"; fail=1; fi
+          done
+          exit $fail
       - name: Build and start the docs site
         env:
           Klyroo__Templates__Enabled: 'false'

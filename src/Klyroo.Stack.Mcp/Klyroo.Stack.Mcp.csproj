@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!-- Same version as the library: both import build/Version.props. -->
-  <Import Project="..\..\build\Version.props" />
 
   <!-- The local MCP server of the Klyroo documentation, as a dotnet tool: dotnet tool install -g Klyroo.Stack.Mcp, then
        klyroo-stack-mcp. It speaks MCP over stdio and carries the docs bundle of the Klyroo.UI and Klyroo.Table versions it was built with. -->
@@ -14,7 +13,7 @@
     <ToolCommandName>klyroo-stack-mcp</ToolCommandName>
     <PackageId>Klyroo.Stack.Mcp</PackageId>
     <Description>MCP server for the Klyroo documentation: search the Klyroo.UI and Klyroo.Table components, their API, examples and guides from an AI coding agent, over stdio.</Description>
-    <PackageTags>blazor;ui;mcp;model-context-protocol;ai;tailwind</PackageTags>
+    <PackageTags>klyroo;blazor;ui;mcp;model-context-protocol;ai;tailwind</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Authors>Klyroo Contributors</Authors>

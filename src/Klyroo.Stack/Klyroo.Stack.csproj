@@ -3,6 +3,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>Klyroo.Stack</RootNamespace>
     <PackageId>Klyroo.Stack</PackageId>
+    <PackageTags>klyroo;blazor;components;meta-package;maui</PackageTags>
     <Description>Umbrella meta-package for the entire Klyroo ecosystem (UI, Query, Table, Form, Dashboard, Display, Spreadsheet, Agent) for Blazor Web and .NET MAUI Hybrid.</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <IsTrimmable>true</IsTrimmable>
