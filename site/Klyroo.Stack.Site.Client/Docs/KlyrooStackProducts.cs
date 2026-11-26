@@ -460,7 +460,7 @@ public static class KlyrooStackProducts
                 ("Semantic Snapshot, Query & Act", "Exposes up to 100 controls by stable ref (c1, c2…), queries select/filter choices without opening popups, and runs semantic actions (setValue, toggle, submit).", "Semantic Bridge"),
                 ("Permission Gate & Confirmation Policy", "Global AllowPolicy or per-call gate with ConfirmRequired flags to approve or block consequential actions before execution.", "Policy Guard"),
                 ("Observe Stream & Secret Redaction", "Unified ObservedChange stream (Agent/User source) where Password and OneTimeCode fields are always redacted as [redacted].", "Privacy First"),
-                ("WebMCP JS Assets & UndoStack<T>", "Ships _content/Klyroo.Agent/klyroo-agent.js + klyroo-behaviors.js for WebMCP and a bounded generic UndoStack<T> in Klyroo.Agent.Core (NativeAOT).", "WebMCP + Undo")
+                ("WebMCP JS Assets & UndoStack<T>", "Ships _content/Klyroo.Agent/klyroo-agent.js for WebMCP and a bounded generic UndoStack<T> in Klyroo.Agent.Core (NativeAOT).", "WebMCP + Undo")
             ],
             CoreCodeTitle: "Klyroo.Agent · AgentBridgeService & UndoStack<T>",
             CoreCode: """
@@ -493,7 +493,7 @@ public static class KlyrooStackProducts
                 new("AgentComponentSnapshot", "Compact NativeAOT semantic snapshot model with state, actions & flags.", "/agent/docs", "Core"),
                 new("UndoStack<T>", "Generic bounded Undo/Redo stack with labels and state notifications.", "/agent/docs", "Core"),
                 new("AgentBridgeService", "Connects FormController, DashboardController & SpreadsheetImporter to AI agents.", "/agent/docs", "UI"),
-                new("klyroo-agent.js & klyroo-behaviors.js", "Static web assets for WebMCP (navigator.modelContext) and composable DOM behaviors.", "/agent/docs", "UI")
+                new("klyroo-agent.js", "Static web asset for browser-side snapshot, query, act and WebMCP (navigator.modelContext).", "/agent/docs", "UI")
             ])
     ];
 

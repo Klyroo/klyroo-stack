@@ -1,0 +1,14 @@
+@inherits LayoutComponentBase
+
+@* KlyHead sends the theme variables and the fonts to <head>, through the HeadOutlet root component of MainPage.xaml. *@
+<KlyHead />
+
+<main class="mx-auto flex min-h-dvh w-full max-w-3xl flex-col gap-6 p-4 sm:p-6">
+    @Body
+</main>
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">x</span>
+</div>

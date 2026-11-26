@@ -105,7 +105,7 @@ dotnet new install Klyroo.Templates::0.1.0-preview.1
 | `klyroo-saas` | Blazor Web App (Interactive Server) with `AddKlyrooStack()`, the stylesheets, a stat card and a form drawer |
 | `klyroo-admin` | Same host with a dashboard page, a data list with a sum row, a form drawer and a CSV preview |
 | `klyroo-headless` | Console app with `PublishAot` that uses `Klyroo.Stack.Core` only |
-| `klyroo-maui` | .NET MAUI Blazor Hybrid starting point. It is incomplete in this preview, see [Platforms](docs/platforms.md#net-maui-blazor-hybrid) |
+| `klyroo-maui` | .NET MAUI Blazor Hybrid app for Android, iOS, Mac Catalyst and Windows, see [Platforms](docs/platforms.md#net-maui-blazor-hybrid) |
 
 ```bash
 dotnet new klyroo-saas -n MyShop

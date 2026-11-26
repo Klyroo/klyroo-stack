@@ -1,4 +1,5 @@
 using Klyroo.Stack;
+using Microsoft.Extensions.Logging;
 
 namespace KlyrooMauiApp;
 
@@ -8,8 +9,15 @@ public static class MauiProgram
     {
         var builder = MauiApp.CreateBuilder();
         builder.UseMauiApp<App>();
+
         builder.Services.AddMauiBlazorWebView();
         builder.Services.AddKlyrooStack();
+
+#if DEBUG
+        builder.Services.AddBlazorWebViewDeveloperTools();
+        builder.Logging.AddDebug();
+#endif
+
         return builder.Build();
     }
 }

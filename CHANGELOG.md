@@ -7,6 +7,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- The `klyroo-maui` template generated a project that did not build: it had no `App` class, `MainPage`, `index.html` or platform folders. It is now a complete MAUI Blazor Hybrid app.
+- The documentation site no longer lists `klyroo-behaviors.js` in Klyroo.Agent, which removed the module.
+
 ## [0.1.0-preview.1] - 2026-11-24
 
 ### Added

@@ -22,12 +22,6 @@ The options freeze once components start resolving themes and texts, because eac
 **A form drawer or file preview never appears.**
 The overlays render through `KlyFormProvider` and `KlyFilePreviewProvider`. Put both inside `<KlyApp>` in `Routes.razor`, as the templates do.
 
-**`dotnet new klyroo-maui` creates a project that does not build.**
-The template is incomplete in this preview: `MauiProgram.cs` uses an `App` class that the template does not contain. See [Platforms](platforms.md#net-maui-blazor-hybrid) for what to do instead.
-
-**`klyroo-stack-mcp --help` shows `klyroo-stack-mcp` in its examples.**
-The usage text is out of date. The installed command is `klyroo-stack-mcp`; register that one in your client.
-
 **The MCP server exits immediately with exit code 2.**
 You passed an option it does not know, or a name in `--tools` that is not a tool. Run `klyroo-stack-mcp --list-tools` for the valid names. The message on stderr says which argument was rejected.
 

@@ -11,7 +11,7 @@ public static partial class KlyrooLibraryDocs
             // GROUP 1: GETTING STARTED
             // =========================================================================
             new("", "Introduction & How It Works", "Getting Started",
-                "Semantic AI Agent Bridge (snapshot, query, act, observe), 12 composable headless DOM behaviors (klyroo-behaviors.js), WebMCP tool registration (navigator.modelContext), automatic [redacted] secret masking, permission policies, and bounded UndoStack<T>.",
+                "Semantic AI Agent Bridge (snapshot, query, act, observe), a browser runtime (klyroo-agent.js), WebMCP tool registration (navigator.modelContext), automatic [redacted] secret masking, permission policies, and bounded UndoStack<T>.",
                 [
                     new("overview", "What is Klyroo.Agent?",
                         Paragraphs:
@@ -36,7 +36,7 @@ public static partial class KlyrooLibraryDocs
                         TableRows:
                         [
                             new("Klyroo.Agent.Core", "AgentComponentSnapshot, AgentQueryRequest, AgentQueryMatch, AgentChoiceItem, AgentActStep, AgentActResult, ObservedChange, AgentToolDefinition, AgentChangeSource, UndoStack<T>", "Zero dependencies · IsAotCompatible=true"),
-                            new("Klyroo.Agent", "AgentBridgeService, AddKlyrooAgent(), _content/Klyroo.Agent/klyroo-agent.js & _content/Klyroo.Agent/klyroo-behaviors.js", "browser, ios, android, maccatalyst, windows")
+                            new("Klyroo.Agent", "AgentBridgeService, AddKlyrooAgent(), _content/Klyroo.Agent/klyroo-agent.js", "browser, ios, android, maccatalyst, windows")
                         ])
                 ]),
             new("installation", "Installation & Setup", "Getting Started",
@@ -57,7 +57,7 @@ public static partial class KlyrooLibraryDocs
                             new("_Imports.razor", "@using Klyroo.Agent")
                         ]),
                     new("assets", "3. Static Web Assets (Optional Browser Bridge)",
-                        Paragraphs: ["Klyroo.Agent serves two zero-dependency ES modules directly at _content/Klyroo.Agent/klyroo-agent.js and _content/Klyroo.Agent/klyroo-behaviors.js for browser-side WebMCP (navigator.modelContext) and 12 composable DOM primitives."])
+                        Paragraphs: ["Klyroo.Agent serves a dependency-free ES module at _content/Klyroo.Agent/klyroo-agent.js for browser-side snapshot, query and act, and WebMCP registration (navigator.modelContext). Custom widgets defined with Klyroo.definePrimitive from the Klyroo.UI script are discovered through their data-kly-primitive attribute."])
                 ]),
 
             // =========================================================================
@@ -122,8 +122,8 @@ public static partial class KlyrooLibraryDocs
                         ],
                         Callout: "Password and OneTimeCode fields ALWAYS emit AgentBridgeService.RedactedValue (\"[redacted]\") in Snapshot(), ActResult.Values, and ObservedChange — plaintext secrets are never exposed to observers or LLMs.")
                 ]),
-            new("undo-and-webmcp", "UndoStack<T>, WebMCP & 12 DOM Behaviors", "State & Browser",
-                "Zero-dependency generic UndoStack<T> in Klyroo.Agent.Core, plus browser WebMCP registration and 12 composable headless DOM behaviors.",
+            new("undo-and-webmcp", "UndoStack<T>, WebMCP & DOM Behaviors", "State & Browser",
+                "Zero-dependency generic UndoStack<T> in Klyroo.Agent.Core, plus browser WebMCP registration. The headless DOM behaviors ship in the Klyroo.UI script as Klyroo.behaviors.",
                 [
                     new("undo", "Bounded Generic UndoStack<T>",
                         LiveDemoKey: "agent-undo",
@@ -138,14 +138,14 @@ public static partial class KlyrooLibraryDocs
                                 var next = history.Redo(); // "Published v3"
                                 """)
                         ]),
-                    new("behaviors", "All 12 Composable Behaviors in _content/Klyroo.Agent/klyroo-behaviors.js & WebMCP",
+                    new("behaviors", "Klyroo.behaviors (Klyroo.UI script) & WebMCP",
                         TableHeaders: ["Exported Function", "Module", "Purpose"],
                         TableRows:
                         [
-                            new("announce / createUndoStack", "klyroo-behaviors.js", "Screen-reader live announcements & browser-side undo/redo stack"),
-                            new("createRovingFocus / createGridFocus / createTypeahead", "klyroo-behaviors.js", "Toolbar/menu arrow roving tabindex, 2D data-grid arrow focus, buffered typeahead"),
-                            new("createSelection / createPopup / createReorder / createResize", "klyroo-behaviors.js", "Single/multi selection, positioned popups, drag/keyboard reorder, pane/column resize"),
-                            new("createViewport / createInlineEdit / definePrimitive", "klyroo-behaviors.js", "Zoomable canvas, inline cell editing, and declarative custom-element composition"),
+                            new("announce / createUndoStack", "Klyroo.UI script", "Screen-reader live announcements & browser-side undo/redo stack"),
+                            new("createRovingFocus / createGridFocus / createTypeahead", "Klyroo.UI script", "Toolbar/menu arrow roving tabindex, 2D data-grid arrow focus, buffered typeahead"),
+                            new("createSelection / createPopup / createReorder / createResize", "Klyroo.UI script", "Single/multi selection, positioned popups, drag/keyboard reorder, pane/column resize"),
+                            new("createViewport / createInlineEdit / definePrimitive", "Klyroo.UI script", "Zoomable canvas, inline cell editing, and declarative custom-element composition"),
                             new("createAgent / registerWebMcp / observe", "klyroo-agent.js", "Registers snapshot, query, and act directly on browser navigator.modelContext")
                         ],
                         CodeSamples:

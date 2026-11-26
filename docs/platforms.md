@@ -48,7 +48,7 @@ The Klyroo.UI documentation (the summary that this repository's `llms.txt` serve
 
 None of it was run on a MAUI target while this page was written: the MAUI workloads for the iOS and Mac Catalyst targets were not available on the machine.
 
-**The `klyroo-maui` template is incomplete in this preview.** It contains `MauiProgram.cs`, the project file, `_Imports.razor` and a `Home.razor` page. `MauiProgram.cs` calls `UseMauiApp<App>()`, but the template has no `App` class, no `MainPage`, no `index.html` for the `BlazorWebView` and no platform folders, so the generated project does not build as it is. Start a MAUI Blazor Hybrid project with the .NET template (`dotnet new maui-blazor`), add `Klyroo.Stack`, call `AddKlyrooStack()` in `MauiProgram.cs` and load the stylesheets from the web view's `index.html`. The `klyroo-maui` project file targets `net10.0-android`, `net10.0-ios` and `net10.0-maccatalyst`, plus a Windows target when generated on Windows.
+The `klyroo-maui` template is a complete MAUI Blazor Hybrid app built on the .NET `maui-blazor` template: `App`, a `MainPage` that hosts the `BlazorWebView` with a `HeadOutlet` root component for `KlyHead`, an `index.html` that loads the Klyroo stylesheets, the platform folders, and an icon and splash screen. It targets `net10.0-android`, plus `net10.0-ios` and `net10.0-maccatalyst` outside Linux and a Windows target on Windows, like the .NET template. A generated project was built for Android; the other targets need their workloads and were not built.
 
 ## NativeAOT and trimming
 
