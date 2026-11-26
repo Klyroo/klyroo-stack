@@ -28,6 +28,33 @@ dotnet test Klyroo.Stack.slnx -c Release --no-build
 dotnet format Klyroo.Stack.slnx --include src/ tests/   # fix formatting of the files you touched
 ```
 
+### Browser tests
+
+`tests/Klyroo.Stack.E2E` drives the documentation site (`site/Klyroo.Stack.Site`) and what it serves in a real browser with Playwright for .NET: the component pages of
+Klyroo.UI and of the sister libraries in the four render modes (an axe theory per family plus behavior tests), the guides, the `/templates` gallery, and the live
+demos of the templates behind the reverse proxy of the docs host. The templates themselves live in `klyroo-ui`, whose `tests/Klyroo.UI.E2E` runs each one on its own;
+the checks of a template are compiled from there (`klyroo-ui/tests/Klyroo.UI.E2E/Checks`), so one scenario runs against the template alone and against its demo.
+Two classes cover the project templates of this repository: `SaasAppTests` and `AdminAppTests` generate `klyroo-saas` and `klyroo-admin` with `dotnet new` and fill,
+validate, submit and cancel their typed account and customer forms (error summary, focus, ranges, radio group, drawer).
+
+Playwright needs a browser, and the generated apps need a feed with the nine repositories packed:
+
+```bash
+build/pack-feed.sh /tmp/klyroo-feed                           # once, and again after a change in a library
+dotnet build tests/Klyroo.Stack.E2E -c Release                # the site and the nine templates it runs as demos are built first
+pwsh tests/Klyroo.Stack.E2E/bin/Release/net10.0/playwright.ps1 install --with-deps chromium
+KLYROO_E2E_FEED=/tmp/klyroo-feed dotnet test --project tests/Klyroo.Stack.E2E -c Release --no-build
+```
+
+Without PowerShell, use a browser that is already installed: `KLYROO_BROWSER_EXECUTABLE=/usr/bin/google-chrome` (any Chromium-based browser) or `KLYROO_BROWSER_CHANNEL=chrome`;
+`KLYROO_BROWSER` picks `chromium` (default), `firefox` or `webkit`. Without `KLYROO_E2E_FEED` the two generated-app classes are skipped on a machine and fail in CI. A class runs
+on its own with `-- --filter-class Klyroo.Stack.E2E.SaasAppTests`. The generated apps are built in a temporary folder with a template hive and a package folder of their own,
+so nothing of your `dotnet new` templates or global NuGet cache is touched or used. The whole project takes a long time (the component pages alone run in four modes): run
+the classes of the family you changed.
+
+The project is in `Klyroo.Stack.slnx`, but a plain `dotnet test Klyroo.Stack.slnx` would run it too, so the CI workflow leaves it out of the quick run
+(`--filter-not-namespace Klyroo.Stack.E2E`) and runs it in the `browser-tests` job, on every push to `main` and by hand (Actions, Run workflow); a pull request does not wait for it.
+
 The build treats warnings as errors and nullable reference types are enabled everywhere: fix a warning instead
 of suppressing it, and justify any `#pragma` or `[SuppressMessage]` in the code.
 

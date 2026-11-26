@@ -77,7 +77,9 @@ jobs:
       - name: Build
         run: dotnet build Klyroo.Stack.slnx -c Release --no-restore --nologo
       - name: Test
-        run: dotnet test Klyroo.Stack.slnx -c Release --no-build --nologo
+        # The browser tests (tests/Klyroo.Stack.E2E) are in the solution but have a job of their own: they need a browser and a feed of packed repositories, and take minutes.
+        # Exit code 8 is "no test ran", which is what that project reports with its tests filtered out.
+        run: dotnet test Klyroo.Stack.slnx -c Release --no-build --nologo --ignore-exit-code 8 -- --filter-not-namespace Klyroo.Stack.E2E
       - name: NativeAOT and trimming analyzers on the .Core libraries
         run: |
           # Only the libraries that declare NativeAOT compatibility: the global properties would otherwise also flow into
@@ -319,3 +321,73 @@ jobs:
           npm install --no-save playwright@1.65.1 @axe-core/playwright@4.14.1
           npx playwright install --with-deps chromium
           node build/verify-a11y.mjs
+
+  browser-tests:
+    # The documentation site, the live demos of the templates and the apps that dotnet new generates, in a real browser (tests/Klyroo.Stack.E2E): slow, so only
+    # after a push to main or by hand, never for a pull request. The generated apps are built against the feed this job packs, like templates-from-local-feed.
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    defaults:
+      run:
+        working-directory: klyroo-stack
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: klyroo-stack
+      - name: Check out klyroo-agent (referenced by relative path)
+        uses: actions/checkout@v4
+        with:
+          repository: klyroo/klyroo-agent
+          path: klyroo-agent
+      - name: Check out klyroo-dashboard (referenced by relative path)
+        uses: actions/checkout@v4
+        with:
+          repository: klyroo/klyroo-dashboard
+          path: klyroo-dashboard
+      - name: Check out klyroo-display (referenced by relative path)
+        uses: actions/checkout@v4
+        with:
+          repository: klyroo/klyroo-display
+          path: klyroo-display
+      - name: Check out klyroo-form (referenced by relative path)
+        uses: actions/checkout@v4
+        with:
+          repository: klyroo/klyroo-form
+          path: klyroo-form
+      - name: Check out klyroo-query (referenced by relative path)
+        uses: actions/checkout@v4
+        with:
+          repository: klyroo/klyroo-query
+          path: klyroo-query
+      - name: Check out klyroo-spreadsheet (referenced by relative path)
+        uses: actions/checkout@v4
+        with:
+          repository: klyroo/klyroo-spreadsheet
+          path: klyroo-spreadsheet
+      - name: Check out klyroo-table (referenced by relative path)
+        uses: actions/checkout@v4
+        with:
+          repository: klyroo/klyroo-table
+          path: klyroo-table
+      - name: Check out klyroo-ui (referenced by relative path)
+        uses: actions/checkout@v4
+        with:
+          repository: klyroo/klyroo-ui
+          path: klyroo-ui
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            10.0.x
+            11.0.x
+      - name: Pack the nine repositories into a local feed
+        run: build/pack-feed.sh "$RUNNER_TEMP/feed"
+      - name: Build the browser tests, the documentation site and the nine templates the site runs as demos
+        run: dotnet build tests/Klyroo.Stack.E2E -c Release --nologo
+      - name: Install the browser Playwright drives
+        run: pwsh tests/Klyroo.Stack.E2E/bin/Release/net10.0/playwright.ps1 install --with-deps chromium
+      - name: Run the browser tests
+        env:
+          KLYROO_E2E_FEED: ${{ runner.temp }}/feed
+        run: dotnet test --project tests/Klyroo.Stack.E2E -c Release --no-build --nologo
