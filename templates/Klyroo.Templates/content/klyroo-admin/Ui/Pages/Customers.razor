@@ -1,0 +1,155 @@
+@page "/customers"
+@inject CustomerStore Store
+@inject FormService Forms
+@inject FilePreviewService Preview
+@inject IToastService Toasts
+
+<PageTitle>Customers - @AppInfo.Name</PageTitle>
+
+<AppPage Title="Customers">
+    <Actions>
+        <KlyButton Label="New customer" Color="KlyColor.Primary" OnClick="CreateAsync">
+            <LeadingIcon>@KlyIcons.Named("plus")</LeadingIcon>
+        </KlyButton>
+    </Actions>
+    <ChildContent>
+        <p class="page-lead">Search, filter and sort the customers, tick rows to act on several at once, and open a customer for the details.</p>
+
+        @* Items are rows in memory: the list searches, sorts and pages them itself. A new list instance (a new reference) makes it load again. *@
+        <KlyDataList TItem="Customer" Schema="CustomerSchema.Schema" Items="_customers" Label="Customers" Selectable="true">
+            <div class="list-layout">
+                <KlyDataListFilterPanel TItem="Customer" Description="Narrow the customers" />
+                <div class="stack-tight">
+                    <div class="toolbar">
+                        <div class="toolbar-grow"><KlyDataListSearch TItem="Customer" /></div>
+                        <KlyDataListResultCount TItem="Customer" />
+                    </div>
+                    <KlyDataListFilterTags TItem="Customer" ShowClear="true" />
+                    <KlyDataListSelectionActions TItem="Customer" Actions="_bulkActions" />
+                    <KlyDataListTable TItem="Customer" RowActions="_rowActions">
+                        <KlyDataListColumn TItem="Customer" Field="name" Title="Customer" Required />
+                        <KlyDataListColumn TItem="Customer" Field="region" Title="Region" />
+                        <KlyDataListColumn TItem="Customer" Field="health" Title="Health">
+                            <Template Context="customer">
+                                <KlyBadge Label="@customer.Health.ToString()" Variant="KlyVariant.Soft" Color="HealthColor(customer.Health)" Size="KlySize.Sm" />
+                            </Template>
+                        </KlyDataListColumn>
+                        <KlyDataListColumn TItem="Customer" Field="arr" Title="Annual revenue (EUR)" Format="N0" Align="DataListAlign.End"
+                                           Summary="DataListSummaryKind.Sum" SummaryFormat="N0" />
+                    </KlyDataListTable>
+                    <KlyDataListPagination TItem="Customer" />
+                </div>
+            </div>
+        </KlyDataList>
+    </ChildContent>
+</AppPage>
+
+@code {
+    private IReadOnlyList<Customer> _customers = [];
+    private IReadOnlyList<DataListAction<Customer>> _bulkActions = [];
+    private IReadOnlyList<DataListRowAction<Customer>> _rowActions = [];
+
+    protected override void OnInitialized()
+    {
+        _customers = [.. Store.All];
+
+        _rowActions =
+        [
+            new DataListRowAction<Customer>
+            {
+                Key = "open",
+                Label = "Open",
+                Icon = "eye",
+                // A link works in a statically rendered list too, and the address is relative to <base href>.
+                Href = c => $"customers/{c.Item.Id}",
+            },
+            new DataListRowAction<Customer>
+            {
+                Key = "edit",
+                Label = "Edit",
+                Icon = "pencil",
+                OnExecute = EditAsync,
+            },
+        ];
+
+        _bulkActions =
+        [
+            new DataListAction<Customer>
+            {
+                Key = "export",
+                Label = "Export CSV",
+                Icon = "download",
+                OnExecute = c =>
+                {
+                    // The ticked rows, or every result when the user chose "Select all": the file preview shows the CSV without a download.
+                    Preview.Open(new FilePreviewFile
+                    {
+                        Src = "customers.csv",
+                        Name = "customers.csv",
+                        Mime = "text/csv",
+                        Content = "Name,Region,Tier,Annual revenue\n" + string.Join("\n", c.SelectedItems.Select(x => $"{x.Name},{x.Region},{x.Tier},{x.Arr}")),
+                    });
+                    return Task.CompletedTask;
+                },
+            },
+            new DataListAction<Customer>
+            {
+                Key = "delete",
+                Label = "Delete",
+                Icon = "trash",
+                Color = KlyColor.Error,
+                Confirm = new DataListActionConfirm<Customer>
+                {
+                    Title = "Delete customers",
+                    Description = c => $"{c.TargetCount} customers will be deleted.",
+                    ConfirmLabel = "Delete",
+                },
+                ClearSelection = DataListSelectionClear.Success,
+                OnExecute = c =>
+                {
+                    Store.Remove(c.SelectedKeys.Select(int.Parse));
+                    Reload();
+                    return Task.CompletedTask;
+                },
+            },
+        ];
+    }
+
+    private async Task CreateAsync()
+    {
+        // The form opens in the drawer that KlyFormProvider (in the layout) hosts, and the task ends when the drawer closes.
+        var outcome = await Forms.CreateFormAsync(CustomerForms.Schema("New customer", editing: false), mode: FormShellMode.Drawer);
+        if (!outcome.IsCompleted) return;
+
+        var (name, contact, region, tier, arr) = CustomerForms.Read(outcome.FormData);
+        Store.Add(name, contact, region, tier, arr);
+        Reload();
+        await Toasts.Add(new KlyToast { Title = "Customer created", Description = name, Color = KlyColor.Success });
+    }
+
+    private async Task EditAsync(DataListRowActionContext<Customer> context)
+    {
+        var customer = context.Item;
+        var outcome = await Forms.CreateFormAsync(CustomerForms.Schema($"Edit {customer.Name}", editing: true), CustomerForms.Input(customer), FormShellMode.Drawer);
+        if (!outcome.IsCompleted) return;
+
+        var (name, contact, region, tier, arr) = CustomerForms.Read(outcome.FormData);
+        Store.Update(customer with { Name = name, Contact = contact, Region = region, Tier = tier, Arr = arr });
+        Reload();
+        await Toasts.Add(new KlyToast { Title = "Customer saved", Description = name, Color = KlyColor.Success });
+    }
+
+    // The list reads a new collection: it loads its rows again, with the search, the filters and the page it had.
+    private void Reload()
+    {
+        _customers = [.. Store.All];
+        StateHasChanged();
+    }
+
+    private static KlyColor HealthColor(int health) => health switch
+    {
+        < 50 => KlyColor.Error,
+        < 70 => KlyColor.Warning,
+        _ => KlyColor.Success,
+    };
+}

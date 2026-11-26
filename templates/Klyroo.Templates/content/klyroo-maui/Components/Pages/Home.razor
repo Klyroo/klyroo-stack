@@ -1,5 +1,27 @@
 @page "/"
+@inject FormService Forms
+@inject IToastService Toasts
+
 <div class="space-y-4 p-6">
-    <KlyDisplay Kind="DisplayKind.Heading" Title="KlyrooMauiApp" Description="Native iOS, Android, macOS & Windows powered by Klyroo." />
+    <KlyDisplay Kind="DisplayKind.Heading" HeadingLevel="1" Title="KlyrooMauiApp" Description="Native iOS, Android, macOS & Windows powered by Klyroo." />
     <KlyDashboardStat Label="Offline Engine" Value="100" Format="DashboardFormatPreset.Percent" />
+    <KlyButton Label="Add a note" Color="KlyColor.Primary" OnClick="AddNoteAsync" />
 </div>
+
+@code {
+    // FormService opens the form in the KlyFormProvider of MainLayout, and the task ends when the drawer closes.
+    private async Task AddNoteAsync()
+    {
+        var outcome = await Forms.CreateFormAsync(new FormSchema
+        {
+            FormKey = "note",
+            Title = "New note",
+            Fields = [new FormFieldSchema { Key = "text", Label = "Note", Kind = FormFieldKind.Textarea, Required = true }],
+        }, mode: FormShellMode.Drawer);
+
+        if (outcome.IsCompleted)
+        {
+            await Toasts.Add(new KlyToast { Title = "Note saved", Description = outcome.FormData["text"]?.ToString(), Color = KlyColor.Success });
+        }
+    }
+}

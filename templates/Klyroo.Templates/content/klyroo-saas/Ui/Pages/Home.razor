@@ -1,0 +1,72 @@
+@page "/"
+@implements IDisposable
+@inject AccountStore Store
+@inject DashboardPersistence Persistence
+
+<PageTitle>Overview - @AppInfo.Name</PageTitle>
+
+@* KlyDashboardPage draws the heading, the refresh button and the filter pills of the controller. The blocks read their data from the resources below. *@
+<KlyDashboardPage Dashboard="_dashboard" Title="Overview" Description="Revenue and accounts at a glance. Sample data, held in memory.">
+    <KlyDashboardGrid Freshness="true">
+        <KlyDashboardStat Source="_summary" Label="Monthly recurring revenue" Span="4" Format="DashboardFormatPreset.Compact"
+                          Value="_summary.Data?.Mrr" Compare="_summary.Data?.PreviousMrr"
+                          TextValue="@(_summary.Data is { } s ? Money.Compact(s.Mrr) : null)" />
+        <KlyDashboardStat Source="_summary" Label="Active accounts" Span="4" Format="DashboardFormatPreset.Integer"
+                          Value="_summary.Data?.ActiveAccounts" Compare="_summary.Data?.PreviousActiveAccounts" />
+        <KlyDashboardStat Source="_summary" Label="Churn rate" Span="4" Format="DashboardFormatPreset.Percent" InvertDelta
+                          Value="_summary.Data?.ChurnRate" Compare="_summary.Data?.PreviousChurnRate" CompareMode="difference" />
+
+        <KlyDashboardChart Source="_revenue" Title="Recurring revenue" Subtitle="The last twelve months, from the accounts that were paying" Span="8"
+                           Type="bar" Format="DashboardFormatPreset.Compact" ShowLegend="false" Height="240"
+                           Categories="_revenue.Data?.Select(p => p.Month).ToList()"
+                           Series="@(_revenue.Data is { } points ? new[] { new DashboardChartSeries("mrr", "MRR", points.Select(p => p.Mrr).ToList()) } : null)" />
+        <KlyDashboardBars Source="_plans" Title="Revenue by plan" Subtitle="Paying accounts only" Span="4" Format="DashboardFormatPreset.Compact"
+                          Items="_plans.Data?.Select(p => new DashboardBarItem(p.Plan, p.Mrr, Tag: p.Accounts.ToString(), Meta: Money.Compact(p.Mrr))).ToList()" />
+
+        <KlyDashboardFeed Source="_activity" Title="Recent activity" Subtitle="The newest accounts" Span="12" GroupByDay="false"
+                          Items="_activity.Data?.Select(a => new DashboardFeedItem(a.Title, a.Time, a.Detail, a.Initials)).ToList()" />
+    </KlyDashboardGrid>
+</KlyDashboardPage>
+
+@code {
+    private readonly DashboardController _dashboard = new("overview");
+    private DashboardResource<Summary> _summary = default!;
+    private DashboardResource<RevenuePoint[]> _revenue = default!;
+    private DashboardResource<PlanShare[]> _plans = default!;
+    private DashboardResource<ActivityEntry[]> _activity = default!;
+    private IDisposable? _persistence;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // 1. The filters first: DashboardPersistence refuses handed-over data when the filters differ from the prerender's.
+        var plan = _dashboard.AddFilter(new DashboardFilterControl(
+            "plan", "Plan",
+            items: [.. AccountStore.Plans.Select(p => new DashboardOption(p, p))],
+            multiple: false,
+            placeholder: "All plans"));
+
+        // 2. The resources. Essential ones load first and in parallel, Background ones once those are done. The JsonTypeInfo of each lets the prerender
+        //    hand its data to the interactive render, so the numbers are loaded once and not twice.
+        _summary = _dashboard.RegisterResource(new DashboardResource<Summary>(
+            "summary", ct => Store.GetSummaryAsync(plan.Value, ct), json: AppJson.Default.Summary));
+        _revenue = _dashboard.RegisterResource(new DashboardResource<RevenuePoint[]>(
+            "revenue", ct => Store.GetRevenueAsync(plan.Value, ct), DashboardQueryStage.Background, json: AppJson.Default.RevenuePointArray));
+        _plans = _dashboard.RegisterResource(new DashboardResource<PlanShare[]>(
+            "plans", ct => Store.GetPlanSharesAsync(plan.Value, ct), DashboardQueryStage.Background, json: AppJson.Default.PlanShareArray));
+        _activity = _dashboard.RegisterResource(new DashboardResource<ActivityEntry[]>(
+            "activity", ct => Store.GetActivityAsync(plan.Value, ct), DashboardQueryStage.Background, json: AppJson.Default.ActivityEntryArray));
+
+        // 3. A filter does not reload anything on its own.
+        plan.ChangedEvent += () => _ = _dashboard.RefreshAsync();
+
+        // 4. Attach after the resources and the filters, then LoadAsync: it keeps what the prerender handed over instead of loading again.
+        _persistence = Persistence.Attach(_dashboard, AppRender.Mode);
+        await _dashboard.LoadAsync();
+    }
+
+    public void Dispose()
+    {
+        _persistence?.Dispose();
+        _dashboard.Dispose();
+    }
+}

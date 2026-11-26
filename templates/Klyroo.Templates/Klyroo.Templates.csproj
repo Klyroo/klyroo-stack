@@ -24,4 +24,50 @@
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
+
+  <!--
+    The templates reference the Klyroo packages at the version this package is released with. Each template.json has a constant symbol, KlyrooVersion,
+    whose value in the source tree is a placeholder; this target writes a copy of every template.json with $(Version) in its place, under obj, and packs
+    the copy instead of the original. A version bump in build/Version.props is therefore the only change a release needs.
+  -->
+  <PropertyGroup>
+    <KlyrooVersionPlaceholder>0.0.0-unstamped</KlyrooVersionPlaceholder>
+  </PropertyGroup>
+
+  <!-- A task of its own because WriteLinesToFile reads a Lines value as paths and turns the backslashes of the JSON strings into slashes. -->
+  <UsingTask TaskName="KlyrooStampFile" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)/Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Source ParameterType="System.String" Required="true" />
+      <Destination ParameterType="System.String" Required="true" />
+      <Placeholder ParameterType="System.String" Required="true" />
+      <Value ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System.IO" />
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        var text = File.ReadAllText(Source);
+        if (!text.Contains(Placeholder)) { Log.LogError("{0} does not contain the version placeholder {1}.", Source, Placeholder); return false; }
+        Directory.CreateDirectory(Path.GetDirectoryName(Destination));
+        var stamped = text.Replace(Placeholder, Value);
+        if (!File.Exists(Destination) || File.ReadAllText(Destination) != stamped) File.WriteAllText(Destination, stamped);
+      ]]></Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="KlyrooStampTemplateVersion" BeforeTargets="_GetPackageFiles;GenerateNuspec">
+    <PropertyGroup>
+      <KlyrooStampDir>$([MSBuild]::NormalizeDirectory($(MSBuildProjectDirectory), $(IntermediateOutputPath), stamped))</KlyrooStampDir>
+    </PropertyGroup>
+    <ItemGroup>
+      <_KlyrooTemplateJson Include="content/**/.template.config/template.json" Exclude="content/**/bin/**;content/**/obj/**" />
+    </ItemGroup>
+    <KlyrooStampFile Source="%(_KlyrooTemplateJson.FullPath)"
+                     Destination="$(KlyrooStampDir)%(_KlyrooTemplateJson.RecursiveDir)template.json"
+                     Placeholder="$(KlyrooVersionPlaceholder)" Value="$(Version)" />
+    <ItemGroup>
+      <Content Remove="@(_KlyrooTemplateJson)" />
+      <Content Include="$(KlyrooStampDir)%(_KlyrooTemplateJson.RecursiveDir)template.json"
+               Pack="true" PackagePath="content/%(_KlyrooTemplateJson.RecursiveDir)" />
+    </ItemGroup>
+  </Target>
 </Project>

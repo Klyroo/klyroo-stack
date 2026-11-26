@@ -1,0 +1,94 @@
+@page "/usage"
+@inject AccountStore Store
+@inject FilePreviewService Preview
+
+<PageTitle>Usage - @AppInfo.Name</PageTitle>
+
+@* KlyDisplay renders read-only blocks from data. Set Kind to pick the block and fill the parameters that kind reads. *@
+<div class="stack">
+    <KlyDisplay Kind="DisplayKind.Heading" HeadingLevel="1" Title="Usage and billing"
+                Description="What your plan includes, how much of it you used and what the next invoice contains. Sample figures." />
+
+    <KlyDisplay Kind="DisplayKind.Stat" Variant="row" Title="This month" StatItems="_usage" />
+
+    <div class="two-columns">
+        <div class="stack">
+            <KlyDisplay Kind="DisplayKind.Meter" Title="Seats" Value="@($"{Seats} of {SeatLimit}")" MeterValue="Seats" MeterMax="SeatLimit"
+                        WarningThreshold="70" ErrorThreshold="90" Description="Invite colleagues from the accounts page." />
+            <KlyDisplay Kind="DisplayKind.Meter" Variant="ring" Title="API calls" Value="68%" MeterValue="68" MeterMax="100" WarningThreshold="80" ErrorThreshold="95"
+                        Description="680,000 of 1,000,000 calls, resets on the first of the month." />
+            <KlyDisplay Kind="DisplayKind.Facts" Title="Plan" Facts="_facts" />
+        </div>
+        <div class="stack">
+            <KlyDisplay Kind="DisplayKind.Breakdown" Title="Next invoice" BreakdownLines="_lines" BreakdownTotal="_total"
+                        Details="Prices exclude tax. The invoice is issued on the first of the month." />
+            <KlyDisplay Kind="DisplayKind.Timeline" Title="Billing history" TimelineItems="_history" />
+            <KlyDisplay Kind="DisplayKind.Code" Variant="secret" Title="API key" Value="kly_live_8f3a91c27d4e5b60" />
+        </div>
+    </div>
+
+    <div>
+        <KlyButton Label="Preview the last invoice" Variant="ButtonVariant.Outline" OnClick="OpenInvoice">
+            <LeadingIcon>@KlyIcons.Named("file-text")</LeadingIcon>
+        </KlyButton>
+    </div>
+</div>
+
+@code {
+    private const int SeatLimit = 25;
+
+    private int Seats => Math.Min(SeatLimit, Store.All.Count(a => a.Status != "Churned") - 2);
+
+    private IReadOnlyList<DisplayStatItem> _usage = [];
+    private IReadOnlyList<DisplayFact> _facts = [];
+    private IReadOnlyList<DisplayBreakdownLine> _lines = [];
+    private DisplayBreakdownLine _total = new("Total");
+    private IReadOnlyList<DisplayTimelineItem> _history = [];
+
+    protected override void OnInitialized()
+    {
+        var paying = Store.All.Where(a => a.Status is "Active" or "Past due").ToList();
+        var subscription = 199m;
+        var seats = Seats * 9m;
+        var overage = 24m;
+
+        _usage =
+        [
+            new("Accounts", Store.All.Count.ToString(), "all plans"),
+            new("Paying", paying.Count.ToString(), Money.Format(paying.Sum(a => a.Mrr)) + " a month"),
+            new("Past due", Store.All.Count(a => a.Status == "Past due").ToString(), "to follow up", KlyColor.Warning),
+        ];
+
+        _facts =
+        [
+            new DisplayFact { Label = "Plan", Chip = new DisplayChip("Team", KlyColor.Primary) },
+            new DisplayFact { Label = "Billing", Value = "Monthly, by card" },
+            new DisplayFact { Label = "Workspace id", Value = "ws_4c91e0a7", Mono = true, Copy = true },
+            new DisplayFact { Label = "Renews", Value = DateTime.UtcNow.AddMonths(1).ToString("MMMM 1, yyyy"), Emphasis = true },
+        ];
+
+        _lines =
+        [
+            new("Team plan", Money.Format(subscription)),
+            new($"{Seats} seats", Money.Format(seats), Detail: "9 EUR per seat"),
+            new("Extra API calls", Money.Format(overage), Detail: "24,000 calls over the limit"),
+        ];
+        _total = new("Total", Money.Format(subscription + seats + overage), IsSubtotal: true);
+
+        var today = DateTimeOffset.UtcNow;
+        _history =
+        [
+            new("Invoice paid", "Card ending 4242", Date: today.AddDays(-3), State: DisplayTimelineState.Done),
+            new("Seats added", "Two seats were added to the workspace", Date: today.AddDays(-12), State: DisplayTimelineState.Done),
+            new("Plan changed", "From Starter to Team", Date: today.AddDays(-41), State: DisplayTimelineState.Done),
+        ];
+    }
+
+    private void OpenInvoice() => Preview.Open(new FilePreviewFile
+    {
+        Src = "invoice.csv",
+        Name = "invoice.csv",
+        Mime = "text/csv",
+        Content = string.Join("\n", _lines.Append(_total).Select(l => $"{l.Label},{l.Value}").Prepend("Item,Amount")),
+    });
+}

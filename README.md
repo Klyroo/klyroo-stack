@@ -14,7 +14,7 @@ Klyroo is a family of independent .NET libraries, each in its own repository wit
 - **Headless meta-package**: `Klyroo.Stack.Core` references the seven `.Core` engines, none of which depends on Razor or ASP.NET Core, and is marked `IsAotCompatible` and `IsTrimmable`.
 - **Component catalog**: `KlyrooStackCatalog` maps a component or controller name such as `KlyDataList<Order>` to the library, the packages, the template short name and the agent skill that own it.
 - **MCP documentation server**: the `klyroo-stack-mcp` tool answers over stdio, offline, with the components, parameters, events, slots, theme slots, example sources and guides of the Klyroo.UI version it was built with.
-- **Project templates**: `Klyroo.Templates` adds four `dotnet new` templates: `klyroo-saas`, `klyroo-admin`, `klyroo-headless` and `klyroo-maui`.
+- **Project templates**: `Klyroo.Templates` adds four `dotnet new` templates: `klyroo-saas` and `klyroo-admin`, two Blazor Web App starters with a shell, a dashboard, a data list, forms and display blocks that run in Interactive Server, WebAssembly or Auto, `klyroo-headless` and `klyroo-maui`.
 - **Precompiled stylesheet**: `Klyroo.Stack` ships `klyroo-stack.css`, so an app needs neither Node nor Tailwind to style the components.
 - **Agent skill**: `skills/klyroo-stack/SKILL.md` routes a coding agent to the skill of each library.
 - **Documentation site source**: `site/` holds the Blazor app that documents the ecosystem. It is not deployed yet and runs locally.
@@ -72,11 +72,15 @@ builder.Services.AddKlyrooStack();
 ```
 
 ```razor
+<KlyColorModeScript />
+<KlyCultureMeta />
+<KlyThemeStyle />
 <link rel="stylesheet" href="@Assets["_content/Klyroo.UI/klyroo.preflight.css"]" />
 <link rel="stylesheet" href="@Assets["_content/Klyroo.UI/klyroo.css"]" />
 <link rel="stylesheet" href="@Assets["_content/Klyroo.Stack/klyroo-stack.css"]" />
-<KlyHead />
 ```
+
+The three components go before the stylesheets: the first applies the stored color mode before the first paint, the second writes the culture of the request so a WebAssembly client formats like the prerender, and the third sends the theme variables. In a .NET MAUI Blazor Hybrid app, which has no server to render `<head>`, use `<KlyHead />` in the layout instead.
 
 In an app with a WebAssembly client, call `AddKlyrooStack()` in the server and in the client `Program.cs` with the same options. [Getting started](https://github.com/klyroo/klyroo-stack/blob/main/docs/getting-started.md) walks through a complete project.
 
@@ -116,16 +120,22 @@ dotnet new install Klyroo.Templates::0.1.0-preview.1
 
 | Short name | Creates |
 | :--- | :--- |
-| `klyroo-saas` | Blazor Web App (Interactive Server) with `AddKlyrooStack()`, the stylesheets, a stat card and a form drawer |
-| `klyroo-admin` | Same host with a dashboard page, a data list with a sum row, a form drawer and a CSV preview |
+| `klyroo-saas` | Blazor Web App for a SaaS product: a header with navigation and a color mode button, a dashboard, a filterable accounts list with a form drawer, and a usage page of display blocks |
+| `klyroo-admin` | Blazor Web App for a back office: a sidebar shell, a dashboard, a customer list with selection and bulk actions, a customer page, and a spreadsheet import |
 | `klyroo-headless` | Console app with `PublishAot` that uses `Klyroo.Stack.Core` only |
 | `klyroo-maui` | .NET MAUI Blazor Hybrid app for Android, iOS, Mac Catalyst and Windows, see [Platforms](https://github.com/klyroo/klyroo-stack/blob/main/docs/platforms.md#net-maui-blazor-hybrid) |
 
 ```bash
 dotnet new klyroo-saas -n MyShop
+cd MyShop
+dotnet run
 ```
 
-The three web and console templates were generated, built and run (the headless one also published with NativeAOT) when this documentation was written.
+Both web templates take `--interactivity Server|WebAssembly|Auto` (Server by default). `Server` is one project; `WebAssembly` and `Auto` add a `.Client` project that holds the pages, the layout and the sample data, and a solution file. The pages show a product name written from the project name (`MyShop` becomes "My Shop"); `--product-name "Acme Cloud"` sets another. The app loads the three precompiled stylesheets, so it needs neither Node nor a Tailwind build, and its own layout classes live in `wwwroot/app.css`: see [Style a generated app](https://github.com/klyroo/klyroo-stack/blob/main/docs/guides.md#style-a-generated-app) for what that means for the classes you write. [Start a project from a template](https://github.com/klyroo/klyroo-stack/blob/main/docs/guides.md#start-a-project-from-a-template) describes each page.
+
+The templates reference the Klyroo packages at the version of the `Klyroo.Templates` package that you installed: the version is written into each template when the package is built, so a new release changes it in one place.
+
+The `klyroo-saas` and `klyroo-admin` templates were generated in all three interactivity modes, built against locally packed packages, run, and loaded in headless Chrome without console errors.
 
 ### Run the documentation site locally
 

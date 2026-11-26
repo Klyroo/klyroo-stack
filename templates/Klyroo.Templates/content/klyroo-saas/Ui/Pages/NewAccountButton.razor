@@ -1,0 +1,24 @@
+@inject AccountStore Store
+@inject FormService Forms
+@inject IToastService Toasts
+
+<KlyButton Label="New account" Color="KlyColor.Primary" OnClick="CreateAsync">
+    <LeadingIcon>@KlyIcons.Named("plus")</LeadingIcon>
+</KlyButton>
+
+@code {
+    // The list that this button sits in: KlyDataList cascades it to its content.
+    [CascadingParameter] private DataListContext<Account> List { get; set; } = default!;
+
+    private async Task CreateAsync()
+    {
+        // The form opens in the drawer that KlyFormProvider (in the layout) hosts, and the task ends when the drawer closes.
+        var outcome = await Forms.CreateFormAsync(AccountForms.Schema("New account", editing: false), mode: FormShellMode.Drawer);
+        if (!outcome.IsCompleted) return;
+
+        var (name, owner, plan, mrr) = AccountForms.Read(outcome.FormData);
+        Store.Add(name, owner, plan, mrr);
+        await List.RefreshAsync();
+        await Toasts.Add(new KlyToast { Title = "Account created", Description = $"{name} started a trial.", Color = KlyColor.Success });
+    }
+}

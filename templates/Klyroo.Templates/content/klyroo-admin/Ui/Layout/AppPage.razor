@@ -1,0 +1,29 @@
+@* A page of the app: a panel with the navbar (the sidebar toggle below lg, the title, the actions of the page, the color mode) over a scrolling body. *@
+<KlyDashboardPanel>
+    <Header>
+        <KlyDashboardNavbar Title="@Title">
+            <Leading>
+                <KlyDashboardSidebarCollapse />
+            </Leading>
+            <Right>
+                @Actions
+                <KlyColorModeButton />
+            </Right>
+        </KlyDashboardNavbar>
+    </Header>
+    <Body>
+        <div class="app-page">
+            @ChildContent
+        </div>
+    </Body>
+</KlyDashboardPanel>
+
+@code {
+    /// <summary>The title of the page, in the navbar: the h1 of the page.</summary>
+    [Parameter] public string? Title { get; set; }
+
+    /// <summary>Buttons of the page, in the navbar.</summary>
+    [Parameter] public RenderFragment? Actions { get; set; }
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

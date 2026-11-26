@@ -1,0 +1,160 @@
+/*
+  The styles of the app itself, loaded after the three precompiled Klyroo stylesheets (App.razor). The precompiled sheets only hold the classes that the
+  Klyroo components use, so a utility class written in your own markup (md:grid-cols-2, space-y-6) is not in them and does nothing: this file holds the
+  layout of the pages instead, in plain CSS on the Klyroo tokens, so it follows the theme and the color mode. To write Tailwind utilities in your markup,
+  compile Tailwind in the app (KlyrooTailwind, see the Klyroo.UI guide "Compile Tailwind in your app") and replace the three sheets with its output.
+*/
+
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
+/* A page ends in its heading when the router moves the focus there: no ring on a heading that is not a control. */
+h1:focus {
+  outline: none;
+}
+
+/* The skip link moves the focus to the main landmark: it is not a control, so no ring. */
+#main:focus {
+  outline: none;
+}
+
+.page-body {
+  padding-block: 2rem;
+}
+
+.page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 2rem;
+  color: var(--klyroo-text-highlighted);
+}
+
+.page-lead {
+  margin: 0.25rem 0 0;
+  max-width: 42rem;
+  font-size: 0.875rem;
+  color: var(--klyroo-text-muted);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+.stack-tight {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.toolbar-grow {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+/* A narrow column of filters next to the list from the lg breakpoint, above it below. */
+.list-layout {
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 64rem) {
+  .list-layout {
+    grid-template-columns: 16rem minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.two-columns {
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (min-width: 64rem) {
+  .two-columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.125rem;
+  font-weight: 600;
+  color: var(--klyroo-text-highlighted);
+  text-decoration: none;
+}
+
+.brand svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.not-found, .error-page {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  padding-block: 4rem;
+}
+
+.not-found .code {
+  margin: 0;
+  font-family: ui-monospace, monospace;
+  font-size: 0.875rem;
+  color: var(--klyroo-text-muted);
+}
+
+.error-page h1 {
+  color: var(--klyroo-error-text);
+}
+
+.error-page p, .not-found p {
+  margin: 0;
+  color: var(--klyroo-text-muted);
+}
+
+/* The bar of the Blazor framework that shows an unhandled exception. */
+#blazor-error-ui {
+  display: none;
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 50;
+  padding: 0.75rem 1rem;
+  background: #fef3c7;
+  color: #18181b;
+  font-size: 0.875rem;
+}
+
+#blazor-error-ui .reload {
+  text-decoration: underline;
+}
+
+#blazor-error-ui .dismiss {
+  margin-inline-start: 1rem;
+  cursor: pointer;
+}

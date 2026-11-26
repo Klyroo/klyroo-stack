@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Klyroo.Stack" Version="KLYROO_VERSION" />
+    <!-- The server side of Klyroo: lets components read cookies (the time zone of the browser, the color choice) while the server renders. Not in the client, which has no request. -->
+    <PackageReference Include="Klyroo.UI.Server" Version="KLYROO_VERSION" />
+<!--#if (UseClient) -->
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.15" />
+    <ProjectReference Include="..\KlyrooAdminApp.Client\KlyrooAdminApp.Client.csproj" />
+<!--#endif -->
+  </ItemGroup>
+</Project>

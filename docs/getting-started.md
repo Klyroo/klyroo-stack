@@ -100,14 +100,18 @@ app.Run();
 
 ### Load the stylesheets
 
-In `Components/App.razor`, add the three stylesheets and `<KlyHead />` inside `<head>`. The first two come from Klyroo.UI, the third from the meta-package; all of them are precompiled, so the app does not need Node or Tailwind:
+In `Components/App.razor`, add the three head components and the three stylesheets inside `<head>`. `KlyColorModeScript` applies the stored color mode before the first paint, `KlyCultureMeta` writes the culture of the request so a WebAssembly client formats like the prerender, and `KlyThemeStyle` sends the theme variables. The first two stylesheets come from Klyroo.UI, the third from the meta-package; all of them are precompiled, so the app does not need Node or Tailwind:
 
 ```razor
+<KlyColorModeScript />
+<KlyCultureMeta />
+<KlyThemeStyle />
 <link rel="stylesheet" href="@Assets["_content/Klyroo.UI/klyroo.preflight.css"]" />
 <link rel="stylesheet" href="@Assets["_content/Klyroo.UI/klyroo.css"]" />
 <link rel="stylesheet" href="@Assets["_content/Klyroo.Stack/klyroo-stack.css"]" />
-<KlyHead />
 ```
+
+In a .NET MAUI Blazor Hybrid app, which has no server to render `<head>`, `<KlyHead />` in the layout does the job of the three head components.
 
 If the project still loads Bootstrap or another stylesheet that sits outside CSS layers, remove it: unlayered CSS overrides the layered CSS of Tailwind v4 and changes how the components look.
 

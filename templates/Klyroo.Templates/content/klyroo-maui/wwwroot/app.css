@@ -1,0 +1,28 @@
+/*
+  The styles of the app itself, loaded after the precompiled Klyroo stylesheets (index.html). Those only hold the classes that the Klyroo components use, so a
+  utility class written in your own markup is not in them: layout classes live here, on the Klyroo tokens.
+*/
+
+body {
+  -webkit-font-smoothing: antialiased;
+}
+
+.app-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 48rem;
+  min-height: 100dvh;
+  margin-inline: auto;
+  padding: 1rem;
+  /* Under the notch and the home indicator of a phone: the viewport covers them (viewport-fit=cover in index.html). */
+  padding-top: max(1rem, env(safe-area-inset-top));
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+@media (min-width: 40rem) {
+  .app-main {
+    padding: 1.5rem;
+  }
+}

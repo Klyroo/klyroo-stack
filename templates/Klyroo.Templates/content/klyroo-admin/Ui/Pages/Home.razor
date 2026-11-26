@@ -1,0 +1,95 @@
+@page "/"
+@implements IDisposable
+@inject CustomerStore Store
+@inject DashboardPersistence Persistence
+
+<PageTitle>Dashboard - @AppInfo.Name</PageTitle>
+
+<AppPage Title="Dashboard">
+    @* KlyDashboardPage draws the description, the refresh button and the filter pills of the controller, under the navbar of AppPage. *@
+    <KlyDashboardPage Dashboard="_dashboard" Description="Customers and recurring revenue. Sample data, held in memory.">
+        <KlyDashboardGrid Freshness="true">
+            <KlyDashboardStat Source="_summary" Label="Customers" Span="3" Format="DashboardFormatPreset.Integer"
+                              Value="_summary.Data?.Customers" Compare="_summary.Data?.PreviousCustomers" />
+            <KlyDashboardStat Source="_summary" Label="Annual revenue" Span="3" Format="DashboardFormatPreset.Compact"
+                              Value="_summary.Data?.Arr" Compare="_summary.Data?.PreviousArr"
+                              TextValue="@(_summary.Data is { } s ? Money.Compact(s.Arr) : null)" />
+            <KlyDashboardStat Source="_summary" Label="At risk" Span="3" Format="DashboardFormatPreset.Integer" InvertDelta
+                              Value="_summary.Data?.AtRisk" Compare="_summary.Data?.PreviousAtRisk" CompareMode="difference"
+                              Caption="Customers with a health score under 50" />
+            <KlyDashboardGauge Source="_summary" Title="Average health" Span="3" Format="DashboardFormatPreset.Integer"
+                               Value="_summary.Data?.AverageHealth" Target="70" Caption="of 100" />
+
+            <KlyDashboardChart Source="_trend" Title="Annual recurring revenue" Subtitle="The last twelve months, from the customers that had signed" Span="8"
+                               Type="line" Format="DashboardFormatPreset.Compact" ShowLegend="false" Height="240"
+                               Categories="_trend.Data?.Select(p => p.Month).ToList()"
+                               Series="@(_trend.Data is { } points ? new[] { new DashboardChartSeries("arr", "ARR", points.Select(p => p.Arr).ToList(), "line") } : null)" />
+            <KlyDashboardBars Source="_regions" Title="Revenue by region" Subtitle="All customers" Span="4" Format="DashboardFormatPreset.Compact"
+                              Items="_regions.Data?.Select(r => new DashboardBarItem(r.Region, r.Arr, Tag: r.Customers.ToString(), Meta: Money.Compact(r.Arr))).ToList()" />
+
+            <KlyDashboardTable Source="_top" Title="Biggest customers" Span="7" Menu="true" Columns="_topColumns"
+                               Rows="TopRows" />
+            <KlyDashboardFeed Source="_activity" Title="Recent activity" Subtitle="The newest contracts" Span="5" GroupByDay="false"
+                              Items="_activity.Data?.Select(a => new DashboardFeedItem(a.Title, a.Time, a.Detail, a.Initials)).ToList()" />
+        </KlyDashboardGrid>
+    </KlyDashboardPage>
+</AppPage>
+
+@code {
+    private readonly DashboardController _dashboard = new("admin-dashboard");
+    private DashboardResource<Summary> _summary = default!;
+    private DashboardResource<ArrPoint[]> _trend = default!;
+    private DashboardResource<RegionShare[]> _regions = default!;
+    private DashboardResource<TopCustomer[]> _top = default!;
+    private DashboardResource<ActivityEntry[]> _activity = default!;
+    private IDisposable? _persistence;
+
+    // One dictionary per row, with the raw value of each column by key.
+    private IReadOnlyList<IReadOnlyDictionary<string, object?>>? TopRows => _top.Data?
+        .Select(c => (IReadOnlyDictionary<string, object?>)new Dictionary<string, object?> { ["name"] = c.Name, ["region"] = c.Region, ["arr"] = c.Arr, ["health"] = c.Health })
+        .ToList();
+
+    private static readonly DashboardTableColumn[] _topColumns =
+    [
+        new("name", "Customer", Sortable: false),
+        new("region", "Region"),
+        new("arr", "Annual revenue", "number", DashboardFormatPreset.Compact),
+        new("health", "Health", "percent"),
+    ];
+
+    protected override async Task OnInitializedAsync()
+    {
+        // 1. The filters first: DashboardPersistence refuses handed-over data when the filters differ from the prerender's.
+        var region = _dashboard.AddFilter(new DashboardFilterControl(
+            "region", "Region",
+            items: [.. CustomerStore.Regions.Select(r => new DashboardOption(r, r))],
+            multiple: false,
+            placeholder: "All regions"));
+
+        // 2. The resources. Essential ones load first and in parallel, Background ones once those are done. The JsonTypeInfo of each lets the prerender
+        //    hand its data to the interactive render, so the numbers are loaded once and not twice.
+        _summary = _dashboard.RegisterResource(new DashboardResource<Summary>(
+            "summary", ct => Store.GetSummaryAsync(region.Value, ct), json: AppJson.Default.Summary));
+        _trend = _dashboard.RegisterResource(new DashboardResource<ArrPoint[]>(
+            "trend", ct => Store.GetArrTrendAsync(region.Value, ct), DashboardQueryStage.Background, json: AppJson.Default.ArrPointArray));
+        _regions = _dashboard.RegisterResource(new DashboardResource<RegionShare[]>(
+            "regions", ct => Store.GetRegionSharesAsync(region.Value, ct), DashboardQueryStage.Background, json: AppJson.Default.RegionShareArray));
+        _top = _dashboard.RegisterResource(new DashboardResource<TopCustomer[]>(
+            "top", ct => Store.GetTopCustomersAsync(region.Value, ct), DashboardQueryStage.Background, json: AppJson.Default.TopCustomerArray));
+        _activity = _dashboard.RegisterResource(new DashboardResource<ActivityEntry[]>(
+            "activity", ct => Store.GetActivityAsync(region.Value, ct), DashboardQueryStage.Background, json: AppJson.Default.ActivityEntryArray));
+
+        // 3. A filter does not reload anything on its own.
+        region.ChangedEvent += () => _ = _dashboard.RefreshAsync();
+
+        // 4. Attach after the resources and the filters, then LoadAsync: it keeps what the prerender handed over instead of loading again.
+        _persistence = Persistence.Attach(_dashboard, AppRender.Mode);
+        await _dashboard.LoadAsync();
+    }
+
+    public void Dispose()
+    {
+        _persistence?.Dispose();
+        _dashboard.Dispose();
+    }
+}

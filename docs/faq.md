@@ -10,6 +10,12 @@ The projects reference the sibling repositories by relative path (`..\..\..\klyr
 **The page renders without styles, or the components look unstyled.**
 The stylesheets are not loaded. Add `klyroo.preflight.css` and `klyroo.css` from `_content/Klyroo.UI/` and `klyroo-stack.css` from `_content/Klyroo.Stack/` to the `<head>` of `App.razor`, as in [Getting started](getting-started.md#load-the-stylesheets). If the stylesheets load but spacing or colors are wrong, check for Bootstrap or another stylesheet that sits outside CSS layers: it overrides the layered CSS of Tailwind v4. Remove it or import it into a layer (`@import url(bootstrap.css) layer(bootstrap);`).
 
+**A utility class in my own markup (`md:grid-cols-2`, `space-y-6`) does nothing.**
+The precompiled sheets only hold the classes the Klyroo components use, and nothing compiles the classes of your pages. Write the rule in your own stylesheet, or compile Tailwind in the app: [Style a generated app](guides.md#style-a-generated-app).
+
+**The header navigation or a search field looks wrong although all the sheets load.**
+An old `klyroo-stack.css` repeated utility rules that `klyroo.css` already holds, and the later copy overrode rules between them. Update `Klyroo.Stack`: the sheet now holds only what `klyroo.css` lacks.
+
 **A `KlyButton` with `OnClick` does nothing.**
 In static server rendering there is no circuit, so a .NET click handler cannot run. Render the page interactively (`@rendermode InteractiveServer`, WebAssembly or Auto), or use `Href` or a form post for the action.
 
@@ -20,7 +26,7 @@ The server and the client registered different options. Call `AddKlyrooStack()` 
 The options freeze once components start resolving themes and texts, because each locale's result is cached. Move the change into the `configureUi` or `configureTable` callback of `AddKlyrooStack()`, before the app renders.
 
 **A form drawer or file preview never appears.**
-The overlays render through `KlyFormProvider` and `KlyFilePreviewProvider`. Put both inside `<KlyApp>` in `Routes.razor`, as the templates do.
+The overlays render through `KlyFormProvider` and `KlyFilePreviewProvider`. Put both inside `<KlyApp>`, in the layout or in `Routes.razor`, as the templates and the tutorial do.
 
 **The MCP server exits immediately with exit code 2.**
 You passed an option it does not know, or a name in `--tools` that is not a tool. Run `klyroo-stack-mcp --list-tools` for the valid names. The message on stderr says which argument was rejected.

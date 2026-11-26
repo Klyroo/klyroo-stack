@@ -1,0 +1,45 @@
+@inherits LayoutComponentBase
+
+<KlyApp>
+    <KlySkipLink />
+
+    @* The group fills its parent, so the parent needs a height: the page itself (app.css). It is the main landmark, so the sidebar and the panels are inside
+       one (the sidebar is a div: its navigation is a landmark of its own, and a complementary one may not sit in main). *@
+    <KlyMain id="main" tabindex="-1">
+        <KlyDashboardGroup StorageKey="admin">
+            @* Links are relative: they resolve against <base href>, so the app works at the root of a site and below a path. *@
+            <KlyDashboardSidebar As="div" Resizable Width="260" MinWidth="208" MaxWidth="360" AriaLabel="Main" MobileTitle="Menu">
+                <Header>
+                    <a href="./" class="brand">
+                        <KlyIcon Name="lucide:shield-check" />
+                        <span>@AppInfo.Name</span>
+                    </a>
+                </Header>
+                <ChildContent>
+                    <KlyNavigationMenu Items="_items" Orientation="KlyOrientation.Vertical" AriaLabel="Pages" />
+                </ChildContent>
+            </KlyDashboardSidebar>
+
+            @Body
+        </KlyDashboardGroup>
+    </KlyMain>
+
+    @* The overlays that the services open: FormService shows its forms here, FilePreviewService its previews. *@
+    <KlyFormProvider />
+    <KlyFilePreviewProvider />
+</KlyApp>
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">x</span>
+</div>
+
+@code {
+    private static readonly KlyNavigationItem[] _items =
+    [
+        new("Dashboard") { Href = "./", Exact = true, Icon = KlyIcons.Named("lucide:layout-dashboard") },
+        new("Customers") { Href = "customers", Icon = KlyIcons.Named("lucide:users") },
+        new("Import") { Href = "import", Icon = KlyIcons.Named("lucide:file-up") },
+    ];
+}

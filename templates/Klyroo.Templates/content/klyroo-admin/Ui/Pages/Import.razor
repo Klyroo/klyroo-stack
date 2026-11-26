@@ -1,0 +1,104 @@
+@page "/import"
+@inject CustomerStore Store
+@inject FilePreviewService Preview
+@inject IToastService Toasts
+
+<PageTitle>Import - @AppInfo.Name</PageTitle>
+
+<AppPage Title="Import customers">
+    <Actions>
+        <KlyButton Label="Preview the template" Variant="ButtonVariant.Ghost" Color="KlyColor.Neutral" OnClick="OpenTemplate" />
+        <KlyButton Label="Try a sample file" Variant="ButtonVariant.Outline" OnClick="LoadSample" />
+    </Actions>
+    <ChildContent>
+        <p class="page-lead">Choose or drop a CSV, TSV or Excel file, or paste rows copied from a spreadsheet. The columns are matched by their header, and every row is checked before anything is imported.</p>
+        <KlySpreadsheetImport Importer="_importer" Title="Customers" />
+    </ChildContent>
+</AppPage>
+
+@code {
+    private SpreadsheetImporter _importer = default!;
+
+    private const string Sample =
+        "Name,Contact,Region,Tier,Annual revenue\n" +
+        "Harbor Freight,ops@harborfreight.example,Americas,Enterprise,182000\n" +
+        "Lantern Books,hello@lanternbooks.example,EMEA,Standard,9400\n" +
+        "Quill Software,team@quill.example,APAC,Plus,56000\n" +
+        "Moss & Co,info@moss.example,Europe,Plus,31500\n" +
+        "Nimbus Air,fleet@nimbus.example,Americas,Plus,not a number\n";
+
+    protected override void OnInitialized()
+    {
+        _importer = new SpreadsheetImporter(new SpreadsheetSchema
+        {
+            Key = "customers",
+            RowKeyField = "name",
+            Columns =
+            [
+                new SpreadsheetColumnSchema { Key = "name", Label = "Name", Required = true, Example = "Acme Corp" },
+                new SpreadsheetColumnSchema { Key = "contact", Label = "Contact", Required = true, Example = "ada@acme.example" },
+                new SpreadsheetColumnSchema
+                {
+                    Key = "region",
+                    Label = "Region",
+                    Kind = SpreadsheetColumnKind.Select,
+                    Required = true,
+                    Example = "EMEA",
+                    // A cell is matched against the label, the value and the aliases: "Europe" in a file lands on EMEA.
+                    Options =
+                    [
+                        new("EMEA", "EMEA", ["Europe"]),
+                        new("Americas", "Americas", ["US", "LATAM"]),
+                        new("APAC", "APAC", ["Asia"]),
+                    ],
+                },
+                new SpreadsheetColumnSchema
+                {
+                    Key = "tier",
+                    Label = "Tier",
+                    Kind = SpreadsheetColumnKind.Select,
+                    HasDefault = true,
+                    DefaultValue = "Standard",
+                    Example = "Plus",
+                    Options = [.. CustomerStore.Tiers.Select(t => new SpreadsheetOption(t, t))],
+                },
+                new SpreadsheetColumnSchema
+                {
+                    Key = "arr",
+                    Label = "Annual revenue",
+                    Kind = SpreadsheetColumnKind.Number,
+                    Required = true,
+                    Example = "48000",
+                    Rules = [SpreadsheetRule.Min(0)],
+                },
+            ],
+            OnSubmit = SaveAsync,
+        });
+    }
+
+    // Receives the importable rows, in batches. Persist them here; return the rows your server refused, or null.
+    private async Task<IReadOnlyList<SpreadsheetRejectedRow>?> SaveAsync(IReadOnlyList<SpreadsheetRow> rows)
+    {
+        foreach (var row in rows)
+        {
+            Store.Add(
+                row.Data["name"]?.ToString() ?? "",
+                row.Data["contact"]?.ToString() ?? "",
+                row.Data["region"]?.ToString() ?? "EMEA",
+                row.Data["tier"]?.ToString() ?? "Standard",
+                Convert.ToDecimal(row.Data["arr"] ?? 0.0));
+        }
+        await Toasts.Add(new KlyToast { Title = "Customers imported", Description = $"{rows.Count} added to the list.", Color = KlyColor.Success });
+        return null;
+    }
+
+    private void LoadSample() => _importer.LoadText(Sample, "customers.csv");
+
+    private void OpenTemplate() => Preview.Open(new FilePreviewFile
+    {
+        Src = "customers-template.csv",
+        Name = "customers-template.csv",
+        Mime = "text/csv",
+        Content = _importer.ExportTemplateCsv(),
+    });
+}

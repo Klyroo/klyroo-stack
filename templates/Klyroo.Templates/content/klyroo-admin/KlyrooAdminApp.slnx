@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="KlyrooAdminApp/KlyrooAdminApp.csproj" />
+  <Project Path="KlyrooAdminApp.Client/KlyrooAdminApp.Client.csproj" />
+</Solution>

@@ -4,8 +4,80 @@
   "classifications": ["Web", "Blazor", "Admin", "Klyroo"],
   "identity": "Klyroo.Templates.Admin",
   "name": "Klyroo Admin Backoffice",
+  "description": "A Blazor Web App for a back office: a sidebar shell, a dashboard, a customer list with selection and a form drawer, a customer page, and a spreadsheet import, on all eight Klyroo libraries.",
   "shortName": "klyroo-admin",
   "sourceName": "KlyrooAdminApp",
+  "preferNameDirectory": true,
   "tags": { "language": "C#", "type": "project" },
-  "preferNameDirectory": true
+  "primaryOutputs": [
+    { "path": "KlyrooAdminApp/KlyrooAdminApp.csproj", "condition": "(UseClient)" },
+    { "path": "KlyrooAdminApp.csproj", "condition": "(!UseClient)" }
+  ],
+  "forms": {
+    "words": { "identifier": "chain", "steps": [ "separators", "camel", "squeeze", "titleCase" ] },
+    "separators": { "identifier": "replace", "pattern": "[_.\\-]+", "replacement": " " },
+    "camel": { "identifier": "replace", "pattern": "([a-z0-9])([A-Z])", "replacement": "$1 $2" },
+    "squeeze": { "identifier": "replace", "pattern": "\\s+", "replacement": " " }
+  },
+  "symbols": {
+    "Interactivity": {
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "Server",
+      "description": "A Blazor Web App for a back office: a sidebar shell, a dashboard, a customer list with selection and a form drawer, a customer page, and a spreadsheet import, on all eight Klyroo libraries.",
+      "choices": [
+        { "choice": "Server", "description": "A Blazor Web App for a back office: a sidebar shell, a dashboard, a customer list with selection and a form drawer, a customer page, and a spreadsheet import, on all eight Klyroo libraries." },
+        { "choice": "WebAssembly", "description": "A Blazor Web App for a back office: a sidebar shell, a dashboard, a customer list with selection and a form drawer, a customer page, and a spreadsheet import, on all eight Klyroo libraries." },
+        { "choice": "Auto", "description": "A Blazor Web App for a back office: a sidebar shell, a dashboard, a customer list with selection and a form drawer, a customer page, and a spreadsheet import, on all eight Klyroo libraries." }
+      ]
+    },
+    "UseClient": {
+      "type": "computed",
+      "value": "(Interactivity == \"WebAssembly\" || Interactivity == \"Auto\")"
+    },
+    "ProductName": {
+      "type": "parameter",
+      "datatype": "text",
+      "defaultValue": "",
+      "description": "A Blazor Web App for a back office: a sidebar shell, a dashboard, a customer list with selection and a form drawer, a customer page, and a spreadsheet import, on all eight Klyroo libraries."
+    },
+    "DerivedProductName": {
+      "type": "derived",
+      "valueSource": "name",
+      "valueTransform": "words"
+    },
+    "ResolvedProductName": {
+      "type": "generated",
+      "generator": "coalesce",
+      "parameters": { "sourceVariableName": "ProductName", "fallbackVariableName": "DerivedProductName" },
+      "replaces": "KlyrooProductName"
+    },
+    "HttpPort": {
+      "type": "generated",
+      "generator": "port",
+      "parameters": { "low": 5000, "high": 5300 },
+      "replaces": "KLYROO_HTTP_PORT"
+    },
+    "HttpsPort": {
+      "type": "generated",
+      "generator": "port",
+      "parameters": { "low": 7000, "high": 7300 },
+      "replaces": "KLYROO_HTTPS_PORT"
+    },
+    "KlyrooVersion": {
+      "type": "generated",
+      "generator": "constant",
+      "parameters": { "value": "0.0.0-unstamped" },
+      "replaces": "KLYROO_VERSION"
+    }
+  },
+  "sources": [
+    {
+      "modifiers": [
+        { "condition": "(!UseClient)", "exclude": [ "Ui/KlyrooAdminApp.Client.csproj", "Ui/Program.cs", "Host/Components/_Imports.razor", "KlyrooAdminApp.slnx" ] },
+        { "condition": "(!UseClient)", "rename": { "Host/": "", "Ui/Services/": "Services/", "Ui/": "Components/" } },
+        { "condition": "(UseClient)", "rename": { "Host/": "KlyrooAdminApp/", "Ui/": "KlyrooAdminApp.Client/" } }
+      ]
+    }
+  ]
 }

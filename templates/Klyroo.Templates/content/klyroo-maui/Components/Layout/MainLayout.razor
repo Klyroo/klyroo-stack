@@ -3,9 +3,16 @@
 @* KlyHead sends the theme variables and the fonts to <head>, through the HeadOutlet root component of MainPage.xaml. *@
 <KlyHead />
 
-<main class="mx-auto flex min-h-dvh w-full max-w-3xl flex-col gap-6 p-4 sm:p-6">
-    @Body
-</main>
+@* KlyApp is the root of the Klyroo components: it renders the toaster, resolves the locale and writes lang and dir. *@
+<KlyApp>
+    <main class="app-main">
+        @Body
+    </main>
+
+    @* The overlays that the services open: FormService shows its forms here, FilePreviewService its previews. *@
+    <KlyFormProvider />
+    <KlyFilePreviewProvider />
+</KlyApp>
 
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.

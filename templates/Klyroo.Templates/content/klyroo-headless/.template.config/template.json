@@ -7,5 +7,13 @@
   "shortName": "klyroo-headless",
   "sourceName": "KlyrooHeadlessApp",
   "tags": { "language": "C#", "type": "project" },
-  "preferNameDirectory": true
+  "preferNameDirectory": true,
+  "symbols": {
+    "KlyrooVersion": {
+      "type": "generated",
+      "generator": "constant",
+      "parameters": { "value": "0.0.0-unstamped" },
+      "replaces": "KLYROO_VERSION"
+    }
+  }
 }

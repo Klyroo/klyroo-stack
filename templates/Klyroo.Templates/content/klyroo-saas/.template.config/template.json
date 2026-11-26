@@ -4,8 +4,80 @@
   "classifications": ["Web", "Blazor", "Klyroo"],
   "identity": "Klyroo.Templates.SaaS",
   "name": "Klyroo SaaS Web App",
+  "description": "A Blazor Web App for a SaaS product: a header shell, a dashboard, a filterable accounts list with a form drawer and a usage page, on all eight Klyroo libraries.",
   "shortName": "klyroo-saas",
   "sourceName": "KlyrooSaaSApp",
+  "preferNameDirectory": true,
   "tags": { "language": "C#", "type": "project" },
-  "preferNameDirectory": true
+  "primaryOutputs": [
+    { "path": "KlyrooSaaSApp/KlyrooSaaSApp.csproj", "condition": "(UseClient)" },
+    { "path": "KlyrooSaaSApp.csproj", "condition": "(!UseClient)" }
+  ],
+  "forms": {
+    "words": { "identifier": "chain", "steps": [ "separators", "camel", "squeeze", "titleCase" ] },
+    "separators": { "identifier": "replace", "pattern": "[_.\\-]+", "replacement": " " },
+    "camel": { "identifier": "replace", "pattern": "([a-z0-9])([A-Z])", "replacement": "$1 $2" },
+    "squeeze": { "identifier": "replace", "pattern": "\\s+", "replacement": " " }
+  },
+  "symbols": {
+    "Interactivity": {
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "Server",
+      "description": "How the pages run: on the server over SignalR, in the browser with WebAssembly, or on the server first and in the browser once it is downloaded.",
+      "choices": [
+        { "choice": "Server", "description": "Interactive Server: one project, the pages run on the server." },
+        { "choice": "WebAssembly", "description": "Interactive WebAssembly: a server project and a .Client project, the pages run in the browser." },
+        { "choice": "Auto", "description": "Interactive Auto: a server project and a .Client project, the pages run on the server first, then in the browser." }
+      ]
+    },
+    "UseClient": {
+      "type": "computed",
+      "value": "(Interactivity == \"WebAssembly\" || Interactivity == \"Auto\")"
+    },
+    "ProductName": {
+      "type": "parameter",
+      "datatype": "text",
+      "defaultValue": "",
+      "description": "The name the pages show for the product. By default the project name written as words."
+    },
+    "DerivedProductName": {
+      "type": "derived",
+      "valueSource": "name",
+      "valueTransform": "words"
+    },
+    "ResolvedProductName": {
+      "type": "generated",
+      "generator": "coalesce",
+      "parameters": { "sourceVariableName": "ProductName", "fallbackVariableName": "DerivedProductName" },
+      "replaces": "KlyrooProductName"
+    },
+    "HttpPort": {
+      "type": "generated",
+      "generator": "port",
+      "parameters": { "low": 5000, "high": 5300 },
+      "replaces": "KLYROO_HTTP_PORT"
+    },
+    "HttpsPort": {
+      "type": "generated",
+      "generator": "port",
+      "parameters": { "low": 7000, "high": 7300 },
+      "replaces": "KLYROO_HTTPS_PORT"
+    },
+    "KlyrooVersion": {
+      "type": "generated",
+      "generator": "constant",
+      "parameters": { "value": "0.0.0-unstamped" },
+      "replaces": "KLYROO_VERSION"
+    }
+  },
+  "sources": [
+    {
+      "modifiers": [
+        { "condition": "(!UseClient)", "exclude": [ "Ui/KlyrooSaaSApp.Client.csproj", "Ui/Program.cs", "Host/Components/_Imports.razor", "KlyrooSaaSApp.slnx" ] },
+        { "condition": "(!UseClient)", "rename": { "Host/": "", "Ui/Services/": "Services/", "Ui/": "Components/" } },
+        { "condition": "(UseClient)", "rename": { "Host/": "KlyrooSaaSApp/", "Ui/": "KlyrooSaaSApp.Client/" } }
+      ]
+    }
+  ]
 }

@@ -1,0 +1,91 @@
+@page "/customers/{Id:int}"
+@inject CustomerStore Store
+@inject FormService Forms
+@inject IToastService Toasts
+
+<PageTitle>@(_customer?.Name ?? "Customer") - @AppInfo.Name</PageTitle>
+
+<AppPage Title="@(_customer?.Name ?? "Customer not found")">
+    <Actions>
+        <KlyButton Label="All customers" Href="customers" Variant="ButtonVariant.Ghost" Color="KlyColor.Neutral" />
+        @if (_customer is not null)
+        {
+            <KlyButton Label="Edit" Variant="ButtonVariant.Outline" OnClick="EditAsync">
+                <LeadingIcon>@KlyIcons.Named("pencil")</LeadingIcon>
+            </KlyButton>
+        }
+    </Actions>
+    <ChildContent>
+        @if (_customer is null)
+        {
+            <KlyDisplay Kind="DisplayKind.Empty" Icon="search-x" Title="This customer does not exist" Description="It may have been deleted. Go back to the list to pick another one."
+                        Actions="_backActions" />
+        }
+        else
+        {
+            @* KlyDisplay renders read-only blocks from data. Set Kind to pick the block and fill the parameters that kind reads. *@
+            <div class="two-columns">
+                <div class="stack">
+                    <KlyDisplay Kind="DisplayKind.Person" Title="@_customer.Contact" Description="@($"{_customer.Region}, customer since {_customer.Since:MMMM yyyy}")"
+                                Chip="new DisplayChip(_customer.Tier, KlyColor.Primary)" />
+                    <KlyDisplay Kind="DisplayKind.Facts" Title="Contract" Facts="_facts" />
+                    <KlyDisplay Kind="DisplayKind.Meter" Title="Health score" Value="@($"{_customer.Health} of 100")" MeterValue="_customer.Health" MeterMax="100"
+                                Description="@HealthText" />
+                </div>
+                <div class="stack">
+                    <KlyDisplay Kind="DisplayKind.Timeline" Title="History" TimelineItems="_history" />
+                    <KlyDisplay Kind="DisplayKind.Alert" Tone="@(_customer.Health < 50 ? KlyColor.Warning : KlyColor.Success)"
+                                Title="@(_customer.Health < 50 ? "At risk" : "In good standing")" Value="@HealthText" />
+                </div>
+            </div>
+        }
+    </ChildContent>
+</AppPage>
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private Customer? _customer;
+    private IReadOnlyList<DisplayFact> _facts = [];
+    private IReadOnlyList<DisplayTimelineItem> _history = [];
+    private IReadOnlyList<DisplayAction> _backActions = [new DisplayAction { Label = "All customers", Href = "customers", Variant = ButtonVariant.Solid, Color = KlyColor.Primary }];
+
+    private string HealthText => _customer is { Health: < 50 } ? "Usage dropped for two months: call the owner of the account." : "Usage is steady: nothing to do.";
+
+    protected override void OnParametersSet() => Load();
+
+    private void Load()
+    {
+        _customer = Store.Find(Id);
+        if (_customer is null) return;
+
+        _facts =
+        [
+            new DisplayFact { Label = "Tier", Chip = new DisplayChip(_customer.Tier, KlyColor.Primary) },
+            new DisplayFact { Label = "Annual revenue", Value = Money.Format(_customer.Arr), Emphasis = true },
+            new DisplayFact { Label = "Region", Value = _customer.Region },
+            new DisplayFact { Label = "Contact", Value = _customer.Contact, Copy = true },
+            new DisplayFact { Label = "Customer id", Value = $"cus_{_customer.Id:D5}", Mono = true, Copy = true },
+        ];
+
+        var start = _customer.Since.ToDateTime(new TimeOnly(9, 0));
+        _history =
+        [
+            new("Contract signed", $"{_customer.Tier} tier, {Money.Format(_customer.Arr)} a year", Date: new DateTimeOffset(start, TimeSpan.Zero), State: DisplayTimelineState.Done),
+            new("Onboarding call", "Two people from the customer joined", Date: new DateTimeOffset(start.AddDays(6), TimeSpan.Zero), State: DisplayTimelineState.Done),
+            new("Renewal", "In twelve months", Date: new DateTimeOffset(start.AddYears(1), TimeSpan.Zero), State: DisplayTimelineState.Upcoming),
+        ];
+    }
+
+    private async Task EditAsync()
+    {
+        if (_customer is null) return;
+        var outcome = await Forms.CreateFormAsync(CustomerForms.Schema($"Edit {_customer.Name}", editing: true), CustomerForms.Input(_customer), FormShellMode.Drawer);
+        if (!outcome.IsCompleted) return;
+
+        var (name, contact, region, tier, arr) = CustomerForms.Read(outcome.FormData);
+        Store.Update(_customer with { Name = name, Contact = contact, Region = region, Tier = tier, Arr = arr });
+        Load();
+        await Toasts.Add(new KlyToast { Title = "Customer saved", Description = name, Color = KlyColor.Success });
+    }
+}

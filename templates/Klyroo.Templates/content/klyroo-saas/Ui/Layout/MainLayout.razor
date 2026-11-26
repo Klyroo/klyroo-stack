@@ -1,0 +1,45 @@
+@inherits LayoutComponentBase
+
+<KlyApp>
+    <KlySkipLink />
+
+    @* Links are relative: they resolve against <base href>, so the app works at the root of a site and below a path. *@
+    <KlyHeader Items="_items" AriaLabel="Main" MenuTitle="Menu">
+        <Left>
+            <a href="./" class="brand">
+                <KlyIcon Name="lucide:layers" />
+                <span>@AppInfo.Name</span>
+            </a>
+        </Left>
+        <Right>
+            <KlyColorModeButton Size="KlySize.Sm" />
+        </Right>
+    </KlyHeader>
+
+    <KlyMain id="main" tabindex="-1">
+        <KlyContainer>
+            <div class="page-body">
+                @Body
+            </div>
+        </KlyContainer>
+    </KlyMain>
+
+    @* The overlays that the services open: FormService shows its forms here, FilePreviewService its previews. *@
+    <KlyFormProvider />
+    <KlyFilePreviewProvider />
+</KlyApp>
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">x</span>
+</div>
+
+@code {
+    private static readonly KlyNavigationItem[] _items =
+    [
+        new("Overview") { Href = "./", Exact = true, Icon = KlyIcons.Named("lucide:layout-dashboard") },
+        new("Accounts") { Href = "accounts", Icon = KlyIcons.Named("lucide:users") },
+        new("Usage") { Href = "usage", Icon = KlyIcons.Named("lucide:gauge") },
+    ];
+}

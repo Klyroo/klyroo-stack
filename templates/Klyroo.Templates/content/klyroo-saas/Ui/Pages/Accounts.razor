@@ -1,0 +1,106 @@
+@page "/accounts"
+@inject AccountStore Store
+@inject FormService Forms
+@inject IToastService Toasts
+
+<PageTitle>Accounts - @AppInfo.Name</PageTitle>
+
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Accounts</h1>
+        <p class="page-lead">Search, filter and sort the customers. The list asks the store for one page at a time.</p>
+    </div>
+</div>
+
+<KlyDataList TItem="Account" Schema="AccountSchema.Schema" Provider="Store.QueryAsync" ResultJson="AppJson.Default.DataListResultAccount" Label="Accounts">
+    <div class="list-layout">
+        <KlyDataListFilterPanel TItem="Account" Description="Narrow the accounts" />
+        <div class="stack-tight">
+            <div class="toolbar">
+                <div class="toolbar-grow"><KlyDataListSearch TItem="Account" /></div>
+                <KlyDataListResultCount TItem="Account" />
+                @* Inside the list, so that it can ask the list to load again once an account was added. *@
+                <NewAccountButton />
+            </div>
+            <KlyDataListFilterTags TItem="Account" ShowClear="true" />
+            <KlyDataListSelectionActions TItem="Account" Actions="_bulkActions" />
+            <KlyDataListTable TItem="Account" RowActions="_rowActions">
+                <KlyDataListColumn TItem="Account" Field="name" Title="Account" Required />
+                <KlyDataListColumn TItem="Account" Field="plan" Title="Plan" />
+                <KlyDataListColumn TItem="Account" Field="status" Title="Status">
+                    <Template Context="account">
+                        <KlyBadge Label="@account.Status" Variant="KlyVariant.Soft" Color="StatusColor(account.Status)" Size="KlySize.Sm" />
+                    </Template>
+                </KlyDataListColumn>
+                <KlyDataListColumn TItem="Account" Field="mrr" Title="MRR" Align="DataListAlign.End">
+                    <Template Context="account">@Money.Format(account.Mrr)</Template>
+                </KlyDataListColumn>
+                <KlyDataListColumn TItem="Account" Field="since" Title="Customer since" Format="d" />
+            </KlyDataListTable>
+            <KlyDataListPagination TItem="Account" />
+        </div>
+    </div>
+</KlyDataList>
+
+@code {
+    private IReadOnlyList<DataListAction<Account>> _bulkActions = [];
+    private IReadOnlyList<DataListRowAction<Account>> _rowActions = [];
+
+    protected override void OnInitialized()
+    {
+        _rowActions =
+        [
+            new DataListRowAction<Account>
+            {
+                Key = "edit",
+                Label = "Edit",
+                Icon = "pencil",
+                RefreshOnSuccess = true,
+                OnExecute = EditAsync,
+            },
+        ];
+
+        _bulkActions =
+        [
+            new DataListAction<Account>
+            {
+                Key = "delete",
+                Label = "Delete",
+                Icon = "trash",
+                Color = KlyColor.Error,
+                Confirm = new DataListActionConfirm<Account>
+                {
+                    Title = "Delete accounts",
+                    Description = c => $"{c.TargetCount} accounts will be deleted.",
+                    ConfirmLabel = "Delete",
+                },
+                ClearSelection = DataListSelectionClear.Success,
+                RefreshOnSuccess = true,
+                OnExecute = c =>
+                {
+                    Store.Remove(c.SelectedKeys.Select(int.Parse));
+                    return Task.CompletedTask;
+                },
+            },
+        ];
+    }
+
+    private async Task EditAsync(DataListRowActionContext<Account> context)
+    {
+        var account = context.Item;
+        var outcome = await Forms.CreateFormAsync(AccountForms.Schema($"Edit {account.Name}", editing: true), AccountForms.Input(account), FormShellMode.Drawer);
+        if (!outcome.IsCompleted) return;
+
+        var (name, owner, plan, mrr) = AccountForms.Read(outcome.FormData);
+        Store.Update(account with { Name = name, Owner = owner, Plan = plan, Mrr = mrr });
+        await Toasts.Add(new KlyToast { Title = "Account saved", Description = name, Color = KlyColor.Success });
+    }
+
+    private static KlyColor StatusColor(string status) => status switch
+    {
+        "Active" => KlyColor.Success,
+        "Trial" => KlyColor.Info,
+        "Past due" => KlyColor.Warning,
+        _ => KlyColor.Neutral,
+    };
+}

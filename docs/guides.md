@@ -9,6 +9,7 @@ Task-oriented recipes for the hub. Each one states its goal, shows complete code
 - [Let an agent fill a form](#let-an-agent-fill-a-form)
 - [Connect a coding agent to the Klyroo.UI documentation](#connect-a-coding-agent-to-the-klyrooui-documentation)
 - [Start a project from a template](#start-a-project-from-a-template)
+- [Style a generated app](#style-a-generated-app)
 - [Publish the headless template with NativeAOT](#publish-the-headless-template-with-nativeaot)
 - [Run the MCP server and the documentation site from source](#run-the-mcp-server-and-the-documentation-site-from-source)
 
@@ -204,7 +205,7 @@ The server has component pages for Klyroo.UI and Klyroo.Table, and the documenta
 
 ## Start a project from a template
 
-Goal: get a runnable app with the meta-package, the stylesheets and the providers already wired.
+Goal: get a runnable app with the meta-package, the stylesheets, a shell and a few pages that use the libraries the way they are meant to be used.
 
 ```bash
 dotnet new install Klyroo.Templates::0.1.0-preview.1
@@ -213,7 +214,30 @@ cd MyShop
 dotnet run
 ```
 
-`klyroo-saas` creates an Interactive Server Blazor Web App. `klyroo-admin` uses the same host with a dashboard page, a data list and a CSV preview, which is the closest to the [Getting started](getting-started.md) project. `klyroo-headless` creates a console app that references only `Klyroo.Stack.Core`. List what is installed with `dotnet new list klyroo`. The generated `.csproj` references `Klyroo.Stack` at the version the template was released with.
+`dotnet new list klyroo` shows the four templates. The two web templates are complete starters with sample data in memory, so they run with no database, and both share the same plumbing: the stock .NET 10 Blazor Web App parts (`MapStaticAssets`, the exception handler, HSTS, HTTPS redirection, a `not-found` page, `launchSettings.json`, `appsettings.json` and a `.gitignore`), `KlyApp` with `KlyFormProvider` and `KlyFilePreviewProvider` in the layout, a color mode button, and `Klyroo.UI.Server` for the cookies of the request.
+
+| Template | Shell | Pages |
+| :--- | :--- | :--- |
+| `klyroo-saas` | `KlyHeader` with the navigation, the product name and a color mode button | **Overview**: a `DashboardController` with a plan filter and four resources, `DashboardPersistence` and JSON type infos. **Accounts**: a `KlyDataList` with a `Provider`, filters with counts, search, paging, euro prices, a bulk delete and an edit row action, and a "New account" button that opens a `FormService` drawer. **Usage**: `KlyDisplay` blocks (stat row, meters, facts, breakdown, timeline, secret code) and a file preview |
+| `klyroo-admin` | `KlyDashboardGroup` with a resizable sidebar and a navbar on every page | **Dashboard**: stats, a gauge, a line chart, bars, a table and a feed. **Customers**: a `KlyDataList` over in-memory rows with selection, a sum row, bulk export to the file preview, an edit drawer and a link to each customer. **Customer**: `KlyDisplay` person, facts, meter, timeline and alert blocks. **Import**: `KlySpreadsheetImport` with a schema (a required field, a select with aliases, a number with a rule), a sample file, and the rows added to the list |
+
+`klyroo-headless` creates a console app that references only `Klyroo.Stack.Core`, and `klyroo-maui` a .NET MAUI Blazor Hybrid app whose layout wraps the body in `KlyApp` with the two providers.
+
+**Options.** `--interactivity Server|WebAssembly|Auto` (default `Server`) picks how the pages run. With `Server` there is one project. With `WebAssembly` or `Auto` the template creates `MyShop` (the server: `Program.cs`, `App.razor`, `wwwroot`) and `MyShop.Client` (the layout, the pages, the sample data and `Routes.razor`, because a page that runs in the browser has to live in the client assembly), plus `MyShop.slnx`; the server project references the client project and both call `AddKlyrooStack()` and `AddAppServices()`. `--product-name "Acme Cloud"` sets the name the pages show; without it the project name is written as words (`MyShop` becomes "My Shop"). The render mode of the app is one line, `AppRender.Mode`, and it is the value that `DashboardPersistence.Attach` receives, which is what hands the data of the prerender to the interactive render in every mode.
+
+**The version.** The generated `.csproj` references `Klyroo.Stack` at the version of the `Klyroo.Templates` package you installed. Each `template.json` holds a constant symbol, `KlyrooVersion`, with a placeholder value; a pre-pack target in `Klyroo.Templates.csproj` writes a copy of every `template.json` with `$(Version)` and packs the copy. A release changes the version in `build/Version.props` and nowhere else, and a test fails when a template file carries a version of its own.
+
+**Where the sample data lives.** The store of each app is a scoped service, so with Interactive Server the data starts again with every circuit (a full page reload) and with WebAssembly with every browser tab. Navigating with the links of the app keeps it. Replace the bodies of the store with your data access: the pages only call its methods, and each read takes the cancellation token that Klyroo cancels when a newer request replaces it.
+
+## Style a generated app
+
+Goal: know which classes work in the markup of a generated app, and how to switch to Tailwind.
+
+The web templates use the zero-setup path that [Getting started](getting-started.md#load-the-stylesheets) describes: `klyroo.preflight.css` and `klyroo.css` from Klyroo.UI, then `klyroo-stack.css` from `Klyroo.Stack`, then the `app.css` of the app. The first three are precompiled, so the app needs neither Node nor a Tailwind build, and the first build needs no network. The consequence is that the sheets only hold the classes the Klyroo components use. A utility such as `md:grid-cols-2` or `space-y-6` that you write in your own markup is not in them and does nothing, because no Tailwind run reads your pages. The templates therefore keep their layout in `wwwroot/app.css`, in plain CSS on the Klyroo tokens (`var(--klyroo-text-muted)` and the others), which follows the theme and the color mode.
+
+A test of this repository checks the markup of the `klyroo-saas`, `klyroo-admin` and `klyroo-maui` templates: every class in a `class` or `Class` attribute has to be defined by one of the sheets or by the `app.css` of the template.
+
+To write Tailwind utilities in your markup instead, compile Tailwind in the app with `KlyrooTailwind`, as the Klyroo.UI guide [Compile Tailwind in your app](https://github.com/klyroo/klyroo-ui/blob/main/docs/guides.md#compile-tailwind-in-your-app) explains, and load its output in place of the three Klyroo sheets. `Klyroo.Table` then needs the extra import that the [Klyroo.Table guide](https://github.com/klyroo/klyroo-table/blob/main/docs/getting-started.md#4-style-the-list) describes, and so do the other libraries whose classes the Klyroo.UI theme does not list. Do not load `klyroo.css` or `klyroo-stack.css` next to a Tailwind build: two sheets that declare the same utilities in one cascade layer override each other.
 
 ## Publish the headless template with NativeAOT
 

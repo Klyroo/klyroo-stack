@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <KlyColorModeScript />
+    <KlyCultureMeta />
+    <KlyThemeStyle />
+    <ResourcePreloader />
+    @* The three precompiled stylesheets of Klyroo (no Node, no Tailwind build), then the styles of the app. Klyroo.UI.preflight is a small reset,
+       klyroo.css holds the tokens and the classes of the components, and klyroo-stack.css the ones of the other libraries. *@
+    <link rel="stylesheet" href="@Assets["_content/Klyroo.UI/klyroo.preflight.css"]" />
+    <link rel="stylesheet" href="@Assets["_content/Klyroo.UI/klyroo.css"]" />
+    <link rel="stylesheet" href="@Assets["_content/Klyroo.Stack/klyroo-stack.css"]" />
+    <link rel="stylesheet" href="@Assets["app.css"]" />
+    <ImportMap />
+    <link rel="icon" type="image/png" href="@Assets["favicon.png"]" />
+    <HeadOutlet @rendermode="AppRender.Mode" />
+</head>
+
+<body>
+    <Routes @rendermode="AppRender.Mode" />
+    <script src="@Assets["_framework/blazor.web.js"]"></script>
+</body>
+
+</html>
