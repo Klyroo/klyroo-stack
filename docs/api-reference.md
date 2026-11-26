@@ -33,11 +33,12 @@ Describes one repository/module in the Klyroo ecosystem. `KlyrooStackModule.Repo
 
 | Constructor | Description |
 | :--- | :--- |
-| `KlyrooStackModule(string Id, string Name, string RepositoryPath, string SolutionFile, string? CorePackage, string UiPackage, string TemplateShortName, string SkillPath, string Summary, IReadOnlyList<string> KeyComponents, string AccentHex = "#ffd23f", string LandingPagePath = "")` | Describes one repository/module in the Klyroo ecosystem. `KlyrooStackModule.RepositoryPath`, `KlyrooStackModule.SolutionFile` and `KlyrooStackModule.SkillPath` are relative to the folder that holds the sibling Klyroo clones (for example `klyroo-ui/Klyroo.UI.slnx`). |
+| `KlyrooStackModule(string Id, string Name, string RepositoryPath, string SolutionFile, string? CorePackage, string UiPackage, string TemplateShortName, string SkillPath, string Summary, IReadOnlyList<string> KeyComponents, IReadOnlyList<string>? AddOnPackages = null, string AccentHex = "#ffd23f", string LandingPagePath = "")` | Describes one repository/module in the Klyroo ecosystem. `KlyrooStackModule.RepositoryPath`, `KlyrooStackModule.SolutionFile` and `KlyrooStackModule.SkillPath` are relative to the folder that holds the sibling Klyroo clones (for example `klyroo-ui/Klyroo.UI.slnx`). |
 
 | Property | Type | Description |
 | :--- | :--- | :--- |
 | `AccentHex` (init) | `string` | The accent color of the library, as a hex string. |
+| `AddOnPackages` (init) | `IReadOnlyList<string>?` | Optional packages of the library that `Klyroo.Stack` does not include (for example `Klyroo.UI.Server`); add them to an app that needs them. |
 | `CorePackage` (init) | `string?` | The headless package of the library, or null when it has none. |
 | `Id` (init) | `string` | The repository name, such as `klyroo-table`. |
 | `KeyComponents` (init) | `IReadOnlyList<string>` | The main public types and components of the library, used by `KlyrooStackCatalog.ResolveComponentModule`. |
