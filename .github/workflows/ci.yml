@@ -235,7 +235,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev
       - name: Pack the nine repositories into a local feed
         run: build/pack-feed.sh "$RUNNER_TEMP/feed"
-      - name: Generate saas, admin, headless and maui from the feed, build them (maui: its Razor pages, the runner has no MAUI workload), run the web apps and publish headless with NativeAOT
+      - name: Generate saas, admin, headless and maui from the feed, build them (for maui only its Razor pages, the runner has no MAUI workload), run the web apps and publish headless with NativeAOT
         run: build/verify-templates.sh "$RUNNER_TEMP/feed" "$RUNNER_TEMP/apps"
 
   accessibility-wcag-audit:
