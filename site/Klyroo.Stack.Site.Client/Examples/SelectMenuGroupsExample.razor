@@ -1,6 +1,6 @@
 <div class="flex w-full max-w-xs flex-col gap-3">
     <KlyFormField Label="Destination">
-        <KlySelectMenu Items="Countries" Value="@_values" ValueChanged="@(v => _values = v ?? [])" Placeholder="Pick a country" data-testid="destination" />
+        <KlySelectMenu TValue="string" Items="Countries" Value="@_values" ValueChanged="@(v => _values = v ?? [])" Placeholder="Pick a country" data-testid="destination" />
     </KlyFormField>
     <p class="text-sm text-(--klyroo-text-muted)" data-testid="destination-state">Selected: @(_values.Count > 0 ? string.Join(", ", _values) : "none")</p>
 </div>

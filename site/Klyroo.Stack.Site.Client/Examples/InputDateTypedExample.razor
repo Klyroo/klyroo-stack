@@ -1,0 +1,17 @@
+<div class="flex w-full max-w-xs flex-col gap-4">
+    <KlyFormField Label="Due (DateTime)">
+        <KlyInputDate @bind-Value="_due" Min="DateOnly.FromDateTime(_today)" data-testid="due" />
+    </KlyFormField>
+    <KlyFormField Label="Shipped (DateTimeOffset?, can be empty)">
+        <KlyInputDate @bind-Value="_shipped" data-testid="shipped" />
+    </KlyFormField>
+    <p class="text-sm text-(--klyroo-text-muted)" data-testid="typed-date-state">Due: @_due.ToString("yyyy-MM-dd"), shipped: @(_shipped?.ToString("yyyy-MM-dd") ?? "null")</p>
+</div>
+
+@code {
+    private static readonly DateTime _today = new(2026, 11, 26);
+
+    // The field binds to a DateOnly, a DateTime or a DateTimeOffset, nullable or not. Picking a day sets that day at midnight.
+    private DateTime _due = new(2026, 12, 15);
+    private DateTimeOffset? _shipped;
+}

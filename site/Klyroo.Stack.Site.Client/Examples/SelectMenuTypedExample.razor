@@ -1,0 +1,26 @@
+<div class="flex w-full max-w-xs flex-col gap-3">
+    <KlyFormField Label="Tags (several ids)">
+        <KlySelectMenu @bind-Value="_tagIds" Items="Tags" Multiple Placeholder="Pick tags" data-testid="tag-ids" />
+    </KlyFormField>
+    <KlyFormField Label="Country (typed suggestion, int key)">
+        <KlyInputMenu @bind-Value="_countryId" Items="Countries" Placeholder="Type a country" data-testid="country-id" />
+    </KlyFormField>
+    <p class="text-sm text-(--klyroo-text-muted)" data-testid="typed-menu-state">Tags: @(_tagIds.Count == 0 ? "none" : string.Join(", ", _tagIds)), country: @(_countryId?.ToString() ?? "none")</p>
+</div>
+
+@code {
+    private sealed record Tag(int Id, string Name);
+
+    private static readonly Tag[] Rows = [new(10, "Urgent"), new(11, "Billing"), new(12, "Shipping"), new(13, "Returns")];
+
+    // Lists bind to a list of the key type: IReadOnlyList<int>.
+    private IReadOnlyList<int> _tagIds = [10];
+
+    private int? _countryId;
+
+    private static readonly IReadOnlyList<KlySelectItem<int>> Tags = KlySelectItems.From(Rows, t => t.Id, t => t.Name);
+
+    // An input menu of anything but strings only accepts a suggestion, so the field is strict: the value is the key of the chosen option.
+    private static readonly IReadOnlyList<KlySelectItem<int?>> Countries =
+        KlySelectItems.From([(250, "France"), (276, "Germany"), (380, "Italy"), (724, "Spain")], c => (int?)c.Item1, c => c.Item2);
+}

@@ -51,7 +51,11 @@ public static partial class Catalog
         new("select", "Select", "Form", "A select-only combobox with keyboard navigation and typeahead; it posts through a hidden input.",
             [new("Select", typeof(Examples.SelectExample)),
              new("Counts, icons and groups", typeof(Examples.SelectItemsExample), "Count shows a number at the end of the row, Icon an icon before the label (a name, like every icon of Klyroo.UI) and Group lists the item under a heading. The headings are not options: the arrow keys and the typeahead skip them. Items without these properties render as before."),
-             new("In a form", typeof(Examples.SelectFormExample), "A form to move through with a remote control: Select edits a field, Back leaves it.")], [typeof(KlySelect)]),
+             new("In a form", typeof(Examples.SelectFormExample), "A form to move through with a remote control: Select edits a field, Back leaves it."),
+             new("Bound to an int foreign key", typeof(Examples.SelectIntExample), "The value of an item has the type of the bound property: KlySelectItems.From builds the items of a lookup table (the key is the value, a column the label), and AsNullable() makes them fit an int? property."),
+             new("Bound to an enum", typeof(Examples.SelectEnumExample), "KlySelectItems.FromEnum lists the members of the enum in order, labeled by their name split into words or by a function you give it."),
+             new("Bound to a Guid", typeof(Examples.SelectGuidExample), "Any value that has an invariant text works: it travels as that text and the control gives back the exact value of the option."),
+             new("Bound to a DateTime", typeof(Examples.SelectDateTimeExample), "A DateTime travels as ISO 8601, so the option with that exact instant is the selected one.")], [typeof(KlySelect<string>)]),
         new("form-field", "FormField", "Form", "Label, description, hint and validation message wired to the control inside.",
             [new("A complete form", typeof(Examples.FormFieldExample))], [typeof(KlyFormField)]),
 

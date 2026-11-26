@@ -1,6 +1,6 @@
 <div class="flex w-full max-w-xs flex-col gap-3">
     <KlyFormField Label="Home country, named">
-        <KlyInputMenu OptionsProvider="_source.ByPage" Items="Known" Strict PageSize="20" Value="@_country" ValueChanged="@(v => _country = v)" data-testid="remote-named-strict" />
+        <KlyInputMenu TValue="string" OptionsProvider="_source.ByPage" Items="Known" Strict PageSize="20" Value="@_country" ValueChanged="@(v => _country = v)" data-testid="remote-named-strict" />
     </KlyFormField>
     <p class="text-sm text-(--klyroo-text-muted)" data-testid="remote-named-strict-state">Selected: @(_country ?? "none")</p>
 </div>

@@ -3,7 +3,7 @@
         <KlyInputMenu OptionsProvider="_free.ByPage" PageSize="20" Placeholder="Type to search" @bind-Value="_text" data-testid="remote-free" />
     </KlyFormField>
     <KlyFormField Label="Country from the source (suggestion required)">
-        <KlyInputMenu OptionsProvider="_strict.ByCursor" ResolveSelected="_strict.Resolve" Strict PageSize="20" Debounce="150" Placeholder="Pick a country"
+        <KlyInputMenu TValue="string" OptionsProvider="_strict.ByCursor" ResolveSelected="_strict.Resolve" Strict PageSize="20" Debounce="150" Placeholder="Pick a country"
                      Value="@_country" ValueChanged="@(v => _country = v)" data-testid="remote-strict" />
     </KlyFormField>
     <p class="text-sm text-(--klyroo-text-muted)" data-testid="remote-input-state">Free: @(_text ?? "none"), strict: @(_country ?? "none")</p>

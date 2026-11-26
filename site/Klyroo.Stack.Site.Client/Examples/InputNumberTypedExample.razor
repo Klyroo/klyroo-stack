@@ -1,0 +1,20 @@
+<div class="flex w-full max-w-xs flex-col gap-4">
+    <KlyFormField Label="Seats (int)">
+        <KlyInputNumber @bind-Value="_seats" Min="1" Max="50" data-testid="seats" />
+    </KlyFormField>
+    <KlyFormField Label="Discount in percent (double)">
+        <KlyInputNumber @bind-Value="_discount" Min="0" Max="100" Step="2.5m" />
+    </KlyFormField>
+    <KlyFormField Label="Ceiling (int?, can be empty)">
+        <KlyInputNumber @bind-Value="_ceiling" Min="0" />
+    </KlyFormField>
+    <p class="text-sm text-(--klyroo-text-muted)" data-testid="typed-number-state">Seats: @_seats, discount: @_discount.ToString(System.Globalization.CultureInfo.InvariantCulture), ceiling: @(_ceiling?.ToString() ?? "null")</p>
+</div>
+
+@code {
+    // The field binds to the type of the property: int, long, double, decimal, byte... and their nullable forms.
+    // Clearing the field of a non-nullable property sets zero; only a nullable property can be empty.
+    private int _seats = 4;
+    private double _discount = 12.5;
+    private int? _ceiling;
+}

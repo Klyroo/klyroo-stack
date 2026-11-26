@@ -1,0 +1,14 @@
+<div class="flex w-full max-w-sm flex-col gap-6">
+    <KlyFormField Label="Volume (int)">
+        <KlySlider @bind-Value="_volume" Min="0" Max="100" Step="5" />
+    </KlyFormField>
+    <KlyFormField Label="Gain (float)">
+        <KlySlider @bind-Value="_gain" Min="0" Max="2" Step="0.1" />
+    </KlyFormField>
+    <p class="text-sm text-(--klyroo-text-muted)" data-testid="typed-slider-state">Volume: @_volume, gain: @_gain.ToString(System.Globalization.CultureInfo.InvariantCulture)</p>
+</div>
+
+@code {
+    private int _volume = 40;
+    private float _gain = 1.0f;
+}

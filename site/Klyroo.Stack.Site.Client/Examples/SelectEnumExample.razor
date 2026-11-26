@@ -1,0 +1,29 @@
+<div class="flex w-full max-w-xs flex-col gap-3">
+    <KlyFormField Label="Status">
+        <KlySelect @bind-Value="_status" Items="Statuses" data-testid="status" />
+    </KlyFormField>
+    <KlyFormField Label="Priority (custom labels)">
+        <KlySelect @bind-Value="_priority" Items="Priorities" data-testid="priority" />
+    </KlyFormField>
+    <p class="text-sm text-(--klyroo-text-muted)" data-testid="status-state">Status: @_status, Priority: @_priority</p>
+</div>
+
+@code {
+    private enum OrderStatus { Draft, InProgress, ReadyToShip, Done }
+
+    private enum Priority { Low, Normal, High }
+
+    private OrderStatus _status = OrderStatus.InProgress;
+
+    private Priority _priority = Priority.Normal;
+
+    // One item per member, in the order of the enum. The default label splits the name into words: InProgress is "In progress".
+    private static readonly IReadOnlyList<KlySelectItem<OrderStatus>> Statuses = KlySelectItems.FromEnum<OrderStatus>();
+
+    private static readonly IReadOnlyList<KlySelectItem<Priority>> Priorities = KlySelectItems.FromEnum<Priority>(p => p switch
+    {
+        Priority.Low => "Whenever",
+        Priority.Normal => "This week",
+        _ => "Today",
+    });
+}

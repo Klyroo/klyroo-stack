@@ -1,0 +1,36 @@
+@* OnSelect makes the bars, points and slices selectable: a click, or Enter and Space on the row the arrow keys are on. *@
+<div class="grid w-full gap-8 md:grid-cols-2">
+    <div>
+        <p class="mb-2 text-sm font-medium text-(--klyroo-text-highlighted)">Bars</p>
+        <KlyChart TItem="Sale" Data="_data" Index="@(s => s.Quarter)" Categories="_categories" Type="KlyChartType.Bar"
+                 OnSelect="@(e => _picked = e)" Width="420" Height="260" data-testid="chart-select-bar" />
+    </div>
+    <div>
+        <p class="mb-2 text-sm font-medium text-(--klyroo-text-highlighted)">Donut</p>
+        <KlyChart TItem="Sale" Data="_data" Index="@(s => s.Quarter)" Categories="_slices" Type="KlyChartType.Donut"
+                 OnSelect="@(e => _picked = e)" Height="260" Thickness="36" data-testid="chart-select-donut" />
+    </div>
+</div>
+<p class="mt-4 text-sm text-(--klyroo-text-muted)" data-testid="chart-select-state">
+    @(_picked is null ? "Nothing selected." : $"Selected {_picked.Index} ({_picked.SeriesKey}): {_picked.Value:N0}, row {_picked.Row} of {_data.Length}.")
+</p>
+
+@code {
+    private sealed record Sale(string Quarter, double Online, double Store);
+
+    private KlyChartSelectEventArgs<Sale>? _picked;
+
+    private static readonly Sale[] _data =
+    [
+        new("Q1", 4200, 3100), new("Q2", 5100, 2800), new("Q3", 4700, 3600), new("Q4", 6900, 4100),
+    ];
+
+    // With several series, a click on a bar reports the bar under the pointer; from the keyboard, the first series that has a value.
+    private static readonly KlyChartCategory<Sale>[] _categories =
+    [
+        new("online", s => s.Online) { Label = "Online" },
+        new("store", s => s.Store) { Label = "Store", Color = KlyColor.Info },
+    ];
+
+    private static readonly KlyChartCategory<Sale>[] _slices = [new("online", s => s.Online) { Label = "Online sales" }];
+}

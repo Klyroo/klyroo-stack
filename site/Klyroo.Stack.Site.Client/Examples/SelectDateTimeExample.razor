@@ -1,0 +1,16 @@
+<div class="flex w-full max-w-xs flex-col gap-3">
+    <KlyFormField Label="Delivery slot">
+        <KlySelect @bind-Value="_slot" Items="Slots" Placeholder="Pick a slot" data-testid="slot" />
+    </KlyFormField>
+    <p class="text-sm text-(--klyroo-text-muted)" data-testid="slot-state">Selected: @(_slot?.ToString("yyyy-MM-dd HH:mm") ?? "none")</p>
+</div>
+
+@code {
+    private static readonly DateTime Day = new(2026, 12, 1);
+
+    // The value of an item can be a DateTime: it travels as an invariant ISO 8601 text, so the exact value comes back.
+    private DateTime? _slot;
+
+    private static readonly IReadOnlyList<KlySelectItem<DateTime?>> Slots =
+        KlySelectItems.From([8, 10, 14, 16], hour => (DateTime?)Day.AddHours(hour), hour => $"{hour}:00 to {hour + 2}:00");
+}

@@ -1,11 +1,11 @@
 <div class="flex w-full max-w-xs flex-col gap-3">
     <KlyFormField Label="Country of the city">
-        <KlySelect Items="Countries" Value="_country" ValueChanged="OnCountryChanged" data-testid="key-country" />
+        <KlySelect TValue="string" Items="Countries" Value="_country" ValueChanged="OnCountryChanged" data-testid="key-country" />
     </KlyFormField>
     @* OptionsKey is the country: when it changes, the pages loaded for the other country are forgotten and the list loads again when it opens. The provider is a new
        delegate on every render here, which alone would keep what was loaded. *@
     <KlyFormField Label="City">
-        <KlySelectMenu OptionsProvider="@((request, ct) => _source.CitiesOf(_country, request, ct))" OptionsKey="_country" PageSize="5" Placeholder="Pick a city"
+        <KlySelectMenu TValue="string" OptionsProvider="@((request, ct) => _source.CitiesOf(_country, request, ct))" OptionsKey="_country" PageSize="5" Placeholder="Pick a city"
                       Value="_cities" ValueChanged="@(v => _cities = v ?? [])" data-testid="key-city" />
     </KlyFormField>
     <p class="text-sm text-(--klyroo-text-muted)" data-testid="key-state">City: @(_cities.Count > 0 ? string.Join(", ", _cities) : "none")</p>

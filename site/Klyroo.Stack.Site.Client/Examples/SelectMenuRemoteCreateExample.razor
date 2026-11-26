@@ -1,6 +1,6 @@
 <div class="flex w-full max-w-xs flex-col gap-3">
     <KlyFormField Label="Countries visited">
-        <KlySelectMenu OptionsProvider="_source.ByPage" Multiple Create PageSize="20" Debounce="150" Placeholder="Search or add a country"
+        <KlySelectMenu TValue="string" OptionsProvider="_source.ByPage" Multiple Create PageSize="20" Debounce="150" Placeholder="Search or add a country"
                       Value="_values" ValueChanged="@(v => _values = v ?? [])" data-testid="remote-create" />
     </KlyFormField>
     <p class="text-sm text-(--klyroo-text-muted)" data-testid="remote-create-state">Selected: @string.Join(", ", _values)</p>

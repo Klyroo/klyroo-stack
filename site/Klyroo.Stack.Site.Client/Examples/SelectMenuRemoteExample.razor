@@ -1,6 +1,6 @@
 <div class="flex w-full max-w-xs flex-col gap-3">
     <KlyFormField Label="Country">
-        <KlySelectMenu OptionsProvider="_source.ByPage" ResolveSelected="_source.Resolve" PageSize="20" Placeholder="Search a country"
+        <KlySelectMenu TValue="string" OptionsProvider="_source.ByPage" ResolveSelected="_source.Resolve" PageSize="20" Placeholder="Search a country"
                       Value="_values" ValueChanged="@(v => _values = v ?? [])" data-testid="remote-select" />
     </KlyFormField>
     <p class="text-sm text-(--klyroo-text-muted)" data-testid="remote-state">Selected: @(_values.Count > 0 ? string.Join(", ", _values) : "none")</p>

@@ -1,0 +1,25 @@
+<div class="flex w-full max-w-xs flex-col gap-3">
+    <KlyFormField Label="Category">
+        <KlySelect @bind-Value="_categoryId" Items="Categories" Placeholder="Choose a category" data-testid="category" />
+    </KlyFormField>
+    <KlyFormField Label="Parent category (optional)">
+        <KlySelect @bind-Value="_parentId" Items="OptionalCategories" Placeholder="None" data-testid="parent-category" />
+    </KlyFormField>
+    <p class="text-sm text-(--klyroo-text-muted)" data-testid="category-state">CategoryId: @_categoryId, ParentId: @(_parentId?.ToString() ?? "null")</p>
+</div>
+
+@code {
+    private sealed record Category(int Id, string Name);
+
+    private static readonly Category[] Rows = [new(1, "Books"), new(2, "Games"), new(3, "Music"), new(4, "Toys")];
+
+    // The foreign key of a model: the item value is the key (an int), the label a column. The bound property is the int itself.
+    private int _categoryId = 2;
+
+    // A nullable foreign key: AsNullable() makes the items KlySelectItem<int?>, and clearing the field sets null.
+    private int? _parentId;
+
+    private static readonly IReadOnlyList<KlySelectItem<int>> Categories = KlySelectItems.From(Rows, c => c.Id, c => c.Name);
+
+    private static readonly IReadOnlyList<KlySelectItem<int?>> OptionalCategories = Categories.AsNullable();
+}
