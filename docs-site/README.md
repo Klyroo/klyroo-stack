@@ -8,7 +8,7 @@ The site is the Markdown docs template of Klyroo.UI (`klyroo-ui/templates/docs`)
 
 | File | Becomes |
 | --- | --- |
-| `README.md` | The home page, below a hero with the title, the tagline and the install command. The badges at the top are left out: the header links to GitHub and NuGet instead. |
+| `README.md` | The home page. Its Features list, Packages table and ecosystem table are set in the layout of the home page (specification sheet, packages with their install lines, the family of libraries), and the rest of the README follows at the bottom. The badges at the top are left out: the header links to GitHub and NuGet instead. |
 | `docs/README.md` | The page `documentation`, the index of the docs. It comes first in the navigation. |
 | `docs/<name>.md` | The page `<name>`. Folders below `docs/` make folders of addresses (`docs/a/b.md` is `a/b`). |
 | `docs/site.yml` | The settings of the site (optional, described below). |
@@ -68,7 +68,11 @@ Every key is optional, and a key that does not exist is an error. A library keep
 | `packages` | The NuGet package ids, each linked from the header (`https://www.nuget.org/packages/<id>`). |
 | `github` | The address of the repository. Default: `https://github.com/klyroo/<repo>`. |
 | `branch` | The branch links to files of the repository and the "Edit this page" link point at. Default: `main`. |
-| `accent` | The primary color: the name of a Tailwind palette (`blue`, `emerald`, `violet`...). Default: the Klyroo colors. |
+| `headline` | The headline of the home page, two lines (a block scalar or a list of two), the second in the accent color. Default: the title and `documentation`. |
+| `lead` | The paragraph under the headline. Default: the tagline. |
+| `accent` | The accent color as `#rrggbb`: buttons, links, marks, the second line of the headline. The text tones for light and dark mode are computed from it so they pass 4.5:1 (3:1 for the headline). Default: the color of the library in `libraries.yml`. |
+| `texture` | The ground behind the header and the hero: `blueprint-grid`, `dot-matrix`, `ruled-rows`, `baseline-grid`, `chart-ticks`, `halftone`, `cell-grid` or `node-dots`. Default: the one of the library in `libraries.yml`. |
+| `demo` | What the hero demonstrates, below. |
 | `repo` | The name of the repository, which is the path of the site. Default: the name of the folder. |
 | `nav` | The pages in the order of the navigation (below). |
 
@@ -91,6 +95,42 @@ nav:
 ```
 
 Pages that are not listed follow in the order of their file names, and `docs/README.md` is always first. A page the file lists that does not exist stops the build and names the pages there are. A navigation label that starts with the name of the library (`Klyroo.Table API reference`) is shortened to what follows it (`API reference`).
+
+## The home page and its demonstration
+
+The home page is its own layout, without the navigation: a two-line headline, the lead, a Get started button and a copyable install command (the line of `install` for the main package), then the demonstration board. Below it come the showcases (table and form only), the features, the packages and the close with the other libraries.
+
+`demo` takes either a `board` or a simple hero:
+
+```yaml
+demo:
+  board: table          # an authored board: table or form
+```
+
+```yaml
+demo:                   # a simple hero: the code, and one result
+  file: Program.cs
+  language: csharp      # csharp (default), razor, bash...
+  focus: 12-20          # the lines the leader line starts at (default: the last line)
+  code: |
+    ...
+  result:
+    title: What it prints
+    output: |           # lines of text; or preview: ui-settings | display-stat | spreadsheet-rows
+      ...
+```
+
+Real code from the docs, synthetic data labelled as such, and nothing invented: the output of a hero is what the README says the code prints.
+
+### Upgrading a simple hero to a full board
+
+A board is a component in `Klyroo.Docs.Site/Components/Boards`, built from `DemoBoard` (the code panel, its chips and the leader lines) and `ResultPanel`; `TableBoard.razor` and `FormBoard.razor` are the models.
+
+1. Copy `FormBoard.razor` to `<Name>Board.razor`. List the lines of the code (`BoardLine`: the text, the chips that light it, `html` for markup) and the chips (`BoardChip`: id, label, the sentence shown while it is picked).
+2. Draw the results in `ResultPanel`s with the classes of `Styles/board.css` (fields, tags, mini tables, output, stat). Mark each part a feature produces with `data-target="<chip id>"`; several chips can name one part (`data-target="search url"`).
+3. Add the name to `LibraryDocs.Boards` and to the `switch` of `Components/Pages/Home.razor`, then put `demo: { board: <name> }` in the `docs/site.yml` of the library.
+
+The leader lines start at the right edge of the lit code lines and end at the left edge of the panel holding each lit target. The board is complete without the script (nothing is lit and the chips are inert); with it, a chip lights its lines and targets and draws the lines once, with an exponential ease-out, and under `prefers-reduced-motion` they appear without drawing.
 
 ## Links
 
@@ -132,7 +172,7 @@ The workflows do not change any setting. GitHub Pages has to be switched to the 
 
 - The pages come from a repository layout and `site.yml`, not from a `content/` folder with front matter: `LibraryDocs` instead of `MarkdownSite.Load`, with no `_dir.yml` and no file watcher.
 - `MarkdownRenderer` can take the first `#` heading out of a page as its title, report the first paragraph, and ask a `LinkResolver` where each link leads (`RenderOptions`).
-- The header has the libraries and NuGet menus and a GitHub button, and every page has an "Edit this page on GitHub" link.
+- The whole look is its own (`Styles/*.css`: tokens for both modes, one accent per library, ground textures): Geist and Geist Mono, a header with the mark and the `klyroo/<name>` wordmark, the search, the ecosystem menu, GitHub and the color mode; a doc page with the navigation rail, breadcrumb, lead, anchored headings, code blocks with a bar and a copy button, the table of contents with scroll-spy, previous and next, and an "Edit this page on GitHub" link. Only the search dialog is still a Klyroo.UI component.
 - Enhanced navigation is switched off (`data-enhance-nav="false"`): Blazor fetches a page for it, and a static host and the script do not agree about the address.
 - `Export/StaticExporter.cs` is new.
 

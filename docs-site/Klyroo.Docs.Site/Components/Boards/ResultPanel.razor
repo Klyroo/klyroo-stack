@@ -1,0 +1,14 @@
+<section class="panel result" data-panel aria-label="@Title">
+    <header class="panel-head">
+        <span class="panel-title">@Title</span>
+        <span class="panel-note">@Note</span>
+    </header>
+    <div class="panel-body @Class">@ChildContent</div>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = "";
+    [Parameter] public string Note { get; set; } = "sample data";
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

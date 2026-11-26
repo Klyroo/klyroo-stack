@@ -1,0 +1,23 @@
+@* The features of the README as a specification sheet: the name on the left, what it does on the right, a hairline between rows. *@
+@if (Features.Count > 0)
+{
+    <section class="section" id="features" aria-labelledby="features-title">
+        <div class="page-wrap">
+            <h2 class="section-title" id="features-title">@Title</h2>
+            <dl class="spec">
+                @foreach (var feature in Features)
+                {
+                    <div class="spec-row">
+                        <dt>@feature.Title</dt>
+                        <dd>@((MarkupString)feature.Html)</dd>
+                    </div>
+                }
+            </dl>
+        </div>
+    </section>
+}
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<HomeFeature> Features { get; set; } = [];
+    [Parameter] public string Title { get; set; } = "What it does";
+}

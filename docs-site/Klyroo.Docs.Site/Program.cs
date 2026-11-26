@@ -40,16 +40,10 @@ if (export && outFolder is null)
 
 Libraries libraries;
 DocsSite site;
-KlyPalette? accent = null;
 try
 {
     libraries = Libraries.Load(Path.Combine(AppContext.BaseDirectory, "libraries.yml"));
     site = LibraryDocs.Load(repoPath, cli["name"], libraries);
-    if (site.Settings.Accent is { } accentName)
-    {
-        accent = KlyPalette.TailwindPalettes.FirstOrDefault(p => p.Name.Equals(accentName, StringComparison.OrdinalIgnoreCase))
-            ?? throw new ContentException($"docs/site.yml: '{accentName}' is not a palette. The accents are: {string.Join(", ", KlyPalette.TailwindPalettes.Select(p => p.Name))}.");
-    }
 }
 catch (ContentException error)
 {
@@ -67,13 +61,8 @@ if (export)
     builder.Logging.SetMinimumLevel(LogLevel.Warning);
 }
 
-builder.Services.AddKlyrooUi(options =>
-{
-    if (accent is not null)
-    {
-        options.Colors.Primary = accent;
-    }
-});
+// The accent of the site is written by the page (Components/App.razor) as CSS variables, so the Klyroo.UI colors need no change here.
+builder.Services.AddKlyrooUi();
 // Static server rendering only: no circuit, no WebAssembly. Everything that moves runs in the browser (Klyroo's own script).
 builder.Services.AddRazorComponents();
 builder.Services.AddSingleton(site);

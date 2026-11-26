@@ -14,6 +14,12 @@ public static partial class LibraryDocs
     /// <summary>The slug of <c>docs/README.md</c>, the index of the documentation.</summary>
     public const string IndexSlug = "documentation";
 
+    /// <summary>The authored boards a <c>site.yml</c> can name in <c>demo.board</c>: the components of <c>Components/Boards</c>.</summary>
+    public static readonly IReadOnlyList<string> Boards = ["table", "form"];
+
+    /// <summary>The authored previews a simple hero can show as its result (<c>demo.result.preview</c>): drawn components of <c>Components/Boards/QuickBoard.razor</c>.</summary>
+    public static readonly IReadOnlyList<string> Previews = ["ui-settings", "display-stat", "spreadsheet-rows"];
+
     // A line of badges at the top of a README (CI status, NuGet version, license): images loaded from other sites, which the header replaces with links.
     [GeneratedRegex(@"^(?:[ \t]*\[!\[[^\]\n]*\]\([^)\n]*\)\]\([^)\n]*\)[ \t]*)+\r?$\n?", RegexOptions.Multiline)]
     private static partial Regex BadgeLine();
@@ -67,13 +73,8 @@ public static partial class LibraryDocs
 
         var problems = new List<string>();
         var renderer = new MarkdownRenderer();
-        RenderedMarkdown Render(string repoPath, string slug)
+        RenderedMarkdown RenderText(string text, string repoPath, string slug)
         {
-            var text = File.ReadAllText(Path.Combine(repoRoot, repoPath.Replace('/', Path.DirectorySeparatorChar))).TrimStart('﻿').Replace("\r\n", "\n");
-            if (repoPath == "README.md")
-            {
-                text = BadgeLine().Replace(text, "");
-            }
             var resolver = new LinkResolver(repoRoot, repoPath, pagePaths, github, config.Branch, name, libraries, problems);
             try
             {
@@ -85,11 +86,35 @@ public static partial class LibraryDocs
             }
         }
 
-        var readme = Render("README.md", "");
+        string ReadText(string repoPath) =>
+            File.ReadAllText(Path.Combine(repoRoot, repoPath.Replace('/', Path.DirectorySeparatorChar))).TrimStart('\uFEFF').Replace("\r\n", "\n");
+
+        RenderedMarkdown Render(string repoPath, string slug) => RenderText(ReadText(repoPath), repoPath, slug);
+
+        // The README is the home page, but its Features, Packages and ecosystem sections are set by the home page in its own layout, so what is rendered
+        // as the body is the README without them. The home page gives their ids to the blocks that replace them, so links to them still land.
+        var readmeText = BadgeLine().Replace(ReadText("README.md"), "");
+        var (intro, sections) = SplitSections(readmeText);
+        var homeContent = ParseHome(sections, RenderText, name, libraries, out var replaced);
+        var bodyText = intro + string.Concat(sections.Where(section => !replaced.Contains(section.Id)).Select(section => section.Text));
+        var readme = RenderText(bodyText, "README.md", "");
         var title = config.Title ?? readme.Title ?? SlugTitle(name);
         var tagline = config.Tagline ?? Shorten(readme.Summary, 200) ?? title;
         var description = config.Description ?? readme.Summary ?? tagline;
-        var settings = new SiteSettings(name, title, tagline, description, config.Install, github, config.Branch, config.Packages, config.Accent);
+        var library = libraries.Find(name);
+        var accent = config.Accent ?? library?.Accent ?? "#10b981";
+        var texture = config.Texture ?? library?.Texture ?? "blueprint-grid";
+        var headline = config.Headline.Count > 0 ? config.Headline : [title, "documentation"];
+        if (config.Demo?.Board is { } board && !Boards.Contains(board))
+        {
+            throw new ContentException($"{configPath}: '{board}' is not a board. The boards are: {string.Join(", ", Boards)}.");
+        }
+        if (config.Demo?.Preview is { } preview && !Previews.Contains(preview))
+        {
+            throw new ContentException($"{configPath}: '{preview}' is not a preview. The previews are: {string.Join(", ", Previews)}.");
+        }
+        var settings = new SiteSettings(name, title, tagline, description, config.Install, github, config.Branch, config.Packages, accent, texture, headline,
+            config.Lead ?? tagline, HeroInstall(config.Install, title, config.Packages), config.Demo);
 
         var rendered = files.ToDictionary(f => f.Slug, f => (f.Path, Result: Render(f.Path, f.Slug)), StringComparer.Ordinal);
 
@@ -103,8 +128,9 @@ public static partial class LibraryDocs
             var (path, result) = rendered[slug];
             var pageTitle = entry?.Title ?? result.Title ?? SlugTitle(slug.Split('/')[^1]);
             var meta = entry?.Description ?? Shorten(result.Summary, 200) ?? description;
-            return new DocPage(slug, path, pageTitle, entry?.NavTitle ?? NavTitle(pageTitle, title), entry?.Description, meta, result.Html, result.Headings, result.Text,
-                entry?.TocDepth ?? 3, entry?.IndexText ?? true, group);
+            var (lead, body) = SplitLead(result.Html, entry?.Description);
+            return new DocPage(slug, path, pageTitle, entry?.NavTitle ?? NavTitle(pageTitle, title), entry?.Description, meta, body, result.Headings, result.Text,
+                entry?.TocDepth ?? 3, entry?.IndexText ?? true, group, lead);
         }
 
         KlyContentNavigationItem Item(DocPage page) => new(page.NavTitle) { Href = page.Href, Exact = true };
@@ -162,7 +188,137 @@ public static partial class LibraryDocs
         var home = new DocPage("", "README.md", title, title, null, description, readme.Html, readme.Headings, readme.Text, 3, true, null);
         var search = new List<KlyContentSearchPage> { ToSearch(home, tagline, searchTextLimit) };
         search.AddRange(ordered.Select(p => ToSearch(p, p.MetaDescription, searchTextLimit)));
-        return new DocsSite(settings, home, ordered, navigation, search, problems.Distinct().ToList());
+        return new DocsSite(settings, home, ordered, navigation, search, problems.Distinct().ToList(), homeContent);
+    }
+
+
+    [GeneratedRegex(@"\A\s*<p>(?<lead>.*?)</p>\s*", RegexOptions.Singleline)]
+    private static partial Regex LeadParagraph();
+
+    // The paragraph under the title of a page is its lead: the description of site.yml when there is one, else the first paragraph, which leaves the body.
+    // A paragraph that is long, or that holds more than a sentence or two of markup, stays in the body.
+    private static (string? Lead, string Body) SplitLead(string html, string? description)
+    {
+        if (description is { Length: > 0 })
+        {
+            return (System.Net.WebUtility.HtmlEncode(description), html);
+        }
+        if (LeadParagraph().Match(html) is { Success: true } match && Tags().Replace(match.Groups["lead"].Value, "").Length <= 320)
+        {
+            return (match.Groups["lead"].Value, html[match.Length..]);
+        }
+        return (null, html);
+    }
+
+    private sealed record Section(string Id, string Heading, string Text);
+
+    // The README as the text before its first "## " heading and the sections from there on, each with its heading line. A "## " inside a code fence is not a heading.
+    private static (string Intro, List<Section> Sections) SplitSections(string text)
+    {
+        var intro = new System.Text.StringBuilder();
+        var sections = new List<(string Heading, System.Text.StringBuilder Text)>();
+        var fence = false;
+        foreach (var line in text.Split('\n'))
+        {
+            if (line.StartsWith("```", StringComparison.Ordinal) || line.StartsWith("~~~", StringComparison.Ordinal))
+            {
+                fence = !fence;
+            }
+            if (!fence && line.StartsWith("## ", StringComparison.Ordinal))
+            {
+                sections.Add((line[3..].Trim(), new System.Text.StringBuilder()));
+            }
+            (sections.Count == 0 ? intro : sections[^1].Text).Append(line).Append('\n');
+        }
+        return (intro.ToString(), [.. sections.Select(s => new Section(s.Heading.ToLowerInvariant(), s.Heading, s.Text.ToString()))]);
+    }
+
+    [GeneratedRegex("""<li>\s*<strong>(?<title>.*?)</strong>:?\s*(?<body>.*?)</li>""", RegexOptions.Singleline)]
+    private static partial Regex FeatureItem();
+
+    [GeneratedRegex("""<tr>\s*<td[^>]*>(?<first>.*?)</td>\s*<td[^>]*>(?<second>.*?)</td>\s*</tr>""", RegexOptions.Singleline)]
+    private static partial Regex TableRow();
+
+    [GeneratedRegex("""<a\b[^>]*\bhref="(?<href>[^"]*)"[^>]*>(?<text>.*?)</a>""", RegexOptions.Singleline)]
+    private static partial Regex Anchor();
+
+    [GeneratedRegex("<[^>]+>")]
+    private static partial Regex Tags();
+
+    // Reads the Features list, the Packages table and the ecosystem table of the README as data. A section that gives nothing stays in the body of the page.
+    private static HomeContent ParseHome(List<Section> sections, Func<string, string, string, RenderedMarkdown> render, string repo, Libraries libraries, out HashSet<string> replaced)
+    {
+        replaced = [];
+        string? Html(string id, string heading)
+        {
+            var section = sections.FirstOrDefault(s => s.Id == id);
+            return section is null ? null : render(section.Text, "README.md", "").Html;
+        }
+        static string PlainText(string html) => System.Net.WebUtility.HtmlDecode(Tags().Replace(html, "")).Trim();
+
+        var features = new List<HomeFeature>();
+        if (Html("features", "Features") is { } featuresHtml)
+        {
+            foreach (Match item in FeatureItem().Matches(featuresHtml))
+            {
+                features.Add(new HomeFeature(PlainText(item.Groups["title"].Value), item.Groups["body"].Value.Trim()));
+            }
+            if (features.Count > 0)
+            {
+                replaced.Add("features");
+            }
+        }
+
+        var packages = new List<HomePackage>();
+        if (Html("packages", "Packages") is { } packagesHtml)
+        {
+            foreach (Match row in TableRow().Matches(packagesHtml))
+            {
+                var id = PlainText(row.Groups["first"].Value);
+                if (id.Length == 0 || !id.All(c => char.IsLetterOrDigit(c) || c is '.' or '_' or '-'))
+                {
+                    continue;
+                }
+                var description = row.Groups["second"].Value.Trim();
+                var layer = id.EndsWith(".Core", StringComparison.OrdinalIgnoreCase) ? "Core"
+                    : PlainText(description).Contains("Blazor", StringComparison.OrdinalIgnoreCase) ? "Blazor"
+                    : "Add-on";
+                packages.Add(new HomePackage(id, layer, description, $"dotnet add package {id} --prerelease", "https://www.nuget.org/packages/" + Uri.EscapeDataString(id)));
+            }
+            if (packages.Count > 0)
+            {
+                replaced.Add("packages");
+            }
+        }
+
+        var ecosystem = new List<HomeLibrary>();
+        if (Html("klyroo ecosystem", "Klyroo ecosystem") is { } ecosystemHtml)
+        {
+            foreach (Match row in TableRow().Matches(ecosystemHtml))
+            {
+                if (Anchor().Match(row.Groups["first"].Value) is not { Success: true } link)
+                {
+                    continue;
+                }
+                var libraryName = PlainText(link.Groups["text"].Value);
+                var known = libraries.Items.FirstOrDefault(l => l.Name.Equals(libraryName, StringComparison.OrdinalIgnoreCase));
+                ecosystem.Add(new HomeLibrary(libraryName, link.Groups["href"].Value, row.Groups["second"].Value.Trim(), known?.Accent, known is not null && known.Repo.Equals(repo, StringComparison.OrdinalIgnoreCase)));
+            }
+            if (ecosystem.Count > 0)
+            {
+                replaced.Add("klyroo ecosystem");
+            }
+        }
+        return new HomeContent(features, packages, ecosystem);
+    }
+
+    // The command of the copyable chip: the line of "install" for the main package (the one named like the library), else its first line, without a trailing "# comment".
+    private static string? HeroInstall(string? install, string title, IReadOnlyList<string> packages)
+    {
+        var lines = (install ?? "").Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+            .Select(l => Regex.Replace(l, @"\s+#.*$", "")).Where(l => l.Length > 0).ToList();
+        var main = lines.FirstOrDefault(l => l.Contains("package " + title + " ", StringComparison.OrdinalIgnoreCase) || l.EndsWith("package " + title, StringComparison.OrdinalIgnoreCase));
+        return main ?? lines.FirstOrDefault() ?? (packages.Count > 0 ? $"dotnet add package {packages[^1]} --prerelease" : null);
     }
 
     private static KlyContentSearchPage ToSearch(DocPage page, string description, int textLimit) =>

@@ -1,0 +1,241 @@
+/*
+  What a page of Markdown contains, set in the world of the site: reading column, headings with anchors, code blocks with their bar, tables, callouts.
+  The class names are the ones Content/MarkdownRenderer.cs writes. These rules are outside any layer on purpose, so nothing of the Klyroo.UI utilities beats them.
+*/
+
+.markdown-body {
+  max-width: 100%;
+  font-size: 1.0625rem;
+  line-height: 1.72;
+  color: var(--text);
+  overflow-wrap: break-word;
+}
+
+/* The running text keeps a measure of about 70 characters; code, tables and callouts use the whole column. */
+.markdown-body > :where(p, ul, ol, dl, blockquote, h2, h3, h4, h5, h6, hr) { max-width: 72ch; }
+
+.markdown-body :where(p) { margin: 1rem 0 0; text-wrap: pretty; }
+.markdown-body > :first-child { margin-top: 0; }
+.markdown-body strong { color: var(--strong); font-weight: 600; }
+
+.markdown-body :where(h2, h3, h4, h5, h6) {
+  position: relative;
+  color: var(--strong);
+  font-family: var(--font-display);
+  line-height: 1.22;
+  letter-spacing: -0.022em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+.markdown-body h2 { margin: 3.5rem 0 0.875rem; font-size: 1.75rem; font-weight: 650; letter-spacing: -0.028em; }
+.markdown-body h3 { margin: 2.5rem 0 0.625rem; font-size: 1.3125rem; font-weight: 620; }
+.markdown-body h4 { margin: 2rem 0 0.5rem; font-size: 1.0625rem; font-weight: 620; }
+.markdown-body h5, .markdown-body h6 { margin: 1.75rem 0 0.5rem; font-size: 1rem; font-weight: 600; }
+
+/* Types of the API reference: each one starts under a hairline, and its name reads as a name. */
+.markdown-body h4:has(> code) {
+  max-width: none;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  font-size: 1.1875rem;
+}
+.markdown-body :is(h2, h3, h4, h5):has(> code) > code { padding: 0; border: 0; background: none; font-size: 0.94em; font-weight: 600; color: inherit; overflow-wrap: anywhere; }
+
+.heading-anchor {
+  display: inline-block;
+  width: 1.5rem;
+  height: 1em;
+  margin-inline-start: 0.25rem;
+  vertical-align: baseline;
+  color: var(--accent-ink);
+  opacity: 0;
+  text-decoration: none;
+  transition: opacity 140ms var(--ease-out);
+}
+.heading-anchor::before {
+  content: "";
+  display: inline-block;
+  width: 0.8em;
+  height: 0.8em;
+  background: currentColor;
+  -webkit-mask: var(--link-icon) center / contain no-repeat;
+  mask: var(--link-icon) center / contain no-repeat;
+}
+:root {
+  --link-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6.75 9.25a3 3 0 0 0 4.24 0l2.5-2.5a3 3 0 0 0-4.24-4.24l-.9.9'/%3E%3Cpath d='M9.25 6.75a3 3 0 0 0-4.24 0l-2.5 2.5a3 3 0 0 0 4.24 4.24l.9-.9'/%3E%3C/svg%3E");
+}
+.markdown-body :is(h2, h3, h4, h5):hover > .heading-anchor,
+.heading-anchor:focus-visible { opacity: 1; }
+@media (hover: none) { .heading-anchor { opacity: 0.45; } }
+
+.markdown-body :where(ul, ol) { margin: 1rem 0 0; padding-inline-start: 1.375rem; }
+.markdown-body :where(ul) { list-style: disc; }
+.markdown-body :where(ol) { list-style: decimal; }
+.markdown-body :where(li) { margin-top: 0.4rem; padding-inline-start: 0.25rem; }
+.markdown-body li::marker { color: var(--dim); }
+.markdown-body :where(li > ul, li > ol) { margin-top: 0.4rem; }
+
+.markdown-body a { color: var(--accent-ink); text-decoration: underline; }
+.markdown-body a:has(> code) { text-decoration: none; }
+.markdown-body a > code { color: var(--accent-ink); }
+
+.markdown-body hr { height: 0; margin: 2.5rem 0; border: 0; border-top: 1px solid var(--line); }
+
+.markdown-body blockquote {
+  margin: 1.5rem 0 0;
+  padding: 0.125rem 0 0.125rem 1.125rem;
+  border-inline-start: 1px solid var(--line-strong);
+  color: var(--muted);
+}
+.markdown-body blockquote > :first-child { margin-top: 0; }
+
+.markdown-body img { max-width: 100%; height: auto; border-radius: var(--r); border: 1px solid var(--line); }
+
+/* Inline code */
+.markdown-body :not(pre) > code, .doc-lead code, .prose-inline code {
+  padding: 0.12em 0.38em;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: color-mix(in oklab, var(--accent) 7%, var(--sunken));
+  color: var(--strong);
+  font-family: var(--font-code);
+  font-size: 0.855em;
+  font-weight: 450;
+  overflow-wrap: anywhere;
+}
+.markdown-body a > code { background: color-mix(in oklab, var(--accent) 9%, var(--sunken)); }
+
+/* Code blocks */
+.tok-comment { color: var(--tok-comment); font-style: italic; }
+.tok-string { color: var(--tok-string); }
+.tok-keyword { color: var(--tok-keyword); }
+.tok-command { color: var(--tok-command); }
+.tok-flag, .tok-property { color: var(--tok-property); }
+.tok-number { color: var(--tok-number); }
+.tok-variable { color: var(--tok-variable); }
+.tok-tag { color: var(--tok-tag); }
+.tok-type { color: var(--tok-type); }
+
+.code-block {
+  position: relative;
+  margin: 1.5rem 0 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--code-bg);
+  font-size: 0.875rem;
+  line-height: 1.65;
+  max-width: 100%;
+}
+
+.code-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 2.5rem;
+  padding: 0 0.5rem 0 1rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--code-head);
+}
+.code-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-code); font-size: 0.75rem; color: var(--muted); }
+
+.code-copy {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  height: 1.75rem;
+  padding: 0 0.625rem;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: color 140ms var(--ease-out), background-color 140ms var(--ease-out), border-color 140ms var(--ease-out);
+}
+.code-copy:hover { color: var(--strong); border-color: var(--line-strong); background: var(--raised); }
+.code-copy .code-check-icon { display: none; }
+.code-copy[data-copied] { color: var(--accent-ink); }
+.code-copy[data-copied] .code-copy-icon { display: none; }
+.code-copy[data-copied] .code-check-icon { display: block; }
+
+.code-copy-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+.code-block pre {
+  margin: 0;
+  padding: 1rem 1.25rem 1.125rem;
+  overflow-x: auto;
+  background: transparent;
+  font-family: var(--font-code);
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  tab-size: 2;
+  color: var(--text);
+}
+.code-block pre:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: -2px; border-radius: 0 0 var(--r) var(--r); }
+.code-block pre code { padding: 0; border: 0; background: transparent; font-size: inherit; white-space: pre; color: inherit; }
+
+/* Callouts: the palette of the site, a hairline and a tint, a title in the ink of the kind. */
+.callout {
+  --c: var(--accent-ink);
+  margin: 1.5rem 0 0;
+  padding: 0.875rem 1.125rem 1rem;
+  border: 1px solid color-mix(in oklab, var(--c) 30%, transparent);
+  border-radius: var(--r);
+  background: color-mix(in oklab, var(--c) 7%, var(--raised));
+  color: var(--text);
+  font-size: 0.9375rem;
+  line-height: 1.65;
+}
+.callout[data-color="info"] { --c: #1f55b0; }
+.callout[data-color="success"] { --c: #0d6b3d; }
+.callout[data-color="warning"] { --c: #8a5a00; }
+.callout[data-color="error"] { --c: #a8321f; }
+.dark .callout[data-color="info"] { --c: #86b6ff; }
+.dark .callout[data-color="success"] { --c: #7ee0a0; }
+.dark .callout[data-color="warning"] { --c: #ffd070; }
+.dark .callout[data-color="error"] { --c: #ff8a75; }
+.callout > * { margin-block: 0.5rem 0; max-width: none; }
+.callout > .callout-title { margin: 0; color: var(--c); font-weight: 650; font-size: 0.9375rem; letter-spacing: -0.005em; }
+.callout a, .callout a > code { color: var(--c); }
+
+/* A wide table scrolls inside its own box instead of widening the page. */
+.table-scroll {
+  margin: 1.5rem 0 0;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: color-mix(in oklab, var(--raised) 60%, transparent);
+  max-width: 100%;
+}
+.table-scroll:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+
+.table-scroll table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.9rem; line-height: 1.55; font-variant-numeric: tabular-nums; }
+.table-scroll :is(th, td) { padding: 0.625rem 0.875rem; border-bottom: 1px solid var(--line); text-align: start; vertical-align: top; }
+.table-scroll tbody tr:last-child td { border-bottom: 0; }
+.table-scroll th {
+  background: color-mix(in oklab, var(--code-head) 92%, transparent);
+  color: var(--strong);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  border-bottom-color: var(--line-strong);
+}
+.table-scroll td code { overflow-wrap: anywhere; }
+.table-scroll td { min-width: 7rem; }
+.table-scroll td:first-child { min-width: 0; }
+
+/* Task lists, footnotes, definition lists */
+.contains-task-list { list-style: none; padding-inline-start: 0.25rem; }
+.task-list-item input { margin-inline-end: 0.5rem; accent-color: var(--accent-ink); }
+
+.footnotes { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.875rem; }
+.footnotes ol { margin: 0; }
+.footnote-ref { font-size: 0.75em; vertical-align: super; }
+
+.markdown-body dt { margin-top: 1rem; font-weight: 600; color: var(--strong); }
+.markdown-body dd { margin-inline-start: 1.5rem; }

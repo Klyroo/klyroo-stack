@@ -1,0 +1,105 @@
+<Showcase Title="Sort by several columns"
+          Description="Shift+click on a header adds a column to the sort, and each sorted header shows its place in the list. The sort is one key of the address."
+          Guide="guides/#sort-by-several-columns"
+          Language="razor"
+          Code="@("<KlyDataListSortMenu TItem=\"Order\" Multiple=\"true\" />")">
+    <Result>
+        <ResultPanel Title="Sorted by team, then by salary" Note="sample data" Class="flush">
+            <div class="mini-scroll">
+                <table class="mini-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Employee</th>
+                            <th scope="col" aria-sort="ascending"><span class="sorted">Team<span class="order">1</span><KlyIcon Name="ph:arrow-up" /></span></th>
+                            <th scope="col" class="num" aria-sort="descending"><span class="sorted">Salary<span class="order">2</span><KlyIcon Name="ph:arrow-down" /></span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Mira Costa</td><td>Design</td><td class="num">91,000</td></tr>
+                        <tr><td>Joel Tran</td><td>Design</td><td class="num">84,000</td></tr>
+                        <tr><td>Rui Ferraz</td><td>Engineering</td><td class="num">128,000</td></tr>
+                        <tr><td>Nina Aho</td><td>Engineering</td><td class="num">119,000</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="result-note"><code class="url"><span class="url-path">?s=</span><span class="url-key is-on">team|-salary</span></code></p>
+        </ResultPanel>
+    </Result>
+</Showcase>
+
+<Showcase Flip="true"
+          Title="Open a detail row under a row"
+          Description="DetailTemplate adds a button to every row and draws your markup in a full-width row below it. Which rows are open is state you can read and set from code."
+          Guide="guides/#show-a-detail-row-under-a-row"
+          Language="razor"
+          Code="@_detail">
+    <Result>
+        <ResultPanel Title="Orders, one row open" Note="sample data" Class="flush">
+            <div class="mini-scroll">
+                <table class="mini-table has-detail">
+                    <thead><tr><th scope="col"><span class="sr-only">Details</span></th><th scope="col">Customer</th><th scope="col" class="num">Total</th></tr></thead>
+                    <tbody>
+                        <tr><td class="toggle"><KlyIcon Name="ph:caret-right" /></td><td>Acme</td><td class="num">$1,200</td></tr>
+                        <tr class="is-open"><td class="toggle"><KlyIcon Name="ph:caret-down" /></td><td>Globex</td><td class="num">$800</td></tr>
+                        <tr class="detail"><td colspan="3"><dl><dt>Ship to</dt><dd>12 Harbor Road</dd><dt>Lines</dt><dd>3</dd></dl></td></tr>
+                        <tr><td class="toggle"><KlyIcon Name="ph:caret-right" /></td><td>Initech</td><td class="num">$450</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </ResultPanel>
+    </Result>
+</Showcase>
+
+<Showcase Title="Export what the user sees"
+          Description="One component downloads the visible columns as CSV: this page, the selection or every result. Text that a spreadsheet would run as a formula gets an apostrophe in front."
+          Guide="guides/#export-rows-as-csv"
+          Language="razor"
+          Code="@_export">
+    <Result>
+        <ResultPanel Title="The export button" Note="sample data">
+            <div class="menu-demo">
+                <span class="menu-button">Export<KlyIcon Name="ph:caret-down" /></span>
+                <ul class="menu-list" aria-label="What to export">
+                    <li>This page</li>
+                    <li>Selection</li>
+                    <li class="is-on">All results</li>
+                </ul>
+            </div>
+            <div class="diff-demo">
+                <div><span class="diff-label">A cell holding</span><code>=SUM(A1:A9)</code></div>
+                <div><span class="diff-label">is written as</span><code class="is-on">'=SUM(A1:A9)</code></div>
+            </div>
+        </ResultPanel>
+    </Result>
+</Showcase>
+
+@code {
+    private const string _detail = """
+        <KlyDataList TItem="Order" Schema="Schema" Items="_orders">
+            <KlyDataListTable TItem="Order">
+                <DetailTemplate Context="order">
+                    <dl>
+                        <dt>Ship to</dt><dd>@order.Address</dd>
+                        <dt>Lines</dt><dd>@order.LineCount</dd>
+                    </dl>
+                </DetailTemplate>
+                <ChildContent>
+                    <KlyDataListFieldColumn TItem="Order" Field="customer" Title="Customer" />
+                    <KlyDataListFieldColumn TItem="Order" Field="total" Title="Total" Format="C0" />
+                </ChildContent>
+            </KlyDataListTable>
+        </KlyDataList>
+        """;
+
+    private const string _export = """
+        <KlyDataList TItem="Order" Schema="Schema" Items="_orders"
+                     Label="Orders" Selectable="true">
+            <KlyDataListExport TItem="Order" FileName="orders"
+                               CsvOptions="@(new DataListCsvOptions { Delimiter = ';' })" />
+            <KlyDataListTable TItem="Order">
+                <KlyDataListFieldColumn TItem="Order" Field="customer" Title="Customer" />
+                <KlyDataListFieldColumn TItem="Order" Field="total" Title="Total" Format="C2" />
+            </KlyDataListTable>
+        </KlyDataList>
+        """;
+}

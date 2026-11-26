@@ -1,0 +1,23 @@
+@* One feature, shown the way a reader decides about it: what you write on one side, what it produces on the other. The rhythm alternates (Flip). *@
+<article class="showcase @(Flip ? "is-flipped" : "")">
+    <div class="showcase-text">
+        <h3 class="showcase-title">@Title</h3>
+        <p class="showcase-copy">@Description</p>
+        @if (Guide is not null)
+        {
+            <a class="text-link" href="@Guide">Read the guide<KlyIcon Name="ph:arrow-right" /></a>
+        }
+    </div>
+    <div class="showcase-code">@((MarkupString)CodeBlockHtml.Render(Code, Language, null))</div>
+    <div class="showcase-result">@Result</div>
+</article>
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = "";
+    [Parameter, EditorRequired] public string Description { get; set; } = "";
+    [Parameter, EditorRequired] public string Code { get; set; } = "";
+    [Parameter] public string Language { get; set; } = "csharp";
+    [Parameter] public string? Guide { get; set; }
+    [Parameter] public bool Flip { get; set; }
+    [Parameter] public RenderFragment? Result { get; set; }
+}

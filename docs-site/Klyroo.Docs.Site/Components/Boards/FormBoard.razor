@@ -1,0 +1,60 @@
+@* The board of Klyroo.Form: a FormSchema for a typed model, the form it renders with an error on a field, and the model it hands to OnSave. The values are sample data. *@
+<DemoBoard File="Contact.razor" Lines="_lines" Chips="_chips" Label="A FormSchema and what it produces">
+    <Results>
+        <ResultPanel Title="The form" Note="sample data">
+            <div class="form-stack">
+                <div class="field">
+                    <span class="field-label">Name<span class="req" data-target="required"> *</span></span>
+                    <div class="control">Alice</div>
+                </div>
+                <div class="field is-invalid">
+                    <span class="field-label">Email<span class="req" data-target="required"> *</span></span>
+                    <div class="control">alice</div>
+                    <span class="field-error" data-target="rule">Enter a valid email address</span>
+                </div>
+                <div class="field">
+                    <span class="field-label">Topic</span>
+                    <div class="control select" data-target="typed"><span>Support</span><KlyIcon Name="ph:caret-down" /></div>
+                </div>
+                <div class="field is-invalid">
+                    <span class="field-label">Message<span class="req" data-target="required"> *</span></span>
+                    <div class="control area" data-target="textarea"><span class="count">0 / 500</span></div>
+                    <span class="field-error" data-target="required">This field is required</span>
+                </div>
+                <div class="form-actions"><span class="send" data-target="submit">Send</span></div>
+            </div>
+        </ResultPanel>
+        <ResultPanel Title="The model OnSave receives" Note="once the form is valid" Class="model-panel">
+            <pre class="model" data-target="submit"><code><span class="model-line">Contact {</span><span class="model-line" data-target="typed">  Name    = "Alice",</span><span class="model-line">  Email   = "alice@example.com",</span><span class="model-line" data-target="typed">  Topic   = Topic.Support,</span><span class="model-line">  Message = "Hello, I have a question."</span><span class="model-line">}</span></code></pre>
+        </ResultPanel>
+    </Results>
+</DemoBoard>
+
+@code {
+    private static readonly IReadOnlyList<BoardLine> _lines =
+    [
+        new("<KlyFormEngine TModel=\"Contact\" Schema=\"_schema\"", "submit", "html"),
+        new("               Model=\"_contact\" OnSave=\"SaveAsync\" />", "submit", "html"),
+        new(""),
+        new("static readonly FormSchema<Contact> _schema ="),
+        new("  FormSchema.For<Contact>(s =>"),
+        new("  {"),
+        new("    s.Field(c => c.Name, f => f.Required());", "typed required"),
+        new("    s.Field(c => c.Email, f => f.Required()", "typed required"),
+        new("      .Rule(e => e.Contains('@'),", "rule"),
+        new("        \"Enter a valid email address\"));", "rule"),
+        new("    s.Field(c => c.Topic);", "typed"),
+        new("    s.Field(c => c.Message, f => f.Required()", "typed required"),
+        new("      .AsTextarea().MaxLength(500));", "textarea"),
+        new("  });"),
+    ];
+
+    private static readonly IReadOnlyList<BoardChip> _chips =
+    [
+        new("typed", "Typed fields", "Each field is picked with an expression, so a renamed member does not compile, and an enum becomes a select."),
+        new("required", "Required", "Required fields are marked, and an empty one says so when the user tries to send."),
+        new("rule", "Rules", "A typed rule with its message: here, the email must contain an at sign."),
+        new("textarea", "Textarea", "AsTextarea and MaxLength change the control and count the characters."),
+        new("submit", "Typed model", "OnSave receives your Contact, filled in, and only after every rule has passed."),
+    ];
+}

@@ -1,0 +1,120 @@
+/*
+  The design tokens of the Klyroo documentation sites, shared by every library. Each site changes only the accent (the four --accent-* variables, which
+  the page writes from docs/site.yml after this file) and its ground texture (ground.css).
+
+  Both modes are authored: the dark ground is a near-black with a faint cool tint, the light one a cool off-white. The tones below are checked against
+  each other (text on ground, on raised surfaces and on the sunken ones) and the accent tones are computed against these grounds (Library/AccentColor.cs
+  holds the same surface colors for its tests).
+*/
+:root {
+  color-scheme: light;
+
+  --font-display: var(--klyroo-font-sans, "Geist"), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--klyroo-font-sans, "Geist"), ui-sans-serif, system-ui, sans-serif;
+  --font-code: var(--klyroo-font-mono, "Geist Mono"), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* The library accent. Replaced by the inline style of every page: these are the Klyroo.UI green, for a page that has none. */
+  --accent: #10b981;
+  --on-accent: #090c11;
+  --accent-ink: #067a56;
+  --accent-display: #0a8f66;
+
+  --bg: #f4f6f9;
+  --raised: #ffffff;
+  --sunken: #e6eaf0;
+  --code-bg: #eef1f6;
+  --code-head: #e7ebf1;
+  --text: #1a2230;
+  --strong: #0a1018;
+  --muted: #465163;
+  --dim: #5a6679;
+  --line: #dbe1e9;
+  --line-strong: #c1cad6;
+  --danger: #b3321e;
+
+  --tx: color-mix(in oklab, var(--accent-ink) 7%, transparent);
+  --tx-major: color-mix(in oklab, var(--accent-ink) 13%, transparent);
+  --accent-soft: color-mix(in oklab, var(--accent) 14%, transparent);
+  --accent-line: color-mix(in oklab, var(--accent-ink) 55%, transparent);
+  --lit: color-mix(in oklab, var(--accent) 17%, transparent);
+
+  --r-sm: 6px;
+  --r: 10px;
+  --r-lg: 14px;
+  --shadow-panel: 0 1px 2px rgb(15 23 42 / 0.05), 0 14px 32px -18px rgb(15 23 42 / 0.24);
+  --shadow-pop: 0 2px 4px rgb(15 23 42 / 0.06), 0 20px 44px -16px rgb(15 23 42 / 0.3);
+
+  --header-h: 4rem;
+  --page-w: 88rem;
+  --gutter: 1.5rem;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Syntax colors, each at least 4.5:1 on --code-bg and on --raised. The accent colors the types, so a library site reads in its own hue. */
+  --tok-comment: #586272;
+  --tok-string: #0d6b3d;
+  --tok-keyword: #6b3fc4;
+  --tok-command: #6b3fc4;
+  --tok-property: #9a4208;
+  --tok-number: #8a5a00;
+  --tok-variable: #a8321f;
+  --tok-tag: #1f55b0;
+  --tok-type: #0f6a7a;
+}
+
+:root.dark {
+  color-scheme: dark;
+
+  --bg: #090c11;
+  --raised: #0f141b;
+  --sunken: #06080c;
+  --code-bg: #0c1117;
+  --code-head: #121922;
+  --text: #cdd5df;
+  --strong: #f1f4f8;
+  --muted: #96a2b3;
+  --dim: #8490a2;
+  --line: #1b222c;
+  --line-strong: #2b3544;
+  --danger: #ff8a75;
+
+  --tx: color-mix(in oklab, var(--accent) 8%, transparent);
+  --tx-major: color-mix(in oklab, var(--accent) 15%, transparent);
+  --accent-soft: color-mix(in oklab, var(--accent) 16%, transparent);
+  --accent-line: color-mix(in oklab, var(--accent) 70%, transparent);
+  --lit: color-mix(in oklab, var(--accent) 15%, transparent);
+
+  --shadow-panel: 0 1px 0 rgb(255 255 255 / 0.035) inset, 0 22px 44px -24px rgb(0 0 0 / 0.85);
+  --shadow-pop: 0 1px 0 rgb(255 255 255 / 0.05) inset, 0 28px 56px -20px rgb(0 0 0 / 0.9);
+
+  --tok-comment: #8a96a8;
+  --tok-string: #7ee0a0;
+  --tok-keyword: #c3a6ff;
+  --tok-command: #c3a6ff;
+  --tok-property: #ffa066;
+  --tok-number: #ffd070;
+  --tok-variable: #ff8a75;
+  --tok-tag: #86b6ff;
+  --tok-type: #6fd3e0;
+}
+
+/* The Klyroo.UI components that remain (the search dialog) read the --klyroo-* tokens: they follow the grounds and the accent of the site. */
+:root {
+  --klyroo-radius: 0.625rem;
+  --klyroo-primary: var(--accent);
+  --klyroo-primary-text: var(--accent-ink);
+  --klyroo-primary-contrast: var(--on-accent);
+  --klyroo-bg: var(--bg);
+  --klyroo-bg-muted: var(--sunken);
+  --klyroo-bg-elevated: var(--raised);
+  --klyroo-bg-accented: var(--code-head);
+  --klyroo-bg-overlay: var(--raised);
+  --klyroo-text: var(--text);
+  --klyroo-text-highlighted: var(--strong);
+  --klyroo-text-toned: var(--text);
+  --klyroo-text-muted: var(--muted);
+  --klyroo-text-dimmed: var(--dim);
+  --klyroo-border: var(--line);
+  --klyroo-border-muted: var(--line);
+  --klyroo-border-accented: var(--line-strong);
+  --klyroo-header-height: var(--header-h);
+}

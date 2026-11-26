@@ -1,0 +1,77 @@
+@* The simple hero: the code of docs/site.yml (demo.code) in the code panel and one result panel, joined by one leader line that starts at the focus lines.
+   A library that deserves a full board gets a component in this folder instead (see docs-site/README.md). *@
+<DemoBoard File="@(Demo.File ?? "Program.cs")" Lines="_lines" Label="@("The code and what it produces")">
+    <Results>
+        <ResultPanel Title="@(Demo.ResultTitle ?? "Result")" Note="@(Demo.Output is not null ? "output of the code" : "sample data")">
+            <div data-target="result">
+                @if (Demo.Output is not null)
+                {
+                    <pre class="output"><code>@foreach (var line in OutputLines){<span class="output-line">@line</span>}</code></pre>
+                }
+                else
+                {
+                    @switch (Demo.Preview)
+                    {
+                        case "ui-settings":
+                            <div class="form-stack">
+                                <div class="field">
+                                    <span class="field-label">Display name</span>
+                                    <div class="control placeholder">Ada Lovelace</div>
+                                </div>
+                                <div class="switch-row">
+                                    <span class="switch is-on" aria-hidden="true"><span class="thumb"></span></span>
+                                    <span>Email notifications</span>
+                                </div>
+                                <div class="form-actions">
+                                    <span class="send ghost">Details</span>
+                                    <span class="send">Save</span>
+                                </div>
+                            </div>
+                            break;
+                        case "display-stat":
+                            <div class="stat">
+                                <span class="stat-title">Monthly revenue</span>
+                                <span class="stat-value">148,900 <span class="stat-unit">EUR</span></span>
+                                <span class="stat-delta">+14.2%</span>
+                                <svg class="spark" viewBox="0 0 120 40" role="img" aria-label="Trend: 102, 118, 134, 149" preserveAspectRatio="none"><polyline points="4,36 42,24 80,13 116,4" fill="none" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" /><circle cx="116" cy="4" r="3" /></svg>
+                            </div>
+                            break;
+                        case "spreadsheet-rows":
+                            <div class="mini-scroll">
+                                <table class="mini-table">
+                                    <thead><tr><th scope="col">SKU</th><th scope="col" class="num">Unit price</th><th scope="col">Currency</th><th scope="col">Row</th></tr></thead>
+                                    <tbody>
+                                        <tr><td>A-1</td><td class="num">12,50</td><td>EUR</td><td><span class="status ok">Importable</span></td></tr>
+                                        <tr><td>A-2</td><td class="num">-3</td><td>USD</td><td><span class="status bad">Negative price</span></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            break;
+                    }
+                }
+            </div>
+        </ResultPanel>
+    </Results>
+</DemoBoard>
+
+@code {
+    [Parameter, EditorRequired] public DemoConfig Demo { get; set; } = default!;
+
+    private IReadOnlyList<BoardLine> _lines = [];
+
+    private string[] OutputLines => (Demo.Output ?? "").Split('\n');
+
+    protected override void OnParametersSet()
+    {
+        var source = (Demo.Code ?? "").Replace("\r\n", "\n").Split('\n');
+        var (from, to) = Demo.Focus ?? (source.Length, source.Length);
+        var razor = Demo.Language is "razor" or "html";
+        _lines =
+        [
+            .. source.Select((text, index) => new BoardLine(
+                text,
+                index + 1 >= from && index + 1 <= to ? "result" : "",
+                razor && text.TrimStart().StartsWith('<') ? "html" : Demo.Language))
+        ];
+    }
+}

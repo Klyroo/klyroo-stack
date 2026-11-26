@@ -1,0 +1,36 @@
+@* The demonstration board: the code panel with its chips on the left, the result panels on the right, and the leader lines between them, which the script
+   draws (wwwroot/site.js). Without the script every panel is there and nothing is lit. A board is authored in a component of Components/Boards. *@
+<div class="board" data-board aria-label="@Label" role="group">
+    <div class="board-grid">
+        <section class="panel board-code" data-board-code aria-label="@File">
+            <header class="panel-head">
+                <span class="panel-file">@File</span>
+                <span class="panel-note">@Lines.Count lines</span>
+            </header>
+            <pre class="board-pre" tabindex="0"><code>@foreach (var line in Lines){<span class="cl" data-lines="@line.Features">@((MarkupString)SyntaxHighlighter.ToHtml(line.Text, line.Language))</span>}</code></pre>
+            @if (Chips.Count > 0)
+            {
+                <div class="board-chips">
+                    <div class="chips" role="group" aria-label="Features">
+                        @for (var i = 0; i < Chips.Count; i++)
+                        {
+                            var chip = Chips[i];
+                            <button type="button" class="chip" data-chip="@chip.Id" data-hint="@chip.Caption" aria-pressed="@(i == 0 ? "true" : "false")">@chip.Label</button>
+                        }
+                    </div>
+                    <p class="chip-caption" data-caption aria-live="polite">@Chips[0].Caption</p>
+                </div>
+            }
+        </section>
+        <div class="board-results">@Results</div>
+    </div>
+    <svg class="board-leaders" data-leaders aria-hidden="true" focusable="false"></svg>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string File { get; set; } = "";
+    [Parameter, EditorRequired] public IReadOnlyList<BoardLine> Lines { get; set; } = [];
+    [Parameter] public IReadOnlyList<BoardChip> Chips { get; set; } = [];
+    [Parameter] public string Label { get; set; } = "What the code produces";
+    [Parameter] public RenderFragment? Results { get; set; }
+}

@@ -256,6 +256,15 @@ public sealed partial class MarkdownRenderer
             .Replace("</table>", "</table></div>", StringComparison.Ordinal);
 
         var text = Whitespace().Replace(PlainText(document), " ").Trim();
+        if (untrusted is null && options is not { StripHeadingIds: true })
+        {
+            // A link to the heading itself, empty: the stylesheet draws its icon, so a page of thousands of types does not carry thousands of images.
+            html = SectionHeading().Replace(html, match =>
+            {
+                var label = WebUtility.HtmlEncode(WebUtility.HtmlDecode(Tags().Replace(match.Groups["text"].Value, "")).Trim());
+                return $"<h{match.Groups["level"].Value} id=\"{match.Groups["id"].Value}\">{match.Groups["text"].Value}<a class=\"heading-anchor\" href=\"{WebUtility.HtmlEncode(pageHref)}#{match.Groups["id"].Value}\" aria-label=\"Link to {label}\"></a></h{match.Groups["level"].Value}>";
+            });
+        }
         if (options is { StripHeadingIds: true })
         {
             html = HeadingId().Replace(html, "<$1>");
@@ -268,6 +277,12 @@ public sealed partial class MarkdownRenderer
 
     [GeneratedRegex("""<(h[1-6]) id="[^"]*">""")]
     private static partial Regex HeadingId();
+
+    [GeneratedRegex("""<h(?<level>[2-4]) id="(?<id>[^"]+)">(?<text>.*?)</h\k<level>>""", RegexOptions.Singleline)]
+    private static partial Regex SectionHeading();
+
+    [GeneratedRegex("<[^>]+>")]
+    private static partial Regex Tags();
 
     // @user and #123 in running text. The lookbehind keeps an e-mail address ("a@b.com"), a path ("owner/repo#1") and a word ("C#12") out of it.
     [GeneratedRegex(@"(?<![\w@/&.])@([A-Za-z0-9](?:[A-Za-z0-9]|-(?=[A-Za-z0-9])){0,38})(?![\w@-])|(?<![\w/&#])#([0-9]{1,9})(?![\w#])")]
@@ -467,15 +482,11 @@ public sealed partial class MarkdownRenderer
         protected override void Write(HtmlRenderer renderer, CodeBlock block)
         {
             var code = block.Lines.ToString().TrimEnd('\n', '\r');
-            var language = block is FencedCodeBlock { Info: { Length: > 0 } info }
-                ? info.Split([' ', '\t', '{'], 2, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()
-                : null;
-            var label = language is not null && SyntaxHighlighter.Supports(language) ? language.ToLowerInvariant() : "text";
-            renderer.Write($"<div class=\"code-block\" data-language=\"{WebUtility.HtmlEncode(label)}\">");
-            renderer.Write("<button type=\"button\" class=\"code-copy\" data-code-copy>Copy</button>");
-            renderer.Write("<span class=\"code-copy-status\" role=\"status\" aria-live=\"polite\"></span>");
-            renderer.Write($"<pre tabindex=\"0\"><code>{SyntaxHighlighter.ToHtml(code, language)}</code></pre>");
-            renderer.Write("</div>");
+            var fence = block as FencedCodeBlock;
+            var language = fence?.Info is { Length: > 0 } text ? text.Split([' ', '\t', '{'], 2, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() : null;
+            // Markdig splits the info string at the first space: the rest (title="Program.cs") is the arguments.
+            var info = fence is null ? null : $"{fence.Info} {fence.Arguments}";
+            renderer.Write(CodeBlockHtml.Render(code, language, info));
         }
     }
 }

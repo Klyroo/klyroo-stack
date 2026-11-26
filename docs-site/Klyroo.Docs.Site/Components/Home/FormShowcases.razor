@@ -1,0 +1,115 @@
+<Showcase Title="Show and require fields conditionally"
+          Description="VisibleWhen and Required take a condition typed against your model. A hidden field is not rendered, not validated and not written into the model."
+          Guide="guides/#show-and-require-fields-conditionally"
+          Code="@_conditional">
+    <Result>
+        <ResultPanel Title="Account type: Business" Note="sample data">
+            <div class="form-stack">
+                <div class="choice-row">
+                    <span class="radio"><span class="dot"></span>Personal</span>
+                    <span class="radio is-on"><span class="dot"></span>Business</span>
+                </div>
+                <div class="field">
+                    <span class="field-label">Company<span class="req"> *</span></span>
+                    <div class="control">Initech</div>
+                </div>
+                <div class="field">
+                    <span class="field-label">VAT number</span>
+                    <div class="control">FR 12 345</div>
+                </div>
+            </div>
+            <p class="result-note">With Personal picked, Company and VAT number are not drawn.</p>
+        </ResultPanel>
+    </Result>
+</Showcase>
+
+<Showcase Flip="true"
+          Title="Split a long form into steps"
+          Description="Steps can be skipped by a condition, and an async hook can stop the user from moving on. An error set there can block the step until it is cleared."
+          Guide="guides/#build-a-multi-step-wizard"
+          Code="@_wizard">
+    <Result>
+        <ResultPanel Title="Create your workspace" Note="sample data">
+            <ol class="steps">
+                <li class="step is-current"><span class="step-n">1</span>Workspace</li>
+                <li class="step is-skipped"><span class="step-n">2</span>Billing<span class="step-tag">skipped on Free</span></li>
+                <li class="step"><span class="step-n">3</span>Invite</li>
+            </ol>
+            <div class="form-stack">
+                <div class="field is-invalid">
+                    <span class="field-label">Address<span class="req"> *</span></span>
+                    <div class="control">acme</div>
+                    <span class="field-error">This address is taken</span>
+                </div>
+                <div class="choice-row">
+                    <span class="radio is-on"><span class="dot"></span>Free</span>
+                    <span class="radio"><span class="dot"></span>Team</span>
+                </div>
+            </div>
+        </ResultPanel>
+    </Result>
+</Showcase>
+
+<Showcase Title="Put a server error on a field"
+          Description="OnBeforeSubmit runs after the local rules pass. Return false after SetError and the message appears under the field, until the user edits it."
+          Guide="guides/#report-a-server-error-on-a-field"
+          Code="@_server">
+    <Result>
+        <ResultPanel Title="After Send" Note="sample data">
+            <div class="form-stack">
+                <div class="field is-invalid">
+                    <span class="field-label">Email<span class="req"> *</span></span>
+                    <div class="control">ada@example.com</div>
+                    <span class="field-error">This email is already registered</span>
+                </div>
+                <div class="form-actions"><span class="send">Send</span></div>
+            </div>
+        </ResultPanel>
+    </Result>
+</Showcase>
+
+@code {
+    private const string _conditional = """
+        var type = s.Field(m => m.AccountType, f => f.AsRadio());
+        s.Field(m => m.Company, f => f
+            .Required()
+            .VisibleWhen(c => c.Get(type) == AccountType.Business));
+        var country = s.Field(m => m.Country, f => f.Default("FR"));
+        s.Field(m => m.VatNumber, f => f
+            .VisibleWhen(c => c.Get(type) == AccountType.Business)
+            .Required(c => c.Get(country) != "US")
+            .DependsOn(country));
+        """;
+
+    private const string _wizard = """
+        s.Step("workspace", "Workspace", step =>
+        {
+            slug = step.Field(m => m.Slug, f => f.Required().Label("Address"));
+            plan = step.Field(m => m.Plan, f => f.AsRadio());
+        });
+        s.Step("billing", "Billing", step =>
+        {
+            step.Field(m => m.VatNumber, f => f.Required());
+        }, skipWhen: c => c.Get(plan) == Tier.Free);
+        s.OnBeforeNext(async (form, stepIndex) =>
+        {
+            if (stepIndex != 0) return true;
+            var taken = await WorkspaceDirectory.IsTakenAsync(form.Get(slug)!);
+            if (taken) form.SetError(slug, "This address is taken", blocking: true);
+            return !taken;
+        });
+        """;
+
+    private const string _server = """
+        var email = s.Field(m => m.Email, f => f.Required());
+        s.OnBeforeSubmit(async (registration, form) =>
+        {
+            if (await accounts.IsEmailTakenAsync(registration.Email))
+            {
+                form.SetError(email, "This email is already registered");
+                return false;
+            }
+            return true;
+        });
+        """;
+}

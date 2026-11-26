@@ -1,0 +1,59 @@
+@* The navigation tree of the docs: groups with an icon, their pages below, the current page in the accent. Plain details elements, so a group opens without a script. *@
+<nav class="docnav" aria-label="@AriaLabel">
+    <ul>
+        @foreach (var item in Items)
+        {
+            @if (item.Children is { Count: > 0 })
+            {
+                <li>
+                    <details open>
+                        <summary>
+                            <KlyIcon Name="@GroupIcon(item.Title)" Class="group-icon" />
+                            <span>@item.Title</span>
+                            <KlyIcon Name="ph:caret-down" Class="chev" />
+                        </summary>
+                        <ul class="pages">
+                            @foreach (var child in item.Children)
+                            {
+                                <li><a href="@child.Href" aria-current="@(IsCurrent(child) ? "page" : null)">@child.Title</a></li>
+                            }
+                        </ul>
+                    </details>
+                </li>
+            }
+            else if (item.Href is not null)
+            {
+                <li>
+                    <a href="@item.Href" aria-current="@(IsCurrent(item) ? "page" : null)">
+                        <KlyIcon Name="@GroupIcon(item.Title)" Class="group-icon" />
+                        <span>@item.Title</span>
+                    </a>
+                </li>
+            }
+        }
+    </ul>
+</nav>
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<KlyContentNavigationItem> Items { get; set; } = [];
+
+    /// <summary>The address of the page being read, as the pages write it (<c>guides/</c>).</summary>
+    [Parameter] public string? CurrentHref { get; set; }
+
+    [Parameter] public string AriaLabel { get; set; } = "Documentation";
+
+    private bool IsCurrent(KlyContentNavigationItem item) => item.Href is not null && item.Href == CurrentHref;
+
+    // One drawn icon per kind of group (Diataxis names and the usual ones), from the Phosphor set Klyroo.UI bundles.
+    private static string GroupIcon(string title) =>
+        title.ToLowerInvariant() switch
+        {
+            "documentation" or "docs" => "ph:book-open-text",
+            "tutorial" or "tutorials" or "getting started" => "ph:rocket-launch",
+            "how-to guides" or "guides" or "how-to" => "ph:signpost",
+            "reference" => "ph:brackets-curly",
+            "explanation" or "concepts" => "ph:lightbulb",
+            "internals" => "ph:gear-six",
+            _ => "ph:folder-simple",
+        };
+}

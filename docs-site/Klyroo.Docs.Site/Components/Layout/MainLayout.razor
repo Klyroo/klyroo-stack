@@ -1,97 +1,114 @@
 @inherits LayoutComponentBase
 @inject DocsSite Site
 @inject Libraries Libraries
+@inject NavigationManager Navigation
 
 <KlyApp>
-    <KlySkipLink />
+    <div class="site tex-@Site.Settings.Texture @(_isHome ? "is-home" : "is-doc")">
+        <KlySkipLink />
+        <div class="ground" aria-hidden="true"></div>
 
-    @* Links are relative: they resolve against <base href>, so the site works below the name of the repository, which is where GitHub Pages serves it. *@
-    <KlyHeader Items="_items" AriaLabel="Site">
-        <Left>
-            <a href="./" class="flex items-center gap-2 rounded-sm font-semibold text-(--klyroo-text-highlighted)">
-                <KlyIcon Name="ph:book-open-text" Class="size-6" />
-                <span>@Site.Settings.Title</span>
-            </a>
-        </Left>
-        <Right>
-            @* Two buttons for one search, so that only one shows: the label and the shortcut where there is room, the icon alone on a phone. *@
-            <KlyContentSearchButton Collapsed="false" Size="KlySize.Sm" Class="hidden sm:inline-flex sm:w-56" />
-            <KlyContentSearchButton Size="KlySize.Sm" Class="sm:hidden" />
-            <KlyButton Square Size="KlySize.Sm" Variant="ButtonVariant.Ghost" Color="KlyColor.Neutral" Href="@Site.Settings.GithubUrl" Target="KlyLinkTarget.Blank" aria-label="@(Site.Settings.Title + " on GitHub")">
-                <LeadingIcon><KlyIcon Name="ph:github-logo" Class="size-5" /></LeadingIcon>
-            </KlyButton>
-            <KlyColorModeButton Size="KlySize.Sm" />
-        </Right>
-        <Body>
-            <KlyContentNavigation Items="Site.Navigation" AriaLabel="Menu" />
-            <div class="mt-6 flex flex-col gap-1 border-t border-(--klyroo-border) pt-4">
-                <p class="text-xs font-semibold uppercase tracking-wide text-(--klyroo-text-muted)">Klyroo libraries</p>
-                @foreach (var library in Libraries.Items)
-                {
-                    <a href="@Libraries.SiteUrl(library.Repo)" class="rounded-sm py-1 text-sm text-(--klyroo-text) hover:text-(--klyroo-text-highlighted)" aria-current="@(IsCurrent(library) ? "true" : null)">@library.Name</a>
-                }
-            </div>
-            @if (Site.Settings.Packages.Count > 0)
-            {
-                <div class="mt-4 flex flex-col gap-1 border-t border-(--klyroo-border) pt-4">
-                    <p class="text-xs font-semibold uppercase tracking-wide text-(--klyroo-text-muted)">NuGet</p>
-                    @foreach (var package in Site.Settings.Packages)
-                    {
-                        <a href="@NugetUrl(package)" target="_blank" rel="noopener noreferrer" class="rounded-sm py-1 text-sm text-(--klyroo-text) hover:text-(--klyroo-text-highlighted)">@package</a>
-                    }
+        @* Links are relative: they resolve against <base href>, so the site works below the name of the repository, which is where GitHub Pages serves it. *@
+        <header class="site-header">
+            <div class="page-wrap header-inner">
+                <a href="./" class="brand" aria-label="@(Site.Settings.Title) home">
+                    <KlyrooMark />
+                    <span class="wordmark">klyroo<span class="slash">/</span><span class="name">@Site.Settings.ShortName</span></span>
+                </a>
+
+                <div class="header-search">
+                    @* One search for the whole site: Ctrl+K (Cmd+K on a Mac) or this button. The browser fetches search-index.json the first time it opens. *@
+                    <button type="button" class="search-pill" data-kly-content-search-open="" aria-haspopup="dialog" aria-keyshortcuts="Control+K Meta+K" aria-label="Search the documentation">
+                        <KlyIcon Name="ph:magnifying-glass" />
+                        <span class="label">Search the docs</span>
+                        <span class="keys" aria-hidden="true"><kbd data-mod-key>Ctrl</kbd><kbd>K</kbd></span>
+                    </button>
                 </div>
-            }
-        </Body>
-    </KlyHeader>
 
-    @* The search of the whole site: Ctrl+K (Cmd+K on a Mac) or one of the buttons above. The browser fetches search-index.json the first time it opens. *@
-    <KlyContentSearch IndexUrl="search-index.json" />
+                <div class="header-actions">
+                    @if (_docs is not null)
+                    {
+                        <a class="header-link" href="@_docs.Href" aria-current="@(_inDocs && !_isApi ? "page" : null)">Docs</a>
+                    }
+                    @if (_api is not null)
+                    {
+                        <a class="header-link" href="@_api.Href" aria-current="@(_isApi ? "page" : null)">API</a>
+                    }
+                    <details class="eco" data-eco>
+                        <summary aria-label="Klyroo libraries"><span class="eco-text">Klyroo</span><KlyIcon Name="ph:caret-down" /></summary>
+                        <div class="eco-menu">
+                            @foreach (var library in Libraries.Items)
+                            {
+                                <a href="@Libraries.SiteUrl(library.Repo)" aria-current="@(IsCurrent(library) ? "true" : null)" style="--dot: @(library.Accent ?? "var(--dim)")">
+                                    <span class="dot" aria-hidden="true"></span>@library.Name@if (IsCurrent(library))
+                                    {
+                                        <span class="here">this site</span>
+                                    }
+                                </a>
+                            }
+                        </div>
+                    </details>
+                    <a class="icon-button" href="@Site.Settings.GithubUrl" target="_blank" rel="noopener noreferrer" aria-label="@(Site.Settings.Title) on GitHub"><KlyIcon Name="ph:github-logo" /></a>
+                    <button type="button" class="icon-button theme-toggle" data-kly-color-mode="toggle" aria-label="Toggle color mode">
+                        <svg class="moon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.5 11.6A6.75 6.75 0 0 1 8.4 3.5a6.75 6.75 0 1 0 8.1 8.1Z" /></svg>
+                        <svg class="sun" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="3.4" /><path d="M10 2.5v1.6M10 15.9v1.6M2.5 10h1.6M15.9 10h1.6M4.7 4.7l1.1 1.1M14.2 14.2l1.1 1.1M15.3 4.7l-1.1 1.1M5.8 14.2l-1.1 1.1" /></svg>
+                    </button>
+                </div>
+            </div>
+        </header>
 
-    <KlyMain id="main" tabindex="-1" class="focus:outline-none">
-        @Body
-    </KlyMain>
+        <KlyContentSearch IndexUrl="search-index.json" />
 
-    <KlyFooter>
-        <Left>
-            <p class="text-sm text-(--klyroo-text-muted)">© @DateTime.UtcNow.Year Klyroo Contributors. Built with Klyroo.UI.</p>
-        </Left>
-        <Right>
-            <KlyButton Label="Source" Href="@Site.Settings.GithubUrl" Target="KlyLinkTarget.Blank" Variant="ButtonVariant.Link" Color="KlyColor.Neutral" Size="KlySize.Sm" />
-        </Right>
-    </KlyFooter>
+        <main id="main" tabindex="-1" class="site-main">
+            @Body
+        </main>
+
+        <footer class="site-footer">
+            <div class="page-wrap footer-inner">
+                <div class="footer-top">
+                    <a href="./" class="brand" aria-label="@(Site.Settings.Title) home">
+                        <KlyrooMark Size="24" />
+                        <span class="wordmark">klyroo<span class="slash">/</span><span class="name">@Site.Settings.ShortName</span></span>
+                    </a>
+                    <nav aria-label="Klyroo libraries">
+                        <ul class="footer-libs">
+                            @foreach (var library in Libraries.Items)
+                            {
+                                <li><a href="@Libraries.SiteUrl(library.Repo)" aria-current="@(IsCurrent(library) ? "true" : null)" style="--dot: @(library.Accent ?? "var(--dim)")"><span class="dot" aria-hidden="true"></span>@library.Name</a></li>
+                            }
+                        </ul>
+                    </nav>
+                </div>
+                <div class="footer-meta">
+                    <span>&copy; @DateTime.UtcNow.Year Klyroo Contributors. Built with <a href="@Libraries.SiteUrl("klyroo-ui")">Klyroo.UI</a>.</span>
+                    <span>
+                        <a href="@Site.Settings.GithubUrl" target="_blank" rel="noopener noreferrer">Source on GitHub</a>
+                        @foreach (var package in Site.Settings.Packages.Take(1))
+                        {
+                            <span aria-hidden="true">&nbsp;&middot;&nbsp;</span><a href="@NugetUrl(package)" target="_blank" rel="noopener noreferrer">NuGet</a>
+                        }
+                    </span>
+                </div>
+            </div>
+        </footer>
+    </div>
 </KlyApp>
 
 @code {
-    private IReadOnlyList<KlyNavigationItem> _items = [];
+    private DocPage? _docs;
+    private DocPage? _api;
+    private bool _isHome;
+    private bool _isApi;
+    private bool _inDocs;
 
-    protected override void OnInitialized()
+    protected override void OnParametersSet()
     {
-        var items = new List<KlyNavigationItem>();
-        var docs = Site.Find(LibraryDocs.IndexSlug) ?? Site.Pages.FirstOrDefault();
-        if (docs is not null)
-        {
-            items.Add(new KlyNavigationItem("Docs") { Href = docs.Href });
-        }
-        foreach (var page in Site.Pages.Where(p => p.Slug == "api-reference"))
-        {
-            items.Add(new KlyNavigationItem(page.NavTitle) { Href = page.Href });
-        }
-        if (Site.Settings.Packages.Count == 1)
-        {
-            items.Add(new KlyNavigationItem("NuGet") { Href = NugetUrl(Site.Settings.Packages[0]), Target = KlyLinkTarget.Blank });
-        }
-        else if (Site.Settings.Packages.Count > 1)
-        {
-            items.Add(new KlyNavigationItem("NuGet")
-            {
-                Children = [.. Site.Settings.Packages.Select(p => new KlyNavigationItem(p) { Href = NugetUrl(p), Target = KlyLinkTarget.Blank })],
-            });
-        }
-        items.Add(new KlyNavigationItem("Klyroo")
-        {
-            Children = [.. Libraries.Items.Select(l => new KlyNavigationItem(l.Name) { Href = Libraries.SiteUrl(l.Repo), Active = IsCurrent(l) })],
-        });
-        _items = items;
+        _docs = Site.Find(LibraryDocs.IndexSlug) ?? Site.Pages.FirstOrDefault();
+        _api = Site.Pages.FirstOrDefault(p => p.Slug == "api-reference");
+        var path = Navigation.ToBaseRelativePath(Navigation.Uri).Split('?', '#')[0].Trim('/');
+        _isHome = path.Length == 0;
+        _isApi = _api is not null && path == _api.Slug;
+        _inDocs = !_isHome && Site.Find(path) is not null;
     }
 
     private bool IsCurrent(LibraryInfo library) => library.Repo.Equals(Site.Settings.RepoName, StringComparison.OrdinalIgnoreCase);

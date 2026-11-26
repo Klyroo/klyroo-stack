@@ -1,0 +1,43 @@
+@inject DocsSite Site
+@inject Libraries Libraries
+
+@* The close: the way in, and the other libraries of the family with their accents. It carries the id of the ecosystem section of the README, which it replaces. *@
+<section class="section close" id="klyroo-ecosystem" aria-labelledby="close-title">
+    <div class="page-wrap">
+        <h2 class="close-title" id="close-title">@(Start is not null ? "Install it, then open the first page." : "Read the documentation.")</h2>
+        <div class="cta-row">
+            @if (Start is not null)
+            {
+                <a class="button button-accent" href="@Start.Href">@(Start.Slug == "getting-started" ? "Get started" : "Read the docs")<KlyIcon Name="ph:arrow-right" /></a>
+            }
+            <a class="button button-outline" href="@Site.Settings.GithubUrl" target="_blank" rel="noopener noreferrer"><KlyIcon Name="ph:github-logo" />GitHub</a>
+        </div>
+
+        @if (Site.HomeContent.Ecosystem.Count > 0)
+        {
+            <h3 class="family-title">The Klyroo family</h3>
+            <ul class="family">
+                @foreach (var library in Site.HomeContent.Ecosystem)
+                {
+                    <li style="--dot: @(library.Accent ?? "var(--dim)")">
+                        <a href="@library.Href" aria-current="@(library.Current ? "true" : null)"><span class="dot" aria-hidden="true"></span>@library.Name</a>
+                        <span class="family-text">@((MarkupString)library.DescriptionHtml)</span>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <ul class="family">
+                @foreach (var library in Libraries.Items)
+                {
+                    <li style="--dot: @(library.Accent ?? "var(--dim)")"><a href="@Libraries.SiteUrl(library.Repo)"><span class="dot" aria-hidden="true"></span>@library.Name</a></li>
+                }
+            </ul>
+        }
+    </div>
+</section>
+
+@code {
+    private DocPage? Start => Site.Pages.FirstOrDefault(p => p.Slug == "getting-started") ?? Site.Find(LibraryDocs.IndexSlug) ?? Site.Pages.FirstOrDefault();
+}

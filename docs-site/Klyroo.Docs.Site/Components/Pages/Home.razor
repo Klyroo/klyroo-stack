@@ -9,65 +9,87 @@
     <link rel="canonical" href="@Libraries.SiteUrl(Site.Settings.RepoName)" />
 </HeadContent>
 
-<KlyPageHero Headline="Documentation"
-            Title="@Site.Settings.Title"
-            Description="@Site.Settings.Tagline"
-            Links="_links"
-            Ui="_heroUi">
-    <Media>
-        @if (_install is not null)
-        {
-            @* The same renderer as the pages: highlighted, with a copy button. *@
-            <div data-testid="hero-snippet" class="mx-auto w-full max-w-[29rem]">@((MarkupString)_install)</div>
-        }
-    </Media>
-</KlyPageHero>
-
-<KlyContainer Class="py-8 lg:py-10">
-    <KlyPage Ui="_columnsUi" Left="_nav" Right="_toc">
-        <article class="min-w-0" data-testid="article">
-            @if (_toc is not null)
+<section class="hero" aria-labelledby="hero-title">
+    <div class="page-wrap">
+        <h1 class="hero-title" id="hero-title">
+            <span class="line">@Site.Settings.Headline[0]</span>
+            @if (Site.Settings.Headline.Count > 1)
             {
-                <div class="lg:hidden">
-                    <KlyContentToc Links="Site.Home.Toc" Title="On this page" />
-                </div>
+                <span class="line accent">@Site.Settings.Headline[1]</span>
             }
-            @* The README of the repository, as written for GitHub: the prose styles of the Klyroo PageBody, plus the ones in Styles/app.css for what Markdown adds. *@
-            <KlyPageBody Class="markdown-body pb-10">@((MarkupString)Site.Home.Html)</KlyPageBody>
-        </article>
-    </KlyPage>
-</KlyContainer>
+        </h1>
+        <div class="hero-row">
+            <p class="hero-lead">@Site.Settings.Lead</p>
+            <div class="cta-row">
+                @if (Start is not null)
+                {
+                    <a class="button button-accent" href="@Start.Href">@(Start.Slug == "getting-started" ? "Get started" : "Read the docs")<KlyIcon Name="ph:arrow-right" /></a>
+                }
+                @if (Site.Settings.HeroInstall is { } install)
+                {
+                    <button type="button" class="install-chip" data-copy="@install" aria-label="Copy: @install">
+                        <code>@install</code>
+                        <span class="chip-icon"><svg class="code-copy-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.75" /><path d="M10.5 3.5v-.25A1.75 1.75 0 0 0 8.75 1.5h-5A1.75 1.75 0 0 0 2 3.25v5C2 9.2 2.8 10 3.75 10h.25" /></svg><svg class="code-check-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3.5 8.5 3 3 6-7" /></svg></span>
+                        <span class="code-copy-label sr-only">Copy</span>
+                        <span class="copy-status sr-only" role="status" aria-live="polite"></span>
+                    </button>
+                }
+            </div>
+        </div>
+
+        @switch (Site.Settings.Demo)
+        {
+            case { Board: "table" }:
+                <TableBoard />
+                break;
+            case { Board: "form" }:
+                <FormBoard />
+                break;
+            case { Code: not null } demo:
+                <QuickBoard Demo="demo" />
+                break;
+        }
+    </div>
+</section>
+
+@switch (Site.Settings.Demo?.Board)
+{
+    case "table":
+        <section class="section showcases" aria-labelledby="showcases-title">
+            <div class="page-wrap">
+                <h2 class="section-title" id="showcases-title">Beyond the first list</h2>
+                <TableShowcases />
+            </div>
+        </section>
+        break;
+    case "form":
+        <section class="section showcases" aria-labelledby="showcases-title">
+            <div class="page-wrap">
+                <h2 class="section-title" id="showcases-title">Beyond the first form</h2>
+                <FormShowcases />
+            </div>
+        </section>
+        break;
+}
+
+<FeatureList Features="Site.HomeContent.Features" Title="@(Site.Settings.Demo?.Board is null ? "What it does" : "Everything it does")" />
+<PackageList Packages="Site.HomeContent.Packages" />
+<CloseBand />
+
+@if (_readme.Length > 0)
+{
+    <section class="section readme" aria-labelledby="readme-title">
+        <div class="page-wrap readme-grid">
+            <h2 class="section-title" id="readme-title">The README</h2>
+            <div class="markdown-body" data-testid="readme">@((MarkupString)_readme)</div>
+        </div>
+    </section>
+}
 
 @code {
-    private static readonly PageUi _columnsUi = new() { Left = "hidden lg:block", Right = "hidden lg:block" };
-    private static readonly PageHeroUi _heroUi = new()
-    {
-        Container = "gap-12 py-16 sm:py-20 lg:py-24",
-        Title = "text-4xl sm:text-5xl lg:text-6xl",
-    };
-    private static readonly MarkdownRenderer Renderer = new();
+    private DocPage? Start => Site.Pages.FirstOrDefault(p => p.Slug == "getting-started") ?? Site.Find(LibraryDocs.IndexSlug) ?? Site.Pages.FirstOrDefault();
 
-    private IReadOnlyList<PageLinkItem> _links = [];
-    private string? _install;
+    private string _readme = "";
 
-    protected override void OnInitialized()
-    {
-        var start = Site.Pages.FirstOrDefault(p => p.Slug == "getting-started") ?? Site.Find(LibraryDocs.IndexSlug) ?? Site.Pages.FirstOrDefault();
-        var links = new List<PageLinkItem>();
-        if (start is not null)
-        {
-            links.Add(new PageLinkItem(start.Slug == "getting-started" ? "Get started" : "Read the docs", start.Href) { TrailingIcon = "ph:arrow-right" });
-        }
-        links.Add(new PageLinkItem("GitHub", Site.Settings.GithubUrl) { Icon = "ph:github-logo", Target = KlyLinkTarget.Blank, Color = KlyColor.Neutral, Variant = ButtonVariant.Outline });
-        _links = links;
-        _install = Site.Settings.Install is { Length: > 0 } install ? Renderer.Render("```bash\n" + install + "\n```", "", "./").Html : null;
-    }
-
-    private RenderFragment? _nav => @<KlyPageAside As="PageAsideElement.Div" Class="py-1">
-        <KlyContentNavigation Items="Site.Navigation" AriaLabel="Documentation" />
-    </KlyPageAside>;
-
-    private RenderFragment? _toc => Site.Home.Toc.Count == 0 ? null : @<KlyPageAside As="PageAsideElement.Div">
-        <KlyContentToc Links="Site.Home.Toc" Title="On this page" />
-    </KlyPageAside>;
+    protected override void OnInitialized() => _readme = Site.Home.Html;
 }

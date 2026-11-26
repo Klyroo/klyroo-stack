@@ -4,8 +4,12 @@ using YamlDotNet.Serialization.NamingConventions;
 
 namespace Klyroo.Docs.Site.Library;
 
-/// <summary>A Klyroo library that has a documentation site.</summary>
-public sealed record LibraryInfo(string Repo, string Name);
+/// <summary>A Klyroo library that has a documentation site, with the accent color and the ground texture that make its site recognizable among the others.</summary>
+public sealed record LibraryInfo(string Repo, string Name, string? Accent = null, string? Texture = null)
+{
+    /// <summary>The name that follows <c>klyroo/</c> in the wordmark: <c>table</c> for <c>klyroo-table</c>.</summary>
+    public string ShortName => Repo.StartsWith("klyroo-", StringComparison.OrdinalIgnoreCase) ? Repo["klyroo-".Length..] : Repo;
+}
 
 /// <summary>The Klyroo libraries listed in the header of every site (<c>libraries.yml</c>), and where their sites are.</summary>
 public sealed class Libraries
@@ -35,7 +39,7 @@ public sealed class Libraries
         {
             Organization = file.Organization ?? "klyroo",
             PagesUrl = (file.Pages ?? "https://klyroo.github.io").TrimEnd('/'),
-            Items = [.. (file.Libraries ?? []).Select(l => new LibraryInfo(l.Repo ?? throw new ContentException($"{path}: a library has no repo."), l.Name ?? l.Repo))],
+            Items = [.. (file.Libraries ?? []).Select(l => new LibraryInfo(l.Repo ?? throw new ContentException($"{path}: a library has no repo."), l.Name ?? l.Repo, l.Accent, l.Texture))],
         };
     }
 
@@ -50,5 +54,7 @@ public sealed class Libraries
     {
         public string? Repo { get; set; }
         public string? Name { get; set; }
+        public string? Accent { get; set; }
+        public string? Texture { get; set; }
     }
 }

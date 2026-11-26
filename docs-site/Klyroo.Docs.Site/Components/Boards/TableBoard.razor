@@ -1,0 +1,84 @@
+@* The board of Klyroo.Table: a KlyDataList with a schema, and what it renders and writes to the address. The rows are sample data. *@
+<DemoBoard File="Customers.razor" Lines="_lines" Chips="_chips" Label="A KlyDataList and what it produces">
+    <Results>
+        <ResultPanel Title="The list" Note="sample data" Class="flush">
+            <div class="list-toolbar">
+                <div class="search-field" data-target="search">
+                    <KlyIcon Name="ph:magnifying-glass" />
+                    <span class="value">co</span>
+                </div>
+                <div class="tags">
+                    <span class="tag" data-target="filters">Country is France<KlyIcon Name="ph:x" Class="tag-x" /></span>
+                    <span class="tag-action">Add filter</span>
+                </div>
+            </div>
+            <div class="mini-scroll">
+                <table class="mini-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Customer</th>
+                            <th scope="col">Country</th>
+                            <th scope="col" class="num" aria-sort="descending"><span class="sorted" data-target="sort">MRR<KlyIcon Name="ph:arrow-down" /></span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var (name, mrr) in _rows)
+                        {
+                            <tr><td>@name</td><td>France</td><td class="num">@mrr</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="list-foot">
+                <span class="count">Showing 6 to 10 of 11</span>
+                <nav class="pager" aria-label="Pages" data-target="paging">
+                    <span class="page-step"><KlyIcon Name="ph:caret-left" /></span>
+                    <span class="page">1</span><span class="page current" aria-current="page">2</span><span class="page">3</span>
+                    <span class="page-step"><KlyIcon Name="ph:caret-right" /></span>
+                </nav>
+            </div>
+        </ResultPanel>
+        <ResultPanel Title="The address it writes" Note="no code needed" Class="url-panel">
+            <code class="url" data-target="url"><span class="url-path">/customers</span><span class="url-sep">?</span><span class="url-key" data-target="search">q=co</span><span class="url-sep">&amp;</span><span class="url-key" data-target="sort">s=-mrr</span><span class="url-sep">&amp;</span><span class="url-key" data-target="filters">f.country=France</span><span class="url-sep">&amp;</span><span class="url-key" data-target="paging">p=2</span></code>
+            <p class="url-note">Back, a shared link and a page rendered on the server all restore this state. A key that equals its default is left out.</p>
+        </ResultPanel>
+    </Results>
+</DemoBoard>
+
+@code {
+    private static readonly IReadOnlyList<BoardLine> _lines =
+    [
+        new("<KlyDataList TItem=\"Customer\" Schema=\"Schema\"", "url", "html"),
+        new("             Items=\"Customers\" />", "url", "html"),
+        new(""),
+        new("static readonly DataListSchema<Customer> Schema ="),
+        new("  DataListSchema.For<Customer>(s => s"),
+        new("    .RowKey(c => c.Id)"),
+        new("    .Search(c => c.Name, c => c.Country)", "search"),
+        new("    .Field(c => c.Name, f => f.Sortable())", "sort"),
+        new("    .Field(c => c.Country, f => f.Sortable()", "sort filters"),
+        new("      .Filter(DataListFilter.Option()))", "filters"),
+        new("    .Field(c => c.Mrr, f => f.Sortable()", "sort filters"),
+        new("      .Filter(DataListFilter.Number(min: 0)))", "filters"),
+        new("    .DefaultSort(c => c.Name)", "sort"),
+        new("    .DefaultPageSize(5));", "paging"),
+    ];
+
+    private static readonly IReadOnlyList<BoardChip> _chips =
+    [
+        new("search", "Search", "Search reads the fields you list, here the name and the country of a customer."),
+        new("sort", "Sort", "Each field you mark sortable gets a sortable header, and a default sort when the address says nothing."),
+        new("filters", "Filters", "A filter per field: options with a count of rows, or a number with a minimum. Each active one is a tag."),
+        new("paging", "Paging", "The page size comes from the schema; the pager and the page number come from the list."),
+        new("url", "URL state", "The list keeps its state in the query string, so one line of markup is enough."),
+    ];
+
+    private static readonly (string Name, string Mrr)[] _rows =
+    [
+        ("Lumeco", "$1,980"),
+        ("Nordico", "$1,640"),
+        ("Coastline Pay", "$1,330"),
+        ("Cooper & Vale", "$1,120"),
+        ("Scopeworks", "$940"),
+    ];
+}
