@@ -88,3 +88,13 @@ version, builds, tests, packs, and waits for approval before publishing to NuGet
 
 By contributing you agree that your contribution is licensed under the [MIT License](./LICENSE) and that you
 follow the [Code of Conduct](./CODE_OF_CONDUCT.md).
+
+## Rebuild klyroo-stack.css
+
+`src/Klyroo.Stack/wwwroot/klyroo-stack.css` holds the Tailwind utilities that the components of the sister libraries use, minus the rules `klyroo.css` already holds, so an app that references Klyroo.Stack needs no Tailwind build. Rebuild it after a component of Table, Form, Dashboard, Display, Spreadsheet or Agent changes its classes, with the sister repositories cloned next to this one:
+
+```bash
+build/build-stack-css.sh
+```
+
+It runs the Tailwind 4.3.5 binary that Klyroo.UI's `KlyrooTailwind` build downloads (pass another path as the first argument), then `build/dedupe-stack-css.mjs`.
