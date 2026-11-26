@@ -333,6 +333,11 @@ public class ContentTests(PlaygroundServer server) : PlaygroundTest(server)
         await Assertions.Expect(input).ToBeFocusedAsync();
         await input.PressSequentiallyAsync("tooltip");
         await Assertions.Expect(SiteSearch.GetByRole(AriaRole.Option, new() { Name = "Badge" })).ToBeHiddenAsync();
+        // The Chart page mentions its tooltip, so it matches too and comes first: the page of the Tooltip is told by its address.
+        await Assertions.Expect(SiteSearch.Locator("[role=option][href$='/components/tooltip']")).ToBeVisibleAsync();
+        // The rest of its description keeps only the Tooltip, which the key then opens.
+        await input.PressSequentiallyAsync(" a short hint");
+        await Assertions.Expect(SiteSearch.GetByRole(AriaRole.Option)).ToHaveCountAsync(1);
         await Assertions.Expect(SiteSearch.GetByRole(AriaRole.Option, new() { Name = "Tooltip" })).ToBeVisibleAsync();
         await AssertNoAccessibilityViolations();
 
@@ -532,13 +537,14 @@ public class ContentTests(PlaygroundServer server) : PlaygroundTest(server)
 
         var main = Page.GetByRole(AriaRole.Navigation, new() { Name = "Main" });
         await Assertions.Expect(main.GetByRole(AriaRole.Link, new() { Name = "Components" })).ToHaveAttributeAsync("href", $"/{mode}/components/button");
-        await Assertions.Expect(main.GetByRole(AriaRole.Link, new() { Name = "Docs" })).ToHaveAttributeAsync("href", "/docs");
+        await Assertions.Expect(main.GetByRole(AriaRole.Link, new() { Name = "Docs" })).ToHaveAttributeAsync("href", "/ui/docs");
         await Assertions.Expect(main.GetByRole(AriaRole.Link, new() { Name = "Theming" })).ToHaveAttributeAsync("href", "/docs/theming");
 
         await Page.Keyboard.PressAsync("Control+K");
         var input = SiteSearch.GetByRole(AriaRole.Combobox);
         await input.PressSequentiallyAsync("badge");
-        var component = SiteSearch.GetByRole(AriaRole.Option, new() { Name = "Badge" });
+        // Other pages mention badges (a pricing plan has one), so the page of the Badge is told by its address.
+        var component = SiteSearch.Locator("[role=option][href$='/components/badge']");
         await Assertions.Expect(component).ToBeVisibleAsync();
         Assert.Equal($"/{mode}/components/badge", await component.EvaluateAsync<string>("e => e.getAttribute('href') ?? e.querySelector('a')?.getAttribute('href')"));
 

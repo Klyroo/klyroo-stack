@@ -85,7 +85,9 @@ public class AiTests(PlaygroundServer server)
         await using var client = await Connect();
         var tools = await client.ListToolsAsync(cancellationToken: TestContext.Current.CancellationToken);
         Assert.Contains("search-components", tools.Select(t => t.Name));
-        Assert.Equal(9, tools.Count);
+        // Nine tools for the components of Klyroo.UI and the tenth, resolve-module, that says which library, package and namespace a component or feature belongs to.
+        Assert.Contains("resolve-module", tools.Select(t => t.Name));
+        Assert.Equal(10, tools.Count);
 
         var result = await client.CallToolAsync("get-component", new Dictionary<string, object?> { ["name"] = "button", ["sections"] = "api" },
             cancellationToken: TestContext.Current.CancellationToken);

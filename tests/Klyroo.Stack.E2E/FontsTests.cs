@@ -1,7 +1,7 @@
 namespace Klyroo.Stack.E2E;
 
 /// <summary>
-/// The docs site declares Geist, Geist Mono and Doto with KlyrooFont items: the build downloads and self-hosts them, so a page
+/// The docs site declares Inter, JetBrains Mono and Plus Jakarta Sans with KlyrooFont items: the build downloads and self-hosts them, so a page
 /// never asks a font provider for anything.
 /// </summary>
 public class FontsTests(PlaygroundServer server) : PlaygroundTest(server)
@@ -17,26 +17,26 @@ public class FontsTests(PlaygroundServer server) : PlaygroundTest(server)
 
         await Page.GotoAsync(path);
         await Page.WaitForFunctionAsync("document.fonts.ready.then(() => true)");
-        await Page.WaitForFunctionAsync("[...document.fonts].some(f => f.family.replace(/\"/g, '') === 'Geist' && f.status === 'loaded')");
+        await Page.WaitForFunctionAsync("[...document.fonts].some(f => f.family.replace(/\"/g, '') === 'Inter' && f.status === 'loaded')");
 
         Assert.DoesNotContain(hosts, h => h.Contains("googleapis") || h.Contains("gstatic") || h.Contains("bunny") || h.Contains("fontsource") || h.Contains("jsdelivr"));
         Assert.Equal([new Uri(BaseUrl).Host], hosts);
     }
 
     [Fact]
-    public async Task Geist_is_loaded_and_the_role_tokens_point_at_the_self_hosted_faces()
+    public async Task Inter_is_loaded_and_the_role_tokens_point_at_the_self_hosted_faces()
     {
         await Page.GotoAsync("/");
-        await Page.WaitForFunctionAsync("[...document.fonts].some(f => f.family.replace(/\"/g, '') === 'Geist' && f.status === 'loaded')");
+        await Page.WaitForFunctionAsync("[...document.fonts].some(f => f.family.replace(/\"/g, '') === 'Inter' && f.status === 'loaded')");
 
-        Assert.True(await Page.EvaluateAsync<bool>("document.fonts.check('16px Geist')"));
+        Assert.True(await Page.EvaluateAsync<bool>("document.fonts.check('16px Inter')"));
         var sans = await Page.EvaluateAsync<string>("getComputedStyle(document.documentElement).getPropertyValue('--klyroo-font-sans')");
-        Assert.StartsWith("\"Geist\", \"Geist Fallback\"", sans.Trim());
+        Assert.StartsWith("\"Inter\", \"Inter Fallback\"", sans.Trim());
         var mono = await Page.EvaluateAsync<string>("getComputedStyle(document.documentElement).getPropertyValue('--klyroo-font-mono')");
-        Assert.StartsWith("\"Geist Mono\", \"Geist Mono Fallback\"", mono.Trim());
+        Assert.StartsWith("\"JetBrains Mono\", \"JetBrains Mono Fallback\"", mono.Trim());
         // The page text really is set in it (Tailwind's font-sans and the preflight follow the token).
         var body = await Page.EvaluateAsync<string>("getComputedStyle(document.body).fontFamily");
-        Assert.StartsWith("Geist,", body);
+        Assert.StartsWith("Inter,", body);
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class FontsTests(PlaygroundServer server) : PlaygroundTest(server)
         var preloads = await Page.EvaluateAsync<string[]>("[...document.querySelectorAll('link[rel=preload][as=font]')].map(l => l.getAttribute('href'))");
         Assert.Equal(2, preloads.Length);
         Assert.All(preloads, href => Assert.StartsWith("_klyroo/fonts/", href));
-        Assert.Contains(preloads, href => href.Contains("Geist-400-700-normal-latin"));
+        Assert.Contains(preloads, href => href.Contains("Inter-400-700-normal-latin"));
 
         var response = await Page.APIRequest.GetAsync(preloads[0]);
         Assert.True(response.Ok);
@@ -66,7 +66,7 @@ public class FontsTests(PlaygroundServer server) : PlaygroundTest(server)
         var css = await (await Page.APIRequest.GetAsync(hrefs.First(h => h.Contains("klyroo.fonts")))).TextAsync();
         var files = System.Text.RegularExpressions.Regex.Matches(css, "url\\(\"([^\"]+)\"\\)").Select(m => m.Groups[1].Value).Distinct().ToList();
         Assert.NotEmpty(files);
-        // Doto's 700 and 900 are the same bytes: one file, two rules.
+        // Two weights that are the same bytes share one file: one file, two rules.
         Assert.Equal(files.Count, files.Select(f => f.Split('.')[^2]).Distinct().Count());
 
         var published = Environment.GetEnvironmentVariable("KLYROO_PLAYGROUND_PUBLISHED") is { Length: > 0 };
@@ -95,7 +95,7 @@ public class FontsTests(PlaygroundServer server) : PlaygroundTest(server)
 
         var css = await Page.APIRequest.GetAsync(hrefs[fonts]);
         var text = await css.TextAsync();
-        Assert.Contains("\"Geist Fallback\"", text);
+        Assert.Contains("\"Inter Fallback\"", text);
         Assert.Contains("size-adjust:", text);
         Assert.DoesNotContain("https://", text);
     }

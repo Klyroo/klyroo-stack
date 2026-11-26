@@ -288,9 +288,10 @@ public class PathBaseTests(PathBaseFixture fixture) : IClassFixture<PathBaseFixt
     }
 
     [Fact]
-    public async Task The_home_page_and_its_unoptimized_images_stay_below_the_path_base()
+    public async Task The_ui_page_and_its_unoptimized_images_stay_below_the_path_base()
     {
-        await Page.GotoAsync("");
+        // The platform screenshots moved from the home page (the hub of the nine libraries) to the page of Klyroo.UI.
+        await Page.GotoAsync("ui");
         await Page.WaitForFunctionAsync("() => !!customElements.get('kly-popover')");
         await Page.EvaluateAsync("() => document.querySelectorAll('img[loading=lazy]').forEach(i => i.loading = 'eager')");
         await Page.WaitForFunctionAsync("() => [...document.images].every(i => i.complete && i.naturalWidth > 0)", null, new() { Timeout = 30_000 });

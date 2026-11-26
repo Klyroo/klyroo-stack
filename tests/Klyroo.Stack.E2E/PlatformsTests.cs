@@ -1,6 +1,6 @@
 namespace Klyroo.Stack.E2E;
 
-/// <summary>The "web, phone, TV" section of the home page and the screenshots of the MAUI guide.</summary>
+/// <summary>The "web, phone, TV" section of the Klyroo.UI page (/ui) and the screenshots of the MAUI guide.</summary>
 public class PlatformsTests(PlaygroundServer server) : PlaygroundTest(server)
 {
     /// <summary>Waits until a lazy image is loaded and decoded (naturalWidth is 0 for a broken one).</summary>
@@ -10,14 +10,16 @@ public class PlatformsTests(PlaygroundServer server) : PlaygroundTest(server)
 
     private async Task OpenHome()
     {
-        await Page.GotoAsync("/");
-        await Assertions.Expect(Page.GetByTestId("renderer").First).ToHaveAttributeAsync("data-interactive", "true", new() { Timeout = 30_000 });
+        // The section moved from the home page, which is the hub of the nine libraries now, to the page of Klyroo.UI.
+        await Page.GotoAsync("/ui");
+        // The page turns interactive after the first render, and its elements are replaced when it does: wait for that before scrolling to one.
+        await Assertions.Expect(Page.Locator("main#main")).ToHaveAttributeAsync("data-interactive", "true", new() { Timeout = 30_000 });
         await Page.WaitForFunctionAsync("() => !!customElements.get('kly-popover') && document.title.length > 0");
         await Page.Locator("#platforms").ScrollIntoViewIfNeededAsync();
     }
 
     [Fact]
-    public async Task The_home_page_shows_the_platform_screenshots_and_an_honest_status_per_target()
+    public async Task The_ui_page_shows_the_platform_screenshots_and_an_honest_status_per_target()
     {
         await OpenHome();
 
@@ -29,10 +31,12 @@ public class PlatformsTests(PlaygroundServer server) : PlaygroundTest(server)
         await Assertions.Expect(list.GetByRole(AriaRole.Listitem)).ToHaveCountAsync(7);
         await Assertions.Expect(list).ToContainTextAsync("Experimental");
         await Assertions.Expect(list).ToContainTextAsync("Not supported");
-        // Targets that were never built or run must not read as tested.
+        // Targets that were never built or run on a device must not read as tested: the page says "Supported" for them, and "Tested" only for the web and the emulator.
         foreach (var target in new[] { "iOS 17+", "Windows", "macOS" })
         {
-            await Assertions.Expect(list.GetByRole(AriaRole.Listitem).Filter(new() { HasText = target })).ToContainTextAsync("Untested");
+            var item = list.GetByRole(AriaRole.Listitem).Filter(new() { HasText = target });
+            await Assertions.Expect(item).ToContainTextAsync("Supported");
+            await Assertions.Expect(item).Not.ToContainTextAsync("Tested");
         }
         await Assertions.Expect(Page.GetByRole(AriaRole.Link, new() { Name = "Read the MAUI guide" })).ToHaveAttributeAsync("href", "/docs/maui");
     }
@@ -47,7 +51,7 @@ public class PlatformsTests(PlaygroundServer server) : PlaygroundTest(server)
     }
 
     [Fact]
-    public async Task The_home_page_has_no_accessibility_violations_in_light_mode()
+    public async Task The_ui_page_has_no_accessibility_violations_in_light_mode()
     {
         await OpenHome();
 
@@ -55,7 +59,7 @@ public class PlatformsTests(PlaygroundServer server) : PlaygroundTest(server)
     }
 
     [Fact]
-    public async Task The_home_page_has_no_accessibility_violations_in_dark_mode()
+    public async Task The_ui_page_has_no_accessibility_violations_in_dark_mode()
     {
         await OpenHome();
         await Page.GetByRole(AriaRole.Button, new() { Name = "Toggle dark mode" }).First.ClickAsync();
@@ -65,7 +69,7 @@ public class PlatformsTests(PlaygroundServer server) : PlaygroundTest(server)
     }
 
     [Fact]
-    public async Task The_home_page_does_not_scroll_sideways_on_a_phone()
+    public async Task The_ui_page_does_not_scroll_sideways_on_a_phone()
     {
         await Page.SetViewportSizeAsync(375, 800);
         await OpenHome();

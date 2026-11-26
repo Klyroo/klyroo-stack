@@ -50,6 +50,8 @@ public class TemplatesPathBaseTests(DemosPathBaseFixture demos, PathBaseFixture 
         // The link is relative to the base href, so it lands below the path base.
         Assert.Equal(demos.Instance.Host + "/sub/templates/starter/demo/", await preview.EvaluateAsync<string>("a => a.href"));
         lock (requests) requests.Clear();
+        // The gallery is an interactive page with a circuit of its own: only the WebSockets the click causes are the demo's.
+        lock (sockets) sockets.Clear();
         await preview.ClickAsync();
         await _page.WaitForURLAsync(url => url.EndsWith("/sub/templates/starter/demo/"));
 
@@ -61,7 +63,8 @@ public class TemplatesPathBaseTests(DemosPathBaseFixture demos, PathBaseFixture 
         lock (requests)
         {
             var outside = requests
-                .Where(url => url.StartsWith(demos.Instance.Host + "/", StringComparison.Ordinal) && !url.Contains("/_framework/dotnet-browser-tools/", StringComparison.Ordinal))
+                // The icon of the docs page the click left, and the lazy screenshots of its gallery, are asked for a moment after that page loaded, from the docs host and not from the demo.
+                .Where(url => url.StartsWith(demos.Instance.Host + "/", StringComparison.Ordinal) && !url.Contains("/_framework/dotnet-browser-tools/", StringComparison.Ordinal) && !Path.GetFileName(new Uri(url).AbsolutePath).StartsWith("favicon.", StringComparison.Ordinal) && !new Uri(url).AbsolutePath.Contains("/img/template-", StringComparison.Ordinal))
                 .Where(url => !url.StartsWith(prefix, StringComparison.Ordinal)).ToList();
             Assert.True(outside.Count == 0, "Requests outside /sub/templates/starter/demo/:\n" + string.Join("\n", outside));
         }

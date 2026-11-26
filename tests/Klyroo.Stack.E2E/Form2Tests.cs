@@ -192,7 +192,8 @@ public class Form2Tests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task Slider_moves_with_the_arrow_keys_by_its_step(string mode)
     {
         await Open(mode, "slider");
-        var volume = Page.GetByRole(AriaRole.Slider, new() { Name = "Volume" });
+        // The page has typed examples after this one (an int and a double slider with the same label): the first is the example this test is about.
+        var volume = Page.GetByRole(AriaRole.Slider, new() { Name = "Volume" }).First;
 
         await volume.FocusAsync();
         await Page.Keyboard.PressAsync("ArrowRight");
@@ -292,7 +293,7 @@ public class Form2Tests(PlaygroundServer server) : PlaygroundTest(server)
         await Assertions.Expect(Page.GetByTestId("toggle-group-state")).ToHaveTextAsync("Alignment: right");
 
         await Open(mode, "slider");
-        await Page.GetByRole(AriaRole.Slider, new() { Name = "Volume" }).FocusAsync();
+        await Page.GetByRole(AriaRole.Slider, new() { Name = "Volume" }).First.FocusAsync();
         await Page.Keyboard.PressAsync("ArrowRight");
         await Assertions.Expect(Page.GetByTestId("slider-state")).ToContainTextAsync("Volume: 45");
     }
@@ -386,7 +387,8 @@ public class Form2Tests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task Unbound_InputNumber_keeps_the_number_when_another_parameter_changes(string mode)
     {
         await Open(mode, "input-number");
-        var seats = Page.GetByRole(AriaRole.Spinbutton, new() { Name = "Seats" });
+        // The typed example above it has a "Seats" field too: the unbound one this test is about posts its value as name=seats.
+        var seats = Page.Locator("kly-input-number:has(input[name=seats])").GetByRole(AriaRole.Spinbutton);
 
         await seats.FocusAsync();
         await Page.Keyboard.PressAsync("ArrowUp");

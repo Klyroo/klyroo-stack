@@ -19,7 +19,18 @@ public class TemplatesTests(PlaygroundServer server) : PlaygroundTest(server)
     private ILocator Card(string title) =>
         Page.GetByTestId("template-card").Filter(new() { Has = Page.GetByRole(AriaRole.Heading, new() { Name = title }) });
 
-    private static bool IsHotReloadTooling(string url) => url.Contains("/_framework/dotnet-browser-tools/", StringComparison.Ordinal);
+    /// <summary>
+    /// What the browser or the SDK asks the host for whatever page is open, and that no demo serves: the hot reload client of the SDK (Development only) fetches its
+    /// settings from the root of the origin, and the browser asks for the icon of the docs page it came from a moment after the page loaded, which can be after
+    /// the click that opens the demo.
+    /// </summary>
+    private static bool IsHotReloadTooling(string url) =>
+        url.Contains("/_framework/dotnet-browser-tools/", StringComparison.Ordinal)
+        || Path.GetFileName(new Uri(url).AbsolutePath).StartsWith("favicon.", StringComparison.Ordinal)
+        || IsGalleryImage(url);
+
+    /// <summary>The screenshots of the gallery are lazy images: the ones below the fold load as the page settles, which can be after the click that opens a demo.</summary>
+    private static bool IsGalleryImage(string url) => new Uri(url).AbsolutePath.Contains("/img/template-", StringComparison.Ordinal);
 
     /// <summary>Skips when the docs run published with no templates to run (a local run); in CI that is a failure, a test that cannot run proves nothing.</summary>
     private void RequireDemos()
@@ -49,20 +60,19 @@ public class TemplatesTests(PlaygroundServer server) : PlaygroundTest(server)
     }
 
     [Fact]
-    public async Task The_gallery_lists_the_ten_templates_and_only_the_starter_the_dashboard_the_landing_the_saas_the_docs_the_portfolio_and_the_changelog_are_live()
+    public async Task The_gallery_lists_the_nine_templates_and_every_one_of_them_has_a_live_demo()
     {
         await OpenGallery();
 
         var cards = Page.GetByTestId("template-card");
-        await Assertions.Expect(cards).ToHaveCountAsync(10);
+        await Assertions.Expect(cards).ToHaveCountAsync(9);
         var starter = cards.Filter(new() { Has = Page.GetByRole(AriaRole.Heading, new() { Name = "Starter" }) });
         await Assertions.Expect(starter.GetByText("Live demo")).ToBeVisibleAsync();
         await Assertions.Expect(starter.GetByRole(AriaRole.List, new() { Name = "Starter features" }).GetByRole(AriaRole.Listitem)).ToHaveCountAsync(3);
         var preview = starter.GetByTestId("template-preview");
         await Assertions.Expect(preview).ToHaveAttributeAsync("href", "templates/starter/demo/");
-        // No fake link: the repositories are not published, so there is no Source link and the card says so.
+        // No fake link: the repositories are not published, so there is no Source link.
         await Assertions.Expect(starter.GetByTestId("template-source")).ToHaveCountAsync(0);
-        await Assertions.Expect(starter.GetByTestId("template-source-missing")).ToHaveTextAsync("Repository not published yet");
 
         // The light and the dark screenshot are both images of the site that load.
         foreach (var name in new[] { "starter", "dashboard", "landing", "saas", "docs", "portfolio", "changelog", "chat", "editor" })
@@ -87,13 +97,9 @@ public class TemplatesTests(PlaygroundServer server) : PlaygroundTest(server)
         var landing = Card("Landing");
         await Assertions.Expect(landing.GetByRole(AriaRole.List, new() { Name = "Landing features" }).GetByRole(AriaRole.Listitem)).ToHaveCountAsync(3);
 
-        // The one other is planned: a badge, no link at all (a broken Preview or Source would be worse than none), no screenshot.
-        var planned = cards.Filter(new() { HasNot = Page.GetByTestId("template-preview") });
-        await Assertions.Expect(planned).ToHaveCountAsync(1);
-        await Assertions.Expect(planned.GetByText("Coming soon", new() { Exact = true }).Locator("visible=true")).ToHaveCountAsync(1);
-        await Assertions.Expect(planned.Locator("a")).ToHaveCountAsync(0);
-        await Assertions.Expect(planned.Locator("img")).ToHaveCountAsync(0);
-        await Assertions.Expect(planned.GetByTestId("template-planned")).ToHaveCountAsync(1);
+        // Every template of the registry runs as a demo: no card is a plan without a link, and none has a Coming soon badge.
+        await Assertions.Expect(cards.Filter(new() { HasNot = Page.GetByTestId("template-preview") })).ToHaveCountAsync(0);
+        await Assertions.Expect(Page.GetByText("Coming soon", new() { Exact = true })).ToHaveCountAsync(0);
     }
 
     [Fact]
@@ -116,7 +122,8 @@ public class TemplatesTests(PlaygroundServer server) : PlaygroundTest(server)
         var recording = false;
         Page.Request += (_, request) => { if (recording) lock (requests) requests.Add(request.Url); };
         Page.Response += (_, response) => { if (recording && response.Status >= 400 && !IsHotReloadTooling(response.Url)) lock (failures) failures.Add($"{response.Status} {response.Url}"); };
-        Page.WebSocket += (_, socket) => { lock (sockets) sockets.Add(socket.Url); };
+        // The gallery is an interactive page with a circuit of its own (a WebSocket at the root of the host): only what the click causes is the demo's.
+        Page.WebSocket += (_, socket) => { if (recording) lock (sockets) sockets.Add(socket.Url); };
         await OpenGallery();
         // Let the gallery settle (fonts, deferred scripts) so only what the click causes is recorded.
         await Page.EvaluateAsync("() => document.fonts.ready");
@@ -188,7 +195,7 @@ public class TemplatesTests(PlaygroundServer server) : PlaygroundTest(server)
         var docs = await Page.GotoAsync("no-such-page");
         Assert.NotNull(docs);
         Assert.Equal(404, docs.Status);
-        await Assertions.Expect(Page).ToHaveTitleAsync("Not found · klyroo-ui");
+        await Assertions.Expect(Page).ToHaveTitleAsync("Not found · Klyroo.UI");
     }
 
     [Fact]
@@ -244,7 +251,8 @@ public class TemplatesTests(PlaygroundServer server) : PlaygroundTest(server)
             if (Regex.IsMatch(request.Url, @"\.wasm(\?|$)|/_blazor(/|\?|$)")) lock (runtime) runtime.Add(request.Url);
         };
         Page.Response += (_, response) => { if (recording && response.Status >= 400 && !IsHotReloadTooling(response.Url)) lock (failures) failures.Add($"{response.Status} {response.Url}"); };
-        Page.WebSocket += (_, socket) => { lock (runtime) runtime.Add(socket.Url); };
+        // The gallery is an interactive page with a circuit of its own (a WebSocket at the root of the host): only what the click causes is the demo's.
+        Page.WebSocket += (_, socket) => { if (recording) lock (runtime) runtime.Add(socket.Url); };
         await OpenGallery();
         await Page.EvaluateAsync("() => document.fonts.ready");
         await Task.Delay(500, TestContext.Current.CancellationToken);
@@ -330,7 +338,8 @@ public class TemplatesTests(PlaygroundServer server) : PlaygroundTest(server)
             if (Regex.IsMatch(request.Url, @"\.wasm(\?|$)|/_blazor(/|\?|$)")) lock (runtime) runtime.Add(request.Url);
         };
         Page.Response += (_, response) => { if (recording && response.Status >= 400 && !IsHotReloadTooling(response.Url)) lock (failures) failures.Add($"{response.Status} {response.Url}"); };
-        Page.WebSocket += (_, socket) => { lock (runtime) runtime.Add(socket.Url); };
+        // The gallery is an interactive page with a circuit of its own (a WebSocket at the root of the host): only what the click causes is the demo's.
+        Page.WebSocket += (_, socket) => { if (recording) lock (runtime) runtime.Add(socket.Url); };
         await OpenGallery();
         await Page.EvaluateAsync("() => document.fonts.ready");
         await Task.Delay(500, TestContext.Current.CancellationToken);
@@ -431,7 +440,8 @@ public class TemplatesTests(PlaygroundServer server) : PlaygroundTest(server)
             if (Regex.IsMatch(request.Url, @"\.wasm(\?|$)|/_blazor(/|\?|$)")) lock (runtime) runtime.Add(request.Url);
         };
         Page.Response += (_, response) => { if (recording && response.Status >= 400 && !IsHotReloadTooling(response.Url)) lock (failures) failures.Add($"{response.Status} {response.Url}"); };
-        Page.WebSocket += (_, socket) => { lock (runtime) runtime.Add(socket.Url); };
+        // The gallery is an interactive page with a circuit of its own (a WebSocket at the root of the host): only what the click causes is the demo's.
+        Page.WebSocket += (_, socket) => { if (recording) lock (runtime) runtime.Add(socket.Url); };
         await OpenGallery();
         await Page.EvaluateAsync("() => document.fonts.ready");
         await Task.Delay(500, TestContext.Current.CancellationToken);
@@ -527,7 +537,8 @@ public class TemplatesTests(PlaygroundServer server) : PlaygroundTest(server)
             if (Regex.IsMatch(request.Url, @"\.wasm(\?|$)|/_blazor(/|\?|$)")) lock (runtime) runtime.Add(request.Url);
         };
         Page.Response += (_, response) => { if (recording && response.Status >= 400 && !IsHotReloadTooling(response.Url)) lock (failures) failures.Add($"{response.Status} {response.Url}"); };
-        Page.WebSocket += (_, socket) => { lock (runtime) runtime.Add(socket.Url); };
+        // The gallery is an interactive page with a circuit of its own (a WebSocket at the root of the host): only what the click causes is the demo's.
+        Page.WebSocket += (_, socket) => { if (recording) lock (runtime) runtime.Add(socket.Url); };
         await OpenGallery();
         await Page.EvaluateAsync("() => document.fonts.ready");
         await Task.Delay(500, TestContext.Current.CancellationToken);
@@ -621,7 +632,8 @@ public class TemplatesTests(PlaygroundServer server) : PlaygroundTest(server)
             if (Regex.IsMatch(request.Url, @"\.wasm(\?|$)|/_blazor(/|\?|$)")) lock (runtime) runtime.Add(request.Url);
         };
         Page.Response += (_, response) => { if (recording && response.Status >= 400 && !IsHotReloadTooling(response.Url)) lock (failures) failures.Add($"{response.Status} {response.Url}"); };
-        Page.WebSocket += (_, socket) => { lock (runtime) runtime.Add(socket.Url); };
+        // The gallery is an interactive page with a circuit of its own (a WebSocket at the root of the host): only what the click causes is the demo's.
+        Page.WebSocket += (_, socket) => { if (recording) lock (runtime) runtime.Add(socket.Url); };
         await OpenGallery();
         await Page.EvaluateAsync("() => document.fonts.ready");
         await Task.Delay(500, TestContext.Current.CancellationToken);
