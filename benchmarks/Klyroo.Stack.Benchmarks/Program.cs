@@ -100,22 +100,19 @@ for (var i = 1; i <= 10_000; i++)
     csvSb.Append($"SKU-{i:D6};user{i}@klyroo.dev;{amt}\n");
 }
 var csvText = csvSb.ToString();
-var sheetSchema = new SpreadsheetSchema
+var sheetSchema = SpreadsheetSchema.For<SheetRow>(sheet =>
 {
-    Key = "bench-csv",
-    RowKeyField = "code",
-    Duplicates = SpreadsheetDuplicatesPolicy.Error,
-    Columns =
-    [
-        new SpreadsheetColumnSchema { Key = "code", Label = "Code", Required = true },
-        new SpreadsheetColumnSchema { Key = "email", Label = "Email", Required = true, Rules = [SpreadsheetRule.Email()] },
-        new SpreadsheetColumnSchema { Key = "amount", Label = "Amount", Kind = SpreadsheetColumnKind.Number, DecimalSeparator = ',', Required = true, Rules = [SpreadsheetRule.Min(0)] }
-    ]
-};
+    sheet.Key = "bench-csv";
+    sheet.Duplicates = SpreadsheetDuplicatesPolicy.Error;
+    var code = sheet.Column(r => r.Code, c => c.Label("Code").Required());
+    sheet.Column(r => r.Email, c => c.Label("Email").Required().Rule(SpreadsheetRule.Email()));
+    sheet.Column(r => r.Amount, c => c.Label("Amount").Required().DecimalSeparator(',').Rule(SpreadsheetRule.Min(0m)));
+    sheet.RowKey(code);
+});
 
 var (sheetMs, sheetKb) = Measure("Klyroo.Spreadsheet 10k CSV rows (Parse + NFD + Validate + Dedup)", 5, () =>
 {
-    var imp = new SpreadsheetImporter(sheetSchema);
+    var imp = new SpreadsheetImporter<SheetRow>(sheetSchema);
     imp.LoadText(csvText, "bench.csv");
     if (imp.ImportableRows.Count != 10_000) throw new InvalidOperationException();
 });
@@ -229,3 +226,10 @@ public sealed class BenchDbContext(DbContextOptions<BenchDbContext> options) : D
 }
 
 public sealed record TreeItem(int Id, string Name, IReadOnlyList<TreeItem>? Children = null);
+
+public sealed class SheetRow
+{
+    public string Code { get; set; } = "";
+    public string Email { get; set; } = "";
+    public decimal Amount { get; set; }
+}

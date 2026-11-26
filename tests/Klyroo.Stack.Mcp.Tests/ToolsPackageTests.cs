@@ -43,7 +43,7 @@ public class ToolsPackageTests
         var list = TestSupport.Service.FindComponent("data-list")!;
 
         Assert.Equal("Klyroo.Table", list.Package);
-        Assert.Equal(["KlyDataList<TItem>", "KlyDataListTable<TItem>", "KlyDataListColumn<TItem>", "KlyDataListPagination<TItem>", "KlyDataListResultCount<TItem>", "KlyDataListRefresh<TItem>", "KlyDataListErrorState<TItem>", "KlyDataListSearch<TItem>"], list.Api.Select(a => a.Name));
+        Assert.Equal(["KlyDataList<TItem>", "KlyDataListTable<TItem>", "KlyDataListColumn<TItem, TValue>", "KlyDataListFieldColumn<TItem>", "KlyDataListTemplateColumn<TItem>", "KlyDataListPagination<TItem>", "KlyDataListResultCount<TItem>", "KlyDataListRefresh<TItem>", "KlyDataListErrorState<TItem>", "KlyDataListSearch<TItem>"], list.Api.Select(a => a.Name));
         var root = list.Api[0];
         Assert.Contains(root.Parameters, p => p.Name == "UrlSync" && p.Description is not null);
         Assert.Contains(root.Parameters, p => p.Name == "ResultJson" && p.Description is not null);

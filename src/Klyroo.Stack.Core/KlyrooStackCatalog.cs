@@ -14,6 +14,7 @@ namespace Klyroo.Stack;
 /// <param name="SkillPath">The agent skill file of the repository, relative to the folder that holds the sibling clones.</param>
 /// <param name="Summary">A one-sentence description of what the library offers.</param>
 /// <param name="KeyComponents">The main public types and components of the library, used by <see cref="KlyrooStackCatalog.ResolveComponentModule"/>.</param>
+/// <param name="AddOnPackages">Optional packages of the library that <c>Klyroo.Stack</c> does not include (for example <c>Klyroo.UI.Server</c>); add them to an app that needs them.</param>
 /// <param name="AccentHex">The accent color of the library, as a hex string.</param>
 /// <param name="LandingPagePath">The path of the library page on the documentation site, such as <c>/table</c>.</param>
 public sealed record KlyrooStackModule(
@@ -27,6 +28,7 @@ public sealed record KlyrooStackModule(
     string SkillPath,
     string Summary,
     IReadOnlyList<string> KeyComponents,
+    IReadOnlyList<string>? AddOnPackages = null,
     string AccentHex = "#ffd23f",
     string LandingPagePath = "");
 
@@ -50,6 +52,7 @@ public static class KlyrooStackCatalog
             SkillPath: "klyroo-ui/skills/klyroo-ui/SKILL.md",
             Summary: "Foundation Design System (100+ Blazor components, Tailwind v4 engine, 12 locales, SSR/WASM/MAUI Hybrid, Images & Server cookies).",
             KeyComponents: ["KlyApp", "KlyButton", "KlyInput", "KlySelect", "KlyModal", "KlyDrawer", "KlyTabs", "KlyCard", "KlyCalendar", "KlyChart", "KlyChat", "KlyEditor"],
+            AddOnPackages: ["Klyroo.UI.Server", "Klyroo.UI.Images", "Klyroo.UI.Images.Local"],
             AccentHex: "#10b981",
             LandingPagePath: "/ui"),
 
@@ -64,6 +67,7 @@ public static class KlyrooStackCatalog
             SkillPath: "klyroo-query/skills/klyroo-query/SKILL.md",
             Summary: "Headless NativeAOT query AST, URL search parameter codecs, IQueryable applier, InMemory engine, Blazor QueryState and EF Core async executor.",
             KeyComponents: ["DataListSchema", "DataListRequest", "DataListFilterGroup", "QueryCodec", "QueryState", "EfAsyncQueryExecutor"],
+            AddOnPackages: ["Klyroo.Query.EntityFrameworkCore"],
             AccentHex: "#ff4154",
             LandingPagePath: "/query"),
 
@@ -77,7 +81,7 @@ public static class KlyrooStackCatalog
             TemplateShortName: "klyroo-admin",
             SkillPath: "klyroo-table/skills/klyroo-table/SKILL.md",
             Summary: "Data lists with table and card-grid layouts, filters, selection, actions, grouping, tree hierarchy and summary rows, built on Klyroo.Query and Klyroo.UI.",
-            KeyComponents: ["KlyDataList", "KlyDataListTable", "KlyDataListGrid", "KlyDataListColumn", "KlyDataListToolbar", "KlyDataListFilterBar", "KlyDataListPagination", "DataListTree", "DataListGroupBy", "DataListSummaries"],
+            KeyComponents: ["KlyDataList", "KlyDataListTable", "KlyDataListGrid", "KlyDataListColumn", "KlyDataListFieldColumn", "KlyDataListTemplateColumn", "KlyDataListToolbar", "KlyDataListFilterBar", "KlyDataListPagination", "DataListTree", "DataListGroupBy", "DataListSummaries"],
             AccentHex: "#00d8ff",
             LandingPagePath: "/table"),
 
@@ -90,8 +94,9 @@ public static class KlyrooStackCatalog
             UiPackage: "Klyroo.Form",
             TemplateShortName: "klyroo-saas",
             SkillPath: "klyroo-form/skills/klyroo-form/SKILL.md",
-            Summary: "Schema-driven forms: field kinds, reactive conditions, dirty tracking, validation triggers, multi-step wizards with SkipWhen, page sections and overlay forms through FormService.",
-            KeyComponents: ["FormSchema", "FormController", "FormService", "KlyFormEngine", "KlyFormPage", "KlyFormProvider"],
+            Summary: "Forms bound to a C# model (FormSchema.For and a FormController of the model type): field kinds from the member types, reactive conditions, dirty tracking, validation triggers, multi-step wizards with SkipWhen, page sections and overlay forms through FormService, plus a Dynamic mode for forms known only at run time and the Klyroo.Form.DataAnnotations add-on.",
+            KeyComponents: ["FormSchema", "FormController", "FormService", "KlyFormEngine", "KlyFormPage", "KlyFormProvider", "IFormRuntime", "DynamicFormSchema", "DynamicFormController", "DynamicFormService", "KlyDynamicFormEngine", "KlyDynamicFormPage"],
+            AddOnPackages: ["Klyroo.Form.DataAnnotations"],
             AccentHex: "#f59e0b",
             LandingPagePath: "/form"),
 
@@ -133,7 +138,7 @@ public static class KlyrooStackCatalog
             TemplateShortName: "klyroo-admin",
             SkillPath: "klyroo-spreadsheet/skills/klyroo-spreadsheet/SKILL.md",
             Summary: "Headless workbook/CSV/TSV importer (layout detection, NFD header normalization, 80%-pass column suggestions, unknown value questions, duplicates/upsert, inline edits & wizard).",
-            KeyComponents: ["SpreadsheetSchema", "SpreadsheetImporter", "KlySpreadsheetImport"],
+            KeyComponents: ["SpreadsheetSchema", "SpreadsheetImporter", "SpreadsheetColumn", "KlySpreadsheetImport"],
             AccentHex: "#14b8a6",
             LandingPagePath: "/spreadsheet"),
 
@@ -147,7 +152,7 @@ public static class KlyrooStackCatalog
             TemplateShortName: "klyroo-headless",
             SkillPath: "klyroo-agent/skills/klyroo-agent/SKILL.md",
             Summary: "Agent bridge that lets AI agents read and act on Klyroo forms, dashboards and imports (snapshot, query, act, observe with secret redaction, UndoStack), plus browser behaviors and WebMCP tools in JavaScript.",
-            KeyComponents: ["AgentBridgeService", "UndoStack", "ObservedChange", "AgentComponentSnapshot", "AgentActStep"],
+            KeyComponents: ["AgentBridgeService", "UndoStack", "ObservedChange", "AgentComponentSnapshot", "AgentActStep", "AgentArgument", "AgentValue", "AgentToolResult"],
             AccentHex: "#6366f1",
             LandingPagePath: "/agent"),
     ];

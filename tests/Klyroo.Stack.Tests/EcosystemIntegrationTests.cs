@@ -14,28 +14,32 @@ public sealed class EcosystemIntegrationTests
 {
     private sealed record Deal(int Id, string Name, string Region, decimal Amount);
 
+    public sealed class DealRow
+    {
+        public string? Name { get; set; }
+        public string? Region { get; set; }
+        public decimal Amount { get; set; }
+    }
+
     [Fact]
     public async Task EndToEnd_Spreadsheet_to_Query_to_Dashboard_to_Display_and_Agent_works_together()
     {
         // 1. Import deals via Klyroo.Spreadsheet
         var deals = new List<Deal>();
-        var importer = new SpreadsheetImporter(new SpreadsheetSchema
+        var importer = new SpreadsheetImporter<DealRow>(SpreadsheetSchema.For<DealRow>(s =>
         {
-            Key = "deals",
-            Columns =
-            [
-                new SpreadsheetColumnSchema { Key = "name", Label = "Name", Required = true },
-                new SpreadsheetColumnSchema { Key = "region", Label = "Region", Required = true },
-                new SpreadsheetColumnSchema { Key = "amount", Label = "Amount", Kind = SpreadsheetColumnKind.Number, Required = true }
-            ],
-            OnSubmit = batch =>
+            s.Key = "deals";
+            s.Column(r => r.Name, c => c.Required());
+            s.Column(r => r.Region, c => c.Required());
+            s.Column(r => r.Amount, c => c.Required());
+            s.OnSubmit = batch =>
             {
                 var id = 1;
                 foreach (var r in batch)
-                    deals.Add(new Deal(id++, r.Data["name"]!.ToString()!, r.Data["region"]!.ToString()!, Convert.ToDecimal(r.Data["amount"])));
+                    deals.Add(new Deal(id++, r.Value.Name!, r.Value.Region!, r.Value.Amount));
                 return Task.FromResult<IReadOnlyList<SpreadsheetRejectedRow>?>(null);
-            }
-        });
+            };
+        }));
         importer.LoadText("Name,Region,Amount\nAcme,EU,100000\nBeta,US,50000\nGamma,EU,75000", "deals.csv");
         await importer.SubmitAsync(TestContext.Current.CancellationToken);
         Assert.Equal(3, deals.Count);

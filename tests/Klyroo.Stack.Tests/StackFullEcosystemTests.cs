@@ -18,6 +18,22 @@ public sealed class StackFullEcosystemTests : BunitContext
 {
     private sealed record Customer(int Id, string Name, string Region, decimal Mrr);
 
+    public sealed class NewCustomer
+    {
+        public string Name { get; set; } = "";
+        public string Region { get; set; } = "";
+        public decimal Mrr { get; set; }
+    }
+
+    private static readonly FormSchema<NewCustomer> NewCustomerSchema = FormSchema.For<NewCustomer>(s =>
+    {
+        s.FormKey = "new-customer";
+        s.Title = "New Customer";
+        s.Field(m => m.Name, f => f.Required().Default("Zephyr"));
+        s.Field(m => m.Region, f => f.Default("APAC"));
+        s.Field(m => m.Mrr, f => f.Default(65_000m));
+    });
+
     private static readonly DataListSchema<Customer> CustomerSchema = DataListSchema.For<Customer>(s => s
         .RowKey(c => c.Id)
         .RowLabel(c => c.Name)
@@ -93,9 +109,9 @@ public sealed class StackFullEcosystemTests : BunitContext
                 b.OpenComponent<KlyDataListTable<Customer>>(0);
                 b.AddAttribute(1, nameof(KlyDataListTable<Customer>.ChildContent), (RenderFragment)(cb =>
                 {
-                    cb.OpenComponent<KlyDataListColumn<Customer>>(0);
-                    cb.AddAttribute(1, nameof(KlyDataListColumn<Customer>.Field), "name");
-                    cb.AddAttribute(2, nameof(KlyDataListColumn<Customer>.Title), "Customer");
+                    cb.OpenComponent<KlyDataListFieldColumn<Customer>>(0);
+                    cb.AddAttribute(1, nameof(KlyDataListFieldColumn<Customer>.Field), "name");
+                    cb.AddAttribute(2, nameof(KlyDataListFieldColumn<Customer>.Title), "Customer");
                     cb.CloseComponent();
                 }));
                 b.CloseComponent();
@@ -132,23 +148,14 @@ public sealed class StackFullEcosystemTests : BunitContext
         // 1. Add account via FormService Drawer
         var formProvider = Render<KlyFormProvider>();
         var formSvc = Services.GetRequiredService<FormService>();
-        var formTask = formSvc.CreateFormAsync(new FormSchema
-        {
-            FormKey = "new-customer",
-            Title = "New Customer",
-            Fields =
-            [
-                new FormFieldSchema { Key = "name", Label = "Name", Required = true, DefaultValue = "Zephyr" },
-                new FormFieldSchema { Key = "region", Label = "Region", DefaultValue = "APAC" },
-                new FormFieldSchema { Key = "mrr", Label = "MRR", Kind = FormFieldKind.Number, DefaultValue = 65_000.0 }
-            ]
-        }, mode: FormShellMode.Drawer);
+        var formTask = formSvc.CreateFormAsync(NewCustomerSchema, mode: FormShellMode.Drawer);
         formProvider.Render();
         await formProvider.InvokeAsync(() => formSvc.SubmitActiveFormAsync());
         var outcome = await formTask;
         Assert.True(outcome.IsCompleted);
 
-        accounts.Add(new Customer(2, outcome.FormData["name"]!.ToString()!, outcome.FormData["region"]!.ToString()!, Convert.ToDecimal(outcome.FormData["mrr"], CultureInfo.InvariantCulture)));
+        var created = outcome.Model!;
+        accounts.Add(new Customer(2, created.Name, created.Region, created.Mrr));
         history.Record([.. accounts]);
         Assert.Equal(2, accounts.Count);
 
