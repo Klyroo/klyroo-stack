@@ -31,6 +31,25 @@ dotnet format Klyroo.Stack.slnx --include src/ tests/   # fix formatting of the 
 The build treats warnings as errors and nullable reference types are enabled everywhere: fix a warning instead
 of suppressing it, and justify any `#pragma` or `[SuppressMessage]` in the code.
 
+## Documentation sites
+
+The README and `docs/` of every library are published as a site at `https://klyroo.github.io/<repo>/`. The site is built here, in `docs-site/Klyroo.Docs.Site`, from the files of the library as they are, and each library publishes it with its own `.github/workflows/docs.yml`. See [`docs-site/README.md`](docs-site/README.md) for the settings (`docs/site.yml`), the links and the export.
+
+Preview a library from a folder that holds this repository, `klyroo-ui` and the library:
+
+```bash
+dotnet run -c Release --project klyroo-stack/docs-site/Klyroo.Docs.Site -- --repo klyroo-table   # http://localhost:5000/
+```
+
+Write the static site the way GitHub Pages will serve it (the export fails on a broken link, anchor or asset):
+
+```bash
+dotnet run -c Release --project klyroo-stack/docs-site/Klyroo.Docs.Site -- export --repo klyroo-table --out preview/klyroo-table
+python3 -m http.server 8000 --directory preview   # http://localhost:8000/klyroo-table/
+```
+
+Change the look or the behavior of every site in `docs-site/`, and the content, the order of the pages and the links of one site in the repository of that library.
+
 ## Workflow
 
 1. **Discuss first** for anything larger than a bug fix: open an issue (or comment on an existing one) so the
