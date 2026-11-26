@@ -1,6 +1,7 @@
 @inherits LayoutComponentBase
 @layout SiteLayout
 
-<main id="main" tabindex="-1" class="focus:outline-none">
+@* data-interactive: E2E tests wait on it before looking at what the interactive render changes (DocsLayout carries the same marker). *@
+<main id="main" tabindex="-1" class="focus:outline-none" data-interactive="@(RendererInfo.IsInteractive ? "true" : "false")">
     @Body
 </main>

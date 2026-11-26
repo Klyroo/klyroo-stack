@@ -87,9 +87,8 @@
 @* Search is scoped strictly to the active library when browsing a library, or global on the Klyroo Hub. *@
 <KlyContentSearch @key="@(_activeProduct?.Slug ?? "hub")" Pages="Klyroo.Stack.Site.Client.Docs.DocsNavigation.SearchPages(_prefix, _activeProduct?.Slug)" />
 
-<main id="main">
-    @Body
-</main>
+@* The main landmark is the one of the layout of the page (MainLayout, DocsLayout): a second one here would nest two mains and give two elements the id of the skip link. *@
+@Body
 
 <footer class="border-t border-(--klyroo-border)">
     <div class="mx-auto flex max-w-(--breakpoint-2xl) flex-col gap-2 px-4 py-8 text-sm text-(--klyroo-text-muted) sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
