@@ -10,6 +10,7 @@ Task-oriented recipes for the hub. Each one states its goal, shows complete code
 - [Connect a coding agent to the Klyroo.UI documentation](#connect-a-coding-agent-to-the-klyrooui-documentation)
 - [Start a project from a template](#start-a-project-from-a-template)
 - [Style a generated app](#style-a-generated-app)
+- [Open a form or a file preview in the MAUI template](#open-a-form-or-a-file-preview-in-the-maui-template)
 - [Publish the headless template with NativeAOT](#publish-the-headless-template-with-nativeaot)
 - [Run the MCP server and the documentation site from source](#run-the-mcp-server-and-the-documentation-site-from-source)
 
@@ -238,6 +239,61 @@ The web templates use the zero-setup path that [Getting started](getting-started
 A test of this repository checks the markup of the `klyroo-saas`, `klyroo-admin` and `klyroo-maui` templates: every class in a `class` or `Class` attribute has to be defined by one of the sheets or by the `app.css` of the template.
 
 To write Tailwind utilities in your markup instead, compile Tailwind in the app with `KlyrooTailwind`, as the Klyroo.UI guide [Compile Tailwind in your app](https://github.com/klyroo/klyroo-ui/blob/main/docs/guides.md#compile-tailwind-in-your-app) explains, and load its output in place of the three Klyroo sheets. `Klyroo.Table` then needs the extra import that the [Klyroo.Table guide](https://github.com/klyroo/klyroo-table/blob/main/docs/getting-started.md#4-style-the-list) describes, and so do the other libraries whose classes the Klyroo.UI theme does not list. Do not load `klyroo.css` or `klyroo-stack.css` next to a Tailwind build: two sheets that declare the same utilities in one cascade layer override each other.
+
+## Open a form or a file preview in the MAUI template
+
+Goal: use `FormService` and `FilePreviewService` in the `klyroo-maui` app, which has no `App.razor` and no server.
+
+```bash
+dotnet new klyroo-maui -n Notes
+cd Notes
+dotnet build -f net10.0-android
+```
+
+The .NET MAUI workload for your platform has to be installed (`dotnet workload install maui-android`, or `maui`). A `BlazorWebView` has no server that renders `<head>`, so the template splits the root of the app between two files. `MainPage.xaml` hosts `Routes` in `#app` and a `HeadOutlet` in `head::after`, and `Components/Layout/MainLayout.razor` puts `<KlyHead />` (the theme variables and the fonts, sent to the head through that outlet), then `KlyApp` around the body with `KlyFormProvider` and `KlyFilePreviewProvider` inside it:
+
+```razor
+<KlyHead />
+
+<KlyApp>
+    <main class="app-main">
+        @Body
+    </main>
+
+    <KlyFormProvider />
+    <KlyFilePreviewProvider />
+</KlyApp>
+```
+
+The providers have to sit in the layout, inside `KlyApp`, because the services open their overlays there: `FormService.CreateFormAsync` finds no host and never completes when the provider is missing. With them in place a page only injects the service. The home page of the template opens a form in a drawer and shows a toast with what was typed:
+
+```razor
+@inject FormService Forms
+@inject IToastService Toasts
+
+<KlyButton Label="Add a note" OnClick="AddNoteAsync" />
+
+@code {
+    private async Task AddNoteAsync()
+    {
+        var outcome = await Forms.CreateFormAsync(new FormSchema
+        {
+            FormKey = "note",
+            Title = "New note",
+            Fields = [new FormFieldSchema { Key = "text", Label = "Note", Kind = FormFieldKind.Textarea, Required = true }],
+        }, mode: FormShellMode.Drawer);
+
+        if (outcome.IsCompleted)
+        {
+            await Toasts.Add(new KlyToast { Title = "Note saved", Description = outcome.FormData["text"]?.ToString() });
+        }
+    }
+}
+```
+
+A preview works the same way: inject `FilePreviewService` and call `Open` with a `FilePreviewFile`. The layout classes of the page are in `wwwroot/app.css`, which `index.html` loads after the three precompiled Klyroo sheets: those sheets hold only the classes of the Klyroo components, so `min-h-dvh` or `max-w-3xl` in your own markup would do nothing (the template had both before). `_Imports.razor` lists the namespaces of all eight libraries, so a page can use any of them without adding a `@using`.
+
+A project generated from the template was built for `net10.0-android` with the `maui-android` workload of the .NET 11 SDK, without warnings. It was not run on a device or an emulator, and the iOS, Mac Catalyst and Windows targets were not built.
 
 ## Publish the headless template with NativeAOT
 
