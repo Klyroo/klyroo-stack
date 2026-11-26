@@ -11,7 +11,7 @@
 @code {
     private static readonly DateTime _today = new(2026, 11, 26);
 
-    // The field binds to a DateOnly, a DateTime or a DateTimeOffset, nullable or not. Picking a day sets that day at midnight.
+    // The field binds to a DateOnly, a DateTime or a DateTimeOffset, nullable or not. Picking a day keeps the time of day (and offset) of the value; a value that was null starts at midnight.
     private DateTime _due = new(2026, 12, 15);
     private DateTimeOffset? _shipped;
 }

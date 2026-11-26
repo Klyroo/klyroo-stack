@@ -15,7 +15,7 @@ public static partial class Catalog
         new("input-date", "InputDate", "Form", "A date field typed in segments with a calendar popover. The value is always posted as yyyy-MM-dd.",
             [new("Bound", typeof(Examples.InputDateExample)),
              new("In an EditForm", typeof(Examples.InputDateFormExample), "Posts in static rendering too: the input is the browser's own date input."),
-             new("Bound to DateTime and DateTimeOffset?", typeof(Examples.InputDateTypedExample), "The field binds to a DateOnly, a DateTime or a DateTimeOffset, nullable or not. Picking a day sets that day at midnight; Min and Max stay days (DateOnly).")],
+             new("Bound to DateTime and DateTimeOffset?", typeof(Examples.InputDateTypedExample), "The field binds to a DateOnly, a DateTime or a DateTimeOffset, nullable or not. Picking a day keeps the time of day and the offset of the value, and a value that was null starts at midnight; Min and Max stay days (DateOnly).")],
             [typeof(KlyInputDate<DateOnly?>)]),
         new("input-time", "InputTime", "Form", "A time field made of spinbutton segments, with a 12 or 24 hour clock taken from the culture. Posts HH:mm.",
             [new("12 and 24 hours", typeof(Examples.InputTimeExample)),
