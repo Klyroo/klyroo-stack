@@ -1,0 +1,74 @@
+@* The board of Klyroo.Dashboard: a controller with a filter and two resources in two stages, how they load, the blocks that show them and the address the filter writes.
+   The numbers are sample data; the states, the formatted value and the query are what the code prints. *@
+<DemoBoard File="Program.cs" Lines="_lines" Chips="_chips" Class="is-dense" Label="A DashboardController and what it produces">
+    <Results>
+        <ResultPanel Title="How RefreshAsync loads" Note="stage by stage, sample values" Class="flush">
+            <ol class="stages" data-target="refresh">
+                <li class="stage" data-target="essential filter">
+                    <span class="stage-name">Essential</span>
+                    <span class="stage-what">loaded first, in parallel</span>
+                    <span class="stage-resource"><code>revenue</code><span class="status ok">Ready</span><span class="stage-value">21.2K</span></span>
+                </li>
+                <li class="stage" data-target="background">
+                    <span class="stage-name">Background</span>
+                    <span class="stage-what">once the essential ones settle</span>
+                    <span class="stage-resource"><code>regions</code><span class="status ok">Ready</span><span class="stage-value">EMEA, AMER</span></span>
+                </li>
+            </ol>
+        </ResultPanel>
+        <ResultPanel Title="The blocks of a page" Note="sample data, one block per resource">
+            <div class="dash-filter">
+                <span class="dash-pill" data-target="filter">Region<span class="pill-value">EMEA</span><KlyIcon Name="ph:caret-down" /></span>
+                <span class="dash-note">the page draws a pill for each filter</span>
+            </div>
+            <div class="dash-blocks">
+                <div class="dash-block" data-target="essential">
+                    <span class="stat-title">Revenue</span>
+                    <span class="stat-value">21.2K</span>
+                </div>
+                <div class="dash-block" data-target="background">
+                    <span class="stat-title">Regions</span>
+                    <ul class="dash-list"><li>EMEA</li><li>AMER</li></ul>
+                </div>
+            </div>
+        </ResultPanel>
+        <ResultPanel Title="The address it writes" Note="the filter, in the URL">
+            <code class="url" data-target="url"><span class="url-path">/sales</span><span class="url-sep">?</span><span class="url-key" data-target="filter">region=EMEA</span></code>
+            <p class="annot-line">
+                <span class="annot" data-annot-for="filter">region: one key=value pair per selected value</span>
+                <span class="annot" data-annot-for="url">only filters that differ from their defaults are written</span>
+            </p>
+        </ResultPanel>
+    </Results>
+</DemoBoard>
+
+@code {
+    private static readonly IReadOnlyList<BoardLine> _lines =
+    [
+        new("var controller = new DashboardController(\"sales\");"),
+        new("var region = controller.AddFilter(new DashboardFilterControl(", "filter"),
+        new("    \"region\", \"Region\",", "filter"),
+        new("    items: [new(\"EMEA\", \"EMEA\"), new(\"AMER\", \"Americas\")]));", "filter"),
+        new(""),
+        new("var revenue = controller.RegisterResource(", "essential"),
+        new("    new DashboardResource<double>(\"revenue\",", "essential"),
+        new("        _ => LoadRevenueAsync(region.Value)));", "essential filter"),
+        new("var regions = controller.RegisterResource(", "background"),
+        new("    new DashboardResource<string[]>(", "background"),
+        new("        \"regions\", LoadRegionsAsync,", "background"),
+        new("        DashboardQueryStage.Background));", "background"),
+        new(""),
+        new("region.Toggle(\"EMEA\");", "filter"),
+        new("await controller.RefreshAsync();", "refresh"),
+        new("var query = controller.ToQuery();   // region=EMEA", "url"),
+    ];
+
+    private static readonly IReadOnlyList<BoardChip> _chips =
+    [
+        new("filter", "Filter", "A filter is a typed control the controller owns. The loader reads its value through a closure, and Toggle changes the selection."),
+        new("essential", "Essential", "An Essential resource, the default, loads first. Each resource has its own state, so one that fails leaves the others intact."),
+        new("background", "Background", "A Background resource loads once the essential ones settle, so the page shows what matters first."),
+        new("refresh", "Refresh", "RefreshAsync loads every resource stage by stage. A new load cancels the one it supersedes."),
+        new("url", "URL state", "ToQuery writes the filters that differ from their defaults as a query string, and ApplyQuery reads one back."),
+    ];
+}

@@ -1,0 +1,79 @@
+@* The board of Klyroo.UI: the subscription form of the tutorial (KlyForm, KlyFormField, KlyInput, KlySelect, KlyCheckbox, KlyButton) as it shows after an empty submit, and the same controls
+   under the two color modes. The components are drawn in the look of the site, not rendered, and the text is sample data. *@
+<DemoBoard File="Subscribe.razor" Lines="_lines" Chips="_chips" Class="is-dense" Label="Klyroo.UI components and what they render">
+    <Results>
+        <ResultPanel Title="The form after an empty submit" Note="drawn, sample data">
+            <div class="form-stack is-compact">
+                <ul class="summary wide" data-target="form" aria-label="Validation summary">
+                    <li>Enter your email address.</li>
+                    <li>You must accept the terms.</li>
+                </ul>
+                <div class="field is-invalid" data-target="field">
+                    <span class="field-label">Email<span class="req"> *</span></span>
+                    <div class="control placeholder">you@example.com</div>
+                    <span class="field-error">Enter your email address.</span>
+                </div>
+                <div class="field">
+                    <span class="field-label">Topic</span>
+                    <div class="control select" data-target="select"><span>Releases</span><KlyIcon Name="ph:caret-down" /></div>
+                </div>
+                <div class="field is-invalid wide">
+                    <span class="check-row"><span class="check-box" aria-hidden="true"></span>I accept the terms</span>
+                    <span class="field-error" data-target="form">You must accept the terms.</span>
+                </div>
+                <div class="form-actions wide"><span class="send" data-target="submit">Subscribe</span></div>
+            </div>
+        </ResultPanel>
+        <ResultPanel Title="The same controls in two color modes" Note="drawn, sample data">
+            <div class="mode-tiles">
+                <div class="mode-tile is-light" data-target="mode">
+                    <span class="mode-name">Light</span>
+                    <div class="mode-control">ada@example.com</div>
+                    <span class="mode-button">Subscribe</span>
+                </div>
+                <div class="mode-tile is-dark" data-target="mode">
+                    <span class="mode-name">Dark</span>
+                    <div class="mode-control">ada@example.com</div>
+                    <span class="mode-button">Subscribe</span>
+                </div>
+            </div>
+            <p class="annot-line">
+                <span class="annot" data-annot-for="mode">the dark class on html changes every --klyroo token; the button stores the choice</span>
+                <span class="annot" data-annot-for="submit">a submit button works before the page is interactive</span>
+                <span class="annot" data-annot-for="form">ShowSummary lists the messages above the fields</span>
+                <span class="annot" data-annot-for="field">Required marks the field and its message names the problem</span>
+                <span class="annot" data-annot-for="select">Items are KlySelectItem records</span>
+            </p>
+        </ResultPanel>
+    </Results>
+</DemoBoard>
+
+@code {
+    private static readonly IReadOnlyList<BoardLine> _lines =
+    [
+        new("<KlyForm Model=\"Model\" FormName=\"subscribe\"", "form", "html"),
+        new("         OnValidSubmit=\"SubscribeAsync\" ShowSummary>", "form", "html"),
+        new("    <KlyFormField Label=\"Email\" Required", "field", "html"),
+        new("        Field=\"FieldIdentifier.Create(() => Model!.Email)\">", "field", "html"),
+        new("        <KlyInput Type=\"InputType.Email\"", "field", "html"),
+        new("                  @bind-Value=\"Model!.Email\"", "field", "html"),
+        new("                  Placeholder=\"you@example.com\" />", "field", "html"),
+        new("    </KlyFormField>", "field", "html"),
+        new("    <KlySelect @bind-Value=\"Model!.Topic\" Items=\"Topics\" />", "select", "html"),
+        new("    <KlyCheckbox @bind-Value=\"Model!.Terms\"", "form", "html"),
+        new("                 Label=\"I accept the terms\" />", "form", "html"),
+        new("    <KlyButton Type=\"ButtonType.Submit\" Label=\"Subscribe\" />", "submit", "html"),
+        new("</KlyForm>", "form", "html"),
+        new(""),
+        new("<KlyColorModeButton />", "mode", "html"),
+    ];
+
+    private static readonly IReadOnlyList<BoardChip> _chips =
+    [
+        new("form", "Form", "KlyForm validates the model, shows the messages and the busy state, and ShowSummary lists them above the fields."),
+        new("field", "Field", "A KlyFormField adds the label, the required mark and the message of its field around any input."),
+        new("select", "Select", "KlySelect takes KlySelectItem records and binds to the value of your model, with no round trip to open."),
+        new("submit", "Submit", "A submit button posts the form in static rendering too. A button with OnClick waits for an interactive page."),
+        new("mode", "Color mode", "KlyColorModeButton switches light and dark, and every component follows the --klyroo tokens of the active mode."),
+    ];
+}

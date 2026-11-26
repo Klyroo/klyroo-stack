@@ -15,7 +15,7 @@ public static partial class LibraryDocs
     public const string IndexSlug = "documentation";
 
     /// <summary>The authored boards a <c>site.yml</c> can name in <c>demo.board</c>: the components of <c>Components/Boards</c>.</summary>
-    public static readonly IReadOnlyList<string> Boards = ["table", "form"];
+    public static readonly IReadOnlyList<string> Boards = ["table", "form", "query", "spreadsheet", "dashboard", "display", "agent", "ui"];
 
     /// <summary>The authored previews a simple hero can show as its result (<c>demo.result.preview</c>): drawn components of <c>Components/Boards/QuickBoard.razor</c>.</summary>
     public static readonly IReadOnlyList<string> Previews = ["ui-settings", "display-stat", "spreadsheet-rows"];

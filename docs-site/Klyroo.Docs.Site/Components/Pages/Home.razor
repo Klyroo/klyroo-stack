@@ -47,6 +47,24 @@
             case { Board: "form" }:
                 <FormBoard />
                 break;
+            case { Board: "query" }:
+                <QueryBoard />
+                break;
+            case { Board: "spreadsheet" }:
+                <SpreadsheetBoard />
+                break;
+            case { Board: "dashboard" }:
+                <DashboardBoard />
+                break;
+            case { Board: "display" }:
+                <DisplayBoard />
+                break;
+            case { Board: "agent" }:
+                <AgentBoard />
+                break;
+            case { Board: "ui" }:
+                <UiBoard />
+                break;
             case { Code: not null } demo:
                 <QuickBoard Demo="demo" />
                 break;

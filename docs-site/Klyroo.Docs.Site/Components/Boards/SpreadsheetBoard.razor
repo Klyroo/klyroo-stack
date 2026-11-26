@@ -1,0 +1,68 @@
+@* The board of Klyroo.Spreadsheet: a schema for a price list, the uploaded file with its column mapping, the typed rows OnSubmit receives and the report of the invalid
+   rows. The file is sample data; the rows and the messages are what the code prints. *@
+<DemoBoard File="Program.cs" Lines="_lines" Chips="_chips" Class="is-dense" Label="A SpreadsheetSchema and what it produces">
+    <Results>
+        <ResultPanel Title="The uploaded prices.csv" Note="sample file" Class="flush">
+            <div class="mini-scroll">
+                <table class="mini-table file-table">
+                    <tbody>
+                        <tr class="is-skipped" data-target="headers"><td class="rownum">1</td><td colspan="3">Price list 2026</td></tr>
+                        <tr class="is-header">
+                            <td class="rownum">2</td>
+                            <th scope="col"><span class="mapped" data-target="headers">Item code<KlyIcon Name="ph:arrow-right" /><span class="map">Sku</span></span></th>
+                            <th scope="col"><span class="mapped" data-target="headers">Unit price<KlyIcon Name="ph:arrow-right" /><span class="map">Price</span></span></th>
+                            <th scope="col"><span class="mapped">Currency<KlyIcon Name="ph:arrow-right" /><span class="map">Currency</span></span></th>
+                        </tr>
+                        <tr><td class="rownum">3</td><td>A-1</td><td><span data-target="decimal">12,50</span></td><td><span data-target="options">€</span></td></tr>
+                        <tr><td class="rownum">4</td><td>A-2</td><td><span data-target="rules decimal">-3</span></td><td><span data-target="options">USD</span></td></tr>
+                        <tr><td class="rownum">5</td><td><span class="empty-cell" data-target="rules">empty</span></td><td><span data-target="decimal">9,90</span></td><td><span data-target="options">$</span></td></tr>
+                        <tr><td class="rownum">6</td><td>A-4</td><td><span data-target="decimal">5,00</span></td><td><span data-target="options">$</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </ResultPanel>
+        <ResultPanel Title="The typed rows OnSubmit receives" Note="importable rows only" Class="model-panel">
+            <pre class="model" data-target="headers submit"><code><span class="model-line" data-target="headers decimal options submit">@BoardMarkup.Code("PriceRow { Sku = \"A-1\", Price = 12.50m, Currency = Currency.Eur }", "csharp")</span><span class="model-line" data-target="headers decimal options submit">@BoardMarkup.Code("PriceRow { Sku = \"A-4\", Price = 5.00m, Currency = Currency.Usd }", "csharp")</span></code></pre>
+            <p class="annot-line">
+                <span class="annot" data-annot-for="headers">Item code is an alias of Sku, and the title row above the header is skipped</span>
+                <span class="annot" data-annot-for="decimal">12,50 is read with the decimal comma, as a decimal</span>
+                <span class="annot" data-annot-for="options">the symbols are aliases of the enum members</span>
+                <span class="annot" data-annot-for="submit">your code gets typed rows, not text</span>
+            </p>
+        </ResultPanel>
+        <ResultPanel Title="The invalid rows" Note="importer.InvalidRows" Class="flush">
+            <pre class="output"><code><span class="output-line" data-target="rules"><span class="status bad">row 4</span> Price: Value is below 0</span><span class="output-line" data-target="rules"><span class="status bad">row 5</span> Sku: Required value is missing</span></code></pre>
+        </ResultPanel>
+    </Results>
+</DemoBoard>
+
+@code {
+    private static readonly IReadOnlyList<BoardLine> _lines =
+    [
+        new("var schema = SpreadsheetSchema.For<PriceRow>(s =>"),
+        new("{"),
+        new("    s.Column(r => r.Sku, c => c"),
+        new("        .Headers(\"Item code\").Required());", "headers rules"),
+        new("    s.Column(r => r.Price, c => c"),
+        new("        .Label(\"Unit price\").DecimalSeparator(',')", "headers decimal"),
+        new("        .Rule(SpreadsheetRule.Min(0m)));", "rules"),
+        new("    s.Column(r => r.Currency, c => c.Options(", "options"),
+        new("        [new(Currency.Eur, \"Euro\", [\"€\"]),", "options"),
+        new("         new(Currency.Usd, \"US dollar\", [\"$\"])]));", "options"),
+        new("    s.OnSubmit = SaveAsync;", "submit"),
+        new("});"),
+        new(""),
+        new("var importer = new SpreadsheetImporter<PriceRow>(schema);"),
+        new("importer.LoadText(text, \"prices.csv\");", "headers"),
+        new("await importer.SubmitAsync();  // InvalidRows hold the rest", "submit rules"),
+    ];
+
+    private static readonly IReadOnlyList<BoardChip> _chips =
+    [
+        new("headers", "Headers", "The header row is found on its own, and a column is matched by its key, its label or an alias: Item code and Unit price land on Sku and Price."),
+        new("decimal", "Decimal comma", "DecimalSeparator tells the column that 12,50 is a number, so the row holds a decimal and not the text."),
+        new("options", "Options", "A column of an enum takes the labels and the aliases you give it, so a euro sign is Currency.Eur."),
+        new("rules", "Rules", "Required and Min(0m) are checked on every row. A row with an issue is reported and kept out of the import."),
+        new("submit", "Submit", "OnSubmit receives the importable rows, typed as your row class. The invalid ones stay in the importer for the user to fix."),
+    ];
+}

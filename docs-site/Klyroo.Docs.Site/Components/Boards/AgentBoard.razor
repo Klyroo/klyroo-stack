@@ -1,0 +1,70 @@
+@* The board of Klyroo.Agent: a form registered with the bridge, the snapshot the model sees, the act call it sends and the form afterwards, with a password field redacted and a write
+   to it refused. The values are sample data; the snapshot lines and the refusal are what the code prints. *@
+<DemoBoard File="Program.cs" Lines="_lines" Chips="_chips" Class="is-dense" Label="A registered form and what the agent sees and does">
+    <Results>
+        <ResultPanel Title="What the model sees" Note="the snapshot" Class="model-panel">
+            <pre class="model" data-target="snapshot"><code><span class="model-line" data-target="register snapshot">@BoardMarkup.Code("c1 select \"Region\" = us-east", "csharp")</span><span class="model-line" data-target="register snapshot redact">@BoardMarkup.Code("c2 input \"Token\" = [redacted]", "csharp")</span><span class="model-line" data-target="register snapshot">@BoardMarkup.Code("c3 form \"Project settings\" = clean", "csharp")</span></code></pre>
+        </ResultPanel>
+        <ResultPanel Title="The tool call" Note="act, as the model sends it" Class="model-panel">
+            <pre class="model"><code>@foreach (var (text, features) in _call){<span class="model-line" data-target="@(features.Length > 0 ? features : null)">@BoardMarkup.Code(text)</span>}</code></pre>
+            <pre class="model result-lines"><code><span class="model-line" data-target="act">c1 setValue <span class="status ok">ok</span> eu-west</span><span class="model-line" data-target="refuse"><span class="status bad">refused</span> Step 2: action "setValue" on "Token" (c2) was refused:</span><span class="model-line" data-target="refuse">the field is sensitive and the application does not let</span><span class="model-line" data-target="refuse">the AI model change it.</span></code></pre>
+        </ResultPanel>
+        <ResultPanel Title="The form afterwards" Note="sample data">
+            <div class="form-stack is-compact">
+                <div class="field" data-target="register">
+                    <span class="field-label">Region</span>
+                    <div class="control select" data-target="act"><span>Europe West</span><KlyIcon Name="ph:caret-down" /></div>
+                </div>
+                <div class="field">
+                    <span class="field-label">Token</span>
+                    <div class="control locked" data-target="redact refuse"><span>[redacted]</span><KlyIcon Name="ph:lock-key" /></div>
+                </div>
+            </div>
+            <p class="annot-line">
+                <span class="annot" data-annot-for="register">the bridge reads the controller, not the markup</span>
+                <span class="annot" data-annot-for="act">the controller holds eu-west: the form is now dirty</span>
+                <span class="annot" data-annot-for="redact">the value is never in a snapshot, a result or a change</span>
+                <span class="annot" data-annot-for="refuse">the token is unchanged</span>
+            </p>
+        </ResultPanel>
+    </Results>
+</DemoBoard>
+
+@code {
+    private static readonly IReadOnlyList<BoardLine> _lines =
+    [
+        new("var schema = FormSchema.For<Project>(s =>"),
+        new("{"),
+        new("    s.Title = \"Project settings\";"),
+        new("    s.Field(p => p.Region, f => f.Options("),
+        new("        [new(\"us-east\", \"US East\"),"),
+        new("         new(\"eu-west\", \"Europe West\")]));"),
+        new("    s.Field(p => p.Token, f => f.AsPassword());", "redact"),
+        new("});"),
+        new("var agent = new AgentBridgeService();", "register"),
+        new("agent.RegisterForm(", "register"),
+        new("    new FormController<Project>(schema, new Project()));", "register"),
+        new(""),
+        new("var snapshot = agent.Snapshot();", "snapshot redact"),
+        new("var result = await agent.ActAsync(", "act"),
+        new("    [new(\"Region\", \"setValue\", [\"eu-west\"]),", "act"),
+        new("     new(\"Token\", \"setValue\", [\"s3cret\"])]);", "act refuse"),
+    ];
+
+    private static readonly IReadOnlyList<BoardChip> _chips =
+    [
+        new("register", "Register", "RegisterForm hands a controller to the bridge. The agent never sees markup, only the labels, values and actions of the controller."),
+        new("snapshot", "Snapshot", "Snapshot lists every registered component with a stable reference, its label and its current value."),
+        new("act", "Act", "ActAsync runs named steps in order, by reference or by label, and stops at the first one that fails."),
+        new("redact", "Redacted", "A password field appears as [redacted] in snapshots, results and changes, so the model never reads it."),
+        new("refuse", "Refused", "The model cannot write a sensitive field either: the step is refused with a reason that does not reveal the value."),
+    ];
+
+    private static readonly (string Text, string Features)[] _call =
+    [
+        ("{ \"steps\": [", ""),
+        ("  { \"ref\": \"Region\", \"action\": \"setValue\", \"args\": [\"eu-west\"] },", "act"),
+        ("  { \"ref\": \"Token\", \"action\": \"setValue\", \"args\": [\"s3cret\"] }", "act refuse"),
+        ("] }", ""),
+    ];
+}

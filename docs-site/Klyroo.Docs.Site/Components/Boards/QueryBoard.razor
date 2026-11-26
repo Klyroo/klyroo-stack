@@ -1,0 +1,91 @@
+@* The board of Klyroo.Query: a list state and a schema, the request they make as JSON, the address they write, and the page with facet counts that the request returns.
+   The rows are sample data; the JSON, the address and the counts are what the code prints. *@
+<DemoBoard File="Program.cs" Lines="_lines" Chips="_chips" Class="is-dense" Label="A request and what it produces">
+    <Results>
+        <ResultPanel Title="The request as JSON" Note="defaults left out" Class="model-panel">
+            <pre class="model"><code>@foreach (var (text, features) in _json){<span class="model-line" data-target="@(features.Length > 0 ? features : null)">@BoardMarkup.Code(text)</span>}</code></pre>
+        </ResultPanel>
+        <ResultPanel Title="The address it writes" Note="URL form of the same state">
+            <code class="url" data-target="url"><span class="url-path">/customers</span><span class="url-sep">?</span><span class="url-key" data-target="search">q=a</span><span class="url-sep">&amp;</span><span class="url-key" data-target="url">ps=3</span><span class="url-sep">&amp;</span><span class="url-key" data-target="sort">s=-age</span><span class="url-sep">&amp;</span><span class="url-key" data-target="filter">f.status.is=Active</span></code>
+            <p class="annot-line">
+                <span class="annot" data-annot-for="search">q: the search text</span>
+                <span class="annot" data-annot-for="sort">s: the sort; a leading - is descending</span>
+                <span class="annot" data-annot-for="filter">f.status.is: one key per rule, with its operator</span>
+                <span class="annot" data-annot-for="facets">facets are asked by the request and are not in the address</span>
+                <span class="annot" data-annot-for="url">only what differs from the defaults is written</span>
+            </p>
+        </ResultPanel>
+        <ResultPanel Title="The page it returns" Note="sample data" Class="flush">
+            <div class="mini-scroll">
+                <table class="mini-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Customer</th>
+                            <th scope="col" class="num" aria-sort="descending"><span class="sorted" data-target="sort">Age<KlyIcon Name="ph:arrow-down" /></span></th>
+                            <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var (name, age) in _rows)
+                        {
+                            <tr><td><span data-target="search">@name</span></td><td class="num">@age</td><td><span data-target="filter">Active</span></td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="list-foot">
+                <span class="count">4 customers, showing 3</span>
+                <span class="facets" data-target="facets"><span class="facet-name">Status</span><span class="facet">Active <b>4</b></span><span class="facet">Inactive <b>1</b></span></span>
+            </div>
+        </ResultPanel>
+    </Results>
+</DemoBoard>
+
+@code {
+    private static readonly IReadOnlyList<BoardLine> _lines =
+    [
+        new("var schema = DataListSchema.For<Customer>(s => s"),
+        new("    .Search(c => c.Name, c => c.Email)", "search"),
+        new("    .Field(c => c.Age, f => f.Sortable())", "sort"),
+        new("    .Field(c => c.Status, f => f.Filter(", "filter facets"),
+        new("        DataListFilter.Option().WithFacets())));", "facets"),
+        new(""),
+        new("var state = schema.DefaultState with"),
+        new("{"),
+        new("    Search = \"a\", PageSize = 3,", "search"),
+        new("    Sort = [new DataListSort(\"age\", Descending: true)],", "sort"),
+        new("    Filters = [new FilterRule(\"status\", FilterOperator.Is,", "filter"),
+        new("        new FilterValue.Text(\"Active\"))],", "filter"),
+        new("};"),
+        new("var request = state.ToRequest(facets: [new(\"status\")]);", "facets"),
+        new("var page = schema.ExecuteInMemory(customers, request);", "facets"),
+        new("var query = DataListStateQuery.ToQuery(state, schema);", "url"),
+    ];
+
+    private static readonly IReadOnlyList<BoardChip> _chips =
+    [
+        new("search", "Search", "Search reads the fields you list, here the name and the email. The request carries only the text."),
+        new("sort", "Sort", "Only a field marked sortable can be sorted on: a request for another key is dropped when it is sanitized."),
+        new("filter", "Filter", "A rule names a field by key, an operator and a typed value, as plain data in the request and as f.key.operator in the address."),
+        new("facets", "Facets", "WithFacets and a facet request count the rows per status, leaving out the status filter itself, so Inactive stays in the list."),
+        new("url", "URL form", "ToQuery writes only what differs from the defaults, and FromQuery reads it back without ever throwing."),
+    ];
+
+    private static readonly (string Text, string Features)[] _json =
+    [
+        ("{ \"paging\": { \"type\": \"offset\", \"skip\": 0, \"take\": 3 },", ""),
+        ("  \"sort\": [{ \"key\": \"age\", \"descending\": true }],", "sort"),
+        ("  \"filter\": { \"combinator\": \"and\", \"children\": [{", "filter"),
+        ("    \"type\": \"rule\", \"key\": \"status\", \"operator\": \"is\",", "filter"),
+        ("    \"value\": { \"type\": \"text\", \"value\": \"Active\" } }] },", "filter"),
+        ("  \"search\": { \"term\": \"a\" },", "search"),
+        ("  \"facets\": [{ \"key\": \"status\" }] }", "facets"),
+    ];
+
+    private static readonly (string Name, int Age)[] _rows =
+    [
+        ("Clara Diaz", 42),
+        ("Erik Holm", 39),
+        ("Alice Martin", 34),
+    ];
+}

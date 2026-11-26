@@ -1,4 +1,14 @@
+using Klyroo.Docs.Site.Content;
+using Microsoft.AspNetCore.Components;
+
 namespace Klyroo.Docs.Site.Components.Boards;
+
+/// <summary>Helpers the result panels of the boards share.</summary>
+public static class BoardMarkup
+{
+    /// <summary>The text with the colors of a language (<c>json</c>, <c>csharp</c>, <c>html</c>...) as markup: the panels show real output in the colors of the code panel.</summary>
+    public static MarkupString Code(string text, string language = "json") => new(SyntaxHighlighter.ToHtml(text, language));
+}
 
 /// <summary>A line of the code panel of a board. <paramref name="Features"/> lists the chips (separated by spaces) whose choice lights the line.</summary>
 /// <param name="Text">The code of the line, as written (indentation included).</param>

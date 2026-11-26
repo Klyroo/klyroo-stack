@@ -101,7 +101,11 @@
       const codeBox = code.getBoundingClientRect();
       const rects = litLines.map((line) => line.getBoundingClientRect());
       const top = Math.min(...rects.map((r) => r.top)), bottom = Math.max(...rects.map((r) => r.bottom));
-      const y1 = (top + bottom) / 2 - frame.top;
+      // The leader starts in the middle of the lit lines; when those are not next to each other the middle can fall on a line that is not lit, so it starts at the lit line nearest to it.
+      const middleOfLines = (top + bottom) / 2;
+      const inside = rects.some((r) => r.top <= middleOfLines && middleOfLines <= r.bottom);
+      const nearest = rects.map((r) => (r.top + r.bottom) / 2).sort((a, b) => Math.abs(a - middleOfLines) - Math.abs(b - middleOfLines))[0];
+      const y1 = (inside ? middleOfLines : nearest) - frame.top;
       const x1 = codeBox.right - frame.left;
       svg.setAttribute("viewBox", `0 0 ${frame.width} ${frame.height}`);
 

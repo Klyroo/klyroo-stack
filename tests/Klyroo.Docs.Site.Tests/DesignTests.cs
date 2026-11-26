@@ -100,6 +100,22 @@ public class DesignTests
         Assert.Contains(expected, error.Message);
     }
 
+    [Theory]
+    [InlineData("table")]
+    [InlineData("form")]
+    [InlineData("query")]
+    [InlineData("spreadsheet")]
+    [InlineData("dashboard")]
+    [InlineData("display")]
+    [InlineData("agent")]
+    [InlineData("ui")]
+    public void Every_authored_board_can_be_named_in_the_settings(string board)
+    {
+        using var repo = Repository($"demo:\n  board: {board}\n");
+        var settings = LibraryDocs.Load(repo.Root, "klyroo-demo", FakeRepository.Libraries).Settings;
+        Assert.Equal(board, settings.Demo!.Board);
+    }
+
     [Fact]
     public void Without_the_keys_the_site_has_the_accent_of_the_family_and_a_headline_from_the_title()
     {

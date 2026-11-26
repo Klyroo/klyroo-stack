@@ -104,7 +104,7 @@ The home page is its own layout, without the navigation: a two-line headline, th
 
 ```yaml
 demo:
-  board: table          # an authored board: table or form
+  board: table          # an authored board: table, form, query, spreadsheet, dashboard, display, agent or ui
 ```
 
 ```yaml
@@ -124,7 +124,7 @@ Real code from the docs, synthetic data labelled as such, and nothing invented: 
 
 ### Upgrading a simple hero to a full board
 
-A board is a component in `Klyroo.Docs.Site/Components/Boards`, built from `DemoBoard` (the code panel, its chips and the leader lines) and `ResultPanel`; `TableBoard.razor` and `FormBoard.razor` are the models.
+A board is a component in `Klyroo.Docs.Site/Components/Boards`, built from `DemoBoard` (the code panel, its chips and the leader lines) and `ResultPanel`; `TableBoard.razor` and `FormBoard.razor` are the models (`QueryBoard`, `SpreadsheetBoard`, `DashboardBoard`, `DisplayBoard`, `AgentBoard` and `UiBoard` follow them, with `Class="is-dense"` for about sixteen lines of code that must still fit the first viewport at 1440x900).
 
 1. Copy `FormBoard.razor` to `<Name>Board.razor`. List the lines of the code (`BoardLine`: the text, the chips that light it, `html` for markup) and the chips (`BoardChip`: id, label, the sentence shown while it is picked).
 2. Draw the results in `ResultPanel`s with the classes of `Styles/board.css` (fields, tags, mini tables, output, stat). Mark each part a feature produces with `data-target="<chip id>"`; several chips can name one part (`data-target="search url"`).

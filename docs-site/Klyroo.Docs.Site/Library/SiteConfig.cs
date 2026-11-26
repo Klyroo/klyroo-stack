@@ -16,7 +16,7 @@ namespace Klyroo.Docs.Site.Library;
 public sealed record NavEntry(string? Page, string? Group, string? Title, string? NavTitle, string? Description, int? TocDepth, bool? IndexText, IReadOnlyList<NavEntry>? Children);
 
 /// <summary>
-/// The demonstration of the home page. <paramref name="Board"/> names an authored board (<c>table</c>, <c>form</c>: a component in <c>Components/Boards</c>) with chips
+/// The demonstration of the home page. <paramref name="Board"/> names an authored board (<c>table</c>, <c>form</c>, <c>query</c>, <c>spreadsheet</c>, <c>dashboard</c>, <c>display</c>, <c>agent</c>, <c>ui</c>: a component in <c>Components/Boards</c>) with chips
 /// and several results. Without a board, <paramref name="Code"/> is shown in a code panel and one result panel shows <paramref name="Output"/> (lines of text) or
 /// the authored <paramref name="Preview"/>, joined by a leader line that starts at the <paramref name="Focus"/> lines.
 /// </summary>
