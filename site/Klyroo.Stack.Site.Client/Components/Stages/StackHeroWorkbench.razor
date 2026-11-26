@@ -234,7 +234,7 @@
                                 <div class="line-through opacity-50">Export 2026;; ← banner skipped</div>
                                 <div><span class="text-emerald-400">Nom;Région;Revenu</span> → NFD mapped</div>
                             </div>
-                            <p class="text-[11px] text-(--klyroo-text-muted)">10k rows NFD + dedup: <strong class="text-(--klyroo-text-highlighted)">38.0 ms</strong></p>
+                            <p class="text-[11px] text-(--klyroo-text-muted)">10k rows NFD + dedup: <strong class="text-(--klyroo-text-highlighted)">24.9 ms</strong></p>
                         </div>
                         break;
 
@@ -308,7 +308,7 @@
             "<KlyModal Title=\"Deploy\">\n  <ChildContent><KlyButton Label=\"Open\" /></ChildContent>\n  <Body><KlySelect @bind-Value=\"_env\" /></Body>\n</KlyModal>",
             ["Static SSR", "Blazor Server", "WebAssembly", ".NET MAUI Hybrid"],
             "Zero-roundtrip popovers, dialogs & roving focus."),
-        new("query", 114, "Klyroo.Query.Core", "Klyroo.Query", "Headless (0 CSS)", "100k rows in 16.5 ms",
+        new("query", 114, "Klyroo.Query.Core", "Klyroo.Query", "Headless (0 CSS)", "100k rows in 12.5 ms",
             "var schema = DataListSchema.For<Order>(s => s\n  .RowKey(o => o.Id)\n  .Search(o => o.Customer)\n  .Field(o => o.Arr, f => f.Sortable()));",
             ["Static SSR", "Blazor Server", "WebAssembly", ".NET MAUI Hybrid", "NativeAOT API"],
             "Runs in Minimal APIs, EF Core SQL & Blazor URLs."),
@@ -328,7 +328,7 @@
             "<KlyDisplay Kind=\"DisplayKind.Code\"\n           Variant=\"DisplayVariant.Secret\"\n           Value=\"@apiKey\" VisibleChars=\"4\" Copy=\"true\" />",
             ["Static SSR", "Blazor Server", "WebAssembly", ".NET MAUI Hybrid", "NativeAOT API"],
             "Facts, meters, diffs, constrained media & lightbox."),
-        new("spreadsheet", 234, "Klyroo.Spreadsheet.Core", "Klyroo.Spreadsheet", "klyroo-spreadsheet.css", "10k CSV rows in 38.0 ms",
+        new("spreadsheet", 234, "Klyroo.Spreadsheet.Core", "Klyroo.Spreadsheet", "klyroo-spreadsheet.css", "10k CSV rows in 24.9 ms",
             "var importer = new SpreadsheetImporter<RateRow>(schema);\nimporter.LoadText(csv, \"tarifs.csv\");\n// 20-row header scan + NFD + 80% auto-map",
             ["Blazor Server", "WebAssembly", ".NET MAUI Hybrid", "NativeAOT API", "MCP / AI Agents"],
             "Turns dirty European CSVs into validated batches."),
