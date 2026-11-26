@@ -14,8 +14,10 @@ tests, versions and releases, so a change usually belongs to exactly one of them
   ```bash
   mkdir klyroo && cd klyroo
   git clone https://github.com/klyroo/klyroo-stack.git
-  # plus the siblings it references, for example:
-  git clone https://github.com/klyroo/klyroo-ui.git
+  # plus every library, which the meta-package, the site and the tests reference:
+  for r in ui query table form dashboard display spreadsheet agent; do
+    git clone https://github.com/klyroo/klyroo-$r.git
+  done
   ```
 
 ## Build, test, format

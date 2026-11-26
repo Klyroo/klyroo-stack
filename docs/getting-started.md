@@ -2,7 +2,7 @@
 
 This tutorial builds a small product list in two steps: first the data logic with no UI at all, using the headless packages, then a Blazor Web App that shows the same kind of list with a stat card and a form drawer. It takes about fifteen minutes and every file is shown in full.
 
-You need the .NET 10 SDK. The packages are preview releases, so every `dotnet add package` command carries `--prerelease`.
+Check the [prerequisites](../README.md#prerequisites) first: the .NET 10 SDK, and for the components a Blazor app with Klyroo.UI set up.
 
 ## 1. Query data without a UI
 

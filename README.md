@@ -41,6 +41,20 @@ Install the hub when you want every library with one registration call, or when 
 | Server-only helpers or the image pipeline of Klyroo.UI | `Klyroo.UI.Server` and `Klyroo.UI.Images`, which `Klyroo.Stack` does not include |
 | Your coding agent to know the Klyroo.UI API | `Klyroo.Stack.Mcp` |
 
+## Prerequisites
+
+To use the library in an app:
+
+- **The .NET 10 SDK**, and an app that targets `net10.0`. The packages are prereleases, so every `dotnet add package` command needs `--prerelease`.
+- **A Blazor app** for `Klyroo.Stack`: a Blazor Web App or a .NET MAUI Blazor Hybrid app. Interactive components need an interactive render mode (Interactive Server, WebAssembly or Auto). In a WebAssembly or Auto app, register the services in the server project and in the `.Client` project.
+- **Klyroo.UI set up in the app.** `AddKlyrooStack()` registers every library, but the layout still needs the Klyroo.UI stylesheets in `<head>` and `<KlyApp>` around the body, as described in the [Klyroo.UI installation](https://github.com/klyroo/klyroo-ui#installation).
+- **A browser with the native popover API**, which Klyroo.UI uses: Chrome and Edge 114, Safari 17 or Firefox 125, or later. In a .NET MAUI app, that means iOS or Mac Catalyst 17, or an Android System WebView 114 or later.
+- **Network access on the first build** only if your app self-hosts web fonts (`KlyrooFont`), uses icons outside the built-in set, or compiles Tailwind (`KlyrooTailwind`): the build downloads them once and caches them under `obj/klyroo`. Node.js is not needed.
+- **For the MCP server**: the .NET 10 runtime, to run the `Klyroo.Stack.Mcp` .NET tool, and an MCP client (Claude Code, VS Code, Cursor...).
+- **For the project templates**: `dotnet new install Klyroo.Templates`; the `klyroo-maui` template also needs the .NET MAUI workload (`dotnet workload install maui`) and the SDKs of the platforms you target.
+
+To build this repository you need the .NET 10 SDK (a newer SDK works too, see `global.json`) and clones of `klyroo-agent`, `klyroo-dashboard`, `klyroo-display`, `klyroo-form`, `klyroo-query`, `klyroo-spreadsheet`, `klyroo-table`, `klyroo-ui` in the same parent folder: some projects reference them by relative path (`../klyroo-agent/...`). See [Contributing](CONTRIBUTING.md).
+
 ## Installation
 
 ### The meta-package
@@ -188,7 +202,7 @@ The page needs `<KlyFormProvider />` inside `<KlyApp>` to show the drawer, as in
 | [API reference](docs/api-reference.md) | Every public type and member |
 | [FAQ](docs/faq.md) | Troubleshooting and limitations |
 
-## Requirements
+## Compatibility
 
 - .NET 10 SDK. `global.json` pins SDK 10.0.100 and rolls forward to a newer major.
 - Blazor render modes: Klyroo.UI documents Static SSR, Interactive Server, WebAssembly and Auto. The hub site runs Interactive Server and WebAssembly.
