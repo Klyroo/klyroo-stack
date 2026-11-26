@@ -126,6 +126,9 @@
 .model[data-target].is-lit { background: transparent; outline-color: transparent; }
 .model-line[data-target].is-lit { border-radius: 0; outline: 0; }
 .url[data-target].is-lit { background: transparent; outline-color: transparent; }
+/* A lit button keeps its own fill and label: the ring marks it, the fill stays what the chip points at. */
+.send[data-target].is-lit { background: var(--accent); color: var(--on-accent); outline: 2px solid var(--accent-ink); outline-offset: 3px; }
+.send.ghost[data-target].is-lit { background: transparent; color: var(--text); }
 .url-key[data-target] { padding: 0.125rem 0.25rem; margin: -0.125rem -0.25rem; }
 
 .list-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.625rem 0.875rem; padding: 0.875rem 1rem; }
