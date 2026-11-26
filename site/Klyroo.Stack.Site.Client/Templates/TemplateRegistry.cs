@@ -93,8 +93,8 @@ public static class TemplateRegistry
 
     public static IReadOnlyList<(string ShortName, string Title, string Target, string Command)> OfficialDotnetTemplates { get; } =
     [
-        ("klyroo-saas", "Full SaaS Web App", "Blazor Web · Interactive Auto", "dotnet new klyroo-saas -n MySaas"),
-        ("klyroo-admin", "Enterprise Admin Backoffice", "Klyroo.Table + Form + Dashboard + Agent", "dotnet new klyroo-admin -n MyBackoffice"),
+        ("klyroo-saas", "Full SaaS Web App", "Blazor Web · Server, WebAssembly or Auto", "dotnet new klyroo-saas -n MySaas"),
+        ("klyroo-admin", "Enterprise Admin Backoffice", "Table + Form + Dashboard + Spreadsheet import", "dotnet new klyroo-admin -n MyBackoffice"),
         ("klyroo-headless", "NativeAOT API / Worker", "100% Headless *.Core · Zero UI", "dotnet new klyroo-headless -n MyApi"),
         ("klyroo-maui", "Cross-Platform MAUI Hybrid", "iOS · Android · macOS · Windows", "dotnet new klyroo-maui -n MyMobileApp"),
     ];

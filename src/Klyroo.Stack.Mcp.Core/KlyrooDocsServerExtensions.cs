@@ -36,8 +36,10 @@ public static class KlyrooDocsServerExtensions
         {
             server.ServerInfo = new() { Name = "klyroo-ui", Version = bundle.Version };
             server.ServerInstructions =
-                "Documentation of Klyroo.UI, an accessible, themable Blazor component library styled with Tailwind CSS v4. " +
-                "Start with search-components (by name, family or intent) and get-component (usage, examples, api, theme); " +
+                "Documentation of the Klyroo ecosystem: Klyroo.UI, an accessible, themable Blazor component library styled with Tailwind CSS v4, and its sister libraries " +
+                "(Query, Table, Form, Dashboard, Display, Spreadsheet, Agent) with the Klyroo.Stack hub and its dotnet new templates. " +
+                "When you do not know which library, package or template owns a name, call resolve-module. " +
+                "For Klyroo.UI start with search-components (by name, family or intent) and get-component (usage, examples, api, theme); " +
                 "use get-component-metadata for the exact parameters before writing markup, and get-installation-guide for setup. " +
                 "Never invent a parameter: every one returned by these tools exists in the library.";
         })

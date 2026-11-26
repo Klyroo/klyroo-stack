@@ -19,7 +19,7 @@ public class ToolsTests
     {
         string[] expected =
             ["search-components", "get-component", "get-component-metadata", "list-examples", "get-example",
-             "search-documentation", "get-documentation-page", "search-icons", "get-installation-guide"];
+             "search-documentation", "get-documentation-page", "search-icons", "get-installation-guide", "resolve-module"];
         Assert.Equal(expected.Order(), DocsTools.Names.Order());
     }
 
@@ -293,6 +293,89 @@ public class ToolsTests
         {
             Assert.Contains(TestSupport.Service.Bundle.LibraryDocs, g => g.Path == $"/{library}/docs/getting-started");
         }
+    }
+
+    [Fact]
+    public void The_documentation_of_the_hub_carries_the_templates_and_is_searchable()
+    {
+        foreach (var page in new[] { "getting-started", "guides", "concepts", "platforms", "faq", "api-reference", "benchmarks" })
+        {
+            Assert.Contains(TestSupport.Service.Bundle.LibraryDocs, g => g.Path == $"/stack/docs/{page}");
+        }
+
+        var guide = Tools.GetDocumentationPage("/stack/docs/guides");
+        Assert.Contains("Start a project from a template", guide);
+        Assert.Contains("--interactivity", guide);
+
+        var hits = Tools.SearchDocumentation("klyroo-saas interactivity product-name", "guides");
+        Assert.Contains("/stack/docs/guides", hits);
+    }
+
+    // ---- resolve-module ----
+
+    [Theory]
+    [InlineData("KlyDataList", "Klyroo.Table", "klyroo-admin")]
+    [InlineData("KlyDataList<Order>", "Klyroo.Table", "klyroo-admin")]
+    [InlineData("DashboardController", "Klyroo.Dashboard", "klyroo-admin")]
+    [InlineData("FormService", "Klyroo.Form", "klyroo-saas")]
+    [InlineData("KlySpreadsheetImport", "Klyroo.Spreadsheet", "klyroo-admin")]
+    [InlineData("AgentBridgeService", "Klyroo.Agent", "klyroo-headless")]
+    [InlineData("klyroo-query", "Klyroo.Query", "klyroo-headless")]
+    [InlineData("Klyroo.Form.Core", "Klyroo.Form", "klyroo-saas")]
+    [InlineData("klyroo.display", "Klyroo.Display", "klyroo-saas")]
+    public void Resolve_module_names_the_library_the_packages_and_the_template(string name, string library, string template)
+    {
+        var answer = Tools.ResolveModule(name);
+
+        Assert.StartsWith($"# {library} (", answer);
+        Assert.Contains($"dotnet add package {library} --prerelease", answer);
+        Assert.Contains($"`{template}`", answer);
+        Assert.Contains("SKILL.md", answer);
+        Assert.Contains("AddKlyrooStack", answer);
+    }
+
+    [Fact]
+    public void Resolve_module_agrees_with_the_catalog_for_every_main_type_of_every_library()
+    {
+        foreach (var module in KlyrooStackCatalog.Modules)
+        {
+            foreach (var type in module.KeyComponents)
+            {
+                var owner = KlyrooStackCatalog.ResolveComponentModule(type)!;
+                Assert.StartsWith($"# {owner.Name} (`{owner.Id}`)", Tools.ResolveModule(type));
+            }
+        }
+    }
+
+    [Fact]
+    public void Resolve_module_reaches_a_klyroo_ui_component_that_the_catalog_does_not_list_through_its_package()
+    {
+        var answer = Tools.ResolveModule("Header");
+
+        Assert.StartsWith("# Klyroo.UI (", answer);
+        Assert.Contains("component page of the docs", answer);
+    }
+
+    [Fact]
+    public void Resolve_module_describes_a_template_by_the_libraries_it_shows()
+    {
+        var answer = Tools.ResolveModule("klyroo-admin");
+
+        Assert.StartsWith("# Template `klyroo-admin`", answer);
+        Assert.Contains("dotnet new klyroo-admin -n MyApp", answer);
+        Assert.Contains("Klyroo.Table", answer);
+        Assert.Contains("Klyroo.Spreadsheet", answer);
+    }
+
+    [Fact]
+    public void Resolve_module_rejects_an_empty_or_unknown_name_and_lists_what_exists()
+    {
+        var empty = Assert.Throws<McpException>(() => Tools.ResolveModule(" "));
+        Assert.Contains("Klyroo.Table (klyroo-table)", empty.Message);
+
+        var unknown = Assert.Throws<McpException>(() => Tools.ResolveModule("NotAThing"));
+        Assert.Contains("No library of the Klyroo ecosystem lists 'NotAThing'", unknown.Message);
+        Assert.Contains("klyroo-saas", unknown.Message);
     }
 
     [Fact]

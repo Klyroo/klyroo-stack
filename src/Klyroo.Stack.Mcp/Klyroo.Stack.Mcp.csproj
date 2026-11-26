@@ -3,7 +3,7 @@
   <!-- Same version as the library: both import build/Version.props. -->
 
   <!-- The local MCP server of the Klyroo documentation, as a dotnet tool: dotnet tool install -g Klyroo.Stack.Mcp, then
-       klyroo-stack-mcp. It speaks MCP over stdio and carries the docs bundle of the Klyroo.UI and Klyroo.Table versions it was built with. -->
+       klyroo-stack-mcp. It speaks MCP over stdio and carries the docs bundle of the Klyroo.UI and Klyroo.Table versions it was built with, the documentation pages of the other libraries and of Klyroo.Stack, and the catalog that resolve-module reads. -->
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
@@ -12,8 +12,8 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>klyroo-stack-mcp</ToolCommandName>
     <PackageId>Klyroo.Stack.Mcp</PackageId>
-    <Description>MCP server for the Klyroo documentation: search the Klyroo.UI and Klyroo.Table components, their API, examples and guides from an AI coding agent, over stdio.</Description>
-    <PackageTags>klyroo;blazor;ui;mcp;model-context-protocol;ai;tailwind</PackageTags>
+    <Description>MCP server for the Klyroo ecosystem: search the Klyroo.UI and Klyroo.Table components, read the documentation of the Klyroo libraries and of the Klyroo.Stack hub (templates, getting started), and ask which library, package or dotnet new template owns a component, from an AI coding agent, over stdio.</Description>
+    <PackageTags>klyroo;blazor;ui;mcp;model-context-protocol;ai;tailwind;dotnet-new;templates;documentation</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Authors>Klyroo Contributors</Authors>

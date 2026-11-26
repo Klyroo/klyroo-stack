@@ -271,6 +271,10 @@ public static class BundleBuilder
         ("api-reference.md", "API reference"),
     ];
 
+    // The documentation of this repository (the hub): the templates and the getting started live in guides.md and getting-started.md. They are served under
+    // /stack/docs/, and benchmarks.md comes with them. README.md is the index of the folder, not a page.
+    private static readonly (string File, string Title)[] StackPages = [.. LibraryPages, ("benchmarks.md", "Benchmarks")];
+
     private static IReadOnlyList<BundleGuide> LibraryGuides(string repoRoot)
     {
         var guides = new List<BundleGuide>();
@@ -290,6 +294,18 @@ public static class BundleBuilder
                 guides.Add(new BundleGuide($"/{slug}/docs/{Path.GetFileNameWithoutExtension(file)}", $"{module.Name}: {title}", module.Name, markdown));
             }
         }
+        guides.AddRange(StackGuides(repoRoot));
         return guides;
+    }
+
+    private static IEnumerable<BundleGuide> StackGuides(string repoRoot)
+    {
+        foreach (var (file, title) in StackPages)
+        {
+            var path = Path.Combine(repoRoot, "docs", file);
+            if (!File.Exists(path)) continue;
+            var markdown = File.ReadAllText(path).Replace("\r\n", "\n").TrimEnd();
+            yield return new BundleGuide($"/stack/docs/{Path.GetFileNameWithoutExtension(file)}", $"Klyroo.Stack: {title}", "Klyroo.Stack", markdown);
+        }
     }
 }

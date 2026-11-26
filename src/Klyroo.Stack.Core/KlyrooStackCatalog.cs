@@ -130,7 +130,7 @@ public static class KlyrooStackCatalog
             SolutionFile: "klyroo-spreadsheet/Klyroo.Spreadsheet.slnx",
             CorePackage: "Klyroo.Spreadsheet.Core",
             UiPackage: "Klyroo.Spreadsheet",
-            TemplateShortName: "klyroo-headless",
+            TemplateShortName: "klyroo-admin",
             SkillPath: "klyroo-spreadsheet/skills/klyroo-spreadsheet/SKILL.md",
             Summary: "Headless workbook/CSV/TSV importer (layout detection, NFD header normalization, 80%-pass column suggestions, unknown value questions, duplicates/upsert, inline edits & wizard).",
             KeyComponents: ["SpreadsheetSchema", "SpreadsheetImporter", "KlySpreadsheetImport"],

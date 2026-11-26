@@ -10,6 +10,8 @@
   <ItemGroup>
     <PackageReference Include="ModelContextProtocol" />
     <ProjectReference Include="..\Klyroo.Stack.Mcp.Model\Klyroo.Stack.Mcp.Model.csproj" />
+    <!-- KlyrooStackCatalog: the resolve-module tool answers from it. -->
+    <ProjectReference Include="..\Klyroo.Stack.Core\Klyroo.Stack.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,6 +35,7 @@
     <_DocsBundleInput Include="$(RepoRoot)../klyroo-ui/src/Klyroo.UI/**/*.cs;$(RepoRoot)../klyroo-ui/src/Klyroo.UI/**/*.razor"
                       Exclude="$(RepoRoot)../klyroo-ui/src/Klyroo.UI/bin/**;$(RepoRoot)../klyroo-ui/src/Klyroo.UI/obj/**" />
     <_DocsBundleInput Include="$(RepoRoot)../klyroo-*/docs/*.md" />
+    <_DocsBundleInput Include="$(RepoRoot)docs/*.md" />
   </ItemGroup>
 
   <Target Name="GenerateDocsBundle" Condition="'$(DesignTimeBuild)' != 'true'" Inputs="@(DocsBundleGenerator);@(_DocsBundleInput)" Outputs="$(DocsBundleFile)">

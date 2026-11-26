@@ -103,7 +103,7 @@ Console.WriteLine(owner?.Id);                       // klyroo-table
 Console.WriteLine(KlyrooStackCatalog.GetModule("Klyroo.Form.Core")?.Name);   // Klyroo.Form
 ```
 
-`ResolveComponentModule` ignores generic arguments and case, and returns `null` for a name that no module lists. It only knows the names in each module's `KeyComponents`, which is a short list of the main types, not every component. `GetModule` accepts a repository id (`klyroo-table`), a library name (`Klyroo.Table`) or either package name.
+`ResolveComponentModule` ignores generic arguments and case, and returns `null` for a name that no module lists. It only knows the names in each module's `KeyComponents`, which is a short list of the main types, not every component. `GetModule` accepts a repository id (`klyroo-table`), a library name (`Klyroo.Table`) or either package name. The `resolve-module` tool of the [MCP server](#connect-a-coding-agent-to-the-klyrooui-documentation) gives the same answer to an agent, with the install commands and the documentation paths.
 
 ## Test an app that uses the stack
 
@@ -224,7 +224,9 @@ For a client that reads an `mcpServers` JSON file, use `{ "mcpServers": { "klyro
 
 Two options are worth knowing. `--tools search-components,get-component` limits the tools a client sees, which keeps the tool list short for clients that load every description. `--site-url https://docs.example.com` prefixes page paths in the answers with your own address once the documentation site is deployed. The server answers from the documentation bundled when the tool was built, so update the tool to get newer documentation.
 
-The server has component pages for Klyroo.UI and Klyroo.Table, and the documentation pages of every other library at `/<library>/docs/<page>`, for example `/spreadsheet/docs/guides`. `search-documentation` searches all of them.
+The server has component pages for Klyroo.UI and Klyroo.Table, and the documentation pages of every other library at `/<library>/docs/<page>`, for example `/spreadsheet/docs/guides`. The pages of this hub, the templates and the getting started among them, are at `/stack/docs/<page>`. `search-documentation` searches all of them.
+
+`resolve-module` is the tool to call when the agent does not know which library owns a name. It takes a component or controller (`KlyDataList`, `DashboardController`, `FormService`), a library or package (`Klyroo.Spreadsheet`), a repository (`klyroo-form`) or a template (`klyroo-admin`), and answers from `KlyrooStackCatalog`: the library, its Blazor and headless packages with the install commands, the template that shows it, its agent skill and the pages to read. A name that is only a Klyroo.UI component page (`KlyHeader`) resolves through the package that ships it.
 
 ## Start a project from a template
 

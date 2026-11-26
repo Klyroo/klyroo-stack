@@ -250,6 +250,78 @@ public sealed class DocsTools(DocsService docs)
         [Description("precompiled (default, no Tailwind in the app) or tailwind (Tailwind v4 compiled by your app).")] string? css = null) =>
         InstallationGuide.Render(renderMode, css, docs.Bundle.Version);
 
+    /// <summary>Tool <c>resolve-module</c>: which library, packages and template own a component, a controller, a package or a template.</summary>
+    /// <param name="name">A component or controller (<c>KlyDataList</c>, <c>DashboardController</c>), a library (<c>Klyroo.Table</c>), a package, a repository (<c>klyroo-form</c>) or a template (<c>klyroo-admin</c>).</param>
+    /// <returns>A Markdown answer: the owner, how to install it, the template that shows it, its skill and its documentation pages.</returns>
+    /// <exception cref="McpException">Nothing in the catalog matches the name.</exception>
+    [McpServerTool(Name = "resolve-module", Title = "Resolve the module that owns a name", ReadOnly = true, Idempotent = true, OpenWorld = false)]
+    [Description("Which Klyroo library, packages, dotnet new template and documentation pages own a component, controller, package, repository or template name (KlyDataList, DashboardController, FormService, Klyroo.Spreadsheet, klyroo-admin). Use it first when you do not know which library to read about or install.")]
+    public string ResolveModule(
+        [Description("A component or controller name (KlyDataList, DashboardController), a library or package (Klyroo.Table, Klyroo.Form.Core), a repository (klyroo-form) or a template short name (klyroo-admin).")] string name)
+    {
+        var query = (name ?? "").Trim();
+        if (query.Length == 0) throw new McpException("Give a component, package, repository or template name. " + Known());
+
+        // A template is not a module: describe it by the libraries it is the best showcase of.
+        var showing = KlyrooStackCatalog.Modules.Where(m => string.Equals(m.TemplateShortName, query, StringComparison.OrdinalIgnoreCase)).ToList();
+        if (showing.Count > 0)
+        {
+            var sb = new StringBuilder($"# Template `{showing[0].TemplateShortName}`\n\n");
+            sb.Append($"A `dotnet new` template of the Klyroo.Templates package: `dotnet new install Klyroo.Templates --prerelease`, then `dotnet new {showing[0].TemplateShortName} -n MyApp`.\n\n");
+            sb.Append("It is the template that shows these libraries:\n\n");
+            foreach (var m in showing) sb.Append($"- {m.Name} (`{m.Id}`): {m.Summary}\n");
+            sb.Append("\nDocumentation: `/stack/docs/guides` (section \"Start a project from a template\").\n");
+            return sb.ToString();
+        }
+
+        var how = "catalog name";
+        var module = KlyrooStackCatalog.ResolveComponentModule(query);
+        if (module is not null) how = $"`{query.Split('<')[0].Trim()}` is one of its main types";
+        module ??= KlyrooStackCatalog.GetModule(query);
+        if (module is not null && how == "catalog name") how = "its repository, library or package name";
+
+        if (module is null && docs.FindComponent(query) is { } component)
+        {
+            // A component the catalog does not list by name: the docs bundle knows the package that ships it, and a component with no package is Klyroo.UI's own.
+            var package = component.Package ?? "Klyroo.UI";
+            module = KlyrooStackCatalog.GetModule(package);
+            how = $"`{component.Name}` is a component page of the docs, shipped in `{package}`";
+        }
+
+        module ??= KlyrooStackCatalog.Modules.FirstOrDefault(m =>
+            m.KeyComponents.Any(c => c.Contains(query.Split('<')[0].Trim(), StringComparison.OrdinalIgnoreCase)) && query.Length >= 4);
+        if (module is not null && how == "catalog name") how = "a main type or name that contains it";
+
+        if (module is null)
+        {
+            throw new McpException($"No library of the Klyroo ecosystem lists '{name}'. {Known()} For a Klyroo.UI component use `search-components`; for any other word use `search-documentation`.");
+        }
+
+        var slug = module.RepositoryPath.StartsWith("klyroo-", StringComparison.Ordinal) ? module.RepositoryPath["klyroo-".Length..] : module.RepositoryPath;
+        var text = new StringBuilder($"# {module.Name} (`{module.Id}`)\n\n");
+        text.Append($"Matched because {how}.\n\n{module.Summary}\n\n");
+        text.Append("## Packages\n\n");
+        text.Append($"- Blazor: `{module.UiPackage}`: `dotnet add package {module.UiPackage} --prerelease`\n");
+        text.Append(module.CorePackage is { } core
+            ? $"- Headless: `{core}`: `dotnet add package {core} --prerelease`\n"
+            : "- Headless: none\n");
+        text.Append("- Everything at once: `Klyroo.Stack` with `services.AddKlyrooStack()`; headless, `Klyroo.Stack.Core`.\n\n");
+        text.Append("## Where to start\n\n");
+        text.Append($"- Template that shows it: `{module.TemplateShortName}` (`dotnet new {module.TemplateShortName} -n MyApp`).\n");
+        text.Append($"- Main types: {string.Join(", ", module.KeyComponents.Select(c => $"`{c}`"))}.\n");
+        text.Append($"- Agent skill: `{module.SkillPath}`.\n");
+        if (module.Id != "klyroo-ui")
+        {
+            text.Append($"- Documentation pages: `/{slug}/docs/getting-started`, `/{slug}/docs/guides`, `/{slug}/docs/api-reference` (read them with `get-documentation-page`).\n");
+        }
+        if (module.LandingPagePath.Length > 0) text.Append($"- Page of the docs site: `{module.LandingPagePath}`.\n");
+        return text.ToString();
+    }
+
+    private static string Known() =>
+        "Libraries: " + string.Join(", ", KlyrooStackCatalog.Modules.Select(m => $"{m.Name} ({m.Id})")) + ". Templates: " +
+        string.Join(", ", KlyrooStackCatalog.Modules.Select(m => m.TemplateShortName).Distinct()) + ".";
+
     private BundleComponent Resolve(string? name)
     {
         var component = docs.FindComponent(name);
