@@ -35,7 +35,10 @@ public static class BundleBuilder
             [.. Catalog.Groups.Where(g => components.Any(c => c.Group == g))],
             components,
             Guides(repoRoot),
-            Icons(repoRoot));
+            Icons(repoRoot))
+        {
+            LibraryDocs = LibraryGuides(repoRoot),
+        };
     }
 
     /// <summary>The NuGet package of a component when it is not Klyroo.UI: the assembly of its first type from a sister package (<c>Klyroo.Table</c>).</summary>
@@ -252,6 +255,40 @@ public static class BundleBuilder
                 ["Klyroo.Stack.Site.Client.Docs.Catalog.Components.Length"] = Catalog.Components.Length.ToString(),
             });
             guides.Add(new BundleGuide(href, title, section, markdown));
+        }
+        return guides;
+    }
+
+    // The documentation pages of every library repository cloned next to this one, so the MCP server answers about
+    // Klyroo.Form, Dashboard, Display, Spreadsheet, Query and Agent too. A repository that is not cloned is skipped.
+    private static readonly (string File, string Title)[] LibraryPages =
+    [
+        ("getting-started.md", "Getting started"),
+        ("guides.md", "Guides"),
+        ("concepts.md", "Concepts"),
+        ("platforms.md", "Platforms"),
+        ("faq.md", "FAQ"),
+        ("api-reference.md", "API reference"),
+    ];
+
+    private static IReadOnlyList<BundleGuide> LibraryGuides(string repoRoot)
+    {
+        var guides = new List<BundleGuide>();
+        var parent = Path.GetFullPath(Path.Combine(repoRoot, ".."));
+        foreach (var module in Klyroo.Stack.KlyrooStackCatalog.Modules)
+        {
+            // Klyroo.UI and the Table components are documented component by component already.
+            if (module.Id is "klyroo-ui") continue;
+            var docs = Path.Combine(parent, module.RepositoryPath, "docs");
+            if (!Directory.Exists(docs)) continue;
+            var slug = module.RepositoryPath.StartsWith("klyroo-", StringComparison.Ordinal) ? module.RepositoryPath["klyroo-".Length..] : module.RepositoryPath;
+            foreach (var (file, title) in LibraryPages)
+            {
+                var path = Path.Combine(docs, file);
+                if (!File.Exists(path)) continue;
+                var markdown = File.ReadAllText(path).Replace("\r\n", "\n").TrimEnd();
+                guides.Add(new BundleGuide($"/{slug}/docs/{Path.GetFileNameWithoutExtension(file)}", $"{module.Name}: {title}", module.Name, markdown));
+            }
         }
         return guides;
     }

@@ -45,7 +45,7 @@ Because `AddKlyrooUi` reuses the options object that an earlier call created, th
 
 `KlyrooStackCatalog.Modules` is a list of eight `KlyrooStackModule` records. Each one holds the repository id, the library name, the headless and Blazor package names, the template short name, the agent skill path, a summary and a list of key component names. The catalog exists so that tools do not hard-code the layout of the ecosystem: the home page of the documentation site uses it, and your own tooling can answer "which package do I add for `KlyFormEngine`" from one place.
 
-The catalog is data written by hand next to the code. A test checks that every module has an id, a name, a UI package and key components, and that ids are unique, but it cannot check that a package or template name exists on NuGet. Treat `TemplateShortName` and `LandingPagePath` as hints.
+The catalog is data written by hand next to the code. Tests check that every module has an id, a name, a UI package and key components, that ids are unique, and that every `TemplateShortName` is a template of `Klyroo.Templates`. They cannot check that a package exists on NuGet, so treat `LandingPagePath` as a hint.
 
 ## The MCP server and the documentation bundle
 
@@ -62,7 +62,7 @@ site/Klyroo.Stack.Site.Client (pages, examples)  \
 
 One bundle feeds the stdio tool, the HTTP endpoint that the site maps at `/mcp`, the `llms.txt` files and the generated skill reference, so the answers cannot drift apart. The trade-off is that the tool is only as current as its build: a new Klyroo.UI parameter appears in answers after the bundle is regenerated and the tool is republished. The tool needs no network, and it exposes only read-only tools.
 
-The bundle documents Klyroo.UI and the Klyroo.Table components that the site describes. It carries a `Package` field per component for the ones outside Klyroo.UI, so an agent that asks about a data list is told to add `Klyroo.Table`.
+The bundle documents Klyroo.UI and the Klyroo.Table components that the site describes, plus the documentation pages (getting started, guides, concepts, platforms, FAQ and API reference) of Klyroo.Query, Table, Form, Dashboard, Display, Spreadsheet and Agent, at paths such as `/form/docs/guides`; the build reads them from the sibling repositories, and skips a repository that is not cloned. It carries a `Package` field per component for the ones outside Klyroo.UI, so an agent that asks about a data list is told to add `Klyroo.Table`.
 
 ## Render modes and where state lives
 

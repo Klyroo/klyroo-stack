@@ -281,6 +281,21 @@ public class ToolsTests
     }
 
     [Fact]
+    public void The_documentation_of_every_library_is_searchable_and_readable()
+    {
+        var hits = Tools.SearchDocumentation("RegisterForm AgentBridgeService", "guides");
+        Assert.Contains("/agent/docs/", hits);
+
+        var page = Tools.GetDocumentationPage("/form/docs/getting-started");
+        Assert.Contains("FormSchema", page);
+
+        foreach (var library in new[] { "query", "table", "form", "dashboard", "display", "spreadsheet", "agent" })
+        {
+            Assert.Contains(TestSupport.Service.Bundle.LibraryDocs, g => g.Path == $"/{library}/docs/getting-started");
+        }
+    }
+
+    [Fact]
     public void Search_documentation_validates_the_section_and_reports_no_result()
     {
         Assert.Throws<McpException>(() => Tools.SearchDocumentation("x", "blog"));

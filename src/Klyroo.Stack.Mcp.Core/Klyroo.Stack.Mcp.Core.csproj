@@ -32,6 +32,7 @@
                       Exclude="$(RepoRoot)site/**/bin/**;$(RepoRoot)site/**/obj/**" />
     <_DocsBundleInput Include="$(RepoRoot)../klyroo-ui/src/Klyroo.UI/**/*.cs;$(RepoRoot)../klyroo-ui/src/Klyroo.UI/**/*.razor"
                       Exclude="$(RepoRoot)../klyroo-ui/src/Klyroo.UI/bin/**;$(RepoRoot)../klyroo-ui/src/Klyroo.UI/obj/**" />
+    <_DocsBundleInput Include="$(RepoRoot)../klyroo-*/docs/*.md" />
   </ItemGroup>
 
   <Target Name="GenerateDocsBundle" Condition="'$(DesignTimeBuild)' != 'true'" Inputs="@(DocsBundleGenerator);@(_DocsBundleInput)" Outputs="$(DocsBundleFile)">

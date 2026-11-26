@@ -15,6 +15,13 @@ public sealed record DocsBundle(
     IReadOnlyList<BundleGuide> Guides,
     IReadOnlyList<string> Icons)
 {
+    /// <summary>
+    /// The documentation pages of the other Klyroo libraries (Query, Table, Form, Dashboard, Display, Spreadsheet,
+    /// Agent), at paths such as <c>/form/docs/guides</c>. They are searchable and readable like guides, but they are
+    /// Markdown files of their repositories, not pages of the docs site.
+    /// </summary>
+    public IReadOnlyList<BundleGuide> LibraryDocs { get; init; } = [];
+
     /// <summary>The JSON settings the bundle is written and read with: web defaults, null values left out.</summary>
     public static JsonSerializerOptions JsonOptions { get; } = new(JsonSerializerDefaults.Web)
     {

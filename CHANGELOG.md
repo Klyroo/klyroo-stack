@@ -7,7 +7,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- The MCP server carries the documentation pages of Klyroo.Query, Table, Form, Dashboard, Display, Spreadsheet and Agent (`/<library>/docs/<page>`), searchable with `search-documentation` and readable with `get-documentation-page`.
+
 ### Fixed
+
+- `KlyrooStackCatalog.TemplateShortName` named templates that do not exist; each library now points at the `Klyroo.Templates` template that shows it, and a test keeps it that way.
+- `search-documentation` split camelCase words in the pages but not in the query, so a query such as `RegisterForm` found nothing.
 
 - The `klyroo-maui` template generated a project that did not build: it had no `App` class, `MainPage`, `index.html` or platform folders. It is now a complete MAUI Blazor Hybrid app.
 - The documentation site no longer lists `klyroo-behaviors.js` in Klyroo.Agent, which removed the module.

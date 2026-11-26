@@ -200,7 +200,7 @@ For a client that reads an `mcpServers` JSON file, use `{ "mcpServers": { "klyro
 
 Two options are worth knowing. `--tools search-components,get-component` limits the tools a client sees, which keeps the tool list short for clients that load every description. `--site-url https://docs.example.com` prefixes page paths in the answers with your own address once the documentation site is deployed. The server answers from the documentation bundled when the tool was built, so update the tool to get newer documentation.
 
-The server documents Klyroo.UI and the Klyroo.Table components only. For Klyroo.Form, Dashboard, Display, Spreadsheet and Agent, point the agent at `skills/klyroo-stack/SKILL.md`, which links the skill of each repository.
+The server has component pages for Klyroo.UI and Klyroo.Table, and the documentation pages of every other library at `/<library>/docs/<page>`, for example `/spreadsheet/docs/guides`. `search-documentation` searches all of them.
 
 ## Start a project from a template
 

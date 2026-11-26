@@ -10,7 +10,7 @@ namespace Klyroo.Stack;
 /// <param name="SolutionFile">The solution file of the repository, relative to the same folder.</param>
 /// <param name="CorePackage">The headless package of the library, or null when it has none.</param>
 /// <param name="UiPackage">The Blazor package of the library.</param>
-/// <param name="TemplateShortName">The short name the catalog records for the <c>dotnet new</c> template of the library.</param>
+/// <param name="TemplateShortName">The short name of the <c>Klyroo.Templates</c> project template (<c>dotnet new</c>) that best shows the library: <c>klyroo-saas</c>, <c>klyroo-admin</c>, <c>klyroo-headless</c> or <c>klyroo-maui</c>.</param>
 /// <param name="SkillPath">The agent skill file of the repository, relative to the folder that holds the sibling clones.</param>
 /// <param name="Summary">A one-sentence description of what the library offers.</param>
 /// <param name="KeyComponents">The main public types and components of the library, used by <see cref="KlyrooStackCatalog.ResolveComponentModule"/>.</param>
@@ -46,7 +46,7 @@ public static class KlyrooStackCatalog
             SolutionFile: "klyroo-ui/Klyroo.UI.slnx",
             CorePackage: "Klyroo.UI.Build.Tasks",
             UiPackage: "Klyroo.UI",
-            TemplateShortName: "klyroo-starter",
+            TemplateShortName: "klyroo-saas",
             SkillPath: "klyroo-ui/skills/klyroo-ui/SKILL.md",
             Summary: "Foundation Design System (100+ Blazor components, Tailwind v4 engine, 12 locales, SSR/WASM/MAUI Hybrid, Images & Server cookies).",
             KeyComponents: ["KlyApp", "KlyButton", "KlyInput", "KlySelect", "KlyModal", "KlyDrawer", "KlyTabs", "KlyCard", "KlyCalendar", "KlyChart", "KlyChat", "KlyEditor"],
@@ -60,7 +60,7 @@ public static class KlyrooStackCatalog
             SolutionFile: "klyroo-query/Klyroo.Query.slnx",
             CorePackage: "Klyroo.Query.Core",
             UiPackage: "Klyroo.Query",
-            TemplateShortName: "klyroo-query",
+            TemplateShortName: "klyroo-headless",
             SkillPath: "klyroo-query/skills/klyroo-query/SKILL.md",
             Summary: "Headless NativeAOT query AST, URL search parameter codecs, IQueryable applier, InMemory engine, Blazor QueryState and EF Core async executor.",
             KeyComponents: ["DataListSchema", "DataListRequest", "DataListFilterGroup", "QueryCodec", "QueryState", "EfAsyncQueryExecutor"],
@@ -74,7 +74,7 @@ public static class KlyrooStackCatalog
             SolutionFile: "klyroo-table/Klyroo.Table.slnx",
             CorePackage: "Klyroo.Table.Core",
             UiPackage: "Klyroo.Table",
-            TemplateShortName: "klyroo-table-admin",
+            TemplateShortName: "klyroo-admin",
             SkillPath: "klyroo-table/skills/klyroo-table/SKILL.md",
             Summary: "Data lists with table and card-grid layouts, filters, selection, actions, grouping, tree hierarchy and summary rows, built on Klyroo.Query and Klyroo.UI.",
             KeyComponents: ["KlyDataList", "KlyDataListTable", "KlyDataListGrid", "KlyDataListColumn", "KlyDataListToolbar", "KlyDataListFilterBar", "KlyDataListPagination", "DataListTree", "DataListGroupBy", "DataListSummaries"],
@@ -88,7 +88,7 @@ public static class KlyrooStackCatalog
             SolutionFile: "klyroo-form/Klyroo.Form.slnx",
             CorePackage: "Klyroo.Form.Core",
             UiPackage: "Klyroo.Form",
-            TemplateShortName: "klyroo-form-wizard",
+            TemplateShortName: "klyroo-saas",
             SkillPath: "klyroo-form/skills/klyroo-form/SKILL.md",
             Summary: "Schema-driven forms: field kinds, reactive conditions, dirty tracking, validation triggers, multi-step wizards with SkipWhen, page sections and overlay forms through FormService.",
             KeyComponents: ["FormSchema", "FormController", "FormService", "KlyFormEngine", "KlyFormPage", "KlyFormProvider"],
@@ -102,7 +102,7 @@ public static class KlyrooStackCatalog
             SolutionFile: "klyroo-dashboard/Klyroo.Dashboard.slnx",
             CorePackage: "Klyroo.Dashboard.Core",
             UiPackage: "Klyroo.Dashboard",
-            TemplateShortName: "klyroo-analytics",
+            TemplateShortName: "klyroo-admin",
             SkillPath: "klyroo-dashboard/skills/klyroo-dashboard/SKILL.md",
             Summary: "Analytical Dashboard Engine (staged Essential/Background/Deferred queries, filters & presets, views, comparison date ranges, CSV export, KPI & chart cards).",
             KeyComponents: ["DashboardController", "DashboardResource", "DashboardFilterControl", "DashboardFormat", "KlyDashboardPage", "KlyDashboardGrid", "KlyDashboardCard", "KlyDashboardStat", "KlyDashboardStats", "KlyDashboardGauge", "KlyDashboardTable", "KlyDashboardChart", "KlyDashboardBars", "KlyDashboardList", "KlyDashboardAlerts", "KlyDashboardFeed"],
@@ -116,7 +116,7 @@ public static class KlyrooStackCatalog
             SolutionFile: "klyroo-display/Klyroo.Display.slnx",
             CorePackage: "Klyroo.Display.Core",
             UiPackage: "Klyroo.Display",
-            TemplateShortName: "klyroo-display-portal",
+            TemplateShortName: "klyroo-saas",
             SkillPath: "klyroo-display/skills/klyroo-display/SKILL.md",
             Summary: "Read-only display blocks (19 kinds), audio and video player controls with clip and play-quota rules, and a file preview overlay.",
             KeyComponents: ["KlyDisplay", "KlyAudioPlayer", "KlyVideoPlayer", "KlyFilePreviewProvider", "FilePreviewService"],
@@ -130,7 +130,7 @@ public static class KlyrooStackCatalog
             SolutionFile: "klyroo-spreadsheet/Klyroo.Spreadsheet.slnx",
             CorePackage: "Klyroo.Spreadsheet.Core",
             UiPackage: "Klyroo.Spreadsheet",
-            TemplateShortName: "klyroo-spreadsheet-app",
+            TemplateShortName: "klyroo-headless",
             SkillPath: "klyroo-spreadsheet/skills/klyroo-spreadsheet/SKILL.md",
             Summary: "Headless workbook/CSV/TSV importer (layout detection, NFD header normalization, 80%-pass column suggestions, unknown value questions, duplicates/upsert, inline edits & wizard).",
             KeyComponents: ["SpreadsheetSchema", "SpreadsheetImporter", "KlySpreadsheetImport"],
@@ -144,7 +144,7 @@ public static class KlyrooStackCatalog
             SolutionFile: "klyroo-agent/Klyroo.Agent.slnx",
             CorePackage: "Klyroo.Agent.Core",
             UiPackage: "Klyroo.Agent",
-            TemplateShortName: "klyroo-agent-copilot",
+            TemplateShortName: "klyroo-headless",
             SkillPath: "klyroo-agent/skills/klyroo-agent/SKILL.md",
             Summary: "Agent bridge that lets AI agents read and act on Klyroo forms, dashboards and imports (snapshot, query, act, observe with secret redaction, UndoStack), plus browser behaviors and WebMCP tools in JavaScript.",
             KeyComponents: ["AgentBridgeService", "UndoStack", "ObservedChange", "AgentComponentSnapshot", "AgentActStep"],

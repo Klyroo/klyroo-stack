@@ -92,7 +92,7 @@ dotnet tool install --global Klyroo.Stack.Mcp --prerelease
 claude mcp add --transport stdio klyroo -- klyroo-stack-mcp
 ```
 
-The server covers the components of Klyroo.UI and the Klyroo.Table components that the documentation site describes. It does not document Klyroo.Form, Dashboard, Display, Spreadsheet or Agent: use the skill of each repository for those. See the [package page](src/Klyroo.Stack.Mcp/README.md) for the tools, prompts, resources, options and client configuration.
+The server covers the components of Klyroo.UI and the Klyroo.Table components that the documentation site describes. It also carries the documentation pages (getting started, guides, concepts, platforms, FAQ and API reference) of Klyroo.Query, Table, Form, Dashboard, Display, Spreadsheet and Agent, at paths such as `/form/docs/guides`, which `search-documentation` and `get-documentation-page` read. See the [package page](src/Klyroo.Stack.Mcp/README.md) for the tools, prompts, resources, options and client configuration.
 
 ### Project templates
 

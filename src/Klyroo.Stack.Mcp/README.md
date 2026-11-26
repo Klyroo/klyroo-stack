@@ -1,6 +1,6 @@
 # Klyroo.Stack.Mcp
 
-A local [Model Context Protocol](https://modelcontextprotocol.io) server that gives AI coding agents the Klyroo.UI documentation, so they read the real API instead of guessing it. It runs over stdio, offline, and answers from the documentation bundle embedded at build time: the components of Klyroo.UI and the Klyroo.Table components described on the documentation site, with parameters, events, slots, theme slots, example sources, guides and installation steps. It does not document Klyroo.Form, Dashboard, Display, Spreadsheet or Agent.
+A local [Model Context Protocol](https://modelcontextprotocol.io) server that gives AI coding agents the Klyroo.UI documentation, so they read the real API instead of guessing it. It runs over stdio, offline, and answers from the documentation bundle embedded at build time: the components of Klyroo.UI and the Klyroo.Table components described on the documentation site, with parameters, events, slots, theme slots, example sources, guides and installation steps. It also carries the documentation pages (getting started, guides, concepts, platforms, FAQ and API reference) of Klyroo.Query, Table, Form, Dashboard, Display, Spreadsheet and Agent, at paths such as `/form/docs/guides`.
 
 ## Install
 

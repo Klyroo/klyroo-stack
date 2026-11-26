@@ -47,7 +47,7 @@ Describes one repository/module in the Klyroo ecosystem. `KlyrooStackModule.Repo
 | `SkillPath` (init) | `string` | The agent skill file of the repository, relative to the folder that holds the sibling clones. |
 | `SolutionFile` (init) | `string` | The solution file of the repository, relative to the same folder. |
 | `Summary` (init) | `string` | A one-sentence description of what the library offers. |
-| `TemplateShortName` (init) | `string` | The short name the catalog records for the `dotnet new` template of the library. |
+| `TemplateShortName` (init) | `string` | The short name of the `Klyroo.Templates` project template (`dotnet new`) that best shows the library: `klyroo-saas`, `klyroo-admin`, `klyroo-headless` or `klyroo-maui`. |
 | `UiPackage` (init) | `string` | The Blazor package of the library. |
 
 ## Klyroo.Stack

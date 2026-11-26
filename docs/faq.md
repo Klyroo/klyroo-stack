@@ -26,14 +26,14 @@ The overlays render through `KlyFormProvider` and `KlyFilePreviewProvider`. Put 
 You passed an option it does not know, or a name in `--tools` that is not a tool. Run `klyroo-stack-mcp --list-tools` for the valid names. The message on stderr says which argument was rejected.
 
 **The MCP server says "No component named ...".**
-The component is not in the bundle. The bundle covers Klyroo.UI and the Klyroo.Table components that the documentation site describes. Ask for it with `search-components` by intent, or read the skill of the library that owns it.
+The component is not in the bundle. Component pages cover Klyroo.UI and the Klyroo.Table components that the documentation site describes; the other libraries are documented as pages (`/form/docs/guides`, `/dashboard/docs/api-reference` and so on), which `search-documentation` finds.
 
 ## Known limitations
 
-- The MCP server documents Klyroo.UI and the Klyroo.Table components only. It does not cover Klyroo.Form, Dashboard, Display, Spreadsheet or Agent.
+- The MCP server has component pages (parameters, events, examples) for Klyroo.UI and Klyroo.Table only. The other libraries are covered by their Markdown documentation pages.
 - The MCP server answers from the documentation bundled at build time. It does not see newer components until the tool is rebuilt and republished.
 - `Klyroo.Stack` does not include `Klyroo.Query.EntityFrameworkCore`, `Klyroo.UI.Server` or `Klyroo.UI.Images`. Add them when you need EF Core execution, the server-side cookies for static rendering, or the image pipeline.
-- `KlyrooStackCatalog` lists the main types of each library, not every component, and its `TemplateShortName` values are not all `dotnet new` templates that exist.
+- `KlyrooStackCatalog` lists the main types of each library, not every component.
 - The documentation site is not deployed. Run it locally, as described in the [README](../README.md#run-the-documentation-site-locally).
 - MAUI Blazor Hybrid support is verified on Android only, according to the Klyroo.UI documentation. See [Platforms](platforms.md).
 

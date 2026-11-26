@@ -248,7 +248,8 @@ public sealed partial class DocsService
     }
 
     private static IReadOnlyList<string> Tokens(string query) =>
-        [.. WordSplit().Split(query.ToLowerInvariant()).Where(t => t.Length > 0 && !StopWords.Contains(t)).Select(Stem).Distinct().Take(MaxQueryTokens)];
+        // Split camelCase like the indexed text does, so "RegisterForm" finds "RegisterForm".
+        [.. WordSplit().Split(CamelBoundary().Replace(query, "$1 $2").ToLowerInvariant()).Where(t => t.Length > 0 && !StopWords.Contains(t)).Select(Stem).Distinct().Take(MaxQueryTokens)];
 
     private static HashSet<string> Words(string text) =>
         [.. WordSplit().Split(CamelBoundary().Replace(text, "$1 $2").ToLowerInvariant()).Where(t => t.Length > 0).Select(Stem)];
@@ -359,6 +360,10 @@ public sealed partial class DocsService
             guideKey = guideKey.StartsWith("docs/", StringComparison.Ordinal) ? guideKey["docs/".Length..] : guideKey == "docs" ? "" : guideKey;
             if (guideKey == key) return guide;
         }
+        foreach (var page in Bundle.LibraryDocs)
+        {
+            if (page.Path.Trim('/').Equals(key, StringComparison.OrdinalIgnoreCase)) return page;
+        }
         // "introduction" is the page at /docs.
         return Bundle.Guides.FirstOrDefault(g => Normalize(g.Title) == Normalize(path));
     }
@@ -369,7 +374,7 @@ public sealed partial class DocsService
     private IReadOnlyList<DocPassage> BuildPassages()
     {
         var list = new List<DocPassage>();
-        foreach (var guide in Bundle.Guides)
+        foreach (var guide in Bundle.Guides.Concat(Bundle.LibraryDocs))
         {
             foreach (var (heading, text) in MarkdownSections.Split(guide.Markdown))
             {

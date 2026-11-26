@@ -193,7 +193,7 @@ public sealed class DocsTools(DocsService docs)
     [McpServerTool(Name = "get-documentation-page", Title = "Get a documentation page", ReadOnly = true, Idempotent = true, OpenWorld = false)]
     [Description("A page of the docs site as Markdown: a guide (/docs/installation, /docs/theming, /docs/render-modes, /docs/mcp...) or a component page (/components/button). Pass headings to get only some sections of a guide.")]
     public string GetDocumentationPage(
-        [Description("The path of the page: /docs/theming, theming, /components/button.")] string path,
+        [Description("The path of the page: /docs/theming, theming, /components/button, or a library page such as /form/docs/guides.")] string path,
         [Description("Comma-separated headings to keep (guides only), matched by substring.")] string? headings = null)
     {
         var trimmed = (path ?? "").Trim();
@@ -206,7 +206,7 @@ public sealed class DocsTools(DocsService docs)
         var guide = docs.FindGuide(trimmed);
         if (guide is null)
         {
-            throw new McpException($"No page at '{path}'. Guides: {string.Join(", ", docs.Bundle.Guides.Select(g => g.Path))}. Component pages: /components/{{slug}} (see `search-components`).");
+            throw new McpException($"No page at '{path}'. Guides: {string.Join(", ", docs.Bundle.Guides.Select(g => g.Path))}. Library pages: {string.Join(", ", docs.Bundle.LibraryDocs.Select(g => g.Path))}. Component pages: /components/{{slug}} (see `search-components`).");
         }
 
         var markdown = guide.Markdown;

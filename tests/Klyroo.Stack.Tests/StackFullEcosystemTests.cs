@@ -28,6 +28,19 @@ public sealed class StackFullEcosystemTests : BunitContext
         .DefaultSort(c => c.Name));
 
     [Fact]
+    public void KlyrooStackCatalog_template_names_are_templates_that_Klyroo_Templates_ships()
+    {
+        var root = new DirectoryInfo(AppContext.BaseDirectory);
+        while (root is not null && !File.Exists(Path.Combine(root.FullName, "Klyroo.Stack.slnx"))) root = root.Parent;
+        Assert.NotNull(root);
+        var shortNames = Directory.GetFiles(Path.Combine(root.FullName, "templates", "Klyroo.Templates", "content"), "template.json", SearchOption.AllDirectories)
+            .Select(path => System.Text.Json.JsonDocument.Parse(File.ReadAllText(path)).RootElement.GetProperty("shortName").GetString())
+            .ToHashSet(StringComparer.Ordinal);
+
+        Assert.All(KlyrooStackCatalog.Modules, m => Assert.Contains(m.TemplateShortName, shortNames));
+    }
+
+    [Fact]
     public void KlyrooStackCatalog_metadata_is_complete_unique_and_returns_null_for_unknown_components()
     {
         var ids = KlyrooStackCatalog.Modules.Select(m => m.Id).ToList();
