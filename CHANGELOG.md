@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- `klyroo-stack.css` repeated 222 utility rules that `klyroo.css` already holds. Both sheets put them in one cascade layer, so the later copy won over the rules between them: the items of the header navigation and the search field of a data list were laid out wrongly. The sheet now only holds what `klyroo.css` lacks (41.9 KB to 27.8 KB), `build/dedupe-stack-css.mjs` rewrites it, and a test fails when a shared rule comes back.
 - `KlyrooStackCatalog.TemplateShortName` named templates that do not exist; each library now points at the `Klyroo.Templates` template that shows it, and a test keeps it that way.
 - `search-documentation` split camelCase words in the pages but not in the query, so a query such as `RegisterForm` found nothing.
 
