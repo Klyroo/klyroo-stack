@@ -20,7 +20,7 @@ The registry of the eight libraries of the Klyroo ecosystem. It maps a component
 
 | Method | Returns | Description |
 | :--- | :--- | :--- |
-| `static GetModule(string idOrName)` | `KlyrooStackModule?` | Finds a module by its repository ID (e.g. `"klyroo-table"`) or package name (e.g. `"Klyroo.Table"`). |
+| `static GetModule(string idOrName)` | `KlyrooStackModule?` | Finds a module by its repository ID (e.g. `"klyroo-table"`) or package name (e.g. `"Klyroo.Table"`, or an add-on such as `"Klyroo.Form.DataAnnotations"`). |
 | `static ResolveComponentModule(string componentOrControllerName)` | `KlyrooStackModule?` | Finds the owning `KlyrooStackModule` for a given component or controller name (case-insensitive). |
 
 ### Records

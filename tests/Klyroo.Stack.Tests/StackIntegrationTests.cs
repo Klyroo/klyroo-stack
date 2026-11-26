@@ -51,7 +51,26 @@ public sealed class StackIntegrationTests : BunitContext
         Assert.Equal(["Klyroo.Form.DataAnnotations"], form.AddOnPackages);
         Assert.Contains("Klyroo.UI.Server", KlyrooStackCatalog.Modules.Single(m => m.Id == "klyroo-ui").AddOnPackages!);
         Assert.Contains("Klyroo.Query.EntityFrameworkCore", KlyrooStackCatalog.Modules.Single(m => m.Id == "klyroo-query").AddOnPackages!);
+        Assert.Equal(["Klyroo.Agent.AI"], KlyrooStackCatalog.Modules.Single(m => m.Id == "klyroo-agent").AddOnPackages);
+    }
 
+    [Fact]
+    public void KlyrooStackCatalog_GetModule_resolves_an_add_on_package_to_its_library()
+    {
+        Assert.Equal("klyroo-form", KlyrooStackCatalog.GetModule("Klyroo.Form.DataAnnotations")?.Id);
+        Assert.Equal("klyroo-ui", KlyrooStackCatalog.GetModule("klyroo.ui.server")?.Id);
+        Assert.Equal("klyroo-ui", KlyrooStackCatalog.GetModule("Klyroo.UI.Images.Local")?.Id);
+        Assert.Equal("klyroo-agent", KlyrooStackCatalog.GetModule("Klyroo.Agent.AI")?.Id);
+        foreach (var module in KlyrooStackCatalog.Modules)
+        {
+            foreach (var package in module.AddOnPackages ?? []) Assert.Equal(module.Id, KlyrooStackCatalog.GetModule(package)?.Id);
+        }
+        Assert.Null(KlyrooStackCatalog.GetModule("Klyroo.Nothing"));
+    }
+
+    [Fact]
+    public void No_add_on_package_is_a_dependency_of_the_hub_or_the_Core_meta_package()
+    {
         // None of them is a package the hub or the Core meta-package depends on.
         var root = new DirectoryInfo(AppContext.BaseDirectory);
         while (root is not null && !File.Exists(Path.Combine(root.FullName, "Klyroo.Stack.slnx"))) root = root.Parent;

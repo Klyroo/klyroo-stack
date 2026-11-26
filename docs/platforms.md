@@ -58,6 +58,6 @@ The `klyroo-maui` template is a complete MAUI Blazor Hybrid app built on the .NE
 
 ## Limitations
 
-- The meta-package does not include `Klyroo.Query.EntityFrameworkCore`, `Klyroo.UI.Server`, `Klyroo.UI.Images` or `Klyroo.Form.DataAnnotations`.
+- The meta-package does not include `Klyroo.Query.EntityFrameworkCore`, `Klyroo.UI.Server`, `Klyroo.UI.Images`, `Klyroo.Form.DataAnnotations` or `Klyroo.Agent.AI`.
 - The MCP server runs on the .NET runtime, not as a native binary.
 - The tool and the templates require the .NET 10 runtime or newer.

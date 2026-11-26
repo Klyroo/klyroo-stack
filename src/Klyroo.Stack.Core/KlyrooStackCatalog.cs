@@ -153,6 +153,7 @@ public static class KlyrooStackCatalog
             SkillPath: "klyroo-agent/skills/klyroo-agent/SKILL.md",
             Summary: "Agent bridge that lets AI agents read and act on Klyroo forms, dashboards and imports (snapshot, query, act, observe with secret redaction, UndoStack), plus browser behaviors and WebMCP tools in JavaScript.",
             KeyComponents: ["AgentBridgeService", "UndoStack", "ObservedChange", "AgentComponentSnapshot", "AgentActStep", "AgentArgument", "AgentValue", "AgentToolResult"],
+            AddOnPackages: ["Klyroo.Agent.AI"],
             AccentHex: "#6366f1",
             LandingPagePath: "/agent"),
     ];
@@ -168,13 +169,14 @@ public static class KlyrooStackCatalog
             m.KeyComponents.Any(c => string.Equals(c, trimmed, StringComparison.OrdinalIgnoreCase)));
     }
 
-    /// <summary>Finds a module by its repository ID (e.g. <c>"klyroo-table"</c>) or package name (e.g. <c>"Klyroo.Table"</c>).</summary>
-    /// <param name="idOrName">A repository ID, a library name, or the name of its core or Blazor package (case-insensitive).</param>
+    /// <summary>Finds a module by its repository ID (e.g. <c>"klyroo-table"</c>) or package name (e.g. <c>"Klyroo.Table"</c>, or an add-on such as <c>"Klyroo.Form.DataAnnotations"</c>).</summary>
+    /// <param name="idOrName">A repository ID, a library name, or the name of its core, Blazor or add-on package (case-insensitive).</param>
     /// <returns>The matching module, or null.</returns>
     public static KlyrooStackModule? GetModule(string idOrName) =>
         Modules.FirstOrDefault(m =>
             string.Equals(m.Id, idOrName, StringComparison.OrdinalIgnoreCase)
             || string.Equals(m.Name, idOrName, StringComparison.OrdinalIgnoreCase)
             || string.Equals(m.CorePackage, idOrName, StringComparison.OrdinalIgnoreCase)
-            || string.Equals(m.UiPackage, idOrName, StringComparison.OrdinalIgnoreCase));
+            || string.Equals(m.UiPackage, idOrName, StringComparison.OrdinalIgnoreCase)
+            || (m.AddOnPackages?.Any(p => string.Equals(p, idOrName, StringComparison.OrdinalIgnoreCase)) ?? false));
 }

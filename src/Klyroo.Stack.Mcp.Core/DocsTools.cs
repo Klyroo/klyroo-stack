@@ -305,6 +305,10 @@ public sealed class DocsTools(DocsService docs)
         text.Append(module.CorePackage is { } core
             ? $"- Headless: `{core}`: `dotnet add package {core} --prerelease`\n"
             : "- Headless: none\n");
+        if (module.AddOnPackages is { Count: > 0 } addOns)
+        {
+            foreach (var addOn in addOns) text.Append($"- Add-on, not in `Klyroo.Stack`: `{addOn}`: `dotnet add package {addOn} --prerelease`\n");
+        }
         text.Append("- Everything at once: `Klyroo.Stack` with `services.AddKlyrooStack()`; headless, `Klyroo.Stack.Core`.\n\n");
         text.Append("## Where to start\n\n");
         text.Append($"- Template that shows it: `{module.TemplateShortName}` (`dotnet new {module.TemplateShortName} -n MyApp`).\n");

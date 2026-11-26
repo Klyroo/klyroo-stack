@@ -38,7 +38,7 @@ The component is not in the bundle. Component pages cover Klyroo.UI and the Klyr
 
 - The MCP server has component pages (parameters, events, examples) for Klyroo.UI and Klyroo.Table only. The other libraries are covered by their Markdown documentation pages.
 - The MCP server answers from the documentation bundled at build time. It does not see newer components until the tool is rebuilt and republished.
-- `Klyroo.Stack` does not include `Klyroo.Query.EntityFrameworkCore`, `Klyroo.UI.Server`, `Klyroo.UI.Images` or `Klyroo.Form.DataAnnotations`. Add them when you need EF Core execution, the server-side cookies for static rendering, the image pipeline, or forms that read the data annotation attributes of your models.
+- `Klyroo.Stack` does not include `Klyroo.Query.EntityFrameworkCore`, `Klyroo.UI.Server`, `Klyroo.UI.Images`, `Klyroo.Form.DataAnnotations` or `Klyroo.Agent.AI`. Add them when you need EF Core execution, the server-side cookies for static rendering, the image pipeline, forms that read the data annotation attributes of your models, or the agent bridge as `Microsoft.Extensions.AI` functions.
 - `KlyrooStackCatalog` lists the main types of each library, not every component.
 - The documentation site is not deployed. Run it locally, as described in the [README](../README.md#run-the-documentation-site-locally).
 - MAUI Blazor Hybrid support is verified on Android only, according to the Klyroo.UI documentation. See [Platforms](platforms.md).

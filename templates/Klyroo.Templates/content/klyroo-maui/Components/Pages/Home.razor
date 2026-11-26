@@ -9,19 +9,27 @@
 </div>
 
 @code {
+    // What the form edits: its field takes the type of the property, and the submit writes the text here.
+    private sealed class NoteForm
+    {
+        public string Text { get; set; } = "";
+    }
+
+    private static readonly FormSchema<NoteForm> NoteSchema = FormSchema.For<NoteForm>(s =>
+    {
+        s.FormKey = "note";
+        s.Title = "New note";
+        s.Field(n => n.Text, f => f.Label("Note").Required().AsTextarea());
+    });
+
     // FormService opens the form in the KlyFormProvider of MainLayout, and the task ends when the drawer closes.
     private async Task AddNoteAsync()
     {
-        var outcome = await Forms.CreateFormAsync(new FormSchema
-        {
-            FormKey = "note",
-            Title = "New note",
-            Fields = [new FormFieldSchema { Key = "text", Label = "Note", Kind = FormFieldKind.Textarea, Required = true }],
-        }, mode: FormShellMode.Drawer);
+        var outcome = await Forms.CreateFormAsync(NoteSchema, mode: FormShellMode.Drawer);
 
         if (outcome.IsCompleted)
         {
-            await Toasts.Add(new KlyToast { Title = "Note saved", Description = outcome.FormData["text"]?.ToString(), Color = KlyColor.Success });
+            await Toasts.Add(new KlyToast { Title = "Note saved", Description = outcome.Model?.Text, Color = KlyColor.Success });
         }
     }
 }

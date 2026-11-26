@@ -40,6 +40,7 @@ Install the hub when you want every library with one registration call, or when 
 | EF Core execution of Klyroo.Query | `Klyroo.Query.EntityFrameworkCore`, which `Klyroo.Stack` does not include |
 | Server-only helpers or the image pipeline of Klyroo.UI | `Klyroo.UI.Server` and `Klyroo.UI.Images`, which `Klyroo.Stack` does not include |
 | Forms that read `[Required]`, `[StringLength]`, `[Range]` and the other attributes of your models | `Klyroo.Form.DataAnnotations`, which `Klyroo.Stack` does not include |
+| The agent bridge as `Microsoft.Extensions.AI` functions for an `IChatClient` | `Klyroo.Agent.AI`, which `Klyroo.Stack` does not include |
 | Your coding agent to know the Klyroo.UI API | `Klyroo.Stack.Mcp` |
 
 ## Prerequisites

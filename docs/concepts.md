@@ -33,7 +33,7 @@ Klyroo.Stack (Blazor, MAUI Blazor Hybrid)
 
 Klyroo.UI has no `.Core` package. The catalog lists `Klyroo.UI.Build.Tasks` in that slot, which is the MSBuild task package of Klyroo.UI and not a headless engine, so `Klyroo.Stack.Core` does not reference it.
 
-A few packages are add-ons that the hub does not reference: `Klyroo.UI.Server`, `Klyroo.UI.Images`, `Klyroo.UI.Images.Local`, `Klyroo.Query.EntityFrameworkCore` and `Klyroo.Form.DataAnnotations`. `KlyrooStackModule.AddOnPackages` lists them per library.
+A few packages are add-ons that the hub does not reference: `Klyroo.UI.Server`, `Klyroo.UI.Images`, `Klyroo.UI.Images.Local`, `Klyroo.Query.EntityFrameworkCore`, `Klyroo.Form.DataAnnotations` and `Klyroo.Agent.AI`. `KlyrooStackModule.AddOnPackages` lists them per library.
 
 ## What `AddKlyrooStack()` does
 

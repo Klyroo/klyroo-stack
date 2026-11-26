@@ -334,6 +334,33 @@ public class ToolsTests
         Assert.Contains("AddKlyrooStack", answer);
     }
 
+    [Theory]
+    [InlineData("Klyroo.Form.DataAnnotations", "Klyroo.Form")]
+    [InlineData("klyroo.ui.server", "Klyroo.UI")]
+    [InlineData("Klyroo.Query.EntityFrameworkCore", "Klyroo.Query")]
+    [InlineData("Klyroo.Agent.AI", "Klyroo.Agent")]
+    public void Resolve_module_resolves_an_add_on_package_to_its_library_and_lists_it_to_install(string package, string library)
+    {
+        var answer = Tools.ResolveModule(package);
+        var addOn = KlyrooStackCatalog.GetModule(package)!.AddOnPackages!.Single(p => string.Equals(p, package, StringComparison.OrdinalIgnoreCase));
+
+        Assert.StartsWith($"# {library} (", answer);
+        Assert.Contains($"dotnet add package {addOn} --prerelease", answer);
+    }
+
+    [Fact]
+    public void Resolve_module_lists_every_add_on_package_of_a_library_in_its_packages_section()
+    {
+        foreach (var module in KlyrooStackCatalog.Modules.Where(m => m.AddOnPackages is { Count: > 0 }))
+        {
+            var answer = Tools.ResolveModule(module.Id);
+            foreach (var addOn in module.AddOnPackages!)
+            {
+                Assert.Contains($"dotnet add package {addOn} --prerelease", answer);
+            }
+        }
+    }
+
     [Fact]
     public void Resolve_module_agrees_with_the_catalog_for_every_main_type_of_every_library()
     {
