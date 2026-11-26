@@ -1,14 +1,15 @@
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 
 [assembly: AssemblyFixture(typeof(Klyroo.Stack.E2E.PlaygroundServer))]
 
 namespace Klyroo.Stack.E2E;
 
 /// <summary>
-/// Starts the playground once for the whole test run, and one browser chosen by KLYROO_BROWSER
-/// (chromium, firefox or webkit; chromium by default).
+/// Starts the documentation site (site/Klyroo.Stack.Site, called the playground in these tests) once for the whole test run, and one browser chosen
+/// by KLYROO_BROWSER (chromium, firefox or webkit; chromium by default).
 /// </summary>
 public sealed class PlaygroundServer : IAsyncLifetime
 {
@@ -33,7 +34,12 @@ public sealed class PlaygroundServer : IAsyncLifetime
             "webkit" => _playwright.Webkit,
             _ => _playwright.Chromium,
         };
-        Browser = await browserType.LaunchAsync();
+        // KLYROO_BROWSER_EXECUTABLE (/usr/bin/google-chrome) or KLYROO_BROWSER_CHANNEL (chrome, msedge) use a browser of the machine instead of the one
+        // Playwright downloads (pwsh bin/Release/net10.0/playwright.ps1 install --with-deps chromium).
+        var options = new BrowserTypeLaunchOptions();
+        if (Environment.GetEnvironmentVariable("KLYROO_BROWSER_EXECUTABLE") is { Length: > 0 } executable) options.ExecutablePath = executable;
+        else if (Environment.GetEnvironmentVariable("KLYROO_BROWSER_CHANNEL") is { Length: > 0 } channel) options.Channel = channel;
+        Browser = await browserType.LaunchAsync(options);
     }
 
     public async ValueTask DisposeAsync()
@@ -62,16 +68,16 @@ public sealed class PlaygroundServer : IAsyncLifetime
         ProcessStartInfo start;
         if (string.IsNullOrEmpty(published))
         {
-            var project = Path.Combine(RepoRoot(), "playground", "Klyroo.Stack.Site", "Klyroo.Stack.Site");
+            var project = Path.Combine(RepoRoot(), "site", "Klyroo.Stack.Site");
             if (direct)
             {
                 // The host itself, not "dotnet run" in front of it: a test that kills the host needs to kill that process and nothing else.
-                var dll = Directory.EnumerateFiles(Path.Combine(project, "bin"), "Klyroo.Stack.Site.dll", SearchOption.AllDirectories).First();
+                var dll = Directory.EnumerateFiles(Path.Combine(project, "bin", Configuration), "Klyroo.Stack.Site.dll", SearchOption.AllDirectories).First();
                 start = new ProcessStartInfo("dotnet", [dll, "--urls", baseUrl]) { WorkingDirectory = project };
             }
             else
             {
-                start = new ProcessStartInfo("dotnet", ["run", "--no-build", "--project", project, "--urls", baseUrl]);
+                start = new ProcessStartInfo("dotnet", ["run", "--no-build", "-c", Configuration, "--project", project, "--urls", baseUrl]);
             }
             // Static web assets of referenced libraries are only served from their source folders in Development.
             start.Environment["ASPNETCORE_ENVIRONMENT"] = "Development";
@@ -94,6 +100,8 @@ public sealed class PlaygroundServer : IAsyncLifetime
         // The Changelog demo reads the sample releases of the template, never GitHub: the E2E run needs no network (the production setting is in
         // the appsettings.json of the docs host: Klyroo:Templates:Demos:changelog).
         // The Chat demo answers from canned replies, never from a service (also the production setting, in the appsettings.json of the docs host).
+        // The demos run from the build output of the configuration the tests were built in (the docs host looks in Debug otherwise).
+        start.Environment["Klyroo__Templates__Configuration"] = Configuration;
         start.Environment["Klyroo__Templates__Demos__chat__Assistant__Provider"] = "Simulated";
         start.Environment["Klyroo__Templates__Demos__changelog__Changelog__Source"] = "File";
         start.Environment["Klyroo__Templates__Demos__changelog__Changelog__Repository"] = "tern-cli/tern";
@@ -175,6 +183,10 @@ public sealed class PlaygroundServer : IAsyncLifetime
         throw new TimeoutException("The playground did not answer within 60 seconds.");
     }
 
+    /// <summary>The configuration this assembly was built in: the site and the template demos are started from that build output, never rebuilt.</summary>
+    private static string Configuration { get; } =
+        typeof(PlaygroundServer).Assembly.GetCustomAttributes<System.Reflection.AssemblyMetadataAttribute>().FirstOrDefault(a => a.Key == "BuildConfiguration")?.Value ?? "Debug";
+
     private static int FreePort()
     {
         using var listener = new TcpListener(IPAddress.Loopback, 0);
@@ -186,9 +198,9 @@ public sealed class PlaygroundServer : IAsyncLifetime
     {
         for (var dir = new DirectoryInfo(AppContext.BaseDirectory); dir is not null; dir = dir.Parent)
         {
-            if (File.Exists(Path.Combine(dir.FullName, "Klyroo.UI.slnx"))) return dir.FullName;
+            if (File.Exists(Path.Combine(dir.FullName, "Klyroo.Stack.slnx"))) return dir.FullName;
         }
-        throw new DirectoryNotFoundException("Klyroo.UI.slnx not found above the test output directory.");
+        throw new DirectoryNotFoundException("Klyroo.Stack.slnx not found above the test output directory.");
     }
 }
 

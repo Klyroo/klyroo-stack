@@ -5,7 +5,7 @@ namespace Klyroo.Stack.E2E;
 /// host the fixture started, at 1280x800 in light and in dark, and writes <c>template-{name}-{light|dark}.png</c> to the folder in
 /// <c>KLYROO_TEMPLATE_SCREENSHOTS</c>; without the variable it is skipped. Run it on demand and commit the images, they are not compared in CI:
 /// <code>
-/// KLYROO_TEMPLATE_SCREENSHOTS=playground/Klyroo.Stack.Site/Klyroo.Stack.Site/wwwroot/img dotnet test --project tests/Klyroo.Stack.E2E --filter-class "Klyroo.Stack.E2E.TemplateScreenshots"
+/// KLYROO_TEMPLATE_SCREENSHOTS=site/Klyroo.Stack.Site/wwwroot/img dotnet test --project tests/Klyroo.Stack.E2E -- --filter-class "Klyroo.Stack.E2E.TemplateScreenshots"
 /// </code>
 /// </summary>
 public class TemplateScreenshots(PlaygroundServer server)
@@ -62,8 +62,8 @@ public class TemplateScreenshots(PlaygroundServer server)
     {
         for (var dir = new DirectoryInfo(AppContext.BaseDirectory); dir is not null; dir = dir.Parent)
         {
-            if (File.Exists(Path.Combine(dir.FullName, "Klyroo.UI.slnx"))) return dir.FullName;
+            if (File.Exists(Path.Combine(dir.FullName, "Klyroo.Stack.slnx"))) return dir.FullName;
         }
-        throw new DirectoryNotFoundException("Klyroo.UI.slnx not found above the test output directory.");
+        throw new DirectoryNotFoundException("Klyroo.Stack.slnx not found above the test output directory.");
     }
 }

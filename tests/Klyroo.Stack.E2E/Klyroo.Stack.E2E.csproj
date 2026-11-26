@@ -16,27 +16,35 @@
 
   <!-- Built first so the fixture can start it without rebuilding. -->
   <ItemGroup>
-    <ProjectReference Include="..\..\playground\Klyroo.Stack.Site\Klyroo.Stack.Site\Klyroo.Stack.Site.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\site\Klyroo.Stack.Site\Klyroo.Stack.Site.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
-  <!-- The live demos of the templates are run by the docs host from their build output: built first, never referenced by it or by the tests. -->
+  <!-- The live demos of the templates (they live in klyroo-ui, next to this repository) are run by the docs host from their build output: built first, never referenced by it or by the tests. -->
   <ItemGroup>
-    <ProjectReference Include="..\..\templates\starter\src\Starter.Web\Starter.Web.csproj" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\..\templates\dashboard\src\Dashboard.Web\Dashboard.Web.csproj" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\..\templates\landing\src\Landing.Web\Landing.Web.csproj" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\..\templates\docs\src\Docs.Web\Docs.Web.csproj" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\..\templates\saas\src\SaaS.Web\SaaS.Web.csproj" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\..\templates\portfolio\src\Portfolio.Web\Portfolio.Web.csproj" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\..\templates\changelog\src\Changelog.Web\Changelog.Web.csproj" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\..\templates\chat\src\Chat.Web\Chat.Web.csproj" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\..\templates\editor\src\Editor.Web\Editor.Web.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\..\klyroo-ui\templates\starter\src\Starter.Web\Starter.Web.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\..\klyroo-ui\templates\dashboard\src\Dashboard.Web\Dashboard.Web.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\..\klyroo-ui\templates\landing\src\Landing.Web\Landing.Web.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\..\klyroo-ui\templates\docs\src\Docs.Web\Docs.Web.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\..\klyroo-ui\templates\saas\src\SaaS.Web\SaaS.Web.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\..\klyroo-ui\templates\portfolio\src\Portfolio.Web\Portfolio.Web.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\..\klyroo-ui\templates\changelog\src\Changelog.Web\Changelog.Web.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\..\klyroo-ui\templates\chat\src\Chat.Web\Chat.Web.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\..\klyroo-ui\templates\editor\src\Editor.Web\Editor.Web.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <!-- The canned chat replies, so chat tests compare with the whole answer instead of guessing a length. -->
   <ItemGroup>
-    <Compile Include="..\..\playground\Klyroo.Stack.Site\Klyroo.Stack.Site.Client\Examples\ChatDemo.cs" Link="ChatDemo.cs" />
+    <Compile Include="..\..\site\Klyroo.Stack.Site.Client\Examples\ChatDemo.cs" Link="ChatDemo.cs" />
     <!-- The list of templates of the gallery, for the screenshot generator. -->
-    <Compile Include="..\..\playground\Klyroo.Stack.Site\Klyroo.Stack.Site.Client\Templates\TemplateRegistry.cs" Link="TemplateRegistry.cs" />
+    <Compile Include="..\..\site\Klyroo.Stack.Site.Client\Templates\TemplateRegistry.cs" Link="TemplateRegistry.cs" />
+  </ItemGroup>
+
+  <!-- The configuration the tests run in is the one the site and the template demos are built in. -->
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>BuildConfiguration</_Parameter1>
+      <_Parameter2>$(Configuration)</_Parameter2>
+    </AssemblyAttribute>
   </ItemGroup>
 
   <!-- One browser page per test class at a time: by default xUnit uses one thread per core, and that many pages
@@ -45,7 +53,14 @@
     <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
+  <!-- What the template checks share with the browser tests of klyroo-ui: the same scenarios run against a template started alone (there) and against
+       its live demo behind the docs host (here), so they are compiled from one place. -->
   <ItemGroup>
+    <Compile Include="..\..\..\klyroo-ui\tests\Klyroo.UI.E2E\Checks\*.cs" LinkBase="Checks" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Klyroo.UI.E2E" />
     <Using Include="Xunit" />
     <Using Include="Microsoft.Playwright" />
   </ItemGroup>
