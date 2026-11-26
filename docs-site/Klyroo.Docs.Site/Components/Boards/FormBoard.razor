@@ -2,7 +2,7 @@
 <DemoBoard File="Contact.razor" Lines="_lines" Chips="_chips" Label="A FormSchema and what it produces">
     <Results>
         <ResultPanel Title="The form" Note="sample data">
-            <div class="form-stack">
+            <div class="form-stack is-compact">
                 <div class="field">
                     <span class="field-label">Name<span class="req" data-target="required"> *</span></span>
                     <div class="control">Alice</div>
@@ -16,16 +16,23 @@
                     <span class="field-label">Topic</span>
                     <div class="control select" data-target="typed"><span>Support</span><KlyIcon Name="ph:caret-down" /></div>
                 </div>
-                <div class="field is-invalid">
+                <div class="form-actions"><span class="send" data-target="submit">Send</span></div>
+                <div class="field is-invalid wide">
                     <span class="field-label">Message<span class="req" data-target="required"> *</span></span>
                     <div class="control area" data-target="textarea"><span class="count">0 / 500</span></div>
                     <span class="field-error" data-target="required">This field is required</span>
                 </div>
-                <div class="form-actions"><span class="send" data-target="submit">Send</span></div>
             </div>
         </ResultPanel>
         <ResultPanel Title="The model OnSave receives" Note="once the form is valid" Class="model-panel">
-            <pre class="model" data-target="submit"><code><span class="model-line">Contact {</span><span class="model-line" data-target="typed">  Name    = "Alice",</span><span class="model-line">  Email   = "alice@example.com",</span><span class="model-line" data-target="typed">  Topic   = Topic.Support,</span><span class="model-line">  Message = "Hello, I have a question."</span><span class="model-line">}</span></code></pre>
+            <p class="annot-line">
+                <span class="annot" data-annot-for="typed">Name and Topic keep their C# types: Topic is the enum, not a string</span>
+                <span class="annot" data-annot-for="required">nothing is written until every required field has a value</span>
+                <span class="annot" data-annot-for="rule">the email is written only once the rule passes</span>
+                <span class="annot" data-annot-for="textarea">at most 500 characters</span>
+                <span class="annot" data-annot-for="submit">OnSave gets this object, all or nothing</span>
+            </p>
+            <pre class="model" data-target="submit"><code><span class="model-line">Contact {</span><span class="model-line" data-target="typed">  Name    = "Alice",</span><span class="model-line" data-target="rule">  Email   = "alice@example.com",</span><span class="model-line" data-target="typed">  Topic   = Topic.Support,</span><span class="model-line" data-target="textarea">  Message = "Hello, I have a question."</span><span class="model-line">}</span></code></pre>
         </ResultPanel>
     </Results>
 </DemoBoard>

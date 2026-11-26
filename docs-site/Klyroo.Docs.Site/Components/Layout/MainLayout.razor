@@ -6,7 +6,7 @@
 <KlyApp>
     <div class="site tex-@Site.Settings.Texture @(_isHome ? "is-home" : "is-doc")">
         <KlySkipLink />
-        <div class="ground" aria-hidden="true"></div>
+        <div class="ground-wrap" aria-hidden="true"><div class="ground"></div></div>
 
         @* Links are relative: they resolve against <base href>, so the site works below the name of the repository, which is where GitHub Pages serves it. *@
         <header class="site-header">
@@ -35,7 +35,7 @@
                         <a class="header-link" href="@_api.Href" aria-current="@(_isApi ? "page" : null)">API</a>
                     }
                     <details class="eco" data-eco>
-                        <summary aria-label="Klyroo libraries"><span class="eco-text">Klyroo</span><KlyIcon Name="ph:caret-down" /></summary>
+                        <summary aria-label="Klyroo libraries"><KlyIcon Name="ph:squares-four" Class="eco-grid" /><span class="eco-text">Klyroo</span><KlyIcon Name="ph:caret-down" Class="eco-caret" /></summary>
                         <div class="eco-menu">
                             @foreach (var library in Libraries.Items)
                             {

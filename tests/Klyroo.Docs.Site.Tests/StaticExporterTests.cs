@@ -42,6 +42,7 @@ public class StaticExporterTests : IDisposable
     {
         ["/klyroo-demo/"] = (HttpStatusCode.OK, "text/html", Page(homeBody)),
         ["/klyroo-demo/guides/"] = (HttpStatusCode.OK, "text/html", Page(guidesBody)),
+        ["/klyroo-demo/overview/"] = (HttpStatusCode.OK, "text/html", Page("<p>The rest of the README.</p>")),
         ["/klyroo-demo/search-index.json"] = (HttpStatusCode.OK, "application/json", "[]"),
         ["/klyroo-demo/app.abc.css"] = (HttpStatusCode.OK, "text/css", "body{background:url(\"font.woff2\")}"),
         ["/klyroo-demo/font.woff2"] = (HttpStatusCode.OK, "font/woff2", "font"),

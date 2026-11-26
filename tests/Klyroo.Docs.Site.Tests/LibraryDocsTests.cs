@@ -41,7 +41,7 @@ public class LibraryDocsTests
         Assert.Contains("<h2 id=\"first-guide\">", guides.Html);
         Assert.Equal("Each guide solves one task.", guides.MetaDescription);
         Assert.Equal("Klyroo.Demo", site.Settings.Title);
-        Assert.DoesNotContain("<h1", site.Home.Html);
+        Assert.DoesNotContain("<h1", site.Find("overview")!.Html);
     }
 
     [Fact]
@@ -57,7 +57,7 @@ public class LibraryDocsTests
             """);
         var site = LibraryDocs.Load(repo.Root, "klyroo-demo", FakeRepository.Libraries);
 
-        Assert.Equal(["documentation", "api-reference", "guides", "getting-started"], site.Pages.Select(p => p.Slug));
+        Assert.Equal(["documentation", "overview", "api-reference", "guides", "getting-started"], site.Pages.Select(p => p.Slug));
         Assert.Equal("API reference", site.Find("api-reference")!.NavTitle);
         Assert.Equal(4, site.Find("api-reference")!.TocDepth);
         Assert.Equal("Reference", site.Find("api-reference")!.Group);
@@ -92,8 +92,8 @@ public class LibraryDocsTests
     {
         using var repo = Repository();
         var site = LibraryDocs.Load(repo.Root, "klyroo-demo", FakeRepository.Libraries);
-        Assert.DoesNotContain("badge.svg", site.Home.Html);
-        Assert.DoesNotContain("<img", site.Home.Html);
+        Assert.DoesNotContain("badge.svg", site.Find("overview")!.Html);
+        Assert.DoesNotContain("<img", site.Find("overview")!.Html);
     }
 
     [Fact]
@@ -101,7 +101,7 @@ public class LibraryDocsTests
     {
         using var repo = Repository();
         var site = LibraryDocs.Load(repo.Root, "klyroo-demo", FakeRepository.Libraries);
-        Assert.Equal(["installation", "installation-1"], site.Home.Headings.Select(h => h.Id));
+        Assert.Equal(["installation", "installation-1"], site.Find("overview")!.Headings.Select(h => h.Id));
     }
 
     [Fact]
@@ -112,10 +112,10 @@ public class LibraryDocsTests
 
         var guides = site.Find("guides")!.Html;
         Assert.Contains("href=\"getting-started/\"", guides);
-        Assert.Contains("href=\"./#installation\"", guides);
+        Assert.Contains("href=\"overview/#installation\"", guides);
         Assert.Contains("href=\"https://github.com/klyroo/klyroo-demo/blob/main/src/Demo/Demo.cs\"", guides);
-        Assert.Contains("href=\"guides/#first-guide\"", site.Home.Html);
-        Assert.Contains("href=\"https://github.com/klyroo/klyroo-demo/blob/main/CHANGELOG.md\"", site.Home.Html);
+        Assert.Contains("href=\"guides/#first-guide\"", site.Find("overview")!.Html);
+        Assert.Contains("href=\"https://github.com/klyroo/klyroo-demo/blob/main/CHANGELOG.md\"", site.Find("overview")!.Html);
         Assert.Empty(site.Problems);
     }
 
@@ -153,6 +153,6 @@ public class LibraryDocsTests
         var site = LibraryDocs.Load(repo.Root, "klyroo-demo", FakeRepository.Libraries);
         Assert.Equal("Klyroo.Demo", site.Settings.Title);
         Assert.Equal("A demo library for the tests. It has two pages.", site.Settings.Description);
-        Assert.Equal(4, site.Pages.Count);
+        Assert.Equal(5, site.Pages.Count);
     }
 }

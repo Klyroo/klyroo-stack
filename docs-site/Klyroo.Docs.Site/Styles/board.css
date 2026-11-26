@@ -27,7 +27,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  min-height: 2.5rem;
+  min-height: 2.25rem;
   padding: 0 1rem;
   border-bottom: 1px solid var(--line);
   background: color-mix(in oklab, var(--code-head) 70%, transparent);
@@ -37,6 +37,9 @@
 .panel-note { font-family: var(--font-code); font-size: 0.6875rem; color: var(--dim); white-space: nowrap; }
 .panel-body { padding: 1rem; }
 .panel-body.flush { padding: 0; }
+
+/* A simple hero has more code than result: the code gets half the width, enough for about 60 columns. */
+@media (min-width: 1024px) { .board.is-quick .board-grid { grid-template-columns: minmax(31rem, 6fr) minmax(0, 6fr); } }
 
 /* The code */
 .board-pre {
@@ -72,7 +75,22 @@
   transition: color 360ms var(--ease-out);
 }
 .cl.is-lit { background: var(--lit); }
-.cl.is-lit::before { color: var(--accent-ink); }
+.cl.is-lit::before { color: var(--strong); }
+/* The marker in the gutter is where the accent shows on a lit line: the line itself is a neutral fill, so it never reads as an error. */
+.cl::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 0.5rem;
+  width: 0.375rem;
+  height: 0.375rem;
+  margin-top: -0.1875rem;
+  border-radius: 50%;
+  background: var(--accent);
+  transform: scale(0);
+  transition: transform 360ms var(--ease-out);
+}
+.cl.is-lit::after { transform: scale(1); }
 
 .board-chips { display: grid; gap: 0.75rem; padding: 0.875rem 1rem 1rem; border-top: 1px solid var(--line); background: color-mix(in oklab, var(--code-head) 55%, transparent); }
 .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
@@ -104,7 +122,7 @@
 
 /* What the chosen feature produces */
 [data-target] { outline: 1px solid transparent; outline-offset: 2px; border-radius: 6px; transition: background-color 360ms var(--ease-out), outline-color 360ms var(--ease-out); }
-[data-target].is-lit { background: var(--lit); outline-color: var(--accent-line); }
+[data-target].is-lit { background: var(--lit); outline-color: var(--line-strong); }
 .model[data-target].is-lit { background: transparent; outline-color: transparent; }
 .model-line[data-target].is-lit { border-radius: 0; outline: 0; }
 .url[data-target].is-lit { background: transparent; outline-color: transparent; }
@@ -134,7 +152,7 @@
 .mini-scroll { overflow-x: auto; }
 .mini-table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; font-variant-numeric: tabular-nums; }
 .mini-table th { padding: 0.5rem 1rem; border-block: 1px solid var(--line); background: color-mix(in oklab, var(--code-head) 60%, transparent); color: var(--muted); font-weight: 600; text-align: start; white-space: nowrap; }
-.mini-table td { padding: 0.5625rem 1rem; border-bottom: 1px solid var(--line); color: var(--text); white-space: nowrap; }
+.mini-table td { padding: 0.4375rem 1rem; border-bottom: 1px solid var(--line); color: var(--text); white-space: nowrap; }
 .mini-table tbody tr:last-child td { border-bottom: 0; }
 .mini-table .num { text-align: end; }
 .sorted { display: inline-flex; align-items: center; gap: 0.3125rem; color: var(--strong); }
@@ -159,6 +177,13 @@
 .url { display: block; overflow-x: auto; padding: 0.125rem 0; font-family: var(--font-code); font-size: 0.875rem; line-height: 1.8; white-space: nowrap; color: var(--strong); }
 .url-sep { color: var(--dim); }
 .url-key.is-on { background: var(--lit); border-radius: 4px; padding: 0.125rem 0.25rem; }
+
+/* A short note under the part of a result that the chosen feature wrote; there is room for it from the start, so nothing moves when it shows. */
+.annot-line { margin: 0.625rem 0 0; min-height: 1.5rem; }
+.annot { display: none; align-items: center; gap: 0.5rem; padding: 0.1875rem 0.625rem; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--raised); color: var(--text); font-family: var(--font-code); font-size: 0.6875rem; line-height: 1.4; }
+.annot.is-lit { display: inline-flex; animation: annot-in 360ms var(--ease-out); }
+@keyframes annot-in { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .annot.is-lit { animation: none; } }
 .url-note, .result-note { margin: 0.75rem 0 0; color: var(--muted); font-size: 0.8125rem; line-height: 1.55; }
 .result-note .url { display: inline; }
 
@@ -233,3 +258,23 @@
   .cl, .cl::before, [data-target], .chip { transition: none; }
 }
 .flush .result-note { padding: 0 1rem 1rem; margin: 0; }
+.model-panel .annot-line { padding-inline: 1rem; }
+
+/* A form drawn small: two columns, so four fields and their errors take little height. */
+.form-stack.is-compact { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.75rem 1rem; align-items: start; }
+.form-stack.is-compact .wide { grid-column: 1 / -1; }
+.form-stack.is-compact .form-actions { align-self: end; }
+.form-stack.is-compact .field { gap: 0.25rem; }
+.form-stack.is-compact .control { min-height: 2.125rem; padding-block: 0.3125rem; }
+.form-stack.is-compact .control.area { min-height: 3.5rem; }
+.model-panel .panel-body { padding: 0.5rem 0 0.375rem; }
+.model-panel .annot-line { margin-top: 0.375rem; }
+@media (max-width: 639px) { .form-stack.is-compact { grid-template-columns: minmax(0, 1fr); } }
+.model-panel .model { line-height: 1.6; }
+.model-panel .annot-line { min-height: 1.375rem; margin-bottom: 0.25rem; }
+.board-results { gap: 0.75rem; }
+.form-stack.is-compact { gap: 0.5rem 1rem; }
+.model-panel .panel-body { padding-top: 0.25rem; }
+.model-panel .model { padding-block: 0; }
+.panel-body:has(.form-stack.is-compact) { padding-block: 0.75rem; }
+.model-panel .annot-line { margin-bottom: 0; }

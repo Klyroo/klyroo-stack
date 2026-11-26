@@ -11,29 +11,31 @@
 
 <section class="hero" aria-labelledby="hero-title">
     <div class="page-wrap">
-        <h1 class="hero-title" id="hero-title">
-            <span class="line">@Site.Settings.Headline[0]</span>
-            @if (Site.Settings.Headline.Count > 1)
-            {
-                <span class="line accent">@Site.Settings.Headline[1]</span>
-            }
-        </h1>
-        <div class="hero-row">
-            <p class="hero-lead">@Site.Settings.Lead</p>
-            <div class="cta-row">
-                @if (Start is not null)
+        <div class="hero-top">
+            <h1 class="hero-title" id="hero-title">
+                <span class="line">@Site.Settings.Headline[0]</span>
+                @if (Site.Settings.Headline.Count > 1)
                 {
-                    <a class="button button-accent" href="@Start.Href">@(Start.Slug == "getting-started" ? "Get started" : "Read the docs")<KlyIcon Name="ph:arrow-right" /></a>
+                    <span class="line accent">@Site.Settings.Headline[1]</span>
                 }
-                @if (Site.Settings.HeroInstall is { } install)
-                {
-                    <button type="button" class="install-chip" data-copy="@install" aria-label="Copy: @install">
-                        <code>@install</code>
-                        <span class="chip-icon"><svg class="code-copy-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.75" /><path d="M10.5 3.5v-.25A1.75 1.75 0 0 0 8.75 1.5h-5A1.75 1.75 0 0 0 2 3.25v5C2 9.2 2.8 10 3.75 10h.25" /></svg><svg class="code-check-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3.5 8.5 3 3 6-7" /></svg></span>
-                        <span class="code-copy-label sr-only">Copy</span>
-                        <span class="copy-status sr-only" role="status" aria-live="polite"></span>
-                    </button>
-                }
+            </h1>
+            <div class="hero-side">
+                <p class="hero-lead">@Site.Settings.Lead</p>
+                <div class="cta-row">
+                    @if (Start is not null)
+                    {
+                        <a class="button button-accent" href="@Start.Href">@(Start.Slug == "getting-started" ? "Get started" : "Read the docs")<KlyIcon Name="ph:arrow-right" /></a>
+                    }
+                    @if (Site.Settings.HeroInstall is { } install)
+                    {
+                        <button type="button" class="install-chip" data-copy="@install" aria-label="Copy: @install">
+                            <code>@install</code>
+                            <span class="chip-icon"><svg class="code-copy-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.75" /><path d="M10.5 3.5v-.25A1.75 1.75 0 0 0 8.75 1.5h-5A1.75 1.75 0 0 0 2 3.25v5C2 9.2 2.8 10 3.75 10h.25" /></svg><svg class="code-check-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3.5 8.5 3 3 6-7" /></svg></span>
+                            <span class="code-copy-label sr-only">Copy</span>
+                            <span class="copy-status sr-only" role="status" aria-live="polite"></span>
+                        </button>
+                    }
+                </div>
             </div>
         </div>
 
@@ -76,20 +78,6 @@
 <PackageList Packages="Site.HomeContent.Packages" />
 <CloseBand />
 
-@if (_readme.Length > 0)
-{
-    <section class="section readme" aria-labelledby="readme-title">
-        <div class="page-wrap readme-grid">
-            <h2 class="section-title" id="readme-title">The README</h2>
-            <div class="markdown-body" data-testid="readme">@((MarkupString)_readme)</div>
-        </div>
-    </section>
-}
-
 @code {
     private DocPage? Start => Site.Pages.FirstOrDefault(p => p.Slug == "getting-started") ?? Site.Find(LibraryDocs.IndexSlug) ?? Site.Pages.FirstOrDefault();
-
-    private string _readme = "";
-
-    protected override void OnInitialized() => _readme = Site.Home.Html;
 }

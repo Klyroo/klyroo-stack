@@ -121,9 +121,10 @@ public class DesignTests
         Assert.Equal([("Klyroo.Demo.Core", "Core"), ("Klyroo.Demo", "Blazor")], site.HomeContent.Packages.Select(p => (p.Id, p.Layer)));
         Assert.Equal("dotnet add package Klyroo.Demo.Core --prerelease", site.HomeContent.Packages[0].Install);
         Assert.Equal([("Klyroo.Demo", true), ("Klyroo.Other", false)], site.HomeContent.Ecosystem.Select(e => (e.Name, e.Current)));
-        Assert.DoesNotContain("Typed schema", site.Home.Html);
-        Assert.DoesNotContain("klyroo-ecosystem", site.Home.Html);
-        Assert.Contains("id=\"installation\"", site.Home.Html);
+        var overview = site.Find("overview")!;
+        Assert.DoesNotContain("Typed schema", overview.Html);
+        Assert.DoesNotContain("klyroo-ecosystem", overview.Html);
+        Assert.Contains("id=\"installation\"", overview.Html);
     }
 
     [Fact]
@@ -158,5 +159,23 @@ public class DesignTests
         Assert.Contains("<span class=\"code-title\">Shell</span>", bash);
         Assert.DoesNotContain("BASH", bash);
         Assert.Contains("<span class=\"code-title\"></span>", CodeBlockHtml.Render("plain", null));
+    }
+}
+
+public class OverviewLinkTests
+{
+    [Fact]
+    public void A_link_to_a_section_of_the_readme_lands_on_the_overview_and_a_link_to_a_replaced_section_stays_home()
+    {
+        using var repo = new FakeRepository()
+            .Write("README.md", "# Klyroo.Demo\n\nA demo.\n\n## Features\n\n- **One**: thing.\n\n## Prerequisites\n\nNeed .NET.\n")
+            .Write("docs/guides.md", "# Guides\n\nSee [prerequisites](../README.md#prerequisites), [features](../README.md#features) and [home](../README.md).\n");
+        var site = LibraryDocs.Load(repo.Root, "klyroo-demo", FakeRepository.Libraries);
+        var guides = site.Find("guides")!;
+        var html = guides.LeadHtml + guides.Html;
+        Assert.Contains("href=\"overview/#prerequisites\"", html);
+        Assert.Contains("href=\"./#features\"", html);
+        Assert.Contains("href=\"./\"", html);
+        Assert.Empty(site.Problems);
     }
 }

@@ -48,7 +48,7 @@
 
   <!-- Icons the build cannot see by scanning: the names of the navigation groups are chosen at run time (Components/Shared/DocNav.razor). -->
   <ItemGroup>
-    <KlyrooIcon Include="ph:book-open-text;ph:rocket-launch;ph:signpost;ph:brackets-curly;ph:lightbulb;ph:gear-six;ph:folder-simple" />
+    <KlyrooIcon Include="ph:book-open-text;ph:rocket-launch;ph:signpost;ph:brackets-curly;ph:lightbulb;ph:gear-six;ph:folder-simple;ph:info" />
   </ItemGroup>
 
   <!-- Fonts are downloaded at build time and served from the site's own origin (KlyFonts in App.razor links them). -->

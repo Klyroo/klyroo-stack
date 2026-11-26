@@ -13,7 +13,7 @@ public class LinkResolverTests
     [InlineData("docs/guides.md", "guides.md#x", "guides/#x")]
     [InlineData("docs/guides.md", "./sub/deep.md", "sub/deep/")]
     [InlineData("docs/sub/deep.md", "../guides.md?q=1#top", "guides/?q=1#top")]
-    [InlineData("docs/guides.md", "../README.md#installation", "./#installation")]
+    [InlineData("docs/guides.md", "../README.md#installation", "overview/#installation")]
     [InlineData("docs/guides.md", "README.md", "documentation/")]
     [InlineData("README.md", "docs/guides.md#a", "guides/#a")]
     [InlineData("README.md", "docs/", "documentation/")]
@@ -47,7 +47,7 @@ public class LinkResolverTests
         var problems = new List<string>();
         var resolver = ResolverFor(repo, "README.md", problems);
         Assert.Equal("guides/#a", resolver.Resolve("https://github.com/klyroo/klyroo-demo/blob/main/docs/guides.md#a").Url);
-        Assert.Equal("https://klyroo.github.io/klyroo-other/#installation", resolver.Resolve("https://github.com/klyroo/klyroo-other#installation").Url);
+        Assert.Equal("https://klyroo.github.io/klyroo-other/overview/#installation", resolver.Resolve("https://github.com/klyroo/klyroo-other#installation").Url);
         Assert.Equal("https://klyroo.github.io/klyroo-other/guides/#x", resolver.Resolve("https://github.com/klyroo/klyroo-other/blob/main/docs/guides.md#x").Url);
         // Not a page, or not a library with a site: left on GitHub.
         Assert.Equal("https://github.com/klyroo/klyroo-other/blob/main/CONTRIBUTING.md", resolver.Resolve("https://github.com/klyroo/klyroo-other/blob/main/CONTRIBUTING.md").Url);

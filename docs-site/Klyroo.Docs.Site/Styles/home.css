@@ -1,12 +1,16 @@
 /* The home page: the hero, the buttons, and the sections below the board. */
 
-.hero { padding-block: clamp(2.25rem, 4.5vw, 4rem) 0; }
+.hero { padding-block: clamp(1.25rem, 2.4vw, 2rem) 0; }
+
+/* Headline on the left, lead and the way in on the right, bottoms on one line: the board starts about 380px down at 1440. */
+.hero-top { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem 3rem; align-items: end; }
+@media (min-width: 1024px) { .hero-top { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); } }
 
 .hero-title {
   margin: 0;
   color: var(--strong);
   font-family: var(--font-display);
-  font-size: clamp(2.5rem, 6.1vw, 5.5rem);
+  font-size: clamp(2.5rem, 6vw, 5.5rem);
   font-weight: 650;
   line-height: 0.99;
   letter-spacing: -0.036em;
@@ -15,33 +19,26 @@
 .hero-title .line { display: block; }
 .hero-title .accent { color: var(--accent-display); }
 
-.hero-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 1.5rem 3rem;
-  margin-top: clamp(1.25rem, 2vw, 1.75rem);
-}
+.hero-side { display: grid; gap: 1rem; justify-items: start; padding-bottom: 0.25rem; }
 
 .hero-lead {
   margin: 0;
-  max-width: 42rem;
+  max-width: 34rem;
   color: var(--muted);
-  font-size: clamp(1.0625rem, 0.95rem + 0.45vw, 1.3125rem);
+  font-size: clamp(1rem, 0.9rem + 0.25vw, 1.125rem);
   line-height: 1.55;
   text-wrap: pretty;
 }
 
-.cta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; min-width: 0; max-width: 100%; }
+.cta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.625rem; min-width: 0; max-width: 100%; }
 
 .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  height: 2.875rem;
-  padding: 0 1.25rem;
+  height: 2.625rem;
+  padding: 0 1.125rem;
   border: 1px solid transparent;
   border-radius: var(--r);
   font: inherit;
@@ -66,8 +63,8 @@
   gap: 0.75rem;
   max-width: 100%;
   min-width: 0;
-  height: 2.875rem;
-  padding: 0 0.875rem 0 1rem;
+  height: 2.625rem;
+  padding: 0 0.75rem 0 0.875rem;
   border: 1px solid var(--line-strong);
   border-radius: var(--r);
   background: color-mix(in oklab, var(--raised) 80%, transparent);
@@ -77,7 +74,7 @@
   transition: border-color 160ms var(--ease-out), background-color 160ms var(--ease-out);
 }
 .install-chip:hover { border-color: color-mix(in oklab, var(--accent-ink) 55%, var(--line-strong)); background: var(--raised); }
-.install-chip code { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-code); font-size: 0.8125rem; color: var(--strong); }
+.install-chip code { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-code); font-size: 0.75rem; color: var(--strong); }
 .install-chip .chip-icon { flex: none; display: inline-grid; color: var(--muted); }
 .install-chip .code-check-icon { display: none; }
 .install-chip[data-copied] .code-copy-icon { display: none; }
@@ -184,5 +181,5 @@
 .family-text code { font-family: var(--font-code); font-size: 0.85em; }
 
 /* The README, as written for GitHub, below everything else. */
-.readme .markdown-body { max-width: 56rem; }
-.readme-grid { display: grid; grid-template-columns: minmax(0, 1fr); }
+
+

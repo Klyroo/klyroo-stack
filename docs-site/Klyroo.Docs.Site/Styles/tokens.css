@@ -36,7 +36,7 @@
   --tx-major: color-mix(in oklab, var(--accent-ink) 13%, transparent);
   --accent-soft: color-mix(in oklab, var(--accent) 14%, transparent);
   --accent-line: color-mix(in oklab, var(--accent-ink) 55%, transparent);
-  --lit: color-mix(in oklab, var(--accent) 17%, transparent);
+  --lit: color-mix(in oklab, var(--strong) 6%, transparent);
 
   --r-sm: 6px;
   --r: 10px;
@@ -81,7 +81,7 @@
   --tx-major: color-mix(in oklab, var(--accent) 15%, transparent);
   --accent-soft: color-mix(in oklab, var(--accent) 16%, transparent);
   --accent-line: color-mix(in oklab, var(--accent) 70%, transparent);
-  --lit: color-mix(in oklab, var(--accent) 15%, transparent);
+  --lit: color-mix(in oklab, var(--strong) 6%, transparent);
 
   --shadow-panel: 0 1px 0 rgb(255 255 255 / 0.035) inset, 0 22px 44px -24px rgb(0 0 0 / 0.85);
   --shadow-pop: 0 1px 0 rgb(255 255 255 / 0.05) inset, 0 28px 56px -20px rgb(0 0 0 / 0.9);

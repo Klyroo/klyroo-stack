@@ -38,9 +38,15 @@
                 </nav>
             </div>
         </ResultPanel>
-        <ResultPanel Title="The address it writes" Note="no code needed" Class="url-panel">
+        <ResultPanel Title="The address it writes" Note="no code needed">
             <code class="url" data-target="url"><span class="url-path">/customers</span><span class="url-sep">?</span><span class="url-key" data-target="search">q=co</span><span class="url-sep">&amp;</span><span class="url-key" data-target="sort">s=-mrr</span><span class="url-sep">&amp;</span><span class="url-key" data-target="filters">f.country=France</span><span class="url-sep">&amp;</span><span class="url-key" data-target="paging">p=2</span></code>
-            <p class="url-note">Back, a shared link and a page rendered on the server all restore this state. A key that equals its default is left out.</p>
+            <p class="annot-line">
+                <span class="annot" data-annot-for="search">q: the text search, over Name and Country</span>
+                <span class="annot" data-annot-for="sort">s: the sort; a leading - is descending</span>
+                <span class="annot" data-annot-for="filters">f.country: one key per filter</span>
+                <span class="annot" data-annot-for="paging">p: the page; a value equal to its default is left out</span>
+                <span class="annot" data-annot-for="url">the whole state is in the address</span>
+            </p>
         </ResultPanel>
     </Results>
 </DemoBoard>

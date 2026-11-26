@@ -69,7 +69,7 @@ public sealed class LinkResolver
         var key = repoPath is "" ? "README.md" : repoPath is "docs" ? "docs/README.md" : repoPath;
         if (_pages.TryGetValue(key, out var slug))
         {
-            return new LinkTarget(Route(slug) + rest, slug);
+            return new LinkTarget(Route(slug, rest), slug);
         }
 
         var onDisk = Path.Combine(_repoRoot, repoPath.Replace('/', Path.DirectorySeparatorChar));
@@ -143,13 +143,27 @@ public sealed class LinkResolver
                 _problems.Add($"{_sourcePath}: the link '{url}' leads to '{path}', which is not a page of the site.");
                 return new LinkTarget(url);
             }
-            return new LinkTarget(Route(slug) + fragment, slug);
+            return new LinkTarget(Route(slug, fragment), slug);
         }
         // Another library: its own site, which is checked when that site is built.
-        return new LinkTarget(_libraries.SiteUrl(library.Repo) + (slug.Length == 0 ? "" : slug + "/") + fragment);
+        return new LinkTarget(_libraries.SiteUrl(library.Repo) + (slug.Length == 0 && fragment.Length > 1 && !HomeAnchors.Contains(fragment[1..]) ? OverviewSlug + "/" : slug.Length == 0 ? "" : slug + "/") + fragment);
     }
 
-    private static string Route(string slug) => slug.Length == 0 ? "./" : slug + "/";
+    /// <summary>The ids on the home page that replace sections of the README (<c>#features</c>, <c>#packages</c>, <c>#klyroo-ecosystem</c>): a link to these stays on the home page.</summary>
+    public static readonly IReadOnlySet<string> HomeAnchors = new HashSet<string>(["features", "packages", "klyroo-ecosystem"], StringComparer.Ordinal);
+
+    /// <summary>The slug of the page that holds the rest of the README, which the home page does not show.</summary>
+    public const string OverviewSlug = "overview";
+
+    // The README is two pages: the home page, and the overview with its other sections. A link to the README with a fragment lands where the fragment is.
+    private static string Route(string slug, string fragment = "")
+    {
+        if (slug.Length == 0 && fragment.Length > 1 && !HomeAnchors.Contains(fragment[1..]))
+        {
+            return OverviewSlug + "/" + fragment;
+        }
+        return (slug.Length == 0 ? "./" : slug + "/") + fragment;
+    }
 
     private string GithubUrl(string kind, string repoPath) =>
         $"{_github}/{kind}/{Uri.EscapeDataString(_branch)}/{string.Join('/', repoPath.Split('/', StringSplitOptions.RemoveEmptyEntries).Select(Uri.EscapeDataString))}";

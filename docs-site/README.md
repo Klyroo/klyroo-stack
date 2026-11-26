@@ -8,7 +8,7 @@ The site is the Markdown docs template of Klyroo.UI (`klyroo-ui/templates/docs`)
 
 | File | Becomes |
 | --- | --- |
-| `README.md` | The home page. Its Features list, Packages table and ecosystem table are set in the layout of the home page (specification sheet, packages with their install lines, the family of libraries), and the rest of the README follows at the bottom. The badges at the top are left out: the header links to GitHub and NuGet instead. |
+| `README.md` | The home page. Its Features list, Packages table and ecosystem table are set in the layout of the home page (specification sheet, packages with their install lines, the family of libraries), and the rest of the README (Prerequisites, Installation, Quick start...) is the page `overview`, second in the navigation. A link to `../README.md#section` lands on the page that holds the section: `overview/#section`, or the home page for `#features`, `#packages` and `#klyroo-ecosystem`. The badges at the top are left out: the header links to GitHub and NuGet instead. |
 | `docs/README.md` | The page `documentation`, the index of the docs. It comes first in the navigation. |
 | `docs/<name>.md` | The page `<name>`. Folders below `docs/` make folders of addresses (`docs/a/b.md` is `a/b`). |
 | `docs/site.yml` | The settings of the site (optional, described below). |

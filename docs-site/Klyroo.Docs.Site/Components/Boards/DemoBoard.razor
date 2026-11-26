@@ -1,6 +1,6 @@
 @* The demonstration board: the code panel with its chips on the left, the result panels on the right, and the leader lines between them, which the script
    draws (wwwroot/site.js). Without the script every panel is there and nothing is lit. A board is authored in a component of Components/Boards. *@
-<div class="board" data-board aria-label="@Label" role="group">
+<div class="board @Class" data-board aria-label="@Label" role="group">
     <div class="board-grid">
         <section class="panel board-code" data-board-code aria-label="@File">
             <header class="panel-head">
@@ -32,5 +32,6 @@
     [Parameter, EditorRequired] public IReadOnlyList<BoardLine> Lines { get; set; } = [];
     [Parameter] public IReadOnlyList<BoardChip> Chips { get; set; } = [];
     [Parameter] public string Label { get; set; } = "What the code produces";
+    [Parameter] public string? Class { get; set; }
     [Parameter] public RenderFragment? Results { get; set; }
 }

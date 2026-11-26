@@ -97,7 +97,8 @@ public static partial class LibraryDocs
         var (intro, sections) = SplitSections(readmeText);
         var homeContent = ParseHome(sections, RenderText, name, libraries, out var replaced);
         var bodyText = intro + string.Concat(sections.Where(section => !replaced.Contains(section.Id)).Select(section => section.Text));
-        var readme = RenderText(bodyText, "README.md", "");
+        // The rest of the README is the page "overview", so the home page is not a wall of text; links to its sections (../README.md#prerequisites) land there.
+        var readme = RenderText(bodyText, "README.md", LinkResolver.OverviewSlug);
         var title = config.Title ?? readme.Title ?? SlugTitle(name);
         var tagline = config.Tagline ?? Shorten(readme.Summary, 200) ?? title;
         var description = config.Description ?? readme.Summary ?? tagline;
@@ -135,6 +136,11 @@ public static partial class LibraryDocs
 
         KlyContentNavigationItem Item(DocPage page) => new(page.NavTitle) { Href = page.Href, Exact = true };
 
+        if (rendered.ContainsKey(LinkResolver.OverviewSlug))
+        {
+            throw new ContentException($"docs/{LinkResolver.OverviewSlug}.md: the address '{LinkResolver.OverviewSlug}' is the one of the rest of the README. Rename the file.");
+        }
+
         if (rendered.ContainsKey(IndexSlug))
         {
             listed.Add(IndexSlug);
@@ -142,6 +148,11 @@ public static partial class LibraryDocs
             ordered.Add(index);
             navigation.Add(Item(index));
         }
+
+        var (overviewLead, overviewBody) = SplitLead(readme.Html, null);
+        var overview = new DocPage(LinkResolver.OverviewSlug, "README.md", "Overview", "Overview", null, description, overviewBody, readme.Headings, readme.Text, 3, true, null, overviewLead);
+        ordered.Add(overview);
+        navigation.Add(Item(overview));
 
         List<KlyContentNavigationItem> Entries(IReadOnlyList<NavEntry> entries, string? group)
         {
@@ -185,7 +196,7 @@ public static partial class LibraryDocs
             navigation.Add(Item(page));
         }
 
-        var home = new DocPage("", "README.md", title, title, null, description, readme.Html, readme.Headings, readme.Text, 3, true, null);
+        var home = new DocPage("", "README.md", title, title, null, description, "", [], readme.Text, 3, true, null);
         var search = new List<KlyContentSearchPage> { ToSearch(home, tagline, searchTextLimit) };
         search.AddRange(ordered.Select(p => ToSearch(p, p.MetaDescription, searchTextLimit)));
         return new DocsSite(settings, home, ordered, navigation, search, problems.Distinct().ToList(), homeContent);
@@ -252,7 +263,9 @@ public static partial class LibraryDocs
         string? Html(string id, string heading)
         {
             var section = sections.FirstOrDefault(s => s.Id == id);
-            return section is null ? null : render(section.Text, "README.md", "").Html;
+            // A link to another section of the README (#components) is a link to the overview, where that section is now.
+            return section is null ? null : Regex.Replace(render(section.Text, "README.md", "").Html, "href=\"\\./#([^\"]+)\"",
+                m => LinkResolver.HomeAnchors.Contains(m.Groups[1].Value) ? m.Value : $"href=\"{LinkResolver.OverviewSlug}/#{m.Groups[1].Value}\"");
         }
         static string PlainText(string html) => System.Net.WebUtility.HtmlDecode(Tags().Replace(html, "")).Trim();
 

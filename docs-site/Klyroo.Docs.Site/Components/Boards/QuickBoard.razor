@@ -1,8 +1,8 @@
 @* The simple hero: the code of docs/site.yml (demo.code) in the code panel and one result panel, joined by one leader line that starts at the focus lines.
    A library that deserves a full board gets a component in this folder instead (see docs-site/README.md). *@
-<DemoBoard File="@(Demo.File ?? "Program.cs")" Lines="_lines" Label="@("The code and what it produces")">
+<DemoBoard File="@(Demo.File ?? "Program.cs")" Lines="_lines" Class="is-quick" Label="@("The code and what it produces")">
     <Results>
-        <ResultPanel Title="@(Demo.ResultTitle ?? "Result")" Note="@(Demo.Output is not null ? "output of the code" : "sample data")">
+        <ResultPanel Title="@(Demo.ResultTitle ?? "Result")" Note="@(Demo.Output is not null ? "output of the code" : "sample data")" Class="@(Demo.Preview == "spreadsheet-rows" ? "flush" : null)">
             <div data-target="result">
                 @if (Demo.Output is not null)
                 {

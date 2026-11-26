@@ -78,6 +78,7 @@
     const chips = [...board.querySelectorAll("[data-chip]")];
     const lines = [...board.querySelectorAll("[data-lines]")];
     const targets = [...board.querySelectorAll("[data-target]")];
+    const annots = [...board.querySelectorAll("[data-annot-for]")];
     const code = board.querySelector("[data-board-code]");
     const svg = board.querySelector("[data-leaders]");
     const caption = board.querySelector("[data-caption]");
@@ -106,14 +107,20 @@
 
       const defs = el("defs", {});
       svg.append(defs);
-      litTargets.forEach((target, index) => {
+      // One leader per panel the feature touches; inside the panel every lit part shows what the code wrote there.
+      const panels = new Map();
+      for (const target of litTargets) {
         const panel = target.closest("[data-panel]") || target;
+        panels.set(panel, [...(panels.get(panel) || []), target]);
+      }
+      [...panels].forEach(([panel, group], index) => {
         const panelBox = panel.getBoundingClientRect();
-        const box = target.getBoundingClientRect();
+        const boxes = group.map((target) => target.getBoundingClientRect());
+        const middle = (Math.min(...boxes.map((r) => r.top)) + Math.max(...boxes.map((r) => r.bottom))) / 2;
         const x2 = panelBox.left - frame.left;
-        const y2 = Math.min(Math.max(box.top + box.height / 2, panelBox.top + 14), panelBox.bottom - 14) - frame.top;
+        const y2 = Math.min(Math.max(middle, panelBox.top + 14), panelBox.bottom - 14) - frame.top;
         const gap = x2 - x1;
-        const xm = x1 + gap * (0.3 + 0.4 * (litTargets.length === 1 ? 0.5 : index / (litTargets.length - 1)));
+        const xm = x1 + gap * (0.3 + 0.4 * (panels.size === 1 ? 0.5 : index / (panels.size - 1)));
         const d = `M${x1} ${y1} H${xm} V${y2} H${x2}`;
         const id = `leader-mask-${++uid}`;
         const animated = animate && !reduceMotion();
@@ -142,6 +149,7 @@
       for (const chip of chips) chip.setAttribute("aria-pressed", String(chip.dataset.chip === feature));
       for (const line of lines) line.classList.toggle("is-lit", has(line, "data-lines", feature));
       for (const target of targets) target.classList.toggle("is-lit", has(target, "data-target", feature));
+      for (const note of annots) note.classList.toggle("is-lit", has(note, "data-annot-for", feature));
       const chip = chips.find((c) => c.dataset.chip === feature);
       if (caption && chip?.dataset.hint) caption.textContent = chip.dataset.hint;
       draw(animate);
