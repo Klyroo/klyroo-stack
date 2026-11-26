@@ -20,6 +20,23 @@ public static class KlyrooStackServiceCollectionExtensions
     /// Works in Blazor Web App (SSR / Interactive Server / WebAssembly) and .NET MAUI Blazor Hybrid. In an app with a WebAssembly client,
     /// call it in the server and in the client <c>Program.cs</c> with the same configuration.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Only the options of Klyroo.UI and Klyroo.Table have a callback here. To configure another library, call its own registration method after this
+    /// one, with the callback: the libraries keep one options object, created by the first call, and every later call changes that same instance, so the
+    /// order of the calls does not matter.
+    /// </para>
+    /// <code>
+    /// builder.Services.AddKlyrooStack(configureUi: ui =&gt; ui.Defaults.Size = KlySize.Sm);
+    /// builder.Services.AddKlyrooDashboard(o =&gt; o.PersistMaxBytes = 4096);        // Klyroo.Dashboard.KlyrooDashboardOptions
+    /// builder.Services.AddKlyrooDisplay(o =&gt; o.Texts("de", t =&gt; t with { ClosePreview = "Schließen" })); // Klyroo.Display.KlyrooDisplayOptions
+    /// </code>
+    /// <para>
+    /// <c>AddKlyrooForm</c>, <c>AddKlyrooSpreadsheet</c>, <c>AddKlyrooQuery</c> and <c>AddKlyrooAgent</c> take no callback. Options are read when the first
+    /// component renders and some freeze at that point (a theme or a message table throws <see cref="InvalidOperationException"/> when changed
+    /// afterwards), so configure them during registration, in the server and in the client project alike.
+    /// </para>
+    /// </remarks>
     /// <param name="services">The service collection.</param>
     /// <param name="configureUi">Configures <see cref="KlyrooOptions"/>, the themes and settings of Klyroo.UI.</param>
     /// <param name="configureTable">Configures <see cref="KlyrooTableOptions"/>, the themes and messages of Klyroo.Table.</param>

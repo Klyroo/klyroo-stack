@@ -4,6 +4,7 @@ Task-oriented recipes for the hub. Each one states its goal, shows complete code
 
 - [Register only the libraries you use](#register-only-the-libraries-you-use)
 - [Share options between the server and the WebAssembly client](#share-options-between-the-server-and-the-webassembly-client)
+- [Configure the options of each library](#configure-the-options-of-each-library)
 - [Find which library owns a component](#find-which-library-owns-a-component)
 - [Test an app that uses the stack](#test-an-app-that-uses-the-stack)
 - [Let an agent fill a form](#let-an-agent-fill-a-form)
@@ -61,6 +62,27 @@ builder.Services.AddAppKlyroo();
 ```
 
 `AddKlyrooStack` takes two callbacks: `configureUi` receives `KlyrooOptions` (the themes and settings of Klyroo.UI) and `configureTable` receives `KlyrooTableOptions` (the themes and messages of Klyroo.Table). Both objects freeze once components start resolving themes and texts (Klyroo.Table messages throw `InvalidOperationException` when changed after that), so configure them in the registration call, never later.
+
+## Configure the options of each library
+
+Goal: change the options of Klyroo.Dashboard or Klyroo.Display although `AddKlyrooStack()` has no callback for them.
+
+`AddKlyrooStack` takes `configureUi` (`KlyrooOptions`) and `configureTable` (`KlyrooTableOptions`). For any other library, call its own registration method after it, with a callback:
+
+```csharp
+using Klyroo.Dashboard;
+using Klyroo.Display;
+using Klyroo.Stack;
+
+builder.Services.AddKlyrooStack(configureUi: ui => ui.Defaults.Size = KlySize.Sm);
+
+builder.Services.AddKlyrooDashboard(o => o.PersistMaxBytes = 4096);
+builder.Services.AddKlyrooDisplay(o => o.Texts("de", t => t with { ClosePreview = "Schließen" }));
+```
+
+This works because every one of these methods looks for the options object that an earlier call registered and changes it, instead of registering a second one. `AddKlyrooDashboard` keeps a single `KlyrooDashboardOptions` singleton, and `AddKlyrooDisplay` and `AddKlyrooTable` call `AddKlyrooUi`, which holds their options as extensions of the `KlyrooOptions` it keeps (`options.Extension<KlyrooDisplayOptions>()`). Whatever the order, one instance results, which this repository's tests check (a call before `AddKlyrooStack`, after it, and the Klyroo.UI and Klyroo.Table callbacks together with a later call of the same methods).
+
+`AddKlyrooForm()`, `AddKlyrooSpreadsheet()`, `AddKlyrooQuery()` and `AddKlyrooAgent()` have no options to configure. Two rules from the libraries apply: options freeze once components start resolving them (a theme or a message table throws `InvalidOperationException` when changed later), so configure during registration, and in an app with a WebAssembly client make the same calls in the server and in the client project, through the shared method described in [Share options between the server and the WebAssembly client](#share-options-between-the-server-and-the-webassembly-client).
 
 ## Find which library owns a component
 
