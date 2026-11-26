@@ -396,3 +396,15 @@
 .panel-head { flex-wrap: wrap; row-gap: 0; }
 .panel-title { white-space: nowrap; }
 @media (max-width: 479px) { .panel-head { padding-block: 0.375rem; } }
+
+/* A lit band (a row, a stage, a block of a panel) is a fill that stays inside the panel border: no outline of its own, which would run into the edge and double the border. */
+tr[data-target].is-lit, .stage[data-target].is-lit, .disp-section[data-target].is-lit, .dash-block[data-target].is-lit { outline: 0; border-radius: 0; background: var(--lit); }
+tr[data-target], .stage[data-target], .disp-section[data-target], .dash-block[data-target] { outline: 0; }
+/* The messages of the ui board: a fill and an underline, no ring and no outlined box. */
+.summary[data-target], .field-error[data-target] { outline: 0; }
+.summary[data-target].is-lit { background: color-mix(in oklab, var(--danger) 16%, transparent); }
+.field-error[data-target].is-lit { background: transparent; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.summary { border: 0; border-radius: 6px; }
+
+/* The form board: Name, Email and Topic share a row, so Message and Send come after them in reading and tab order without a half-empty row. */
+@media (min-width: 640px) { .form-stack.is-compact.is-three { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
