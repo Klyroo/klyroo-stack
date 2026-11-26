@@ -53,7 +53,7 @@ To use the library in an app:
 - **For the MCP server**: the .NET 10 runtime, to run the `Klyroo.Stack.Mcp` .NET tool, and an MCP client (Claude Code, VS Code, Cursor...).
 - **For the project templates**: `dotnet new install Klyroo.Templates`; the `klyroo-maui` template also needs the .NET MAUI workload (`dotnet workload install maui`) and the SDKs of the platforms you target.
 
-To build this repository you need the .NET 10 SDK (a newer SDK works too, see `global.json`) and clones of `klyroo-agent`, `klyroo-dashboard`, `klyroo-display`, `klyroo-form`, `klyroo-query`, `klyroo-spreadsheet`, `klyroo-table`, `klyroo-ui` in the same parent folder: some projects reference them by relative path (`../klyroo-agent/...`). See [Contributing](CONTRIBUTING.md).
+To build this repository you need the .NET 10 SDK (a newer SDK works too, see `global.json`) and clones of `klyroo-agent`, `klyroo-dashboard`, `klyroo-display`, `klyroo-form`, `klyroo-query`, `klyroo-spreadsheet`, `klyroo-table` and `klyroo-ui` in the same parent folder: some projects reference them by relative path (`../klyroo-agent/...`). See [Contributing](CONTRIBUTING.md).
 
 ## Installation
 
