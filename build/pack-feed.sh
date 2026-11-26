@@ -20,4 +20,9 @@ for repo in ui query table form dashboard display spreadsheet agent stack; do
   echo "::endgroup::"
 done
 
+# The templates are not in the solution of the hub: pack them too, so that "dotnet new install Klyroo.Templates" works from the feed.
+echo "::group::pack Klyroo.Templates"
+dotnet pack "$root/klyroo-stack/templates/Klyroo.Templates/Klyroo.Templates.csproj" -c "$configuration" -o "$feed" --nologo
+echo "::endgroup::"
+
 ls "$feed"

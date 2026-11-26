@@ -13,6 +13,7 @@ Task-oriented recipes for the hub. Each one states its goal, shows complete code
 - [Style a generated app](#style-a-generated-app)
 - [Open a form or a file preview in the MAUI template](#open-a-form-or-a-file-preview-in-the-maui-template)
 - [Publish the headless template with NativeAOT](#publish-the-headless-template-with-nativeaot)
+- [Verify the templates against local packages](#verify-the-templates-against-local-packages)
 - [Run the MCP server and the documentation site from source](#run-the-mcp-server-and-the-documentation-site-from-source)
 
 ## Register only the libraries you use
@@ -331,6 +332,21 @@ dotnet publish -c Release -r linux-x64
 ```
 
 The template sets `PublishAot` and references `Klyroo.Stack.Core`, whose engines are marked `IsAotCompatible`. The program prints a line that shows each engine working: a query, a spreadsheet import, a CSV preview, a form controller, a KPI format and an undo stack. Use the runtime identifier of your machine instead of `linux-x64`. NativeAOT needs the platform's native toolchain (a C compiler and linker on Linux); that requirement comes from the .NET SDK, not from Klyroo.
+
+## Verify the templates against local packages
+
+Goal: prove that the templates work for someone who has only the packages, before a release or after changing a template.
+
+The projects of the templates reference `Klyroo.Stack` by version, not by path, so they can only be checked against packed packages. Two scripts do it, and the `templates-from-local-feed` job of `.github/workflows/ci.yml` runs the same two commands:
+
+```bash
+build/pack-feed.sh /tmp/klyroo-feed
+build/verify-templates.sh /tmp/klyroo-feed /tmp/klyroo-apps
+```
+
+`pack-feed.sh` runs `dotnet pack` in the nine repositories in dependency order (Klyroo.UI first, this repository and its templates last) into one folder. `verify-templates.sh` writes a `nuget.config` next to the apps that maps `Klyroo.*` to that folder and everything else to nuget.org, so a Klyroo package can only come from the feed. It then installs `Klyroo.Templates` from the feed, generates `klyroo-saas` in the three interactivity modes, `klyroo-admin` in two of them and `klyroo-headless`, builds each with warnings as errors, starts the web apps and requests their pages (each answer has to contain an `h1` and the Klyroo stylesheet, and the log of the app must hold no `fail`), and publishes the headless app with NativeAOT and runs the binary.
+
+Set `DOTNET_CLI_HOME` and `NUGET_PACKAGES` to empty folders first to keep your own caches out of it: a package cached from an earlier build with the same version would hide a problem of the new one. NativeAOT needs a C toolchain (`clang` and `zlib1g-dev` on Ubuntu); on a machine that has only `gcc`, set `AOT_ARGS="-p:CppCompilerAndLinker=gcc"`.
 
 ## Run the MCP server and the documentation site from source
 
