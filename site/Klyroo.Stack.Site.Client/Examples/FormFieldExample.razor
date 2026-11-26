@@ -3,7 +3,7 @@
 <EditForm Model="Model" FormName="signup" OnValidSubmit="Submit" class="flex w-full max-w-sm flex-col gap-4" novalidate>
     <DataAnnotationsValidator />
     <KlyFormField Label="Email" Required For="() => Model!.Email" Description="We never share it.">
-        <KlyInput Type="email" @bind-Value="Model!.Email" Placeholder="you@example.com" />
+        <KlyInput Type="InputType.Email" @bind-Value="Model!.Email" Placeholder="you@example.com" />
     </KlyFormField>
     <KlyFormField Label="Role" Hint="Optional">
         <KlySelect @bind-Value="Model!.Role" Items="Roles" Placeholder="Pick one" />
@@ -12,7 +12,7 @@
         <KlyTextarea @bind-Value="Model!.Bio" Rows="3" />
     </KlyFormField>
     <KlyCheckbox @bind-Value="Model!.Newsletter" Label="Send me the newsletter" />
-    <KlyButton Type="submit" Label="Create account" Block />
+    <KlyButton Type="ButtonType.Submit" Label="Create account" Block />
     @if (_done)
     {
         <KlyAlert Title="Account created" Color="KlyColor.Success" Variant="KlyVariant.Soft" Icon='KlyIcons.Named("circle-check")' />

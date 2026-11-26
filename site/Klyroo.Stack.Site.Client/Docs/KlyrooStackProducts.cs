@@ -201,8 +201,8 @@ public static class KlyrooStackProducts
                     <KlyDataListTable TItem="Employee"
                                      HeaderMenu="true"
                                      Summaries="@(new DataListSummaries<Employee>())">
-                        <KlyDataListColumn TItem="Employee" Field="name" Title="Name" />
-                        <KlyDataListColumn TItem="Employee" Field="salary" Title="Salary"
+                        <KlyDataListFieldColumn TItem="Employee" Field="name" Title="Name" />
+                        <KlyDataListFieldColumn TItem="Employee" Field="salary" Title="Salary"
                                           Summary="DataListSummaryKind.Sum" />
                     </KlyDataListTable>
                 </KlyDataList>
@@ -233,27 +233,31 @@ public static class KlyrooStackProducts
             Platforms: ["Headless C# / NativeAOT", ".NET MAUI Native C#", "Blazor Server / WASM / Auto", ".NET MAUI Blazor Hybrid"],
             Features:
             [
-                ("31 Declarative Field Kinds", "Text, Password (with requirement checklist), Number, Select, AutoComplete, Checkbox, Switch, Slider, Repeatable Arrays, and Tabs driven by FormSchema.", "31 Field Kinds"),
-                ("Reactive Conditions & Transforms", "Evaluates Condition = f => ... live, automatically skips hidden fields during validation and output building, and applies TransformOutput on submit.", "Reactive Engine"),
-                ("Multi-Step Wizards with SkipWhen", "Split complex flows into FormStepSchema with conditional SkipWhen branching, per-step validation, and automatic dirty re-baselining after submit.", "Wizard Flow"),
+                ("31 Declarative Field Kinds", "Text, Password (with requirement checklist), Number, Select, AutoComplete, Checkbox, Switch, Slider, Repeatable Rows, and Tabs, chosen from the types of the members of your model with FormSchema.For<TModel>.", "31 Field Kinds"),
+                ("Reactive Conditions & Transforms", "Evaluates VisibleWhen(c => ...) live, automatically skips hidden fields during validation and the model write, and applies TransformOutput on submit.", "Reactive Engine"),
+                ("Multi-Step Wizards with SkipWhen", "Split complex flows into s.Step with conditional skipWhen branching, per-step validation, and automatic dirty re-baselining after submit.", "Wizard Flow"),
                 ("FormPage & Overlay FormService", "Sectioned pages with completion indicators (KlyFormPage) and programmatic modal/drawer form hosts via FormService + KlyFormProvider.", "Overlay Host")
             ],
-            CoreCodeTitle: "Klyroo.Form.Core · Headless FormSchema & FormController",
+            CoreCodeTitle: "Klyroo.Form.Core · Headless FormSchema & FormController<TModel>",
             CoreCode: """
 
-                var schema = new FormSchema
+                public sealed class Profile
                 {
-                    FormKey = "profile",
-                    Title = "User Profile",
-                    Fields =
-                    [
-                        new FormFieldSchema { Key = "name", Label = "Full Name", Required = true, TransformOutput = v => v?.ToString()?.Trim() },
-                        new FormFieldSchema { Key = "age", Label = "Age", Kind = FormFieldKind.Number, DefaultValue = 25.0 },
-                        new FormFieldSchema { Key = "company", Label = "Company", Required = true, Condition = f => f.GetValue<double>("age") >= 21 }
-                    ]
-                };
+                    public string Name { get; set; } = "";
+                    public int Age { get; set; }
+                    public string? Company { get; set; }
+                }
 
-                var form = new FormController(schema, new Dictionary<string, object?> { ["name"] = "Alice" });
+                var schema = FormSchema.For<Profile>(s =>
+                {
+                    s.FormKey = "profile";
+                    s.Title = "User Profile";
+                    s.Field(m => m.Name, f => f.Label("Full Name").Required().TransformOutput(v => v.Trim()));
+                    var age = s.Field(m => m.Age, f => f.Default(25));
+                    s.Field(m => m.Company, f => f.Required().VisibleWhen(c => c.Get(age) >= 21));
+                });
+
+                var form = new FormController<Profile>(schema, new Profile { Name = "Alice" });
                 var ok = await form.SubmitAsync();
                 """,
             UiCodeTitle: "Klyroo.Form · KlyFormEngine & KlyFormPage",
@@ -265,10 +269,10 @@ public static class KlyrooStackProducts
                 """,
             Components:
             [
-                new("FormSchema", "Declarative schema with 31 field kinds, steps, sections, rules & transforms.", "/form/docs", "Core"),
-                new("FormController", "Headless NativeAOT state machine for values, errors, dirty paths & steps.", "/form/docs", "Core"),
+                new("FormSchema", "Typed schema bound to a C# model: 31 field kinds, steps, sections, rules & transforms.", "/form/docs", "Core"),
+                new("FormController<TModel>", "Headless NativeAOT state machine for values, errors, dirty fields & steps.", "/form/docs", "Core"),
                 new("FormService", "Programmatic overlay service to open forms in modals or drawers.", "/form/docs", "Core"),
-                new("KlyFormEngine", "Automatic Blazor/MAUI renderer for FormSchema & multi-step wizards.", "/form/docs", "UI"),
+                new("KlyFormEngine<TModel>", "Automatic Blazor/MAUI renderer for FormSchema & multi-step wizards.", "/form/docs", "UI"),
                 new("KlyFormPage", "Sectioned form page layout with live completion & dirty status.", "/form/docs", "UI")
             ]),
 
@@ -353,7 +357,7 @@ public static class KlyrooStackProducts
                 ("19 Read-Only Display Blocks", "Heading, Text, expandable Alert, Callout, copyable Facts, Stat with sparkline, Breakdown, threshold Meter, Diff before/after, Timeline, and Secret Code.", "19 Blocks"),
                 ("Constrained Audio & Video Players", "Supports Start/End clip slicing, MaxPlays play quotas (ideal for exams and language assessments), Seekable=false locking, and subtitle tracks.", "Media Quotas"),
                 ("Multi-Format FilePreviewService", "Headless MIME/extension detection in .Core, built-in RFC 4180 CSV parser, and zoomable modal lightbox for images, PDFs, audio, video, and CSV.", "File Lightbox"),
-                ("Secret Masking & One-Click Reveal", "DisplayKind.Code with Variant=\"secret\" automatically masks API keys (••••••••3210) with Reveal/Hide toggle and clipboard copy.", "Security UX")
+                ("Secret Masking & One-Click Reveal", "DisplayKind.Code with Variant=\"DisplayVariant.Secret\" automatically masks API keys (••••••••3210) with Reveal/Hide toggle and clipboard copy.", "Security UX")
             ],
             CoreCodeTitle: "Klyroo.Display.Core · FilePreviewService & CSV Parser",
             CoreCode: """
@@ -371,7 +375,7 @@ public static class KlyrooStackProducts
                 <KlyDisplay Kind="DisplayKind.Stat" Title="MRR" Value="€148,900"
                            Delta="+14.2%" Trend="@([102, 118, 134, 149])" />
 
-                <KlyDisplay Kind="DisplayKind.Code" Variant="secret"
+                <KlyDisplay Kind="DisplayKind.Code" Variant="DisplayVariant.Secret"
                            Value="sk_live_9876543210" VisibleChars="4" Copy="true" />
 
                 <KlyAudioPlayer Src="/media/listening.mp3" Title="Listening Extract #1"
@@ -412,18 +416,26 @@ public static class KlyrooStackProducts
             CoreCodeTitle: "Klyroo.Spreadsheet.Core · Headless SpreadsheetImporter",
             CoreCode: """
 
-                var schema = new SpreadsheetSchema
+                public sealed class RateRow
                 {
-                    Key = "rates",
-                    Columns =
-                    [
-                        new SpreadsheetColumnSchema { Key = "code", Label = "Code", Required = true },
-                        new SpreadsheetColumnSchema { Key = "price", Label = "Unit Price", Kind = SpreadsheetColumnKind.Number, DecimalSeparator = ',', Rules = [SpreadsheetRule.Min(0)] },
-                        new SpreadsheetColumnSchema { Key = "currency", Label = "Currency", Kind = SpreadsheetColumnKind.Select, Options = [new("EUR", "Euro", ["€", "EUR"]), new("USD", "US Dollar", ["$", "USD"])] }
-                    ]
-                };
+                    public string Code { get; set; } = "";
+                    public decimal Price { get; set; }
+                    public string Currency { get; set; } = "";
+                }
 
-                var importer = new SpreadsheetImporter(schema);
+                var schema = SpreadsheetSchema.For<RateRow>(s =>
+                {
+                    s.Key = "rates";
+                    s.Column(r => r.Code, c => c.Label("Code").Required());
+                    s.Column(r => r.Price, c => c.Label("Unit Price").DecimalSeparator(',').Rule(SpreadsheetRule.Min(0m)));
+                    s.Column(r => r.Currency, c => c.Label("Currency").Options(
+                    [
+                        new SpreadsheetOption<string?>("EUR", "Euro", ["€", "EUR"]),
+                        new SpreadsheetOption<string?>("USD", "US Dollar", ["$", "USD"]),
+                    ]));
+                });
+
+                var importer = new SpreadsheetImporter<RateRow>(schema);
                 importer.LoadText(csvText, "rates.csv"); // Auto-detects header row & 80%-pass suggestions
                 """,
             UiCodeTitle: "Klyroo.Spreadsheet · KlySpreadsheetImport Wizard",
@@ -459,7 +471,7 @@ public static class KlyrooStackProducts
             [
                 ("Semantic Snapshot, Query & Act", "Exposes up to 100 controls by stable ref (c1, c2…), queries select/filter choices without opening popups, and runs semantic actions (setValue, toggle, submit).", "Semantic Bridge"),
                 ("Permission Gate & Confirmation Policy", "Global AllowPolicy or per-call gate with ConfirmRequired flags to approve or block consequential actions before execution.", "Policy Guard"),
-                ("Observe Stream & Secret Redaction", "Unified ObservedChange stream (Agent/User source) where Password and OneTimeCode fields are always redacted as [redacted].", "Privacy First"),
+                ("Observe Stream & Secret Redaction", "Unified ObservedChange stream (Agent/User source) where Password and OneTimeCode fields are always redacted as [redacted], and the model cannot write them unless the app names them in allowSensitiveWrites.", "Privacy First"),
                 ("WebMCP JS Assets & UndoStack<T>", "Ships _content/Klyroo.Agent/klyroo-agent.js for WebMCP and a bounded generic UndoStack<T> in Klyroo.Agent.Core (NativeAOT).", "WebMCP + Undo")
             ],
             CoreCodeTitle: "Klyroo.Agent · AgentBridgeService & UndoStack<T>",
@@ -492,7 +504,7 @@ public static class KlyrooStackProducts
             [
                 new("AgentComponentSnapshot", "Compact NativeAOT semantic snapshot model with state, actions & flags.", "/agent/docs", "Core"),
                 new("UndoStack<T>", "Generic bounded Undo/Redo stack with labels and state notifications.", "/agent/docs", "Core"),
-                new("AgentBridgeService", "Connects FormController, DashboardController & SpreadsheetImporter to AI agents.", "/agent/docs", "UI"),
+                new("AgentBridgeService", "Connects FormController<TModel>, DashboardController & SpreadsheetImporter to AI agents.", "/agent/docs", "UI"),
                 new("klyroo-agent.js", "Static web asset for browser-side snapshot, query, act and WebMCP (navigator.modelContext).", "/agent/docs", "UI")
             ])
     ];

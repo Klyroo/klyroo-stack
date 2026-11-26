@@ -25,8 +25,8 @@ public static partial class KlyrooLibraryDocs
                         TableHeaders: ["Step", "API / Mechanism", "What Happens"],
                         TableRows:
                         [
-                            new("1. Register", "RegisterForm · RegisterDashboard · RegisterSpreadsheet", "Binds headless Klyroo controllers to AgentBridgeService with stable refs (c1, c2...) and confirmSubmit flags."),
-                            new("2. Snapshot", "agent.Snapshot(includeOffPage: false)", "Emits up to 100 concise AgentComponentSnapshot records; Password & OneTimeCode values are ALWAYS replaced with \"[redacted]\"."),
+                            new("1. Register", "RegisterForm · RegisterDashboard · RegisterSpreadsheet", "Binds headless Klyroo controllers to AgentBridgeService with stable refs (c1, c2...) and confirmSubmit flags. A form is any IFormRuntime: a FormController<TModel> or a DynamicFormController; a spreadsheet is any SpreadsheetImporter, typed or not."),
+                            new("2. Snapshot", "agent.Snapshot(includeOffPage: false)", "Emits up to 100 concise AgentComponentSnapshot records; Password & OneTimeCode values are ALWAYS replaced with \"[redacted]\", and the model cannot change those fields."),
                             new("3. Query", "agent.Query(new AgentQueryRequest { Within, Text, Kind })", "Searches labels and closed select/option choices accent-insensitively ('region' matches 'Région') without opening UI popups."),
                             new("4. Policy Gate & Act", "agent.AllowPolicy + await agent.ActAsync(steps)", "Resolves targets by Ref or normalized Label, enforces AllowPolicy on consequential steps, executes actions sequentially, or halts with a clear diagnostic error."),
                             new("5. Observe & Undo", "agent.Observe(cb) + UndoStack<T>", "Broadcasts ObservedChange events tagged with AgentChangeSource (Agent, Keyboard, Programmatic...) and supports instant Undo/Redo.")
@@ -35,7 +35,7 @@ public static partial class KlyrooLibraryDocs
                         TableHeaders: ["Package", "Primary Exports", "Compatibility"],
                         TableRows:
                         [
-                            new("Klyroo.Agent.Core", "AgentComponentSnapshot, AgentQueryRequest, AgentQueryMatch, AgentChoiceItem, AgentActStep, AgentActResult, ObservedChange, AgentToolDefinition, AgentChangeSource, UndoStack<T>", "Zero dependencies · IsAotCompatible=true"),
+                            new("Klyroo.Agent.Core", "AgentComponentSnapshot, AgentValue, AgentArgument, AgentQueryRequest, AgentQueryMatch, AgentRecord, AgentChoiceItem, AgentActStep, AgentActResult, AgentToolResult, ObservedChange, AgentToolDefinition, AgentChangeSource, UndoStack<T>", "Zero dependencies · IsAotCompatible=true"),
                             new("Klyroo.Agent", "AgentBridgeService, AddKlyrooAgent(), _content/Klyroo.Agent/klyroo-agent.js", "browser, ios, android, maccatalyst, windows")
                         ])
                 ]),
@@ -120,7 +120,7 @@ public static partial class KlyrooLibraryDocs
                             new("Programmatic", "Application C# or JS code", "Identifies state changes triggered by app logic"),
                             new("Agent", "AgentBridgeService.ActAsync()", "Automatically tagged on every agent-driven step")
                         ],
-                        Callout: "Password and OneTimeCode fields ALWAYS emit AgentBridgeService.RedactedValue (\"[redacted]\") in Snapshot(), ActResult.Values, and ObservedChange — plaintext secrets are never exposed to observers or LLMs.")
+                        Callout: "Password and OneTimeCode fields ALWAYS emit AgentBridgeService.RedactedValue (\"[redacted]\") in Snapshot(), ActResult.Values, and ObservedChange — plaintext secrets are never exposed to observers or LLMs. ActAsync also refuses every write to a sensitive field unless the application names it in RegisterForm(form, allowSensitiveWrites: [\"Code\"]), and refuses a write to a field of another step of a wizard (move there with the nextStep action first).")
                 ]),
             new("undo-and-webmcp", "UndoStack<T>, WebMCP & DOM Behaviors", "State & Browser",
                 "Zero-dependency generic UndoStack<T> in Klyroo.Agent.Core, plus browser WebMCP registration. The headless DOM behaviors ship in the Klyroo.UI script as Klyroo.behaviors.",
@@ -336,7 +336,7 @@ public static partial class KlyrooLibraryDocs
                                 """)
                         ]),
                     new("multi-controller", "4. Cross-Controller Plan (Klyroo.Form + Klyroo.Dashboard Together)",
-                        Paragraphs: ["Register both a FormController and a DashboardController on one AgentBridgeService and mutate both in a single ActAsync() batch."],
+                        Paragraphs: ["Register both a FormController<TModel> and a DashboardController on one AgentBridgeService and mutate both in a single ActAsync() batch."],
                         LiveDemoKey: "agent-multi-controller",
                         LiveDemoTitle: "Unified Multi-Controller Snapshot & ActAsync",
                         CodeSamples:

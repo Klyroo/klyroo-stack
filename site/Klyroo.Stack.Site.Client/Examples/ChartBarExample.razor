@@ -2,12 +2,12 @@
 <div class="grid w-full gap-8 md:grid-cols-2">
     <div>
         <p class="mb-2 text-sm font-medium text-(--klyroo-text-highlighted)">Grouped</p>
-        <KlyChart TItem="Sale" Data="_data" Index="@(s => s.Quarter)" Categories="_categories" Type="KlyChartType.Bar"
+        <KlyChart TItem="Sale" TIndex="string" Data="_data" Index="@(s => s.Quarter)" Categories="_categories" Type="KlyChartType.Bar"
                  Format="Money" Table="KlyChartTable.Toggle" Width="420" Height="260" data-testid="chart-bar" />
     </div>
     <div>
         <p class="mb-2 text-sm font-medium text-(--klyroo-text-highlighted)">Stacked and horizontal</p>
-        <KlyChart TItem="Sale" Data="_data" Index="@(s => s.Quarter)" Categories="_categories" Type="KlyChartType.Bar"
+        <KlyChart TItem="Sale" TIndex="string" Data="_data" Index="@(s => s.Quarter)" Categories="_categories" Type="KlyChartType.Bar"
                  Stacked Horizontal Format="Money" Width="420" Height="260" data-testid="chart-bar-horizontal" />
     </div>
 </div>

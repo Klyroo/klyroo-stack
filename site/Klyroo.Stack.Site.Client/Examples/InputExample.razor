@@ -3,7 +3,7 @@
     {
         <KlyInput Variant="variant" Placeholder="@($"{variant} input")" aria-label="@($"{variant} input")" />
     }
-    <KlyInput @bind-Value="_search" Immediate Type="search" Placeholder="Search…" aria-label="Search">
+    <KlyInput @bind-Value="_search" Immediate Type="InputType.Search" Placeholder="Search…" aria-label="Search">
         <LeadingIcon><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg></LeadingIcon>
     </KlyInput>
     <p class="text-sm text-(--klyroo-text-muted)">Searching for: @_search</p>

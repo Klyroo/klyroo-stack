@@ -4,7 +4,7 @@
     <KlyFormField Label="Toolset" For="() => Model!.Stack" class="w-full">
         <KlySelectMenu Items="Stack" Multiple @bind-Value="Model!.Stack" Placeholder="Pick technologies" />
     </KlyFormField>
-    <KlyButton Type="submit" Label="Save selection" />
+    <KlyButton Type="ButtonType.Submit" Label="Save selection" />
     @if (_saved)
     {
         <p role="status" class="text-sm text-(--klyroo-success-text)" data-testid="clear-saved">Saved: @(Picked.Count == 0 ? "none" : string.Join(", ", Picked))</p>

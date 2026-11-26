@@ -9,14 +9,14 @@
         </div>
         <KlyDataListErrorState />
         <KlyDataListTable Caption="Invoices from a provider">
-            <KlyDataListColumn Field="id" Title="No." Align="DataListAlign.End" />
-            <KlyDataListColumn Field="customer" />
-            <KlyDataListColumn Field="status">
+            <KlyDataListFieldColumn Field="id" Title="No." Align="DataListAlign.End" />
+            <KlyDataListFieldColumn Field="customer" />
+            <KlyDataListTemplateColumn Key="status">
                 <Template Context="invoice">
                     <KlyBadge Label="@invoice.Status" Variant="KlyVariant.Soft" Color="@StatusColor(invoice.Status)" />
                 </Template>
-            </KlyDataListColumn>
-            <KlyDataListColumn Field="amount" Align="DataListAlign.End" Format="C2" />
+            </KlyDataListTemplateColumn>
+            <KlyDataListFieldColumn Field="amount" Align="DataListAlign.End" Format="C2" />
         </KlyDataListTable>
         <KlyDataListPagination />
     </KlyDataList>

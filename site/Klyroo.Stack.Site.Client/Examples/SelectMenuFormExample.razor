@@ -8,7 +8,7 @@
     <KlyFormField Label="Keywords" For="() => Model!.Keywords" class="w-full">
         <KlyInputTags @bind-Value="Model!.Keywords" Placeholder="Type, then Enter" />
     </KlyFormField>
-    <KlyButton Type="submit" Label="Save profile" />
+    <KlyButton Type="ButtonType.Submit" Label="Save profile" />
     @if (_saved)
     {
         <p role="status" class="text-sm text-(--klyroo-success-text)" data-testid="saved">Saved: @string.Join(", ", Model!.Stack) / @string.Join(", ", Model!.Keywords)</p>

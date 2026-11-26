@@ -45,6 +45,14 @@
     <CodeBlock Title="Program.cs (server project)" Code="@ServerCs" />
     <p>The package has the same version as Klyroo.UI and depends on exactly that version.</p>
 
+    <h2>Data annotations: Klyroo.Form.DataAnnotations</h2>
+    <p>
+        A form schema declares its rules in code. If your models already carry <code>[Required]</code>, <code>[StringLength]</code>, <code>[Range]</code>, <code>[Display]</code> and the other attributes of <code>System.ComponentModel.DataAnnotations</code>,
+        the package <code>Klyroo.Form.DataAnnotations</code> reads them into the schema: call <code>FormSchema.For&lt;T&gt;(s =&gt; s.FromDataAnnotations())</code>. <code>Klyroo.Stack</code> does not include it, like <code>Klyroo.UI.Server</code>, because it reads
+        attributes by reflection (trim-safe, not NativeAOT-safe): add it to the projects that use it.
+    </p>
+    <CodeBlock Title="Terminal" Code="@DataAnnotationsCs" />
+
     <h2>MAUI Blazor Hybrid apps</h2>
     <p>
         In a MAUI app the package and the stylesheets are the same, but there are no render modes and no server. Call <code>AddKlyrooUi</code>
@@ -55,6 +63,10 @@
 </div>
 
 @code {
+    private const string DataAnnotationsCs = """
+        dotnet add package Klyroo.Form.DataAnnotations --prerelease
+        """;
+
     private const string ProgramCs = """
         builder.Services.AddKlyrooUi(options =>
         {

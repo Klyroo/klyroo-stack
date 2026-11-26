@@ -1,5 +1,5 @@
 <div class="flex flex-wrap items-center gap-4">
-    <KlyPopover @bind-Open="_open" Placement="bottom-start">
+    <KlyPopover @bind-Open="_open" Placement="KlyPlacement.BottomStart">
         <ChildContent><KlyButton Label="Open bound" Variant="ButtonVariant.Outline" data-testid="bound-trigger" /></ChildContent>
         <Content>
             <div class="flex w-64 flex-col items-start gap-2 p-4" data-testid="bound-panel">

@@ -160,9 +160,9 @@
             case "table-basic":
                 <KlyDataList TItem="TableDemoRow" Schema="@TableSchema" Items="@TableRows" UrlSync="false">
                     <KlyDataListTable TItem="TableDemoRow" HeaderMenu="true" ShowProgressLine="true" Summaries="@(new DataListSummaries<TableDemoRow>())">
-                        <KlyDataListColumn TItem="TableDemoRow" Field="name" Title="Employee" />
-                        <KlyDataListColumn TItem="TableDemoRow" Field="dept" Title="Department" />
-                        <KlyDataListColumn TItem="TableDemoRow" Field="salary" Title="Salary (€)" Summary="DataListSummaryKind.Sum" />
+                        <KlyDataListFieldColumn TItem="TableDemoRow" Field="name" Title="Employee" />
+                        <KlyDataListFieldColumn TItem="TableDemoRow" Field="dept" Title="Department" />
+                        <KlyDataListFieldColumn TItem="TableDemoRow" Field="salary" Title="Salary (€)" Summary="DataListSummaryKind.Sum" />
                     </KlyDataListTable>
                 </KlyDataList>
                 break;
@@ -170,8 +170,8 @@
             case "table-tree":
                 <KlyDataList TItem="OrgRow" Schema="@OrgSchema" Items="@OrgRoots" UrlSync="false">
                     <KlyDataListTable TItem="OrgRow" Tree="@OrgTree">
-                        <KlyDataListColumn TItem="OrgRow" Field="name" Title="Organization Hierarchy" />
-                        <KlyDataListColumn TItem="OrgRow" Field="role" Title="Role" />
+                        <KlyDataListFieldColumn TItem="OrgRow" Field="name" Title="Organization Hierarchy" />
+                        <KlyDataListFieldColumn TItem="OrgRow" Field="role" Title="Role" />
                     </KlyDataListTable>
                 </KlyDataList>
                 break;
@@ -187,9 +187,9 @@
                     </div>
                     <KlyDataList TItem="TableDemoRow" Schema="@TableSchema" Items="@TableRows" UrlSync="false">
                         <KlyDataListTable TItem="TableDemoRow" Density="@_tableDensity" GroupBy="@TableGroupBy" Summaries="@(new DataListSummaries<TableDemoRow>())">
-                            <KlyDataListColumn TItem="TableDemoRow" Field="name" Title="Employee" />
-                            <KlyDataListColumn TItem="TableDemoRow" Field="dept" Title="Department" />
-                            <KlyDataListColumn TItem="TableDemoRow" Field="salary" Title="Salary (€)" Summary="DataListSummaryKind.Average" />
+                            <KlyDataListFieldColumn TItem="TableDemoRow" Field="name" Title="Employee" />
+                            <KlyDataListFieldColumn TItem="TableDemoRow" Field="dept" Title="Department" />
+                            <KlyDataListFieldColumn TItem="TableDemoRow" Field="salary" Title="Salary (€)" Summary="DataListSummaryKind.Average" />
                         </KlyDataListTable>
                     </KlyDataList>
                 </div>
@@ -209,9 +209,9 @@
                         <KlyDataListTable TItem="TableDemoRow"
                                          RowSummary="@(_tableMobileSummary ? TablePhoneSummary : null)"
                                          Summaries="@(new DataListSummaries<TableDemoRow>())">
-                            <KlyDataListColumn TItem="TableDemoRow" Field="name" Title="Employee" />
-                            <KlyDataListColumn TItem="TableDemoRow" Field="dept" Title="Department" />
-                            <KlyDataListColumn TItem="TableDemoRow" Field="salary" Title="Salary (€)" Summary="@_tableSummaryKind" />
+                            <KlyDataListFieldColumn TItem="TableDemoRow" Field="name" Title="Employee" />
+                            <KlyDataListFieldColumn TItem="TableDemoRow" Field="dept" Title="Department" />
+                            <KlyDataListFieldColumn TItem="TableDemoRow" Field="salary" Title="Salary (€)" Summary="@_tableSummaryKind" />
                         </KlyDataListTable>
                     </KlyDataList>
                 </div>
@@ -242,8 +242,8 @@
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-(--klyroo-border) bg-(--klyroo-bg-muted)/40 px-3 py-2 font-mono text-xs">
                         <span>IsDirty: <strong>@_formCtrl.IsDirty</strong></span>
-                        <span>DirtyPaths: <strong>@(_formCtrl.DirtyPaths.Count == 0 ? "none" : string.Join(", ", _formCtrl.DirtyPaths))</strong></span>
-                        <span>Company visible (age &ge; 21): <strong>@(_formCtrl.GetValue<double>("age") >= 21)</strong></span>
+                        <span>Dirty fields: <strong>@(DirtyProfileFields.Count == 0 ? "none" : string.Join(", ", DirtyProfileFields))</strong></span>
+                        <span>Company visible (age &ge; 21): <strong>@(_formCtrl.Get(ProfileAge) >= 21)</strong></span>
                     </div>
                     <KlyFormEngine Form="@_formCtrl" SubmitLabel="Validate & Submit" ShowReset="true" />
                 </div>
@@ -252,8 +252,8 @@
             case "form-wizard":
                 <div class="flex flex-col gap-3">
                     <p class="font-mono text-xs text-(--klyroo-text-muted)">
-                        Step @(_wizardCtrl.CurrentStepIndex + 1) · Active: <strong>@_wizardCtrl.CurrentStep?.Title</strong>
-                        (Select <code>free</code> to skip the Billing step automatically via <code>SkipWhen</code>)
+                        Step @(_wizardCtrl.CurrentStepIndex + 1) · Active: <strong>@WizardStepTitle</strong>
+                        (Select <code>Free</code> to skip the Billing step automatically via <code>SkipWhen</code>)
                     </p>
                     <KlyFormEngine Form="@_wizardCtrl" SubmitLabel="Complete Onboarding" ShowReset="true" />
                 </div>
@@ -263,7 +263,7 @@
                 <div class="flex flex-col gap-4">
                     <KlyFormEngine Form="@_arrayCtrl" SubmitLabel="Build Invoice Payload" ShowReset="true" />
                     <div class="rounded-xl border border-(--klyroo-border) bg-(--klyroo-bg-muted)/40 p-3 font-mono text-xs">
-                        Line items count: <strong>@_arrayCtrl.GetArrayItems("items").Count</strong>
+                        Line items count: <strong>@_arrayCtrl.Rows(InvoiceItems).Count</strong>
                     </div>
                 </div>
                 break;
@@ -271,19 +271,19 @@
             case "form-dirty-diff":
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-wrap items-center gap-2">
-                        <KlyButton Label="Mutate Name -> 'Claire'" Size="KlySize.Sm" OnClick="@(() => { _dirtyCtrl.SetValue("name", "Claire", markTouched: true); RefreshDirtyJson(); })" />
-                        <KlyButton Label="Mutate Plan -> 'enterprise'" Size="KlySize.Sm" Color="KlyColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => { _dirtyCtrl.SetValue("plan", "enterprise", markTouched: true); RefreshDirtyJson(); })" />
-                        <KlyButton Label="ResetField('name')" Size="KlySize.Sm" Color="KlyColor.Neutral" Variant="ButtonVariant.Soft" OnClick="@(() => { _dirtyCtrl.ResetField("name"); RefreshDirtyJson(); })" />
+                        <KlyButton Label="Mutate Name -> 'Claire'" Size="KlySize.Sm" OnClick="@(() => { _dirtyCtrl.Set(WorkspaceName, "Claire", markTouched: true); RefreshDirtyJson(); })" />
+                        <KlyButton Label="Mutate Plan -> 'enterprise'" Size="KlySize.Sm" Color="KlyColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => { _dirtyCtrl.Set(WorkspacePlan, "enterprise", markTouched: true); RefreshDirtyJson(); })" />
+                        <KlyButton Label="ResetField(Name)" Size="KlySize.Sm" Color="KlyColor.Neutral" Variant="ButtonVariant.Soft" OnClick="@(() => { _dirtyCtrl.ResetField(WorkspaceName); RefreshDirtyJson(); })" />
                         <KlyButton Label="SubmitAsync() (Re-baseline)" Size="KlySize.Sm" Color="KlyColor.Success" Variant="ButtonVariant.Soft" OnClick="@SubmitDirtyDemoAsync" />
                     </div>
                     <div class="grid gap-3 lg:grid-cols-2 font-mono text-xs">
                         <div class="rounded-xl border border-(--klyroo-border) bg-(--klyroo-bg-muted)/40 p-3 space-y-1">
                             <p>IsDirty: <strong class="text-(--klyroo-text-highlighted)">@_dirtyCtrl.IsDirty</strong></p>
-                            <p>DirtyPaths: <strong class="text-(--klyroo-text-highlighted)">@(_dirtyCtrl.DirtyPaths.Count == 0 ? "(clean)" : string.Join(", ", _dirtyCtrl.DirtyPaths))</strong></p>
-                            <p>Value(name): <strong>@(_dirtyCtrl.GetValue<string>("name"))</strong> · Value(plan): <strong>@(_dirtyCtrl.GetValue<string>("plan"))</strong></p>
+                            <p>Dirty fields: <strong class="text-(--klyroo-text-highlighted)">@(DirtyWorkspaceFields.Count == 0 ? "(clean)" : string.Join(", ", DirtyWorkspaceFields))</strong></p>
+                            <p>Get(Name): <strong>@(_dirtyCtrl.Get(WorkspaceName))</strong> · Get(Plan): <strong>@(_dirtyCtrl.Get(WorkspacePlan))</strong></p>
                         </div>
                         <div class="rounded-xl border border-(--klyroo-border) bg-(--pg-code-bg) p-3 text-[#d7dcde]">
-                            <p class="mb-1 text-[#94a3b8]">BuildOutput() (trimmed &amp; transformed)</p>
+                            <p class="mb-1 text-[#94a3b8]">CreateModel() (trimmed &amp; transformed)</p>
                             <pre class="overflow-x-auto">@_dirtyOutputJson</pre>
                         </div>
                     </div>
@@ -293,9 +293,9 @@
             case "form-sections-errors":
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-wrap items-center gap-2">
-                        <KlyButton Label="Inject Server Blocking Error on 'email'" Size="KlySize.Sm" Color="KlyColor.Error" Variant="ButtonVariant.Soft" OnClick="@(() => _sectionCtrl.SetError("email", "Email already registered on server", blocking: true))" />
-                        <KlyButton Label="ClearError('email')" Size="KlySize.Sm" Color="KlyColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => _sectionCtrl.ClearError("email"))" />
-                        <KlyButton Label="Fill All Required" Size="KlySize.Sm" Color="KlyColor.Success" Variant="ButtonVariant.Soft" OnClick="@(() => { _sectionCtrl.SetValue("email", "team@klyroo.dev"); _sectionCtrl.SetValue("vat", "FR99123456789"); _sectionCtrl.ClearError("email"); })" />
+                        <KlyButton Label="Inject Server Blocking Error on Email" Size="KlySize.Sm" Color="KlyColor.Error" Variant="ButtonVariant.Soft" OnClick="@(() => _sectionCtrl.SetError(SetupEmail, "Email already registered on server", blocking: true))" />
+                        <KlyButton Label="ClearErrors(Email)" Size="KlySize.Sm" Color="KlyColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => _sectionCtrl.ClearErrors(SetupEmail))" />
+                        <KlyButton Label="Fill All Required" Size="KlySize.Sm" Color="KlyColor.Success" Variant="ButtonVariant.Soft" OnClick="@(() => { _sectionCtrl.Set(SetupEmail, "team@klyroo.dev"); _sectionCtrl.Set(SetupVat, "FR99123456789"); _sectionCtrl.ClearErrors(SetupEmail); })" />
                     </div>
                     <div class="grid gap-3 sm:grid-cols-3 font-mono text-xs">
                         @foreach (var sec in _sectionCtrl.GetSectionStates())
@@ -307,7 +307,7 @@
                         }
                     </div>
                     <p class="font-mono text-xs text-(--klyroo-text-muted)">
-                        HasBlockingErrors: <strong class="text-(--klyroo-text-highlighted)">@_sectionCtrl.HasBlockingErrors</strong> · Email error: <strong>@(_sectionCtrl.GetError("email") ?? "none")</strong>
+                        HasBlockingErrors: <strong class="text-(--klyroo-text-highlighted)">@_sectionCtrl.HasBlockingErrors</strong> · Email error: <strong>@(_sectionCtrl.GetError(SetupEmail) ?? "none")</strong>
                     </p>
                 </div>
                 break;
@@ -428,7 +428,7 @@
                     <div class="grid gap-4 lg:grid-cols-2">
                         <KlyDisplay Kind="DisplayKind.Stat" Title="Monthly Recurring Revenue" Value="€148,900" Delta="+14.2%" Trend="@([102.0, 118.0, 134.0, 148.9])" />
                         <KlyDisplay Kind="DisplayKind.Meter" Title="Storage Quota" MeterValue="@_meterVal" MeterMax="100" WarningThreshold="75" ErrorThreshold="90" />
-                        <KlyDisplay Kind="DisplayKind.Code" Variant="secret" Title="Production API Token" Value="sk_live_klyroo_3210" VisibleChars="4" Copy="true" />
+                        <KlyDisplay Kind="DisplayKind.Code" Variant="DisplayVariant.Secret" Title="Production API Token" Value="sk_live_klyroo_3210" VisibleChars="4" Copy="true" />
                         <KlyDisplay Kind="DisplayKind.Diff" Title="Plan Upgrade" DiffItems="@([new DisplayDiffItem("Tier", "Starter", "Enterprise", Changed: true)])" />
                     </div>
                 </div>
@@ -551,8 +551,8 @@
             case "spreadsheet-edit-retry":
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-wrap items-center gap-2">
-                        <KlyButton Label="EditCell(Row 0, 'price', '49,90')" Size="KlySize.Sm" OnClick="@(() => _editImporter.EditCell(0, "price", "49,90"))" />
-                        <KlyButton Label="RevertCell(Row 0, 'price')" Size="KlySize.Sm" Color="KlyColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => _editImporter.RevertCell(0, "price"))" />
+                        <KlyButton Label="EditCell(Row 0, 'price', '49,90')" Size="KlySize.Sm" OnClick="@(() => _editImporter.EditCell(0, "Price", "49,90"))" />
+                        <KlyButton Label="RevertCell(Row 0, 'price')" Size="KlySize.Sm" Color="KlyColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@(() => _editImporter.RevertCell(0, "Price"))" />
                         <KlyButton Label="DiscardRow(1)" Size="KlySize.Sm" Color="KlyColor.Neutral" Variant="ButtonVariant.Soft" OnClick="@(() => _editImporter.DiscardRows([1]))" />
                         <KlyButton Label="RestoreRow(1)" Size="KlySize.Sm" Color="KlyColor.Neutral" Variant="ButtonVariant.Ghost" OnClick="@(() => _editImporter.RestoreRows([1]))" />
                     </div>
@@ -608,7 +608,7 @@
                             {
                                 <li class="flex justify-between gap-2">
                                     <span>@s.Ref · @s.Label (@s.Component)</span>
-                                    <strong class="text-(--klyroo-text-highlighted)">@(s.Value?.ToString() ?? "null")</strong>
+                                    <strong class="text-(--klyroo-text-highlighted)">@(s.Value?.ToDisplayString() ?? "null")</strong>
                                 </li>
                             }
                         </ul>
@@ -841,7 +841,7 @@
         _headlessNodes = all;
     }
     private void CycleTreeDepth() { _treeDepth = _treeDepth >= 3 ? 1 : _treeDepth + 1; InspectHeadlessTree(); }
-    private static readonly DataListGroupBy<TableDemoRow> TableGroupBy = new() { Key = r => r.Dept };
+    private static readonly DataListGroupBy<TableDemoRow> TableGroupBy = DataListGroupBy<TableDemoRow>.By(r => r.Dept);
 
     private sealed record OrgRow(int Id, string Name, string Role, IReadOnlyList<OrgRow>? Reports = null);
     private static readonly DataListSchema<OrgRow> OrgSchema = DataListSchema.For<OrgRow>(s => s
@@ -860,66 +860,91 @@
     private static readonly DataListTree<OrgRow> OrgTree = new() { Children = r => r.Reports, DefaultExpandedDepth = 2 };
 
     // ---- Form Demos ----
-    private readonly FormController _formCtrl = new(new FormSchema
+    public sealed class ProfileSettings
     {
-        FormKey = "docs-reactive-demo",
-        Title = "Profile Settings",
-        Fields =
-        [
-            new FormFieldSchema { Key = "name", Label = "Full Name", Required = true, DefaultValue = "Alice" },
-            new FormFieldSchema { Key = "age", Label = "Age (set < 21 to hide Company)", Kind = FormFieldKind.Number, Min = 18, Max = 120, DefaultValue = 25.0 },
-            new FormFieldSchema { Key = "company", Label = "Company", Required = true, DefaultValue = "Klyroo Labs", Condition = f => f.GetValue<double>("age") >= 21 },
-            new FormFieldSchema { Key = "password", Label = "Password", Kind = FormFieldKind.Password, PasswordRequirements = [new("len", "At least 8 characters", s => s.Length >= 8)] }
-        ]
+        public string Name { get; set; } = "";
+        public int Age { get; set; }
+        public string Company { get; set; } = "";
+        public string Password { get; set; } = "";
+    }
+
+    private static readonly FormSchema<ProfileSettings> ProfileSchema = FormSchema.For<ProfileSettings>(s =>
+    {
+        s.FormKey = "docs-reactive-demo";
+        s.Title = "Profile Settings";
+        s.Field(m => m.Name, f => f.Label("Full Name").Required().Default("Alice"));
+        var age = s.Field(m => m.Age, f => f.Label("Age (set < 21 to hide Company)").Range(18, 120).Default(25));
+        s.Field(m => m.Company, f => f.Required().Default("Klyroo Labs").VisibleWhen(c => c.Get(age) >= 21));
+        s.Field(m => m.Password, f => f.AsPassword(new FormPasswordRequirement("len", "At least 8 characters", pw => pw.Length >= 8)));
     });
 
-    private readonly FormController _wizardCtrl = new(new FormSchema
+    private static readonly FormField<ProfileSettings, int> ProfileAge = ProfileSchema.Field(m => m.Age);
+    private readonly FormController<ProfileSettings> _formCtrl = new(ProfileSchema);
+
+    private IReadOnlyList<string> DirtyProfileFields =>
+        [.. new (string Name, FormItem<ProfileSettings> Item)[]
+        {
+            ("Name", ProfileSchema.Field(m => m.Name)), ("Age", ProfileAge), ("Company", ProfileSchema.Field(m => m.Company)), ("Password", ProfileSchema.Field(m => m.Password)),
+        }.Where(x => _formCtrl.IsFieldDirty(x.Item)).Select(x => x.Name)];
+
+    public enum OnboardingPlan { Free, Pro }
+
+    public sealed class Onboarding
     {
-        FormKey = "docs-wizard-demo",
-        Title = "Workspace Onboarding",
-        ShowStepper = true,
-        Steps =
-        [
-            new FormStepSchema
-            {
-                Key = "account", Title = "Account",
-                Fields =
-                [
-                    new FormFieldSchema { Key = "org", Label = "Organization", Required = true, DefaultValue = "Acme Corp" },
-                    new FormFieldSchema { Key = "plan", Label = "Plan", Kind = FormFieldKind.Select, DefaultValue = "free", Options = [new("free", "Free (skips Billing)"), new("pro", "Pro (shows Billing)")] }
-                ]
-            },
-            new FormStepSchema
-            {
-                Key = "billing", Title = "Billing",
-                SkipWhen = f => f.GetValue<string>("plan") == "free",
-                Fields = [new FormFieldSchema { Key = "vat", Label = "VAT Number", Required = true }]
-            },
-            new FormStepSchema
-            {
-                Key = "review", Title = "Confirm",
-                Fields = [new FormFieldSchema { Key = "terms", Label = "I accept the terms", Kind = FormFieldKind.Checkbox, Required = true, DefaultValue = true }]
-            }
-        ]
+        public string Org { get; set; } = "";
+        public OnboardingPlan Plan { get; set; }
+        public string Vat { get; set; } = "";
+        public bool Terms { get; set; }
+    }
+
+    private static readonly FormSchema<Onboarding> OnboardingSchema = FormSchema.For<Onboarding>(s =>
+    {
+        s.FormKey = "docs-wizard-demo";
+        s.Title = "Workspace Onboarding";
+        s.ShowStepper = true;
+        FormField<Onboarding, OnboardingPlan>? plan = null;
+        s.Step("account", "Account", st =>
+        {
+            st.Field(m => m.Org, f => f.Label("Organization").Required().Default("Acme Corp"));
+            plan = st.Field(m => m.Plan, f => f.Default(OnboardingPlan.Free).Options(
+            [
+                new FormOption<OnboardingPlan>(OnboardingPlan.Free, "Free (skips Billing)"),
+                new FormOption<OnboardingPlan>(OnboardingPlan.Pro, "Pro (shows Billing)"),
+            ]));
+        });
+        s.Step("billing", "Billing", st => st.Field(m => m.Vat, f => f.Label("VAT Number").Required()),
+            skipWhen: c => c.Get(plan!) == OnboardingPlan.Free);
+        s.Step("review", "Confirm", st => st.Field(m => m.Terms, f => f.Label("I accept the terms").Required().Default(true)));
     });
 
-    private readonly FormController _arrayCtrl = new(new FormSchema
+    private readonly FormController<Onboarding> _wizardCtrl = new(OnboardingSchema);
+
+    private string? WizardStepTitle => _wizardCtrl.CurrentStepKey switch { "account" => "Account", "billing" => "Billing", "review" => "Confirm", var key => key };
+
+    public sealed class InvoiceLine
     {
-        FormKey = "docs-array-demo",
-        Title = "Invoice Builder",
-        Fields =
-        [
-            new FormFieldSchema
-            {
-                Key = "items", Label = "Line Items", Kind = FormFieldKind.ArrayTable, AddItemLabel = "Add line item",
-                Fields =
-                [
-                    new FormFieldSchema { Key = "sku", Label = "SKU", Required = true, DefaultValue = "KLY-PRO" },
-                    new FormFieldSchema { Key = "qty", Label = "Qty", Kind = FormFieldKind.Number, Min = 1, DefaultValue = 2.0 }
-                ]
-            }
-        ]
+        public string Sku { get; set; } = "";
+        public int Qty { get; set; }
+    }
+
+    public sealed class Invoice
+    {
+        public List<InvoiceLine> Items { get; set; } = [];
+    }
+
+    private static readonly FormSchema<Invoice> InvoiceSchema = FormSchema.For<Invoice>(s =>
+    {
+        s.FormKey = "docs-array-demo";
+        s.Title = "Invoice Builder";
+        s.List(m => m.Items, row =>
+        {
+            row.Field(l => l.Sku, f => f.Label("SKU").Required().Default("KLY-PRO"));
+            row.Field(l => l.Qty, f => f.Label("Qty").Range(1, 100_000).Default(2));
+        }, addLabel: "Add line item", configure: f => f.Label("Line Items"));
     });
+
+    private static readonly FormListField<Invoice, InvoiceLine> InvoiceItems = InvoiceSchema.List(m => m.Items);
+    private readonly FormController<Invoice> _arrayCtrl = new(InvoiceSchema);
 
     // ---- Dashboard Demos ----
     private static readonly IReadOnlyList<DashboardStatsItem> DashStats =
@@ -948,17 +973,19 @@
         await _waveDeferred.ActivateAsync();
     }
 
-    private static readonly IReadOnlyList<DashboardTableColumn> DashTableCols =
+    private sealed record RegionRow(string Region, int Revenue, double Delta);
+
+    private static readonly IReadOnlyList<DashboardTableColumn<RegionRow>> DashTableCols =
     [
-        new("region", "Region", Type: "text"),
-        new("revenue", "Revenue", Type: "bar"),
-        new("delta", "Growth", Type: "delta")
+        DashboardTableColumn.For<RegionRow, string>("region", "Region", r => r.Region),
+        DashboardTableColumn.For<RegionRow, int>("revenue", "Revenue", r => r.Revenue, kind: DashboardTableColumnKind.Bar),
+        DashboardTableColumn.For<RegionRow, double>("delta", "Growth", r => r.Delta, kind: DashboardTableColumnKind.Delta)
     ];
-    private static readonly IReadOnlyList<IReadOnlyDictionary<string, object>> DashTableRows =
+    private static readonly IReadOnlyList<RegionRow> DashTableRows =
     [
-        new Dictionary<string, object> { ["region"] = "Europe", ["revenue"] = 148900, ["delta"] = 14.2 },
-        new Dictionary<string, object> { ["region"] = "North America", ["revenue"] = 192400, ["delta"] = 19.8 },
-        new Dictionary<string, object> { ["region"] = "Asia-Pacific", ["revenue"] = 84200, ["delta"] = 11.4 }
+        new("Europe", 148900, 14.2),
+        new("North America", 192400, 19.8),
+        new("Asia-Pacific", 84200, 11.4)
     ];
     private static readonly IReadOnlyList<DashboardAlertItem> DashAlerts =
     [
@@ -978,48 +1005,72 @@
     private double _meterVal = 92;
 
     // ---- Spreadsheet Demos ----
-    private readonly SpreadsheetImporter _importer;
-    private SpreadsheetImporter _reconcileImporter = default!;
+    public sealed class RateRow
+    {
+        public string? Code { get; set; }
+        public decimal Price { get; set; }
+        public string Currency { get; set; } = "";
+    }
+
+    private SpreadsheetImporter<RateRow> _importer = default!;
+    private SpreadsheetImporter<CandidateRow> _reconcileImporter = default!;
     private string _rawHeaderInput = "Prénom * (required)";
+
+    public sealed class CandidateRow
+    {
+        public string Email { get; set; } = "";
+        public CandidateLevel Level { get; set; }
+    }
+
+    public enum CandidateLevel { B1, B2, C1 }
 
     private void InitReconcileImporter()
     {
-        var schema = new SpreadsheetSchema
+        SpreadsheetColumn<CandidateRow, string>? email = null;
+        var schema = SpreadsheetSchema.For<CandidateRow>(s =>
         {
-            Key = "candidates",
-            RowKeyField = "email",
-            Duplicates = SpreadsheetDuplicatesPolicy.Error,
-            ExistingRecords = new Dictionary<string, IReadOnlyDictionary<string, object?>>
-            {
-                ["bob@example.com"] = new Dictionary<string, object?> { ["email"] = "bob@example.com", ["level"] = "B2" }
-            },
-            ExistingAction = SpreadsheetExistingAction.Update,
-            Columns =
+            s.Key = "candidates";
+            s.Duplicates = SpreadsheetDuplicatesPolicy.Error;
+            s.ExistingRecords = new Dictionary<string, CandidateRow> { ["bob@example.com"] = new() { Email = "bob@example.com", Level = CandidateLevel.B2 } };
+            s.ExistingAction = SpreadsheetExistingAction.Update;
+            email = s.Column(r => r.Email, c => c.Label("Email").Required().Rule(SpreadsheetRule.Email()));
+            s.Column(r => r.Level, c => c.Label("Level").Required().UnknownPolicy(SpreadsheetUnknownValuePolicy.Ask).Options(
             [
-                new SpreadsheetColumnSchema { Key = "email", Label = "Email", Required = true, Rules = [SpreadsheetRule.Email()] },
-                new SpreadsheetColumnSchema { Key = "level", Label = "Level", Kind = SpreadsheetColumnKind.Select, Required = true, Options = [new("B1", "B1"), new("B2", "B2")], UnknownPolicy = SpreadsheetUnknownValuePolicy.Ask }
-            ]
-        };
-        _reconcileImporter = new SpreadsheetImporter(schema);
+                new SpreadsheetOption<CandidateLevel>(CandidateLevel.B1, "B1"),
+                new SpreadsheetOption<CandidateLevel>(CandidateLevel.B2, "B2"),
+            ]));
+            s.RowKey(email);
+        });
+        _reconcileImporter = new SpreadsheetImporter<CandidateRow>(schema);
         _reconcileImporter.Paste("Email\tLevel\nalice@example.com\tC1-Advanced\nalice@example.com\tB1\nbob@example.com\tB2");
     }
-    private void AnswerUnknownDemo() => _reconcileImporter.AnswerValue("level", "C1-Advanced", new SpreadsheetValueAnswer(SpreadsheetValueAnswerAction.Map, "B2", "B2"));
-    private void FixDuplicateDemo() => _reconcileImporter.EditCell(1, "email", "alice.second@example.com");
+    private void AnswerUnknownDemo() => _reconcileImporter.AnswerValue("Level", "C1-Advanced", new SpreadsheetValueAnswer(SpreadsheetValueAnswerAction.Map, "B2", "B2"));
+    private void FixDuplicateDemo() => _reconcileImporter.EditCell(1, "Email", "alice.second@example.com");
     private void ResetReconcileDemo() => InitReconcileImporter();
 
     // ---- Agent Demos ----
     private readonly AgentBridgeService _agent = new();
-    private readonly FormController _agentForm = new(new FormSchema
+    public sealed class ProjectSettings
     {
-        FormKey = "agent-live",
-        Title = "Project Settings",
-        Fields =
+        public string Project { get; set; } = "";
+        public string Region { get; set; } = "";
+        public string Token { get; set; } = "";
+    }
+
+    private static readonly FormSchema<ProjectSettings> ProjectSchema = FormSchema.For<ProjectSettings>(s =>
+    {
+        s.FormKey = "agent-live";
+        s.Title = "Project Settings";
+        s.Field(m => m.Project, f => f.Default("Apollo"));
+        s.Field(m => m.Region, f => f.Label("Région").Default("us-east").Options(
         [
-            new FormFieldSchema { Key = "project", Label = "Project", DefaultValue = "Apollo" },
-            new FormFieldSchema { Key = "region", Label = "Région", Kind = FormFieldKind.Select, DefaultValue = "us-east", Options = [new("us-east", "US East"), new("eu-west", "Europe West")] },
-            new FormFieldSchema { Key = "token", Label = "API Secret", Kind = FormFieldKind.Password, DefaultValue = "sk_live_secret_99" }
-        ]
+            new FormOption<string>("us-east", "US East"),
+            new FormOption<string>("eu-west", "Europe West"),
+        ]));
+        s.Field(m => m.Token, f => f.Label("API Secret").AsPassword().Default("sk_live_secret_99"));
     });
+
+    private readonly FormController<ProjectSettings> _agentForm = new(ProjectSchema);
     private readonly UndoStack<string> _undo = new("Project = Apollo");
     private int _step;
     private string? _agentQueryNote;
@@ -1035,7 +1086,7 @@
     }
     private void RunAgentQueryDemo()
     {
-        var q = _agent.Query(new AgentQueryRequest { Within = "region", Text = "Europe" });
+        var q = _agent.Query(new AgentQueryRequest { Within = "Region", Text = "Europe" });
         _agentQueryNote = q.Count > 0 && q[0].Items.Count > 0
             ? $"Matched {q[0].Label} -> {q[0].Items[0].Value} ({q[0].Items[0].Label}) without opening popup!"
             : "No match";
@@ -1084,47 +1135,71 @@
         _multiAgent.RegisterForm(_multiForm, confirmSubmit: false);
         _multiAgent.RegisterDashboard(_multiDash);
 
-        _importer = new SpreadsheetImporter(new SpreadsheetSchema
+        _importer = new SpreadsheetImporter<RateRow>(SpreadsheetSchema.For<RateRow>(s =>
         {
-            Key = "rates",
-            Columns =
+            s.Key = "rates";
+            s.Column(r => r.Code, c => c.Label("Code").Required());
+            s.Column(r => r.Price, c => c.Label("Unit Price").Required().DecimalSeparator(',').Rule(SpreadsheetRule.Min(0m)));
+            s.Column(r => r.Currency, c => c.Label("Currency").Required().Options(
             [
-                new SpreadsheetColumnSchema { Key = "code", Label = "Code", Required = true },
-                new SpreadsheetColumnSchema { Key = "price", Label = "Unit Price", Kind = SpreadsheetColumnKind.Number, DecimalSeparator = ',', Required = true, Rules = [SpreadsheetRule.Min(0)] },
-                new SpreadsheetColumnSchema { Key = "currency", Label = "Currency", Kind = SpreadsheetColumnKind.Select, Required = true, Options = [new("EUR", "Euro", ["€", "EUR"]), new("USD", "US Dollar", ["$", "USD"])] }
-            ]
-        });
+                new SpreadsheetOption<string?>("EUR", "Euro", ["€", "EUR"]),
+                new SpreadsheetOption<string?>("USD", "US Dollar", ["$", "USD"]),
+            ]));
+        }));
         _importer.LoadText("Export 2026;;\nCode;Amount;Currency\nA1;12,50;€\nA2;45,00;USD", "rates.csv");
         InitReconcileImporter();
         InitEditAndBatchImporters();
     }
 
     // ---- Extra Form Demos ----
-    private readonly FormController _dirtyCtrl = new(new FormSchema
+    public sealed class Workspace
     {
-        FormKey = "dirty-demo",
-        Title = "Workspace Settings",
-        Fields =
-        [
-            new FormFieldSchema { Key = "name", Label = "Name", Required = true, TransformOutput = v => v?.ToString()?.Trim() },
-            new FormFieldSchema { Key = "plan", Label = "Plan", DefaultValue = "pro" }
-        ]
-    }, new Dictionary<string, object?> { ["name"] = "Alice", ["plan"] = "pro" });
+        public string Name { get; set; } = "";
+        public string Plan { get; set; } = "";
+    }
+
+    private static readonly FormSchema<Workspace> WorkspaceSchema = FormSchema.For<Workspace>(s =>
+    {
+        s.FormKey = "dirty-demo";
+        s.Title = "Workspace Settings";
+        s.Field(m => m.Name, f => f.Required().TransformOutput(v => v.Trim()));
+        s.Field(m => m.Plan, f => f.Default("pro"));
+    });
+
+    private static readonly FormField<Workspace, string> WorkspaceName = WorkspaceSchema.Field(m => m.Name);
+    private static readonly FormField<Workspace, string> WorkspacePlan = WorkspaceSchema.Field(m => m.Plan);
+    private readonly FormController<Workspace> _dirtyCtrl = new(WorkspaceSchema, new Workspace { Name = "Alice", Plan = "pro" });
     private string _dirtyOutputJson = "{}";
-    private void RefreshDirtyJson() => _dirtyOutputJson = JsonSerializer.Serialize(_dirtyCtrl.BuildOutput());
+
+    private IReadOnlyList<string> DirtyWorkspaceFields =>
+        [.. new (string Name, FormItem<Workspace> Item)[] { ("Name", WorkspaceName), ("Plan", WorkspacePlan) }.Where(x => _dirtyCtrl.IsFieldDirty(x.Item)).Select(x => x.Name)];
+
+    private void RefreshDirtyJson()
+    {
+        var model = _dirtyCtrl.CreateModel();
+        _dirtyOutputJson = JsonSerializer.Serialize(new Dictionary<string, string> { ["name"] = model.Name, ["plan"] = model.Plan });
+    }
     private async Task SubmitDirtyDemoAsync() { await _dirtyCtrl.SubmitAsync(); RefreshDirtyJson(); }
 
-    private readonly FormController _sectionCtrl = new(new FormSchema
+    public sealed class AccountSetup
     {
-        FormKey = "sections-demo",
-        Title = "Account Setup",
-        Sections =
-        [
-            new FormPageSectionSchema { Key = "account", Label = "1. Account", Fields = [new FormFieldSchema { Key = "email", Label = "Email", Required = true }] },
-            new FormPageSectionSchema { Key = "billing", Label = "2. Billing", Fields = [new FormFieldSchema { Key = "vat", Label = "VAT ID", Required = true }] },
-            new FormPageSectionSchema { Key = "notes", Label = "3. Notes (Optional)", Optional = true, Fields = [new FormFieldSchema { Key = "note", Label = "Note" }] }
-        ]
+        public string Email { get; set; } = "";
+        public string Vat { get; set; } = "";
+        public string? Note { get; set; }
+    }
+
+    private static readonly FormSchema<AccountSetup> SetupSchema = FormSchema.For<AccountSetup>(s =>
+    {
+        s.FormKey = "sections-demo";
+        s.Title = "Account Setup";
+        s.Section("account", "1. Account", sec => sec.Field(m => m.Email, f => f.Required()));
+        s.Section("billing", "2. Billing", sec => sec.Field(m => m.Vat, f => f.Label("VAT ID").Required()));
+        s.Section("notes", "3. Notes (Optional)", sec => sec.Field(m => m.Note), optional: true);
     });
+
+    private static readonly FormField<AccountSetup, string> SetupEmail = SetupSchema.Field(m => m.Email);
+    private static readonly FormField<AccountSetup, string> SetupVat = SetupSchema.Field(m => m.Vat);
+    private readonly FormController<AccountSetup> _sectionCtrl = new(SetupSchema);
 
     // ---- Extra Dashboard Demos ----
     private readonly DashboardController _dashFilterCtrl = new("filters-demo");
@@ -1136,60 +1211,76 @@
     private readonly string _previewCsvText = "Region,MRR,Growth\nEU,148900,+14.2%\nUS,192400,+19.8%\nAPAC,84200,+11.4%";
 
     // ---- Extra Spreadsheet Demos ----
-    private SpreadsheetImporter _editImporter = default!;
-    private SpreadsheetImporter _batchImporter = default!;
+    public sealed class PriceRow
+    {
+        public string Code { get; set; } = "";
+        public decimal Price { get; set; }
+    }
+
+    public sealed class CodeRow
+    {
+        public string Code { get; set; } = "";
+    }
+
+    private SpreadsheetImporter<PriceRow> _editImporter = default!;
+    private SpreadsheetImporter<CodeRow> _batchImporter = default!;
     private bool _rejectRow1 = true;
     private void InitEditAndBatchImporters()
     {
-        _editImporter = new SpreadsheetImporter(new SpreadsheetSchema
+        _editImporter = new SpreadsheetImporter<PriceRow>(SpreadsheetSchema.For<PriceRow>(s =>
         {
-            Key = "edit-demo",
-            Columns =
-            [
-                new SpreadsheetColumnSchema { Key = "code", Label = "Code", Required = true },
-                new SpreadsheetColumnSchema { Key = "price", Label = "Price", Kind = SpreadsheetColumnKind.Number, DecimalSeparator = ',', Required = true, Rules = [SpreadsheetRule.Min(0)] }
-            ]
-        });
+            s.Key = "edit-demo";
+            s.Column(r => r.Code, c => c.Label("Code").Required());
+            s.Column(r => r.Price, c => c.Label("Price").Required().DecimalSeparator(',').Rule(SpreadsheetRule.Min(0m)));
+        }));
         _editImporter.LoadText("Code;Price\nSKU-1;-15,00\nSKU-2;29,00", "prices.csv");
         InitBatchImporter();
     }
     private void InitBatchImporter()
     {
         _rejectRow1 = true;
-        _batchImporter = new SpreadsheetImporter(new SpreadsheetSchema
+        _batchImporter = new SpreadsheetImporter<CodeRow>(SpreadsheetSchema.For<CodeRow>(s =>
         {
-            Key = "batch-demo",
-            BatchSize = 2,
-            Columns = [new SpreadsheetColumnSchema { Key = "code", Label = "Code", Required = true }],
-            OnSubmit = batch =>
+            s.Key = "batch-demo";
+            s.BatchSize = 2;
+            s.Column(r => r.Code, c => c.Label("Code").Required());
+            s.OnSubmit = batch =>
             {
                 var rejected = new List<SpreadsheetRejectedRow>();
                 if (_rejectRow1)
                 {
                     var dup = batch.FirstOrDefault(r => r.Index == 1);
-                    if (dup is not null) rejected.Add(new SpreadsheetRejectedRow(1, "Duplicate SKU on server", "code"));
+                    if (dup is not null) rejected.Add(new SpreadsheetRejectedRow(1, "Duplicate SKU on server", "Code"));
                 }
                 return Task.FromResult<IReadOnlyList<SpreadsheetRejectedRow>?>(rejected);
-            }
-        });
+            };
+        }));
         _batchImporter.LoadText("Code\nSKU-100\nSKU-DUP\nSKU-300", "batch.csv");
     }
     private async Task RunBatchSubmitDemoAsync() => await _batchImporter.SubmitAsync();
     private async Task RetryRejectedDemoAsync()
     {
         _rejectRow1 = false;
-        _batchImporter.EditCell(1, "code", "SKU-200-FIXED");
+        _batchImporter.EditCell(1, "Code", "SKU-200-FIXED");
         await _batchImporter.RetryRejectedAsync();
     }
 
     // ---- Extra Agent Demos ----
     private readonly AgentBridgeService _multiAgent = new();
-    private readonly FormController _multiForm = new(new FormSchema
+    public sealed class Campaign
     {
-        FormKey = "multi-form",
-        Title = "Campaign",
-        Fields = [new FormFieldSchema { Key = "title", Label = "Campaign Title", DefaultValue = "Q4 Launch" }]
+        public string Title { get; set; } = "";
+    }
+
+    private static readonly FormSchema<Campaign> CampaignSchema = FormSchema.For<Campaign>(s =>
+    {
+        s.FormKey = "multi-form";
+        s.Title = "Campaign";
+        s.Field(m => m.Title, f => f.Label("Campaign Title").Default("Q4 Launch"));
     });
+
+    private static readonly FormField<Campaign, string> CampaignTitle = CampaignSchema.Field(m => m.Title);
+    private readonly FormController<Campaign> _multiForm = new(CampaignSchema);
     private readonly DashboardController _multiDash = new("multi-dash");
     private string _multiAgentStatus = "Click 'Run Cross-Controller Plan' to mutate Form + Dashboard in one AgentActStep[] batch.";
     private async Task RunMultiControllerPlanAsync()
@@ -1198,7 +1289,7 @@
             new AgentActStep("Campaign Title", "setValue", ["Enterprise Launch 2026"]),
             new AgentActStep("multi-dash", "setView", ["cohorts"])
         ]);
-        _multiAgentStatus = $"Ok={res.Ok} | Steps={res.Steps.Count} | CurrentView={_multiDash.CurrentView} | Title={_multiForm.GetValue<string>("title")}";
+        _multiAgentStatus = $"Ok={res.Ok} | Steps={res.Steps.Count} | CurrentView={_multiDash.CurrentView} | Title={_multiForm.Get(CampaignTitle)}";
     }
     private async Task ResetMultiDashboardAsync()
     {
@@ -1207,7 +1298,7 @@
     }
 
     private string _diagResult = "Trigger any failure case above to inspect the deterministic AgentActResult.Error returned to an LLM.";
-    private async Task RunDiagStepAsync(string target, string action, object?[]? args)
+    private async Task RunDiagStepAsync(string target, string action, AgentArgument[]? args)
     {
         var res = await _agent.ActAsync(
             [new AgentActStep(target, action, args)],

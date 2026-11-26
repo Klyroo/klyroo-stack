@@ -7,7 +7,7 @@
             <KlyEditorToolbar />
         </KlyEditor>
     </KlyFormField>
-    <KlyButton Type="submit" Label="Save" />
+    <KlyButton Type="ButtonType.Submit" Label="Save" />
     @if (_saved is not null)
     {
         <p role="status" class="break-all font-mono text-xs text-(--klyroo-text-muted)" data-testid="saved">Saved: @_saved</p>

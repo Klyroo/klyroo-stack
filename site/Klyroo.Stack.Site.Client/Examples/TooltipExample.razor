@@ -1,8 +1,12 @@
 <div class="flex flex-wrap items-center gap-3">
-    @foreach (var placement in new[] { "top", "right", "bottom", "left" })
+    @foreach (var placement in new[] { KlyPlacement.Top, KlyPlacement.Right, KlyPlacement.Bottom, KlyPlacement.Left })
     {
-        <KlyTooltip Text="@($"Tooltip on the {placement}")" Placement="@placement">
-            <KlyButton Label="@placement" Color="KlyColor.Neutral" Variant="ButtonVariant.Outline" />
+        <KlyTooltip Text="@($"Tooltip on the {PlacementName(placement)}")" Placement="@placement">
+            <KlyButton Label="@PlacementName(placement)" Color="KlyColor.Neutral" Variant="ButtonVariant.Outline" />
         </KlyTooltip>
     }
 </div>
+
+@code {
+    private static string PlacementName(KlyPlacement placement) => placement.ToString().ToLowerInvariant();
+}

@@ -2,7 +2,7 @@
     <KlyFormField Label="Accent color" Description="Posted as #rrggbb." For="() => Model!.Accent">
         <KlyColorPicker @bind-Value="Model!.Accent" />
     </KlyFormField>
-    <KlyButton Type="submit" Label="Save theme" />
+    <KlyButton Type="ButtonType.Submit" Label="Save theme" />
     @if (_saved)
     {
         <p role="status" class="text-sm text-(--klyroo-success-text)" data-testid="theme-saved">Saved: @Model!.Accent</p>

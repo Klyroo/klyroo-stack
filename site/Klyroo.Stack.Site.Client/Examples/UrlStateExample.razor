@@ -10,7 +10,7 @@
        Without interactivity the same field is a GET form that carries the other keys as hidden fields. *@
     @if (RendererInfo.IsInteractive)
     {
-        <KlyInput Value="@State.Q" ValueChanged="OnSearch" Debounce="300" ClearOnEscape Type="search" Placeholder="Search tasks" aria-label="Search" data-testid="url-q" />
+        <KlyInput Value="@State.Q" ValueChanged="OnSearch" Debounce="300" ClearOnEscape Type="InputType.Search" Placeholder="Search tasks" aria-label="Search" data-testid="url-q" />
     }
     else
     {
@@ -19,8 +19,8 @@
             {
                 <input type="hidden" name="@key" value="@value" />
             }
-            <KlyInput Value="@State.Q" Name="q" Type="search" Placeholder="Search tasks" aria-label="Search" data-testid="url-q" />
-            <KlyButton Type="submit" Label="Search" />
+            <KlyInput Value="@State.Q" Name="q" Type="InputType.Search" Placeholder="Search tasks" aria-label="Search" data-testid="url-q" />
+            <KlyButton Type="ButtonType.Submit" Label="Search" />
         </form>
     }
 

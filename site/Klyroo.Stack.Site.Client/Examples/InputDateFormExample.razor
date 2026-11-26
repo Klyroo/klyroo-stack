@@ -2,7 +2,7 @@
     <KlyFormField Label="Appointment date" Description="Posted as yyyy-MM-dd." For="() => Model!.Date" class="w-full">
         <KlyInputDate @bind-Value="Model!.Date" data-testid="appointment" />
     </KlyFormField>
-    <KlyButton Type="submit" Label="Book" />
+    <KlyButton Type="ButtonType.Submit" Label="Book" />
     @if (_saved)
     {
         <p role="status" class="text-sm text-(--klyroo-success-text)" data-testid="appointment-saved">Booked: @Model!.Date?.ToString("yyyy-MM-dd")</p>

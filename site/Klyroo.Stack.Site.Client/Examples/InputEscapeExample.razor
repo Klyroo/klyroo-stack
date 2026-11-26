@@ -3,7 +3,7 @@
         <ChildContent><KlyButton Label="Open search" Variant="ButtonVariant.Outline" data-testid="escape-trigger" /></ChildContent>
         <Body>
             <div class="flex flex-col gap-3">
-                <KlyInput @bind-Value="_text" Debounce="200" ClearOnEscape Type="search" aria-label="Search in dialog" data-testid="escape-input" />
+                <KlyInput @bind-Value="_text" Debounce="200" ClearOnEscape Type="InputType.Search" aria-label="Search in dialog" data-testid="escape-input" />
                 <KlyInput Value="locked" ClearOnEscape readonly aria-label="Read-only" data-testid="escape-readonly" />
             </div>
         </Body>

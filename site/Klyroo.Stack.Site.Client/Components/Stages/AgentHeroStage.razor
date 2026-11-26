@@ -67,7 +67,7 @@
                             <span>confirmSubmit: true</span>
                         </div>
                         <p class="mt-1.5 text-xs text-[#e5e7eb]">
-                            Agent requested <code class="font-mono text-white">submit</code> on <strong class="text-white">@_form.GetValue("project")</strong>. Approve execution?
+                            Agent requested <code class="font-mono text-white">submit</code> on <strong class="text-white">@_form.Get(_project)</strong>. Approve execution?
                         </p>
                         <div class="mt-3 flex items-center gap-2">
                             <button type="button"
@@ -102,7 +102,7 @@
                 <ul class="mt-4 divide-y divide-(--klyroo-border) font-mono text-xs">
                     @foreach (var snap in _bridge.Snapshot())
                     {
-                        var val = snap.Value?.ToString() ?? "null";
+                        var val = snap.Value?.ToDisplayString() ?? "null";
                         var redacted = val == "[redacted]";
                         <li @key="@($"{snap.Ref}-{val}")" class="lib-flash flex items-center justify-between gap-3 py-2.5">
                             <div class="min-w-0">
@@ -127,7 +127,28 @@
 
 @code {
     private readonly AgentBridgeService _bridge = new();
-    private readonly FormController _form;
+    public sealed class DeployControl
+    {
+        public string Project { get; set; } = "";
+        public string Env { get; set; } = "";
+        public string Token { get; set; } = "";
+    }
+
+    private static readonly FormSchema<DeployControl> DeploySchema = FormSchema.For<DeployControl>(s =>
+    {
+        s.FormKey = "deploy-agent-stage";
+        s.Title = "Deploy Control";
+        s.Field(m => m.Project, f => f.Default("Apollo"));
+        s.Field(m => m.Env, f => f.Label("Environment").Default("staging").Options(
+        [
+            new FormOption<string>("staging", "Staging"),
+            new FormOption<string>("prod", "Production"),
+        ]));
+        s.Field(m => m.Token, f => f.Label("API Token").AsPassword().Default("sk_live_never_leaked_99"));
+    });
+
+    private static readonly FormField<DeployControl, string> _project = DeploySchema.Field(m => m.Project);
+    private readonly FormController<DeployControl> _form;
     private readonly UndoStack<string> _undo = new("Apollo");
     private int _step;
     private string _lastEvent = "Ready";
@@ -138,17 +159,7 @@
 
     public AgentHeroStage()
     {
-        _form = new FormController(new FormSchema
-        {
-            FormKey = "deploy-agent-stage",
-            Title = "Deploy Control",
-            Fields =
-            [
-                new FormFieldSchema { Key = "project", Label = "Project", DefaultValue = "Apollo" },
-                new FormFieldSchema { Key = "env", Label = "Environment", Kind = FormFieldKind.Select, DefaultValue = "staging", Options = [new("staging", "Staging"), new("prod", "Production")] },
-                new FormFieldSchema { Key = "token", Label = "API Token", Kind = FormFieldKind.Password, DefaultValue = "sk_live_never_leaked_99" }
-            ]
-        });
+        _form = new FormController<DeployControl>(DeploySchema);
 
         _bridge.RegisterForm(_form, confirmSubmit: true);
         _bridge.AllowPolicy = async (step, confirmRequired) =>
@@ -185,14 +196,14 @@
     private void UndoState()
     {
         var prev = _undo.Undo();
-        _form.SetValue("project", prev);
+        _form.Set(_project, prev);
         _lastEvent = $"Undo → {prev}";
     }
 
     private void RedoState()
     {
         var next = _undo.Redo();
-        _form.SetValue("project", next);
+        _form.Set(_project, next);
         _lastEvent = $"Redo → {next}";
     }
 }

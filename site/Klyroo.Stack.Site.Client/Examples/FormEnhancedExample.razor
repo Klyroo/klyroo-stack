@@ -16,7 +16,7 @@
     <KlyFormField Label="Visit" For="() => Model!.Visit">
         <KlyCalendar @bind-Value="Model!.Visit" AriaLabel="Visit date" />
     </KlyFormField>
-    <KlyButton Type="submit" Label="Save enhanced" />
+    <KlyButton Type="ButtonType.Submit" Label="Save enhanced" />
     @if (_posted is not null)
     {
         <p role="status" class="text-sm text-(--klyroo-success-text)" data-testid="enhanced-saved">Posted: @_posted</p>

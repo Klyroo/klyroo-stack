@@ -48,11 +48,11 @@
                                  ShowProgressLine="true"
                                  GroupBy="@(_groupByLayer ? LayerGroupBy : null)"
                                  Summaries="@(new DataListSummaries<TableDemoRow>())">
-                    <KlyDataListColumn TItem="TableDemoRow" Field="pkg" Title="Package" />
-                    <KlyDataListColumn TItem="TableDemoRow" Field="layer" Title="Layer" />
-                    <KlyDataListColumn TItem="TableDemoRow" Field="aot" Title="NativeAOT" />
-                    <KlyDataListColumn TItem="TableDemoRow" Field="sizeKb" Title="Size (KB)" Summary="DataListSummaryKind.Sum" />
-                    <KlyDataListColumn TItem="TableDemoRow" Field="tests" Title="Tests" Summary="DataListSummaryKind.Sum" />
+                    <KlyDataListFieldColumn TItem="TableDemoRow" Field="pkg" Title="Package" />
+                    <KlyDataListFieldColumn TItem="TableDemoRow" Field="layer" Title="Layer" />
+                    <KlyDataListFieldColumn TItem="TableDemoRow" Field="aot" Title="NativeAOT" />
+                    <KlyDataListFieldColumn TItem="TableDemoRow" Field="sizeKb" Title="Size (KB)" Summary="DataListSummaryKind.Sum" />
+                    <KlyDataListFieldColumn TItem="TableDemoRow" Field="tests" Title="Tests" Summary="DataListSummaryKind.Sum" />
                 </KlyDataListTable>
             </KlyDataList>
         </div>
@@ -113,7 +113,7 @@
         .Field(r => r.SizeKb, f => f.Key("sizeKb").Sortable())
         .Field(r => r.Tests, f => f.Key("tests").Sortable()));
 
-    private static readonly DataListGroupBy<TableDemoRow> LayerGroupBy = new() { Key = r => r.Layer };
+    private static readonly DataListGroupBy<TableDemoRow> LayerGroupBy = DataListGroupBy<TableDemoRow>.By(r => r.Layer);
 
     private static readonly TableDemoRow[] AllRows =
     [

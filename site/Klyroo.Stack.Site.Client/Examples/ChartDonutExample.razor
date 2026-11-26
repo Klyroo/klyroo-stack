@@ -1,6 +1,6 @@
 @* A donut has one slice per row, sized by the first category. The Center fragment sits over the hole. *@
 <div class="w-full">
-    <KlyChart TItem="Browser" Data="_data" Index="@(b => b.Name)" Categories="_categories" Type="KlyChartType.Donut"
+    <KlyChart TItem="Browser" TIndex="string" Data="_data" Index="@(b => b.Name)" Categories="_categories" Type="KlyChartType.Donut"
              Height="260" Thickness="36" data-testid="chart-donut">
         <Center>
             <span class="text-2xl font-semibold text-(--klyroo-text-highlighted)">@_data.Sum(b => b.Share)%</span>

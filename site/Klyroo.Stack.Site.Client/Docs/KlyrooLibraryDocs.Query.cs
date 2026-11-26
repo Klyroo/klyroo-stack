@@ -663,9 +663,9 @@ public static partial class KlyrooLibraryDocs
                                     <KlyDataListFilterPanel TItem="Employee" />
 
                                     <KlyDataListTable TItem="Employee" HeaderMenu="true" ShowProgressLine="true">
-                                        <KlyDataListColumn TItem="Employee" Field="name" Title="Name" />
-                                        <KlyDataListColumn TItem="Employee" Field="dept" Title="Department" />
-                                        <KlyDataListColumn TItem="Employee" Field="salary" Title="Salary" Summary="DataListSummaryKind.Sum" />
+                                        <KlyDataListFieldColumn TItem="Employee" Field="name" Title="Name" />
+                                        <KlyDataListFieldColumn TItem="Employee" Field="dept" Title="Department" />
+                                        <KlyDataListFieldColumn TItem="Employee" Field="salary" Title="Salary" Summary="DataListSummaryKind.Sum" />
                                     </KlyDataListTable>
 
                                     <KlyDataListPagination TItem="Employee" />
@@ -738,11 +738,17 @@ public static partial class KlyrooLibraryDocs
 
                                 @code {
                                     private sealed record DashFilter(string Period, string Region, bool ActiveOnly);
+                                    private sealed record TopAccount(string Name, decimal Revenue);
 
                                     private QueryGroup<DashFilter> _url = default!;
                                     private readonly DashboardController _dashboard = new("revenue");
+                                    private static readonly IReadOnlyList<DashboardTableColumn<TopAccount>> _cols =
+                                    [
+                                        DashboardTableColumn.For<TopAccount, string>("name", "Account", a => a.Name),
+                                        DashboardTableColumn.For<TopAccount, decimal>("revenue", "Revenue", a => a.Revenue, DashboardFormatPreset.Compact),
+                                    ];
                                     private DashboardResource<IReadOnlyList<DashboardStatItem>> _kpis = default!;
-                                    private DashboardResource<IReadOnlyList<IReadOnlyDictionary<string, object>>> _topRows = default!;
+                                    private DashboardResource<IReadOnlyList<TopAccount>> _topRows = default!;
 
                                     protected override void OnInitialized()
                                     {
@@ -754,7 +760,7 @@ public static partial class KlyrooLibraryDocs
                                         _kpis = _dashboard.RegisterResource(new DashboardResource<IReadOnlyList<DashboardStatItem>>(
                                             "kpis", ct => LoadKpisAsync(_url.Value, ct), DashboardQueryStage.Essential));
 
-                                        _topRows = _dashboard.RegisterResource(new DashboardResource<IReadOnlyList<IReadOnlyDictionary<string, object>>>(
+                                        _topRows = _dashboard.RegisterResource(new DashboardResource<IReadOnlyList<TopAccount>>(
                                             "top", ct => LoadTopAccountsAsync(_url.Value, ct), DashboardQueryStage.Background));
 
                                         _url.Changed += OnUrlFilterChanged;
@@ -785,26 +791,33 @@ public static partial class KlyrooLibraryDocs
                                 using Klyroo.Form;
                                 using Klyroo.Query;
 
-                                // Open a typed Klyroo.Form drawer and turn its validated output into a Klyroo.Query DataListState
+                                // Open a typed Klyroo.Form drawer and turn the submitted model into a Klyroo.Query DataListState
+                                public sealed class EmployeeSearch
+                                {
+                                    public string? Q { get; set; }
+                                    public decimal? MinSalary { get; set; }
+                                    public List<string> Departments { get; set; } = [];
+                                }
+
                                 public async Task OpenAdvancedSearchAsync(
                                     FormService formService,
                                     QueryState queryState,
-                                    FormSchema searchFormSchema)
+                                    FormSchema<EmployeeSearch> searchFormSchema)
                                 {
                                     var outcome = await formService.CreateFormAsync(
                                         searchFormSchema, mode: FormShellMode.Drawer);
 
-                                    if (!outcome.Submitted) return;
+                                    if (outcome is not { IsCompleted: true, Model: { } search }) return;
 
                                     var rules = new List<FilterRule>();
-                                    if (outcome.Data.TryGetValue("minSalary", out var min) && min is decimal minVal)
-                                        rules.Add(new FilterRule("salary", FilterOperator.Gte, new FilterValue.Number(minVal)));
+                                    if (search.MinSalary is { } minSalary)
+                                        rules.Add(new FilterRule("salary", FilterOperator.Gte, new FilterValue.Number(minSalary)));
 
-                                    if (outcome.Data.TryGetValue("departments", out var depts) && depts is IReadOnlyList<string> list && list.Count > 0)
-                                        rules.Add(new FilterRule("dept", FilterOperator.IsAnyOf, new FilterValue.List(list)));
+                                    if (search.Departments.Count > 0)
+                                        rules.Add(new FilterRule("dept", FilterOperator.IsAnyOf, new FilterValue.List(search.Departments)));
 
                                     var state = new DataListState(
-                                        search: outcome.Data.GetValueOrDefault("q")?.ToString() ?? "",
+                                        search: search.Q ?? "",
                                         filters: rules,
                                         sort: [new DataListSort("salary", Descending: true)],
                                         page: 1,

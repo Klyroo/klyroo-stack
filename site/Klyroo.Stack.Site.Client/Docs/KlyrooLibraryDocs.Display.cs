@@ -36,7 +36,7 @@ public static partial class KlyrooLibraryDocs
                             new("Editorial & Status (4)", "Heading, Text, Alert, Empty", "Section titles with count pills, collapsible Alert details, empty states"),
                             new("Metrics & Visuals (5)", "Facts, Stat, Breakdown, Meter, Chart", "Copyable fact grids, sparklines, breakdown lines, threshold-colored meters"),
                             new("Structured Data (6)", "Table, Diff, Record, Person, List, Accordion", "Before/after diffs, record cards, progressive Reveal More lists, accordions"),
-                            new("Rich & Technical (4)", "Timeline, Date, Media, Code", "Timeline states (Done/Current/Upcoming), relative dates, image galleries & Variant=\"secret\" code")
+                            new("Rich & Technical (4)", "Timeline, Date, Media, Code", "Timeline states (Done/Current/Upcoming), relative dates, image galleries & Variant=\"DisplayVariant.Secret\" code")
                         ]),
                     new("layers", "Two-Layer Architecture",
                         TableHeaders: ["Package", "Primary Exports", "Compatibility"],
@@ -109,7 +109,7 @@ public static partial class KlyrooLibraryDocs
                         Paragraphs:
                         [
                             "DisplayKind.Meter automatically transitions its tone to warning at WarningThreshold and error at ErrorThreshold.",
-                            "DisplayKind.Code with Variant=\"secret\" masks leading characters while keeping the last VisibleChars visible, with built-in reveal toggle and unmasked clipboard copy."
+                            "DisplayKind.Code with Variant=\"DisplayVariant.Secret\" masks leading characters while keeping the last VisibleChars visible, with built-in reveal toggle and unmasked clipboard copy."
                         ],
                         LiveDemoKey: "display-blocks",
                         LiveDemoTitle: "Live Stat, Threshold Meter, Secret Mask & Diff",
@@ -118,7 +118,7 @@ public static partial class KlyrooLibraryDocs
                             new("MetricsAndSecret.razor", """
                                 <KlyDisplay Kind="DisplayKind.Stat" Title="MRR" Value="€148,900" Delta="+14.2%" Trend="@([102.0, 118.0, 134.0, 148.9])" />
                                 <KlyDisplay Kind="DisplayKind.Meter" Title="Storage Quota" MeterValue="@_val" MeterMax="100" WarningThreshold="75" ErrorThreshold="90" />
-                                <KlyDisplay Kind="DisplayKind.Code" Variant="secret" Title="Webhook Secret" Value="sk_live_9876543210" VisibleChars="4" Copy="true" />
+                                <KlyDisplay Kind="DisplayKind.Code" Variant="DisplayVariant.Secret" Title="Webhook Secret" Value="sk_live_9876543210" VisibleChars="4" Copy="true" />
                                 <KlyDisplay Kind="DisplayKind.Diff" Title="Plan Upgrade" DiffItems="@([new DisplayDiffItem("Tier", "Starter", "Enterprise", Changed: true)])" />
                                 """)
                         ]),
@@ -246,8 +246,17 @@ public static partial class KlyrooLibraryDocs
                         [
                             new("FormChangeDiff.razor", """
                                 <KlyDisplay Kind="DisplayKind.Diff" Title="Review Changes Before Saving"
-                                           DiffItems="@([.. _form.DirtyPaths.Select(key =>
-                                               new DisplayDiffItem(key, _baseline[key]?.ToString(), _form.GetValue<object>(key)?.ToString(), Changed: true))])" />
+                                           DiffItems="@Changes()" />
+
+                                @code {
+                                    // One item per field whose IsFieldDirty is true: its label, the baseline text and the current text.
+                                    private IReadOnlyList<DisplayDiffItem> Changes() =>
+                                    [
+                                        .. new[] { (Label: "Name", Field: _name), (Label: "Plan", Field: _plan) }
+                                            .Where(x => _form.IsFieldDirty(x.Field))
+                                            .Select(x => new DisplayDiffItem(x.Label, _baseline[x.Label], _form.Get(x.Field), Changed: true)),
+                                    ];
+                                }
                                 """)
                         ]),
                     new("dashboard-csv", "2. Klyroo.Display + Klyroo.Dashboard (Inline CSV Export Preview)",
@@ -308,7 +317,7 @@ public static partial class KlyrooLibraryDocs
                             new("DisplayBlocks.razor", """
                                 <KlyDisplay Kind="DisplayKind.Stat" Title="MRR" Value="€148,900" Delta="+14.2%" Trend="@([102.0, 118.0, 134.0, 148.9])" />
                                 <KlyDisplay Kind="DisplayKind.Meter" Title="Storage Quota" MeterValue="@_val" MeterMax="100" WarningThreshold="75" ErrorThreshold="90" />
-                                <KlyDisplay Kind="DisplayKind.Code" Variant="secret" Title="API Token" Value="sk_live_klyroo_3210" VisibleChars="4" Copy="true" />
+                                <KlyDisplay Kind="DisplayKind.Code" Variant="DisplayVariant.Secret" Title="API Token" Value="sk_live_klyroo_3210" VisibleChars="4" Copy="true" />
                                 <KlyDisplay Kind="DisplayKind.Diff" Title="Plan Upgrade" DiffItems="@([new DisplayDiffItem("Tier", "Starter", "Enterprise", Changed: true)])" />
                                 """)
                         ]),

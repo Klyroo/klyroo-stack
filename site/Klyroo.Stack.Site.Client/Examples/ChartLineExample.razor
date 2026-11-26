@@ -2,12 +2,12 @@
 <div class="grid w-full gap-8 md:grid-cols-2">
     <div>
         <p class="mb-2 text-sm font-medium text-(--klyroo-text-highlighted)">Line, with points and a smooth curve</p>
-        <KlyChart TItem="Visit" Data="_data" Index="@(v => v.Month)" Categories="_categories" Points Curve="KlyChartCurve.Monotone"
+        <KlyChart TItem="Visit" TIndex="string" Data="_data" Index="@(v => v.Month)" Categories="_categories" Points Curve="KlyChartCurve.Monotone"
                  XLabel="Month" YLabel="Visitors" Width="420" Height="260" data-testid="chart-line" />
     </div>
     <div>
         <p class="mb-2 text-sm font-medium text-(--klyroo-text-highlighted)">Stacked area</p>
-        <KlyChart TItem="Visit" Data="_data" Index="@(v => v.Month)" Categories="_categories" Type="KlyChartType.Area" Stacked
+        <KlyChart TItem="Visit" TIndex="string" Data="_data" Index="@(v => v.Month)" Categories="_categories" Type="KlyChartType.Area" Stacked
                  Width="420" Height="260" AriaLabel="Visitors by month, desktop and mobile stacked" data-testid="chart-area" />
     </div>
 </div>

@@ -81,7 +81,7 @@ public static partial class Catalog
         new("accordion", "Accordion", "Navigation", "Stacked headings that reveal their section.",
             [new("Accordion", typeof(Examples.AccordionExample)), new("With controls inside", typeof(Examples.AccordionNestedExample))], [typeof(KlyAccordion)]),
         new("table", "Table", "Data", "A data table with sortable columns.",
-            [new("Sortable table", typeof(Examples.TableExample))], [typeof(KlyTable<object>), typeof(KlyColumn<object>)]),
+            [new("Sortable table", typeof(Examples.TableExample))], [typeof(KlyTable<object>), typeof(KlyColumn<object, object>), typeof(KlyTemplateColumn<object>)]),
     ];
 
     public static ComponentDoc? Find(string slug) => Components.FirstOrDefault(c => c.Slug == slug);

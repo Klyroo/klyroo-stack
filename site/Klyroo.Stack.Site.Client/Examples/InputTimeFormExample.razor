@@ -2,7 +2,7 @@
     <KlyFormField Label="Meeting starts" Description="Posted as HH:mm." For="() => Model!.Start" class="w-full">
         <KlyInputTime @bind-Value="Model!.Start" Hour12="false" data-testid="meeting" />
     </KlyFormField>
-    <KlyButton Type="submit" Label="Schedule" />
+    <KlyButton Type="ButtonType.Submit" Label="Schedule" />
     @if (_saved)
     {
         <p role="status" class="text-sm text-(--klyroo-success-text)" data-testid="meeting-saved">Scheduled: @Model!.Start?.ToString("HH:mm")</p>

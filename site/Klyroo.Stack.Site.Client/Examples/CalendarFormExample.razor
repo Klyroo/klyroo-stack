@@ -5,7 +5,7 @@
         <KlyCalendar Mode="KlyCalendarMode.Multiple" @bind-Values="Model!.Days" AriaLabel="Days to book" data-testid="form-days" />
         <KlyCalendar Mode="KlyCalendarMode.Range" @bind-Range="Model!.Stay" AriaLabel="Stay dates" data-testid="form-stay" />
     </div>
-    <KlyButton Type="submit" Label="Book dates" />
+    <KlyButton Type="ButtonType.Submit" Label="Book dates" />
     @if (_saved)
     {
         <p role="status" class="text-sm text-(--klyroo-success-text)" data-testid="calendar-saved">Booked: @Text()</p>

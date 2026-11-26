@@ -8,7 +8,7 @@
         @* Interactive rendering: shows that .NET has the files, so Upload sends them. *@
         <p class="text-sm text-(--klyroo-text-muted)" data-testid="documents-chosen">Ready to send: @_chosen.Count file(s)</p>
     }
-    <KlyButton Type="submit" Label="Upload" />
+    <KlyButton Type="ButtonType.Submit" Label="Upload" />
     @if (_saved)
     {
         <p role="status" class="text-sm text-(--klyroo-success-text)" data-testid="documents-saved">Received: @(_received.Count == 0 ? "nothing" : string.Join(", ", _received))</p>

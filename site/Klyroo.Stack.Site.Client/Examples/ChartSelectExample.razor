@@ -2,12 +2,12 @@
 <div class="grid w-full gap-8 md:grid-cols-2">
     <div>
         <p class="mb-2 text-sm font-medium text-(--klyroo-text-highlighted)">Bars</p>
-        <KlyChart TItem="Sale" Data="_data" Index="@(s => s.Quarter)" Categories="_categories" Type="KlyChartType.Bar"
+        <KlyChart TItem="Sale" TIndex="string" Data="_data" Index="@(s => s.Quarter)" Categories="_categories" Type="KlyChartType.Bar"
                  OnSelect="@(e => _picked = e)" Width="420" Height="260" data-testid="chart-select-bar" />
     </div>
     <div>
         <p class="mb-2 text-sm font-medium text-(--klyroo-text-highlighted)">Donut</p>
-        <KlyChart TItem="Sale" Data="_data" Index="@(s => s.Quarter)" Categories="_slices" Type="KlyChartType.Donut"
+        <KlyChart TItem="Sale" TIndex="string" Data="_data" Index="@(s => s.Quarter)" Categories="_slices" Type="KlyChartType.Donut"
                  OnSelect="@(e => _picked = e)" Height="260" Thickness="36" data-testid="chart-select-donut" />
     </div>
 </div>
@@ -18,7 +18,7 @@
 @code {
     private sealed record Sale(string Quarter, double Online, double Store);
 
-    private KlyChartSelectEventArgs<Sale>? _picked;
+    private KlyChartSelectEventArgs<Sale, string>? _picked;
 
     private static readonly Sale[] _data =
     [

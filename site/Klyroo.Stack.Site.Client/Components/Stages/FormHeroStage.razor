@@ -25,7 +25,7 @@
             </div>
         </div>
         <div class="flex-1 p-5">
-            <KlyFormEngine Form="@_controller" SubmitLabel="Validate & Submit" ShowReset="true" OnSubmit="@HandleSubmit" />
+            <KlyFormEngine Form="@_controller" SubmitLabel="Validate & Submit" ShowReset="true" OnSubmit="@HandleSubmit" TModel="WorkspaceRequest" />
             @if (_submitNotice is not null)
             {
                 <p class="lib-flash mt-3 rounded-lg border border-(--klyroo-border) bg-(--klyroo-bg-muted)/60 px-3 py-2 font-mono text-xs text-(--klyroo-text-highlighted)">
@@ -56,7 +56,7 @@
                     @(IsEu ? "EU VAT ACTIVE" : "EU VAT HIDDEN")
                 </span>
             </div>
-            <pre class="mt-2.5 overflow-x-auto rounded-lg bg-(--pg-code-bg) p-3 font-mono text-[11.5px] leading-5 text-[#d7dcde]"><code>Condition: f =&gt; f.GetValue&lt;string&gt;("region") == "EU"
+            <pre class="mt-2.5 overflow-x-auto rounded-lg bg-(--pg-code-bg) p-3 font-mono text-[11.5px] leading-5 text-[#d7dcde]"><code>VisibleWhen(c =&gt; c.Get(region) == "EU")
 // live evaluation: <span style="color:var(--lib-accent-bright)">@(IsEu ? "true → field visible & required" : "false → field hidden & skipped")</span></code></pre>
         </div>
 
@@ -65,15 +65,15 @@
                 <span class="font-semibold uppercase tracking-wider text-(--klyroo-text-highlighted)">Live Dirty Diff</span>
                 <span class="tabular-nums text-(--klyroo-text-muted)">@(_controller.IsDirty ? "Modified" : "Clean")</span>
             </div>
-            @{ var output = _controller.BuildOutput(); }
+            @{ var output = _controller.CreateModel(); }
             <pre class="mt-2.5 overflow-x-auto rounded-lg bg-(--pg-code-bg) p-3 font-mono text-[11.5px] leading-5 text-[#d7dcde]"><code>{
-  "workspace": "@output.GetValueOrDefault("name")",
-  "region": "@output.GetValueOrDefault("region")",
-  "tier": "@output.GetValueOrDefault("tier")",@if (IsEu) {
+  "workspace": "@output.Name",
+  "region": "@output.Region",
+  "tier": "@output.Tier",@if (IsEu) {
 <text>
-  "vatId": "@(output.GetValueOrDefault("vat") ?? "")",</text>
+  "vatId": "@output.Vat",</text>
 }
-  "mauiHybrid": @((output.GetValueOrDefault("maui") is true).ToString().ToLowerInvariant()),
+  "mauiHybrid": @output.Maui.ToString().ToLowerInvariant(),
   "isDirty": @_controller.IsDirty.ToString().ToLowerInvariant()
 }</code></pre>
             <p class="mt-2.5 text-xs text-(--klyroo-text-muted)">
@@ -84,64 +84,61 @@
 </div>
 
 @code {
-    private readonly FormSchema _schema;
-    private readonly FormController _controller;
+    public sealed class WorkspaceRequest
+    {
+        public string Name { get; set; } = "";
+        public string Region { get; set; } = "";
+        public string Vat { get; set; } = "";
+        public string Tier { get; set; } = "";
+        public bool Maui { get; set; }
+    }
+
+    private static readonly FormSchema<WorkspaceRequest> Schema = FormSchema.For<WorkspaceRequest>(s =>
+    {
+        s.FormKey = "klyroo-form-stage";
+        s.Title = "Provision Workspace";
+        s.Field(m => m.Name, f => f.Label("Workspace Name").Required().Default("Helios Cloud"));
+        var region = s.Field(m => m.Region, f => f.Label("Billing Region").Default("EU").Options(
+        [
+            new FormOption<string>("EU", "Europe (triggers EU VAT)"),
+            new FormOption<string>("US", "United States"),
+            new FormOption<string>("APAC", "Asia-Pacific"),
+        ]));
+        s.Field(m => m.Vat, f => f.Label("EU VAT ID").Placeholder("FR40303265045").Default("FR40303265045")
+            .VisibleWhen(c => c.Get(region) == "EU").Required(c => c.Get(region) == "EU"));
+        s.Field(m => m.Tier, f => f.Label("Plan Tier").Default("pro").Options(
+        [
+            new FormOption<string>("starter", "Starter"),
+            new FormOption<string>("pro", "Pro"),
+            new FormOption<string>("enterprise", "Enterprise"),
+        ]));
+        s.Field(m => m.Maui, f => f.Label("Enable .NET MAUI Blazor Hybrid").AsSwitch().Default(true));
+    });
+
+    private static readonly FormField<WorkspaceRequest, string> RegionField = Schema.Field(m => m.Region);
+
+    private readonly FormController<WorkspaceRequest> _controller;
     private string? _submitNotice;
 
-    private bool IsEu => string.Equals(_controller.GetValue<string>("region"), "EU", StringComparison.OrdinalIgnoreCase);
+    private bool IsEu => string.Equals(_controller.Get(RegionField), "EU", StringComparison.OrdinalIgnoreCase);
 
     public FormHeroStage()
     {
-        _schema = new FormSchema
-        {
-            FormKey = "klyroo-form-stage",
-            Title = "Provision Workspace",
-            Fields =
-            [
-                new FormFieldSchema { Key = "name", Label = "Workspace Name", Required = true, DefaultValue = "Helios Cloud" },
-                new FormFieldSchema
-                {
-                    Key = "region",
-                    Label = "Billing Region",
-                    Kind = FormFieldKind.Select,
-                    DefaultValue = "EU",
-                    Options = [new("EU", "Europe (triggers EU VAT)"), new("US", "United States"), new("APAC", "Asia-Pacific")]
-                },
-                new FormFieldSchema
-                {
-                    Key = "vat",
-                    Label = "EU VAT ID",
-                    Placeholder = "FR40303265045",
-                    DefaultValue = "FR40303265045",
-                    Condition = f => f.GetValue<string>("region") == "EU",
-                    RequiredWhen = f => f.GetValue<string>("region") == "EU"
-                },
-                new FormFieldSchema
-                {
-                    Key = "tier",
-                    Label = "Plan Tier",
-                    Kind = FormFieldKind.Select,
-                    DefaultValue = "pro",
-                    Options = [new("starter", "Starter"), new("pro", "Pro"), new("enterprise", "Enterprise")]
-                },
-                new FormFieldSchema { Key = "maui", Label = "Enable .NET MAUI Blazor Hybrid", Kind = FormFieldKind.Switch, DefaultValue = true }
-            ]
-        };
-        _controller = new FormController(_schema);
+        _controller = new FormController<WorkspaceRequest>(Schema);
         _controller.Changed += () => InvokeAsync(StateHasChanged);
     }
 
-    private void HandleSubmit(IReadOnlyDictionary<string, object?> data)
+    private void HandleSubmit(WorkspaceRequest request)
     {
-        _submitNotice = $"Submitted {data.GetValueOrDefault("name")} ({data.GetValueOrDefault("region")}) · Dirty fields validated.";
+        _submitNotice = $"Submitted {request.Name} ({request.Region}) · Dirty fields validated.";
     }
 
     private async Task OpenInShellAsync(FormShellMode mode)
     {
-        var outcome = await FormService.CreateFormAsync(_schema, mode: mode);
+        var outcome = await FormService.CreateFormAsync(Schema, mode: mode);
         if (outcome.IsCompleted)
         {
-            _submitNotice = $"{mode} shell completed for {outcome.FormData.GetValueOrDefault("name")}.";
+            _submitNotice = $"{mode} shell completed for {outcome.Model?.Name}.";
         }
     }
 }

@@ -7,7 +7,7 @@
     <KlyFormField Label="Seats" For="() => Model!.Seats">
         <KlyInputNumber @bind-Value="Model!.Seats" Min="1" Max="50" />
     </KlyFormField>
-    <KlyButton Type="submit" Label="Create workspace" />
+    <KlyButton Type="ButtonType.Submit" Label="Create workspace" />
     @if (_saved)
     {
         <p role="status" class="text-sm text-(--klyroo-success-text)" data-testid="form-saved">Workspace @Model!.Name created.</p>

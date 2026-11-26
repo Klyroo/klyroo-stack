@@ -2,7 +2,7 @@
    group. Below the lg breakpoint the sidebar is replaced by the toggle, which opens it as an off-canvas panel. *@
 <div class="h-72 w-full overflow-hidden rounded-xl border border-(--klyroo-border)" data-testid="dashboard-sidebar-frame">
     <KlyDashboardGroup StorageKey="playground-dashboard-sidebar">
-        <KlyDashboardSidebar As="div" Width="224" Resizable data-testid="dashboard-sidebar-only" MobileTitle="Workspace">
+        <KlyDashboardSidebar As="KlyElement.Div" Width="224" Resizable data-testid="dashboard-sidebar-only" MobileTitle="Workspace">
             <Header><span class="font-semibold text-(--klyroo-text-highlighted)">Acme</span></Header>
             <ChildContent>
                 <KlyNavigationMenu Items="_items" Orientation="KlyOrientation.Vertical" AriaLabel="Sections" Ui="_navUi" />

@@ -96,9 +96,9 @@ public static partial class KlyrooLibraryDocs
                                                      ShowProgressLine="true"
                                                      Density="DataListDensity.Default"
                                                      Summaries="@(new DataListSummaries<Employee>())">
-                                        <KlyDataListColumn TItem="Employee" Field="name" Title="Employee" Pin="DataListPin.Start" />
-                                        <KlyDataListColumn TItem="Employee" Field="dept" Title="Department" />
-                                        <KlyDataListColumn TItem="Employee" Field="salary" Title="Salary"
+                                        <KlyDataListFieldColumn TItem="Employee" Field="name" Title="Employee" Pinned="DataListPin.Start" />
+                                        <KlyDataListFieldColumn TItem="Employee" Field="dept" Title="Department" />
+                                        <KlyDataListFieldColumn TItem="Employee" Field="salary" Title="Salary"
                                                           Align="DataListAlign.End"
                                                           Summary="DataListSummaryKind.Sum" />
                                     </KlyDataListTable>
@@ -138,9 +138,9 @@ public static partial class KlyrooLibraryDocs
                         [
                             new("PinnedColumns.razor", """
                                 <KlyDataListTable TItem="Employee" HeaderMenu="true">
-                                    <KlyDataListColumn TItem="Employee" Field="name" Title="Employee" Pin="DataListPin.Start" SkeletonKind="DataListSkeletonKind.Avatar" />
-                                    <KlyDataListColumn TItem="Employee" Field="dept" Title="Department" SkeletonKind="DataListSkeletonKind.Badge" />
-                                    <KlyDataListColumn TItem="Employee" Field="salary" Title="Salary" Align="DataListAlign.End" SkeletonKind="DataListSkeletonKind.Number" Summary="DataListSummaryKind.Sum" />
+                                    <KlyDataListFieldColumn TItem="Employee" Field="name" Title="Employee" Pinned="DataListPin.Start" Skeleton="DataListSkeletonKind.Avatar" />
+                                    <KlyDataListFieldColumn TItem="Employee" Field="dept" Title="Department" Skeleton="DataListSkeletonKind.Badge" />
+                                    <KlyDataListFieldColumn TItem="Employee" Field="salary" Title="Salary" Align="DataListAlign.End" Skeleton="DataListSkeletonKind.Number" Summary="DataListSummaryKind.Sum" />
                                 </KlyDataListTable>
                                 """)
                         ])
@@ -181,16 +181,14 @@ public static partial class KlyrooLibraryDocs
                 "Group rows under collapsible headers, calculate footer totals across 6 aggregation modes, and attach row/bulk actions with confirmation dialogs.",
                 [
                     new("grouping", "Visual Row Grouping (DataListGroupBy<TItem>)",
-                        Paragraphs: ["DataListGroupBy<TItem> groups loaded rows by any key selector (Key = e => e.Dept), renders collapsible group headers with item counts and tri-state group checkboxes, and persists fold state when PreferencesKey is set."],
+                        Paragraphs: ["DataListGroupBy<TItem> groups loaded rows by any key selector (DataListGroupBy<Employee>.By(e => e.Dept), typed by the key, or ByField(\"dept\") for a field of the schema), renders collapsible group headers with item counts and tri-state group checkboxes, and persists fold state when PreferencesKey is set."],
                         LiveDemoKey: "table-grouped",
                         LiveDemoTitle: "Interactive GroupBy & Density Switcher",
                         CodeSamples:
                         [
                             new("Grouping.cs", """
-                                var groupBy = new DataListGroupBy<Employee>
-                                {
-                                    Key = e => e.Dept
-                                };
+                                var groupBy = DataListGroupBy<Employee>.By(e => e.Dept);
+                                var byField = DataListGroupBy<Employee>.ByField("dept", ["Engineering", "Sales"]);
                                 """)
                         ]),
                     new("summaries", "All 6 DataListSummaryKind Aggregations & Scopes",
@@ -260,9 +258,9 @@ public static partial class KlyrooLibraryDocs
                                     <KlyDataListToolbar TItem="EmployeeDto" />
                                     <KlyDataListFilterPanel TItem="EmployeeDto" />
                                     <KlyDataListTable TItem="EmployeeDto" HeaderMenu="true" ShowProgressLine="true">
-                                        <KlyDataListColumn TItem="EmployeeDto" Field="name" Title="Employee" Pin="DataListPin.Start" />
-                                        <KlyDataListColumn TItem="EmployeeDto" Field="dept" Title="Department" />
-                                        <KlyDataListColumn TItem="EmployeeDto" Field="salary" Title="Salary" Summary="DataListSummaryKind.Sum" />
+                                        <KlyDataListFieldColumn TItem="EmployeeDto" Field="name" Title="Employee" Pinned="DataListPin.Start" />
+                                        <KlyDataListFieldColumn TItem="EmployeeDto" Field="dept" Title="Department" />
+                                        <KlyDataListFieldColumn TItem="EmployeeDto" Field="salary" Title="Salary" Summary="DataListSummaryKind.Sum" />
                                     </KlyDataListTable>
                                     <KlyDataListPagination TItem="EmployeeDto" />
                                 </KlyDataList>
@@ -285,7 +283,7 @@ public static partial class KlyrooLibraryDocs
                 "Launch row edit drawers with Klyroo.Form (FormService.CreateFormAsync) and preview row attachments or detail modals with Klyroo.Display (FilePreviewService & KlyDisplay).",
                 [
                     new("row-edit-form", "1. Row Action -> Klyroo.Form Drawer (Edit & Reload Table)",
-                        Paragraphs: ["Wire a DataListRowAction<TItem> to FormService.CreateFormAsync(editSchema, initialData, FormShellMode.Drawer). When outcome.Submitted is true, persist the record and reload the table cleanly."],
+                        Paragraphs: ["Wire a DataListRowAction<TItem> to FormService.CreateFormAsync(editSchema, model, FormShellMode.Drawer). When outcome.IsCompleted is true, persist the record and reload the table cleanly."],
                         CodeSamples:
                         [
                             new("EditRowDrawer.cs", """
@@ -296,17 +294,12 @@ public static partial class KlyrooLibraryDocs
                                 {
                                     var outcome = await formService.CreateFormAsync(
                                         EmployeeFormSchemas.Edit,
-                                        input: new Dictionary<string, object?>
-                                        {
-                                            ["name"] = ctx.Item.Name,
-                                            ["dept"] = ctx.Item.Dept,
-                                            ["salary"] = (double)ctx.Item.Salary
-                                        },
+                                        new EmployeeForm { Name = ctx.Item.Name, Dept = ctx.Item.Dept, Salary = ctx.Item.Salary },
                                         mode: FormShellMode.Drawer);
 
-                                    if (outcome.Submitted)
+                                    if (outcome is { IsCompleted: true, Model: { } edited })
                                     {
-                                        await api.UpdateEmployeeAsync(ctx.Item.Id, outcome.Data);
+                                        await api.UpdateEmployeeAsync(ctx.Item.Id, edited);
                                         await _dataListRef.ReloadAsync();
                                     }
                                 });
@@ -414,9 +407,9 @@ public static partial class KlyrooLibraryDocs
                                 <KlyDataList TItem="Employee" Schema="@EmployeeSchema" Items="@_employees" UrlSync="false">
                                     <KlyDataListTable TItem="Employee" HeaderMenu="true" ShowProgressLine="true"
                                                      Summaries="@(new DataListSummaries<Employee>())">
-                                        <KlyDataListColumn TItem="Employee" Field="name" Title="Employee" />
-                                        <KlyDataListColumn TItem="Employee" Field="dept" Title="Department" />
-                                        <KlyDataListColumn TItem="Employee" Field="salary" Title="Salary (€)"
+                                        <KlyDataListFieldColumn TItem="Employee" Field="name" Title="Employee" />
+                                        <KlyDataListFieldColumn TItem="Employee" Field="dept" Title="Department" />
+                                        <KlyDataListFieldColumn TItem="Employee" Field="salary" Title="Salary (€)"
                                                           Summary="DataListSummaryKind.Sum" />
                                     </KlyDataListTable>
                                 </KlyDataList>
@@ -432,8 +425,8 @@ public static partial class KlyrooLibraryDocs
                                 <KlyDataList TItem="OrgRow" Schema="@OrgSchema" Items="@_roots" UrlSync="false">
                                     <KlyDataListTable TItem="OrgRow"
                                                      Tree="@(new DataListTree<OrgRow> { Children = m => m.Reports, DefaultExpandedDepth = 2 })">
-                                        <KlyDataListColumn TItem="OrgRow" Field="name" Title="Organization Hierarchy" />
-                                        <KlyDataListColumn TItem="OrgRow" Field="role" Title="Role" />
+                                        <KlyDataListFieldColumn TItem="OrgRow" Field="name" Title="Organization Hierarchy" />
+                                        <KlyDataListFieldColumn TItem="OrgRow" Field="role" Title="Role" />
                                     </KlyDataListTable>
                                 </KlyDataList>
                                 """)
@@ -448,11 +441,11 @@ public static partial class KlyrooLibraryDocs
                                 <KlyDataList TItem="Employee" Schema="@EmployeeSchema" Items="@_employees" UrlSync="false">
                                     <KlyDataListTable TItem="Employee"
                                                      Density="@_density"
-                                                     GroupBy="@(new DataListGroupBy<Employee> { Key = e => e.Dept })"
+                                                     GroupBy="@(DataListGroupBy<Employee>.By(e => e.Dept))"
                                                      Summaries="@(new DataListSummaries<Employee>())">
-                                        <KlyDataListColumn TItem="Employee" Field="name" Title="Employee" />
-                                        <KlyDataListColumn TItem="Employee" Field="dept" Title="Department" />
-                                        <KlyDataListColumn TItem="Employee" Field="salary" Title="Salary (€)"
+                                        <KlyDataListFieldColumn TItem="Employee" Field="name" Title="Employee" />
+                                        <KlyDataListFieldColumn TItem="Employee" Field="dept" Title="Department" />
+                                        <KlyDataListFieldColumn TItem="Employee" Field="salary" Title="Salary (€)"
                                                           Summary="DataListSummaryKind.Average" />
                                     </KlyDataListTable>
                                 </KlyDataList>
@@ -468,7 +461,7 @@ public static partial class KlyrooLibraryDocs
                                 <KlyDataListTable TItem="Employee"
                                                  RowSummary="@_phoneSummary"
                                                  Summaries="@(new DataListSummaries<Employee>())">
-                                    <KlyDataListColumn TItem="Employee" Field="salary" Title="Salary (€)" Summary="@_summaryKind" />
+                                    <KlyDataListFieldColumn TItem="Employee" Field="salary" Title="Salary (€)" Summary="@_summaryKind" />
                                 </KlyDataListTable>
                                 """)
                         ]),
@@ -488,6 +481,6 @@ public static partial class KlyrooLibraryDocs
             new("api", "API Reference", "Reference",
                 "Complete public API reference for Klyroo.Table.Core and Klyroo.Table.",
                 [],
-                ApiTypes: [typeof(KlyDataList<object>), typeof(KlyDataListTable<object>), typeof(KlyDataListColumn<object>), typeof(DataListTree<object>), typeof(DataListGroupBy<object>), typeof(DataListSummaries<object>), typeof(DataListRowSummary<object>)])
+                ApiTypes: [typeof(KlyDataList<object>), typeof(KlyDataListTable<object>), typeof(KlyDataListColumn<object, object>), typeof(KlyDataListFieldColumn<object>), typeof(KlyDataListTemplateColumn<object>), typeof(DataListTree<object>), typeof(DataListGroupBy<object>), typeof(DataListSummaries<object>), typeof(DataListRowSummary<object>)])
         ]);
 }

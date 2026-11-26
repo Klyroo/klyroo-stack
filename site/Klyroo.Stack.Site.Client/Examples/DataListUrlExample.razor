@@ -14,10 +14,10 @@
         </div>
         <KlyDataListErrorState />
         <KlyDataListTable Caption="Invoices in the URL" data-testid="url-table">
-            <KlyDataListColumn Field="id" Title="No." Align="DataListAlign.End" />
-            <KlyDataListColumn Field="customer" />
-            <KlyDataListColumn Field="amount" Align="DataListAlign.End" Format="C2" />
-            <KlyDataListColumn Field="issued" Format="d" />
+            <KlyDataListFieldColumn Field="id" Title="No." Align="DataListAlign.End" />
+            <KlyDataListFieldColumn Field="customer" />
+            <KlyDataListFieldColumn Field="amount" Align="DataListAlign.End" Format="C2" />
+            <KlyDataListFieldColumn Field="issued" Format="d" />
         </KlyDataListTable>
         <KlyDataListPagination data-testid="url-pagination" />
     </KlyDataList>

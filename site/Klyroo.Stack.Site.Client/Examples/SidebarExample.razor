@@ -1,7 +1,7 @@
 @* As="div": the docs page already sits inside a main landmark, and an aside must not. In a layout, keep the default.
    The group-data-[state=collapsed]/sidebar variant hides a label visually while it stays available to screen readers. *@
 <div class="flex h-96 w-full flex-col overflow-hidden rounded-xl border border-(--klyroo-border) lg:flex-row">
-    <KlySidebar Id="playground-sidebar" As="div" data-testid="sidebar">
+    <KlySidebar Id="playground-sidebar" As="KlyElement.Div" data-testid="sidebar">
         <Header>
             <span class="font-semibold text-(--klyroo-text-highlighted)">Acme</span>
         </Header>

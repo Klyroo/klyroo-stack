@@ -18,10 +18,10 @@
             </div>
             <KlyDataListSelectionActions Actions="_bulkActions" />
             <KlyDataListTable Caption="Invoices with table and grid views" RowActions="_rowActions" RowSummary="_summary" Summaries="_summaries">
-                <KlyDataListColumn Field="id" Title="No." Align="DataListAlign.End" />
-                <KlyDataListColumn Field="customer" Summary="DataListSummaryKind.Count" />
-                <KlyDataListColumn Field="status" />
-                <KlyDataListColumn Field="amount" Align="DataListAlign.End" Format="C2" Summary="DataListSummaryKind.Sum" />
+                <KlyDataListFieldColumn Field="id" Title="No." Align="DataListAlign.End" />
+                <KlyDataListFieldColumn Field="customer" Summary="DataListSummaryKind.Count" />
+                <KlyDataListFieldColumn Field="status" />
+                <KlyDataListFieldColumn Field="amount" Align="DataListAlign.End" Format="C2" Summary="DataListSummaryKind.Sum" />
             </KlyDataListTable>
             <KlyDataListGrid Columns="3" RowActions="_rowActions">
                 <ItemTemplate Context="invoice">
@@ -62,10 +62,10 @@
             </div>
             <KlyDataListSelectionActions Actions="_bulkActions" />
             <KlyDataListTable Caption="Invoices grouped by status" GroupBy="_groupBy">
-                <KlyDataListColumn Field="id" Title="No." Align="DataListAlign.End" />
-                <KlyDataListColumn Field="customer" />
-                <KlyDataListColumn Field="status" />
-                <KlyDataListColumn Field="amount" Align="DataListAlign.End" Format="C2" />
+                <KlyDataListFieldColumn Field="id" Title="No." Align="DataListAlign.End" />
+                <KlyDataListFieldColumn Field="customer" />
+                <KlyDataListFieldColumn Field="status" />
+                <KlyDataListFieldColumn Field="amount" Align="DataListAlign.End" Format="C2" />
             </KlyDataListTable>
             <KlyDataListGrid Columns="3" GroupBy="_groupBy" />
         </KlyDataList>
@@ -82,9 +82,9 @@
             </div>
             <KlyDataListSelectionActions Actions="_treeActions" />
             <KlyDataListTable Caption="Departments tree" Tree="_tree">
-                <KlyDataListColumn Field="name" Title="Department" />
-                <KlyDataListColumn Field="head" Title="Lead" />
-                <KlyDataListColumn Field="headcount" Title="Headcount" Align="DataListAlign.End" />
+                <KlyDataListFieldColumn Field="name" Title="Department" />
+                <KlyDataListFieldColumn Field="head" Title="Lead" />
+                <KlyDataListFieldColumn Field="headcount" Title="Headcount" Align="DataListAlign.End" />
             </KlyDataListTable>
         </KlyDataList>
     </div>
@@ -100,11 +100,7 @@
         InvoiceData.All[6] with { Status = "" },
     ];
 
-    private static readonly DataListGroupBy<Invoice> _groupBy = new()
-    {
-        Field = "status",
-        Order = ["Paid", "Pending", "Overdue"],
-    };
+    private static readonly DataListGroupBy<Invoice> _groupBy = DataListGroupBy<Invoice>.ByField("status", ["Paid", "Pending", "Overdue"]);
 
     private sealed record DepartmentNode(string Id, string Name, string Head, int Headcount, IReadOnlyList<DepartmentNode>? Subteams = null);
 

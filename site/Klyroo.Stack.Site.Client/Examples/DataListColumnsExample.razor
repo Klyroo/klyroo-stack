@@ -14,11 +14,11 @@
                 </div>
             </div>
             <KlyDataListTable Caption="Invoices with configurable columns" Resizable="true">
-                <KlyDataListColumn Field="id" Title="No." Align="DataListAlign.End" Width="90" Pinned="DataListPin.Start" />
-                <KlyDataListColumn Field="customer" Required="true" Width="220" />
-                <KlyDataListColumn Field="status" Width="140" />
-                <KlyDataListColumn Field="amount" Align="DataListAlign.End" Format="C2" Width="150" />
-                <KlyDataListColumn Field="issued" Title="Issued date" Width="160" />
+                <KlyDataListFieldColumn Field="id" Title="No." Align="DataListAlign.End" Width="90" Pinned="DataListPin.Start" />
+                <KlyDataListFieldColumn Field="customer" Required="true" Width="220" />
+                <KlyDataListFieldColumn Field="status" Width="140" />
+                <KlyDataListFieldColumn Field="amount" Align="DataListAlign.End" Format="C2" Width="150" />
+                <KlyDataListFieldColumn Field="issued" Title="Issued date" Width="160" />
             </KlyDataListTable>
             <KlyDataListPagination />
         </KlyDataList>
@@ -30,10 +30,10 @@
                 <KlyDataListColumnPanel />
             </div>
             <KlyDataListTable Caption="Invoices with selection and row actions" Resizable="true" RowActions="_actions" RowActionsMaxVisible="1">
-                <KlyDataListColumn Field="id" Title="No." Align="DataListAlign.End" Width="90" />
-                <KlyDataListColumn Field="customer" Width="220" />
-                <KlyDataListColumn Field="status" Width="140" />
-                <KlyDataListColumn Field="amount" Align="DataListAlign.End" Format="C2" Width="150" />
+                <KlyDataListFieldColumn Field="id" Title="No." Align="DataListAlign.End" Width="90" />
+                <KlyDataListFieldColumn Field="customer" Width="220" />
+                <KlyDataListFieldColumn Field="status" Width="140" />
+                <KlyDataListFieldColumn Field="amount" Align="DataListAlign.End" Format="C2" Width="150" />
             </KlyDataListTable>
             <KlyDataListPagination />
         </KlyDataList>

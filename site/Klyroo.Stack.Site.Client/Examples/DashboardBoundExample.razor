@@ -1,7 +1,7 @@
 <div class="flex flex-col gap-3">
     <div class="h-72 w-full overflow-hidden rounded-xl border border-(--klyroo-border)" data-testid="dashboard-bound">
         <KlyDashboardGroup StorageKey="playground-dashboard-bound" @bind-Sizes="_sizes">
-            <KlyDashboardSidebar As="div" @bind-Collapsed="_collapsed" data-testid="dashboard-bound-sidebar">
+            <KlyDashboardSidebar As="KlyElement.Div" @bind-Collapsed="_collapsed" data-testid="dashboard-bound-sidebar">
                 <Header><span class="font-semibold text-(--klyroo-text-highlighted)">Acme</span></Header>
                 <ChildContent>
                     <KlyNavigationMenu Items="_items" Orientation="KlyOrientation.Vertical" AriaLabel="Workspace, bound" Ui="_navUi" />

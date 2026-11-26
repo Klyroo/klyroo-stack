@@ -90,7 +90,7 @@
 
     private const string BasicUsage = """
         <KlyImage Src="/img/team.jpg" Alt="The team on stage" Width="640" Height="360"
-                 Format="webp" Quality="80" Sizes="100vw md:640px" />
+                 Format="KlyImageFormat.WebP" Quality="80" Sizes="100vw md:640px" />
 
         @* Decorative: an empty alt *@
         <KlyImage Src="/img/texture.png" Alt="" />
@@ -98,7 +98,7 @@
 
     private const string SizesUsage = """
         <KlyImage Src="/img/hero.jpg" Alt="Layered waves" Width="640" Height="360"
-                 Sizes="100vw sm:50vw md:400px" Densities="x1 x2" Format="webp" />
+                 Sizes="100vw sm:50vw md:400px" Densities="@(new[] { 1, 2 })" Format="KlyImageFormat.WebP" />
         """;
 
     private const string ProviderUsage = """

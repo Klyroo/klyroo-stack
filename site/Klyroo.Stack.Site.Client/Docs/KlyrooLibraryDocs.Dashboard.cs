@@ -189,24 +189,32 @@ public static partial class KlyrooLibraryDocs
                                 """)
                         ]),
                     new("table-alerts", "Table, Alerts, Feed, Details, List & Chart",
-                        Paragraphs: ["KlyDashboardTable supports sortable columns (Type: \"text\" | \"number\" | \"bar\" | \"delta\") and built-in CSV export; KlyDashboardAlerts displays Error, Warning, Info, and Success severity items."],
+                        Paragraphs: ["KlyDashboardTable supports sortable columns (a DashboardTableColumnKind: Text, Number, Delta, Percent or Bar) and built-in CSV export; KlyDashboardAlerts displays Error, Warning, Info, and Success severity items."],
                         LiveDemoKey: "dashboard-table-alerts",
                         LiveDemoTitle: "KlyDashboardTable, KlyDashboardAlerts & CSV Export",
                         CodeSamples:
                         [
                             new("TablesAndAlerts.razor", """
-                                <KlyDashboardTable Title="Top Regions" Menu="true"
-                                                  Columns="@([
-                                                      new DashboardTableColumn("region", "Region", Type: "text"),
-                                                      new DashboardTableColumn("revenue", "Revenue", Type: "bar"),
-                                                      new DashboardTableColumn("delta", "Growth", Type: "delta")
-                                                  ])"
-                                                  Rows="@_regionRows" />
+                                <KlyDashboardTable Title="Top Regions" Menu="true" Columns="@_regionColumns" Rows="@_regionRows" />
 
                                 <KlyDashboardAlerts Title="Operational Alerts" Items="@([
                                     new DashboardAlertItem(DashboardAlertSeverity.Success, "EU latency within SLA", "P95 at 24ms"),
                                     new DashboardAlertItem(DashboardAlertSeverity.Warning, "Cache eviction spike in us-east", "Raise memory tier")
                                 ])" />
+
+                                @code {
+                                    private sealed record Region(string Name, int Revenue, double Delta);
+
+                                    // A column reads its value from the row with a delegate: a renamed property is a compile error.
+                                    private static readonly IReadOnlyList<DashboardTableColumn<Region>> _regionColumns =
+                                    [
+                                        DashboardTableColumn.For<Region, string>("region", "Region", r => r.Name),
+                                        DashboardTableColumn.For<Region, int>("revenue", "Revenue", r => r.Revenue, kind: DashboardTableColumnKind.Bar),
+                                        DashboardTableColumn.For<Region, double>("delta", "Growth", r => r.Delta, kind: DashboardTableColumnKind.Delta),
+                                    ];
+
+                                    private static readonly IReadOnlyList<Region> _regionRows = [new("Europe", 148900, 14.2), new("North America", 192400, 19.8)];
+                                }
                                 """)
                         ])
                 ]),
@@ -269,9 +277,9 @@ public static partial class KlyrooLibraryDocs
                         [
                             new("AlertRuleModal.cs", """
                                 var outcome = await formService.CreateFormAsync(AlertRuleFormSchema, mode: FormShellMode.Drawer);
-                                if (outcome.Submitted)
+                                if (outcome is { IsCompleted: true, Model: { } rule })
                                 {
-                                    await alertsApi.SaveRuleAsync(outcome.Data);
+                                    await alertsApi.SaveRuleAsync(rule);
                                     await dashboard.RefreshAsync();
                                 }
                                 """)
@@ -362,7 +370,7 @@ public static partial class KlyrooLibraryDocs
                         CodeSamples:
                         [
                             new("OpsOverview.razor", """
-                                <KlyDashboardTable Title="Top Regions" Columns="@_columns" Rows="@_rows" Menu="true" />
+                                <KlyDashboardTable Title="Top Regions" Columns="@_regionColumns" Rows="@_regionRows" Menu="true" />
                                 <KlyDashboardAlerts Title="Operational Alerts" Items="@([
                                     new DashboardAlertItem(DashboardAlertSeverity.Success, "EU cluster latency within SLA", "P95 at 24ms"),
                                     new DashboardAlertItem(DashboardAlertSeverity.Warning, "Cache eviction spike in us-east", "Raise memory tier")
@@ -397,6 +405,6 @@ public static partial class KlyrooLibraryDocs
             new("api", "API Reference", "Reference",
                 "Complete public API reference for Klyroo.Dashboard.Core and Klyroo.Dashboard.",
                 [],
-                ApiTypes: [typeof(KlyDashboardPage), typeof(KlyDashboardStats), typeof(KlyDashboardStat), typeof(KlyDashboardGauge), typeof(KlyDashboardBars), typeof(KlyDashboardTable), typeof(KlyDashboardAlerts), typeof(DashboardController), typeof(DashboardFilterControl)])
+                ApiTypes: [typeof(KlyDashboardPage), typeof(KlyDashboardStats), typeof(KlyDashboardStat), typeof(KlyDashboardGauge), typeof(KlyDashboardBars), typeof(KlyDashboardTable<object>), typeof(KlyDashboardAlerts), typeof(DashboardController), typeof(DashboardFilterControl)])
         ]);
 }

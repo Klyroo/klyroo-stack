@@ -1,7 +1,7 @@
 @* The ErrorContent of an ErrorBoundary hands over the exception: <KlyError Exception="exception" />.
    Its message stays hidden unless ShowDetails is set, because exception messages can leak internals. *@
 <div class="w-full overflow-hidden rounded-xl border border-(--klyroo-border)">
-    <KlyError Exception="_exception" ShowDetails HeadingAs="h3" Clear="false" data-testid="error-boundary">
+    <KlyError Exception="_exception" ShowDetails HeadingLevel="3" Clear="false" data-testid="error-boundary">
         <Actions>
             <KlyButton Label="Try again" Href="/components/error" />
             <KlyButton Label="Contact support" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" Href="/docs" />

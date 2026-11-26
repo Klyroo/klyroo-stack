@@ -134,11 +134,11 @@
                                              ShowProgressLine="true"
                                              GroupBy="@(_groupByRegion ? AccountGroupBy : null)"
                                              Summaries="@(new DataListSummaries<AccountRecord>())">
-                                <KlyDataListColumn TItem="AccountRecord" Field="name" Title="Account" />
-                                <KlyDataListColumn TItem="AccountRecord" Field="region" Title="Region" />
-                                <KlyDataListColumn TItem="AccountRecord" Field="plan" Title="Plan" />
-                                <KlyDataListColumn TItem="AccountRecord" Field="status" Title="Status" />
-                                <KlyDataListColumn TItem="AccountRecord" Field="arr" Title="ARR (€)" Summary="DataListSummaryKind.Sum" />
+                                <KlyDataListFieldColumn TItem="AccountRecord" Field="name" Title="Account" />
+                                <KlyDataListFieldColumn TItem="AccountRecord" Field="region" Title="Region" />
+                                <KlyDataListFieldColumn TItem="AccountRecord" Field="plan" Title="Plan" />
+                                <KlyDataListFieldColumn TItem="AccountRecord" Field="status" Title="Status" />
+                                <KlyDataListFieldColumn TItem="AccountRecord" Field="arr" Title="ARR (€)" Summary="DataListSummaryKind.Sum" />
                             </KlyDataListTable>
                         </KlyDataList>
                     }
@@ -184,7 +184,7 @@
                         ])" />
                         <KlyDisplay Kind="DisplayKind.Meter" Surface="DisplaySurface.Bordered" Title="Seat Quota Utilization"
                                    MeterValue="@selected.SeatUsagePct" MeterMax="100" WarningThreshold="75" ErrorThreshold="90" />
-                        <KlyDisplay Kind="DisplayKind.Code" Surface="DisplaySurface.Bordered" Variant="secret"
+                        <KlyDisplay Kind="DisplayKind.Code" Surface="DisplaySurface.Bordered" Variant="DisplayVariant.Secret"
                                    Title="Webhook Signing Key (Redacted in AgentBridge)" Value="@($"sk_live_klyroo_{selected.Id:D4}_9921")" VisibleChars="4" Copy="true" />
                         <KlyDisplay Kind="DisplayKind.Timeline" Surface="DisplaySurface.Bordered" Title="Lifecycle Audit" TimelineItems="@([
                             new DisplayTimelineItem("Account Provisioned", Time: "Q1 2026", State: DisplayTimelineState.Done),
@@ -218,7 +218,7 @@
                 </div>
 
                 <div class="p-5">
-                    <KlyFormEngine Form="@_quickDealForm" SubmitLabel="Add Deal" ShowReset="false" OnSubmit="@HandleQuickDealSubmit" />
+                    <KlyFormEngine Form="@_quickDealForm" SubmitLabel="Add Deal" ShowReset="false" OnSubmit="@HandleQuickDealSubmit" TModel="QuickDeal" />
                 </div>
 
                 <div class="p-5">
@@ -261,7 +261,7 @@
         .Field(a => a.Status, f => f.Key("status").Sortable().Filter(DataListFilter.Option()))
         .Field(a => a.Arr, f => f.Key("arr").Sortable().Filter(DataListFilter.Number(min: 0))));
 
-    private static readonly DataListGroupBy<AccountRecord> AccountGroupBy = new() { Key = a => a.Region };
+    private static readonly DataListGroupBy<AccountRecord> AccountGroupBy = DataListGroupBy<AccountRecord>.By(a => a.Region);
 
     private List<AccountRecord> _accounts =
     [
@@ -273,13 +273,74 @@
         new(6, "Alpine Energy GmbH", "EU", "Starter", "At Risk", 24_000m, 95)
     ];
 
+    public sealed class QuickDeal
+    {
+        public string Name { get; set; } = "";
+        public string Region { get; set; } = "";
+        public decimal Arr { get; set; }
+        public string ApiKey { get; set; } = "";
+    }
+
+    public sealed class ImportedAccount
+    {
+        public string Name { get; set; } = "";
+        public string Region { get; set; } = "";
+        public string Plan { get; set; } = "";
+        public decimal Arr { get; set; }
+    }
+
+    public sealed class NewAccount
+    {
+        public string Name { get; set; } = "";
+        public string Region { get; set; } = "";
+        public string Plan { get; set; } = "";
+        public decimal Arr { get; set; }
+        public string? Vat { get; set; }
+    }
+
+    private static readonly FormSchema<QuickDeal> QuickDealSchema = FormSchema.For<QuickDeal>(s =>
+    {
+        s.FormKey = "quick-deal";
+        s.Title = "Quick Deal";
+        s.Field(m => m.Name, f => f.Label("Account Name").Required().Default("Aether Dynamics"));
+        s.Field(m => m.Region, f => f.Default("EU").Options(
+        [
+            new FormOption<string>("EU", "Europe"),
+            new FormOption<string>("US", "US"),
+            new FormOption<string>("APAC", "APAC"),
+        ]));
+        s.Field(m => m.Arr, f => f.Label("ARR (€)").Range(1000m, 100_000_000m).Default(85000m));
+        s.Field(m => m.ApiKey, f => f.Label("Webhook Secret").AsPassword().Default("sk_live_hidden_9999"));
+    });
+
+    private static readonly FormSchema<NewAccount> NewAccountSchema = FormSchema.For<NewAccount>(s =>
+    {
+        s.FormKey = "create-account";
+        s.Title = "New Customer Account";
+        s.Field(m => m.Name, f => f.Label("Company Name").Required());
+        var region = s.Field(m => m.Region, f => f.Default("EU").Options(
+        [
+            new FormOption<string>("EU", "Europe"),
+            new FormOption<string>("US", "North America"),
+            new FormOption<string>("APAC", "Asia-Pacific"),
+        ]));
+        s.Field(m => m.Plan, f => f.Default("Enterprise").Options(
+        [
+            new FormOption<string>("Starter", "Starter"),
+            new FormOption<string>("Pro", "Pro"),
+            new FormOption<string>("Enterprise", "Enterprise"),
+        ]));
+        s.Field(m => m.Arr, f => f.Label("Annual Contract (€)").Range(1000m, 100_000_000m).Default(75000m));
+        s.Field(m => m.Vat, f => f.Label("EU VAT ID (visible for EU)").VisibleWhen(c => c.Get(region) == "EU").Required(c => c.Get(region) == "EU"));
+    });
+
     private readonly UndoStack<AccountRecord[]> _history;
     private readonly DashboardController _dashboard = new("revops");
     private readonly DashboardFilterControl _regionFilter;
     private readonly DashboardResource<int> _kpiWave;
     private readonly AgentBridgeService _agent = new();
-    private readonly FormController _quickDealForm;
-    private readonly SpreadsheetImporter _importer;
+    private readonly FormController<QuickDeal> _quickDealForm;
+    private readonly SpreadsheetImporter<ImportedAccount> _importer;
     private IDisposable? _observeSub;
 
     private string _activeTab = "overview";
@@ -328,47 +389,34 @@
         _kpiWave = _dashboard.RegisterResource(new DashboardResource<int>(
             "kpis", _ => Task.FromResult(_accounts.Count), DashboardQueryStage.Essential));
 
-        _quickDealForm = new FormController(new FormSchema
-        {
-            FormKey = "quick-deal",
-            Title = "Quick Deal",
-            Fields =
-            [
-                new FormFieldSchema { Key = "name", Label = "Account Name", Required = true, DefaultValue = "Aether Dynamics" },
-                new FormFieldSchema { Key = "region", Label = "Region", Kind = FormFieldKind.Select, DefaultValue = "EU", Options = [new("EU", "Europe"), new("US", "US"), new("APAC", "APAC")] },
-                new FormFieldSchema { Key = "arr", Label = "ARR (€)", Kind = FormFieldKind.Number, Min = 1000, DefaultValue = 85000.0 },
-                new FormFieldSchema { Key = "apiKey", Label = "Webhook Secret", Kind = FormFieldKind.Password, DefaultValue = "sk_live_hidden_9999" }
-            ]
-        });
+        _quickDealForm = new FormController<QuickDeal>(QuickDealSchema);
 
-        _importer = new SpreadsheetImporter(new SpreadsheetSchema
+        _importer = new SpreadsheetImporter<ImportedAccount>(SpreadsheetSchema.For<ImportedAccount>(sheet =>
         {
-            Key = "accounts-import",
-            BatchSize = 50,
-            Columns =
+            sheet.Key = "accounts-import";
+            sheet.BatchSize = 50;
+            sheet.Column(r => r.Name, c => c.Label("Account Name").Headers("Nom", "Account").Required());
+            sheet.Column(r => r.Region, c => c.Label("Region").Headers("Région").Required().Options(
             [
-                new SpreadsheetColumnSchema { Key = "name", Label = "Account Name", Headers = ["Nom", "Account"], Required = true },
-                new SpreadsheetColumnSchema { Key = "region", Label = "Region", Headers = ["Région"], Kind = SpreadsheetColumnKind.Select, Required = true, Options = [new("EU", "Europe", ["eu", "europe"]), new("US", "US", ["us"]), new("APAC", "APAC", ["apac"])] },
-                new SpreadsheetColumnSchema { Key = "plan", Label = "Plan", Headers = ["Offre"], Required = true },
-                new SpreadsheetColumnSchema { Key = "arr", Label = "ARR", Headers = ["Revenu"], Kind = SpreadsheetColumnKind.Number, DecimalSeparator = ',', Required = true, Rules = [SpreadsheetRule.Min(0)] }
-            ],
-            OnSubmit = batch =>
+                new SpreadsheetOption<string?>("EU", "Europe", ["eu", "europe"]),
+                new SpreadsheetOption<string?>("US", "US", ["us"]),
+                new SpreadsheetOption<string?>("APAC", "APAC", ["apac"]),
+            ]));
+            sheet.Column(r => r.Plan, c => c.Label("Plan").Headers("Offre").Required());
+            sheet.Column(r => r.Arr, c => c.Label("ARR").Headers("Revenu").Required().DecimalSeparator(',').Rule(SpreadsheetRule.Min(0m)));
+            sheet.OnSubmit = batch =>
             {
                 var nextId = _accounts.Max(a => a.Id) + 1;
                 foreach (var row in batch)
                 {
-                    var name = row.Data.GetValueOrDefault("name")?.ToString() ?? "Imported";
-                    var region = row.Data.GetValueOrDefault("region")?.ToString() ?? "EU";
-                    var plan = row.Data.GetValueOrDefault("plan")?.ToString() ?? "Pro";
-                    var arr = Convert.ToDecimal(row.Data.GetValueOrDefault("arr") ?? 25000m, CultureInfo.InvariantCulture);
-                    _accounts.Add(new AccountRecord(nextId++, name, region, plan, "Active", arr, 50));
+                    _accounts.Add(new AccountRecord(nextId++, row.Value.Name, row.Value.Region, row.Value.Plan, "Active", row.Value.Arr, 50));
                 }
                 _history.Record([.. _accounts]);
                 _importedNotice = batch.Count == 1 ? "Imported 1 account." : $"Imported {batch.Count} accounts.";
                 InvokeAsync(StateHasChanged);
                 return Task.FromResult<IReadOnlyList<SpreadsheetRejectedRow>?>(null);
-            }
-        });
+            };
+        }));
         _importer.LoadText("Nom;Région;Offre;Revenu\nSolaris AI;EU;Enterprise;132000,00\nPacific Data;APAC;Pro;48500,00", "new-accounts.csv");
 
         _agent.RegisterForm(_quickDealForm, confirmSubmit: true);
@@ -449,32 +497,11 @@
 
     private async Task OpenCreateAccountDrawerAsync()
     {
-        var schema = new FormSchema
-        {
-            FormKey = "create-account",
-            Title = "New Customer Account",
-            Fields =
-            [
-                new FormFieldSchema { Key = "name", Label = "Company Name", Required = true },
-                new FormFieldSchema { Key = "region", Label = "Region", Kind = FormFieldKind.Select, DefaultValue = "EU", Options = [new("EU", "Europe"), new("US", "North America"), new("APAC", "Asia-Pacific")] },
-                new FormFieldSchema { Key = "plan", Label = "Plan", Kind = FormFieldKind.Select, DefaultValue = "Enterprise", Options = [new("Starter", "Starter"), new("Pro", "Pro"), new("Enterprise", "Enterprise")] },
-                new FormFieldSchema { Key = "arr", Label = "Annual Contract (€)", Kind = FormFieldKind.Number, Min = 1000, DefaultValue = 75000.0 },
-                new FormFieldSchema { Key = "vat", Label = "EU VAT ID (visible for EU)", Condition = f => f.GetValue<string>("region") == "EU", RequiredWhen = f => f.GetValue<string>("region") == "EU" }
-            ]
-        };
-
-        var outcome = await FormService.CreateFormAsync(schema, mode: FormShellMode.Drawer);
-        if (outcome.IsCompleted)
+        var outcome = await FormService.CreateFormAsync(NewAccountSchema, mode: FormShellMode.Drawer);
+        if (outcome is { IsCompleted: true, Model: { } created })
         {
             var nextId = _accounts.Max(a => a.Id) + 1;
-            _accounts.Add(new AccountRecord(
-                nextId,
-                outcome.FormData.GetValueOrDefault("name")?.ToString() ?? "New Account",
-                outcome.FormData.GetValueOrDefault("region")?.ToString() ?? "EU",
-                outcome.FormData.GetValueOrDefault("plan")?.ToString() ?? "Enterprise",
-                "Active",
-                Convert.ToDecimal(outcome.FormData.GetValueOrDefault("arr") ?? 75000m, CultureInfo.InvariantCulture),
-                45));
+            _accounts.Add(new AccountRecord(nextId, created.Name, created.Region, created.Plan, "Active", created.Arr, 45));
             _history.Record([.. _accounts]);
             _activeTab = "accounts";
         }
@@ -499,19 +526,12 @@
         });
     }
 
-    private void HandleQuickDealSubmit(IReadOnlyDictionary<string, object?> data)
+    private void HandleQuickDealSubmit(QuickDeal deal)
     {
         var nextId = _accounts.Max(a => a.Id) + 1;
-        _accounts.Add(new AccountRecord(
-            nextId,
-            data.GetValueOrDefault("name")?.ToString() ?? "AI Deal",
-            data.GetValueOrDefault("region")?.ToString() ?? "EU",
-            "Enterprise",
-            "Active",
-            Convert.ToDecimal(data.GetValueOrDefault("arr") ?? 85000m, CultureInfo.InvariantCulture),
-            55));
+        _accounts.Add(new AccountRecord(nextId, deal.Name, deal.Region, "Enterprise", "Active", deal.Arr, 55));
         _history.Record([.. _accounts]);
-        _agentLog = $"[Deal Added] {data.GetValueOrDefault("name")} · €{data.GetValueOrDefault("arr")}\n" + _agentLog;
+        _agentLog = $"[Deal Added] {deal.Name} · €{deal.Arr}\n" + _agentLog;
     }
 
     private async Task AgentFilterEuAsync()
@@ -537,13 +557,13 @@
             new AgentActStep("ARR (€)", "setValue", [165000.0])
         ]);
         var secretSnap = _agent.Snapshot().FirstOrDefault(s => s.Label == "Webhook Secret")?.Value;
-        _agentLog = $"Act(Prefill) Ok={res.Ok} · Secret in Snapshot = \"{secretSnap}\"\n" + _agentLog;
+        _agentLog = $"Act(Prefill) Ok={res.Ok} · Secret in Snapshot = \"{secretSnap?.ToDisplayString()}\"\n" + _agentLog;
     }
 
     private async Task AgentSubmitDealAsync()
     {
         var res = await _agent.ActAsync([new AgentActStep("Quick Deal", "submit")]);
-        if (res.Ok) HandleQuickDealSubmit(_quickDealForm.BuildOutput());
+        if (res.Ok) HandleQuickDealSubmit(_quickDealForm.CreateModel());
         _agentLog = res.Ok ? "Policy approved · Deal submitted.\n" + _agentLog : $"Policy refused: {res.Error}\n" + _agentLog;
     }
 

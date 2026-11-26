@@ -35,7 +35,7 @@ public static partial class KlyrooLibraryDocs
                         TableHeaders: ["Package", "Primary Exports", "Compatibility"],
                         TableRows:
                         [
-                            new("Klyroo.Spreadsheet.Core", "SpreadsheetImporter, SpreadsheetSchema, SpreadsheetColumnSchema, SpreadsheetRule, SpreadsheetOption, SpreadsheetRow", "Headless C# · IsAotCompatible=true"),
+                            new("Klyroo.Spreadsheet.Core", "SpreadsheetImporter<TRow>, SpreadsheetSchema.For<TRow>, SpreadsheetColumn<TRow, TValue>, SpreadsheetRule, SpreadsheetOption<TValue>, SpreadsheetRow<TRow>", "Headless C# · IsAotCompatible=true"),
                             new("Klyroo.Spreadsheet", "KlySpreadsheetImport, AddKlyrooSpreadsheet()", "browser, ios, android, maccatalyst, windows")
                         ])
                 ]),
@@ -62,56 +62,54 @@ public static partial class KlyrooLibraryDocs
             // GROUP 2: IMPORT PIPELINE DEEP DIVE
             // =========================================================================
             new("schema", "Schema, Columns & Validation Rules", "Import Pipeline",
-                "Configure column kinds, header aliases, decimal separators, date formats, built-in validation rules, custom parsers, and cross-field row validators.",
+                "Declare the columns of a row class, with header aliases, decimal separators, date formats, built-in validation rules, custom parsers, and cross-field row validators.",
                 [
-                    new("kinds", "All 5 SpreadsheetColumnKind Values & Built-In SpreadsheetRule Factories",
+                    new("kinds", "Column Kinds from the Property Type & Built-In SpreadsheetRule Factories",
                         TableHeaders: ["Column Kind / Rule", "Configuration", "Behavior"],
                         TableRows:
                         [
-                            new("SpreadsheetColumnKind.Text", "SpreadsheetRule.Email(), Pattern(regex)", "Trimmed string with regex/email validation and Error or Warning IssueLevel"),
-                            new("SpreadsheetColumnKind.Number", "DecimalSeparator ('.' or ','), Min, Max, Between", "Locale-aware number parsing with numeric bounds"),
-                            new("SpreadsheetColumnKind.Date", "DateFormats (custom format list)", "Exact and ISO date parsing"),
-                            new("SpreadsheetColumnKind.Boolean", "DefaultValue / HasDefault", "Parses true/false, yes/no, 1/0"),
-                            new("SpreadsheetColumnKind.Select", "Options, UnknownPolicy, OnCreateOption", "Matches Value, Label, or Aliases case/accent-insensitively")
+                            new("string (SpreadsheetColumnKind.Text)", "SpreadsheetRule.Email(), Pattern(regex)", "Trimmed string with regex/email validation and Error or Warning IssueLevel"),
+                            new("int, decimal, double... (Number)", "DecimalSeparator ('.' or ','), Min, Max, Between", "Locale-aware number parsing with numeric bounds; a whole number type refuses 1.5"),
+                            new("DateOnly, DateTime, DateTimeOffset (Date)", "DateFormats (custom format list)", "Exact and ISO date parsing"),
+                            new("bool (Boolean)", "Default(value)", "Parses true/false, yes/no, 1/0"),
+                            new("enum or Options(...) (Select)", "Options, UnknownPolicy, OnCreateOption", "Matches Value, Label, or Aliases case/accent-insensitively")
                         ]),
                     new("example", "Full SpreadsheetSchema with Cross-Field ValidateRow & Batch OnSubmit",
                         CodeSamples:
                         [
                             new("RatesSchema.cs", """
-                                var schema = new SpreadsheetSchema
+                                public enum Currency { Eur, Usd }
+
+                                public sealed class RateRow
                                 {
-                                    Key = "rates",
-                                    MaxRows = 5000,
-                                    RowKeyField = "code",
-                                    Duplicates = SpreadsheetDuplicatesPolicy.Error,
-                                    ExistingAction = SpreadsheetExistingAction.Update,
-                                    BatchSize = 100,
-                                    Columns =
+                                    public string Code { get; set; } = "";
+                                    public decimal Price { get; set; }
+                                    public Currency Currency { get; set; }
+                                }
+
+                                var schema = SpreadsheetSchema.For<RateRow>(s =>
+                                {
+                                    s.Key = "rates";
+                                    s.MaxRows = 5000;
+                                    s.Duplicates = SpreadsheetDuplicatesPolicy.Error;
+                                    s.ExistingAction = SpreadsheetExistingAction.Update;
+                                    s.BatchSize = 100;
+
+                                    var code = s.Column(r => r.Code, c => c.Label("Code").Headers("SKU", "Item Code").Required());
+                                    s.Column(r => r.Price, c => c.Label("Unit Price").DecimalSeparator(',')
+                                        .Rule(SpreadsheetRule.Between(0m, 100_000m, "Price must be between 0 and 100,000")));
+                                    s.Column(r => r.Currency, c => c.Label("Currency").UnknownPolicy(SpreadsheetUnknownValuePolicy.Ask).Options(
                                     [
-                                        new SpreadsheetColumnSchema { Key = "code", Label = "Code", Headers = ["SKU", "Item Code"], Required = true },
-                                        new SpreadsheetColumnSchema
-                                        {
-                                            Key = "price", Label = "Unit Price", Kind = SpreadsheetColumnKind.Number,
-                                            DecimalSeparator = ',', Required = true,
-                                            Rules = [SpreadsheetRule.Between(0, 100_000, "Price must be between 0 and 100,000")]
-                                        },
-                                        new SpreadsheetColumnSchema
-                                        {
-                                            Key = "currency", Label = "Currency", Kind = SpreadsheetColumnKind.Select,
-                                            Required = true, UnknownPolicy = SpreadsheetUnknownValuePolicy.Ask,
-                                            Options =
-                                            [
-                                                new SpreadsheetOption("EUR", "Euro", ["€", "EUR"]),
-                                                new SpreadsheetOption("USD", "US Dollar", ["$", "USD"])
-                                            ]
-                                        }
-                                    ],
-                                    ValidateRow = data =>
-                                        (double?)data.GetValueOrDefault("price") == 0
-                                            ? [new SpreadsheetRowIssue("price", "Zero-price item marked promotional", SpreadsheetIssueLevel.Warning)]
-                                            : [],
-                                    OnSubmit = async batch => await api.UpsertRatesBatchAsync(batch)
-                                };
+                                        new SpreadsheetOption<Currency>(Currency.Eur, "Euro", ["€", "EUR"]),
+                                        new SpreadsheetOption<Currency>(Currency.Usd, "US Dollar", ["$", "USD"]),
+                                    ]));
+                                    s.RowKey(code);
+
+                                    s.ValidateRow = row => row.Price == 0
+                                        ? [new SpreadsheetRowIssue("Price", "promo", SpreadsheetIssueLevel.Warning, "Zero-price item marked promotional")]
+                                        : [];
+                                    s.OnSubmit = async batch => await api.UpsertRatesBatchAsync(batch);
+                                });
                                 """)
                         ])
                 ]),
@@ -143,7 +141,7 @@ public static partial class KlyrooLibraryDocs
                         TableRows:
                         [
                             new("SpreadsheetUnknownValuePolicy", "Ask, Error, SkipRows, LeaveEmpty, Create", "How unrecognized Select cell values are handled"),
-                            new("SpreadsheetDuplicatesPolicy", "Error, KeepFirst, KeepLast", "Handles repeated RowKeyField keys inside the uploaded file"),
+                            new("SpreadsheetDuplicatesPolicy", "Error, KeepFirst, KeepLast", "Handles repeated row keys (the column passed to s.RowKey) inside the uploaded file"),
                             new("SpreadsheetExistingAction", "Update, Skip, Error", "Handles rows matching Schema.ExistingRecords (sets Mode = Create/Update/Skip)"),
                             new("SpreadsheetRowStatus", "Valid, Warning, Blocking, Discarded", "Computed validation state per row"),
                             new("SpreadsheetDiscardReason", "Manual, Value, Limit, Duplicate, Existing", "Why a row was excluded from ImportableRows")
@@ -212,7 +210,7 @@ public static partial class KlyrooLibraryDocs
 
                                 // AI assistant repairs an invalid cell and advances the wizard
                                 await agent.ActAsync([
-                                    new AgentActStep("rates", "editCell", [0, "price", "49,90"]),
+                                    new AgentActStep("rates", "editCell", [0, "Price", "49,90"]),
                                     new AgentActStep("rates", "nextStep")
                                 ]);
                                 """)
@@ -242,13 +240,13 @@ public static partial class KlyrooLibraryDocs
                                     var rejected = new List<SpreadsheetRejectedRow>();
                                     foreach (var row in batch)
                                     {
-                                        var code = row.Data["code"]!.ToString()!;
+                                        var code = row.Value.Code;   // row.Value is the parsed RateRow
                                         if (await db.Products.AnyAsync(p => p.Code == code && p.Locked))
                                         {
-                                            rejected.Add(new SpreadsheetRejectedRow(row.Index, "SKU is locked in ERP", "code"));
+                                            rejected.Add(new SpreadsheetRejectedRow(row.Index, "SKU is locked in ERP", "Code"));
                                             continue;
                                         }
-                                        await UpsertProductAsync(db, row.Data);
+                                        await UpsertProductAsync(db, row.Value);
                                     }
                                     await db.SaveChangesAsync();
                                     return rejected;
@@ -273,7 +271,7 @@ public static partial class KlyrooLibraryDocs
             // GROUP 4: PLATFORMS
             // =========================================================================
             MauiAndAotPage("Klyroo.Spreadsheet", "Klyroo.Spreadsheet.Core", "Klyroo.Spreadsheet", "builder.Services.AddKlyrooSpreadsheet();",
-                "var importer = new SpreadsheetImporter(schema); importer.LoadText(csvText, \"rates.csv\");"),
+                "var importer = new SpreadsheetImporter<RateRow>(schema); importer.LoadText(csvText, \"rates.csv\");"),
 
             // =========================================================================
             // GROUP 5: LIVE EXAMPLES (5 INTERACTIVE DEMOS)
@@ -298,13 +296,10 @@ public static partial class KlyrooLibraryDocs
                         CodeSamples:
                         [
                             new("ReconcileLookup.cs", """
-                                new SpreadsheetColumnSchema
-                                {
-                                    Key = "level", Label = "Level", Kind = SpreadsheetColumnKind.Select,
-                                    UnknownPolicy = SpreadsheetUnknownValuePolicy.Ask,
-                                    Options = [new SpreadsheetOption("B2", "B2", ["b2", "upper-intermediate"])]
-                                };
-                                importer.AnswerValue("level", "C1-Advanced", new SpreadsheetValueAnswer(SpreadsheetValueAnswerAction.Map, "B2", "B2"));
+                                s.Column(r => r.Level, c => c
+                                    .UnknownPolicy(SpreadsheetUnknownValuePolicy.Ask)
+                                    .Options([new SpreadsheetOption<CandidateLevel>(CandidateLevel.B2, "B2", ["b2", "upper-intermediate"])]));
+                                importer.AnswerValue("Level", "C1-Advanced", new SpreadsheetValueAnswer(SpreadsheetValueAnswerAction.Map, "B2", "B2"));
                                 """)
                         ]),
                     new("unicode-nfd", "3. Accent-Insensitive (Unicode NFD) Normalization & Template Export",
@@ -325,8 +320,8 @@ public static partial class KlyrooLibraryDocs
                         CodeSamples:
                         [
                             new("InlineEdit.cs", """
-                                importer.EditCell(rowIndex: 0, fieldKey: "price", rawText: "49,90");
-                                importer.RevertCell(rowIndex: 0, fieldKey: "price");
+                                importer.EditCell(rowIndex: 0, fieldKey: "Price", rawText: "49,90");
+                                importer.RevertCell(rowIndex: 0, fieldKey: "Price");
                                 importer.DiscardRows([1]);
                                 string invalidCsv = importer.ExportInvalidRowsCsv();
                                 """)
@@ -341,7 +336,7 @@ public static partial class KlyrooLibraryDocs
                                 await importer.SubmitAsync();
                                 if (importer.RejectedCount > 0)
                                 {
-                                    importer.EditCell(rowIndex: 1, fieldKey: "code", rawText: "SKU-200-FIXED");
+                                    importer.EditCell(rowIndex: 1, fieldKey: "Code", rawText: "SKU-200-FIXED");
                                     await importer.RetryRejectedAsync();
                                 }
                                 """)
@@ -350,6 +345,6 @@ public static partial class KlyrooLibraryDocs
             new("api", "API Reference", "Reference",
                 "Complete public API reference for Klyroo.Spreadsheet.Core and Klyroo.Spreadsheet.",
                 [],
-                ApiTypes: [typeof(KlySpreadsheetImport), typeof(SpreadsheetImporter), typeof(SpreadsheetSchema), typeof(SpreadsheetColumnSchema), typeof(SpreadsheetRule), typeof(SpreadsheetRow)])
+                ApiTypes: [typeof(KlySpreadsheetImport), typeof(SpreadsheetImporter), typeof(SpreadsheetImporter<object>), typeof(SpreadsheetSchema), typeof(SpreadsheetSchema<object>), typeof(SpreadsheetColumnSchema), typeof(SpreadsheetRule), typeof(SpreadsheetRow), typeof(SpreadsheetRow<object>)])
         ]);
 }

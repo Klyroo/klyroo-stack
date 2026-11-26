@@ -12,10 +12,10 @@
         <KlyDataListErrorState />
         <div class="max-h-72 overflow-y-auto rounded-(--klyroo-radius) border border-(--klyroo-border)" data-testid="cursor-scroll">
             <KlyDataListTable Caption="Invoices with infinite scroll" Class="border-0 rounded-none">
-                <KlyDataListColumn Field="id" Title="No." Align="DataListAlign.End" />
-                <KlyDataListColumn Field="customer" />
-                <KlyDataListColumn Field="status" />
-                <KlyDataListColumn Field="amount" Align="DataListAlign.End" Format="C2" />
+                <KlyDataListFieldColumn Field="id" Title="No." Align="DataListAlign.End" />
+                <KlyDataListFieldColumn Field="customer" />
+                <KlyDataListFieldColumn Field="status" />
+                <KlyDataListFieldColumn Field="amount" Align="DataListAlign.End" Format="C2" />
             </KlyDataListTable>
             <KlyDataListInfiniteLoader Root="[data-testid='cursor-scroll']" RootMargin="0px 0px 40px 0px" ShowEnd="true" />
         </div>

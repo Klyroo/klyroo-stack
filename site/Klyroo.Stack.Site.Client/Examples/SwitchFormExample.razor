@@ -4,7 +4,7 @@
     <DataAnnotationsValidator />
     <KlySwitch @bind-Value="Model!.AcceptTerms" Label="I accept the terms" data-testid="terms" />
     <ValidationMessage For="() => Model!.AcceptTerms" class="text-sm text-(--klyroo-error-text)" />
-    <KlyButton Type="submit" Label="Save" />
+    <KlyButton Type="ButtonType.Submit" Label="Save" />
     @if (_saved)
     {
         <p role="status" class="text-sm text-(--klyroo-success-text)" data-testid="saved">Saved, terms accepted.</p>

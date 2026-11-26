@@ -1,16 +1,16 @@
 <div class="w-full">
     <KlyTable Items="People" Caption="Team members" Class="rounded-xl border border-(--klyroo-border)">
-        <KlyColumn TItem="Person" Title="Name" Field="p => p.Name" Sortable Class="font-medium text-(--klyroo-text)" />
-        <KlyColumn TItem="Person" Title="Role" Field="p => p.Role" Sortable />
-        <KlyColumn TItem="Person" Title="Joined" Field="p => p.Joined" Sortable>
+        <KlyColumn Title="Name" Field="p => p.Name" Sortable Class="font-medium text-(--klyroo-text)" />
+        <KlyColumn Title="Role" Field="p => p.Role" Sortable />
+        <KlyColumn Title="Joined" Field="p => p.Joined" Sortable>
             <Template>@context.Joined.ToString("MMM yyyy")</Template>
         </KlyColumn>
-        <KlyColumn TItem="Person" Title="Status">
+        <KlyTemplateColumn TItem="Person" Title="Status">
             <Template>
                 <KlyBadge Label="@context.Status" Variant="KlyVariant.Subtle" Size="KlySize.Sm"
                          Color="@(context.Status == "Active" ? KlyColor.Success : KlyColor.Neutral)" />
             </Template>
-        </KlyColumn>
+        </KlyTemplateColumn>
     </KlyTable>
 </div>
 

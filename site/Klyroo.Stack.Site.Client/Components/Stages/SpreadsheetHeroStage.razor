@@ -17,7 +17,7 @@
                 </button>
             }
         </div>
-        <span class="font-mono text-xs text-(--klyroo-text-muted)">10k rows benchmark: <strong class="text-(--klyroo-text-highlighted)">23.0 ms</strong></span>
+        <span class="font-mono text-xs text-(--klyroo-text-muted)">10k rows benchmark: <strong class="text-(--klyroo-text-highlighted)">38.0 ms</strong></span>
     </div>
 
     @* 5-Stage Signal Pipeline *@
@@ -77,7 +77,14 @@
     ];
 
     private string _presetKey = "french-banner";
-    private SpreadsheetImporter _importer = default!;
+    public sealed class PriceRow
+    {
+        public string Code { get; set; } = "";
+        public decimal Price { get; set; }
+        public string Currency { get; set; } = "";
+    }
+
+    private SpreadsheetImporter<PriceRow> _importer = default!;
 
     private CsvPreset ActivePreset => Presets.First(p => p.Key == _presetKey);
 
@@ -87,16 +94,17 @@
     {
         _presetKey = key;
         var preset = Presets.First(p => p.Key == key);
-        _importer = new SpreadsheetImporter(new SpreadsheetSchema
+        _importer = new SpreadsheetImporter<PriceRow>(SpreadsheetSchema.For<PriceRow>(sheet =>
         {
-            Key = $"stage-{key}",
-            Columns =
+            sheet.Key = $"stage-{key}";
+            sheet.Column(r => r.Code, c => c.Label("Code").Headers("Code", "SKU").Required());
+            sheet.Column(r => r.Price, c => c.Label("Unit Price").Headers("Montant", "Amount", "Prix").Required().DecimalSeparator(',').Rule(SpreadsheetRule.Min(0m)));
+            sheet.Column(r => r.Currency, c => c.Label("Currency").Headers("Devise", "Currency").Required().Options(
             [
-                new SpreadsheetColumnSchema { Key = "code", Label = "Code", Headers = ["Code", "SKU"], Required = true },
-                new SpreadsheetColumnSchema { Key = "price", Label = "Unit Price", Headers = ["Montant", "Amount", "Prix"], Kind = SpreadsheetColumnKind.Number, DecimalSeparator = ',', Required = true, Rules = [SpreadsheetRule.Min(0)] },
-                new SpreadsheetColumnSchema { Key = "currency", Label = "Currency", Headers = ["Devise", "Currency"], Kind = SpreadsheetColumnKind.Select, Required = true, Options = [new("EUR", "Euro", ["€", "EUR"]), new("USD", "US Dollar", ["$", "USD"])] }
-            ]
-        });
+                new SpreadsheetOption<string?>("EUR", "Euro", ["€", "EUR"]),
+                new SpreadsheetOption<string?>("USD", "US Dollar", ["$", "USD"]),
+            ]));
+        }));
         _importer.LoadText(preset.Csv, preset.FileName);
     }
 }

@@ -13,7 +13,7 @@
 
     private static readonly KlyAuthField[] Fields =
     [
-        new("code", "otp") { Label = "Verification code", Length = 6, Required = true, Help = "The code expires in 10 minutes." },
+        new("code", KlyAuthFieldType.Otp) { Label = "Verification code", Length = 6, Required = true, Help = "The code expires in 10 minutes." },
     ];
 
     private Task VerifyAsync(IReadOnlyDictionary<string, string?> values)
