@@ -25,7 +25,7 @@
         new("Q1", 4200, 3100), new("Q2", 5100, 2800), new("Q3", 4700, 3600), new("Q4", 6900, 4100),
     ];
 
-    // With several series, a click on a bar reports the bar under the pointer; from the keyboard, the first series that has a value.
+    // With several series, a click on a bar reports the bar under the pointer; from the keyboard, with several series, no series is named (SeriesKey is null) and Item is the row to work from.
     private static readonly KlyChartCategory<Sale>[] _categories =
     [
         new("online", s => s.Online) { Label = "Online" },
