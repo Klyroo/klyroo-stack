@@ -1,0 +1,75 @@
+name: Docs pages
+
+# Builds the documentation site of one Klyroo library and publishes it to GitHub Pages at https://klyroo.github.io/<repo>/.
+# It is called from .github/workflows/docs.yml of each library repository:
+#
+#   jobs:
+#     docs:
+#       uses: Klyroo/klyroo-stack/.github/workflows/docs-pages.yml@main
+#       with:
+#         repo: klyroo-table
+#
+# The calling workflow has to grant the permissions below, because a reusable workflow cannot have more than its caller.
+# GitHub Pages must be set to "GitHub Actions" as its source in the settings of the library repository (once; nothing here changes settings).
+
+on:
+  workflow_call:
+    inputs:
+      repo:
+        description: The name of the calling repository, which is the address of the site (https://klyroo.github.io/<repo>/).
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # The three repositories side by side: the site project refers to ../../../klyroo-ui by relative path, like the other projects of klyroo-stack.
+      - name: Check out the library
+        uses: actions/checkout@v4
+        with:
+          path: ${{ inputs.repo }}
+      - name: Check out klyroo-stack (the docs site)
+        if: inputs.repo != 'klyroo-stack'
+        uses: actions/checkout@v4
+        with:
+          repository: klyroo/klyroo-stack
+          path: klyroo-stack
+      - name: Check out klyroo-ui (referenced by relative path)
+        if: inputs.repo != 'klyroo-ui'
+        uses: actions/checkout@v4
+        with:
+          repository: klyroo/klyroo-ui
+          path: klyroo-ui
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Export the site
+        env:
+          REPO: ${{ inputs.repo }}
+        run: |
+          dotnet run -c Release --project klyroo-stack/docs-site/Klyroo.Docs.Site -- \
+            export --repo "$GITHUB_WORKSPACE/$REPO" --name "$REPO" --out "$GITHUB_WORKSPACE/_site"
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
