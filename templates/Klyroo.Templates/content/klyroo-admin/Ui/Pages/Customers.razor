@@ -27,14 +27,14 @@
                     <KlyDataListFilterTags TItem="Customer" ShowClear="true" />
                     <KlyDataListSelectionActions TItem="Customer" Actions="_bulkActions" />
                     <KlyDataListTable TItem="Customer" RowActions="_rowActions">
-                        <KlyDataListColumn TItem="Customer" Field="name" Title="Customer" Required />
-                        <KlyDataListColumn TItem="Customer" Field="region" Title="Region" />
-                        <KlyDataListColumn TItem="Customer" Field="health" Title="Health">
+                        <KlyDataListFieldColumn TItem="Customer" Field="name" Title="Customer" Required />
+                        <KlyDataListFieldColumn TItem="Customer" Field="region" Title="Region" />
+                        <KlyDataListTemplateColumn TItem="Customer" Key="health" Title="Health">
                             <Template Context="customer">
                                 <KlyBadge Label="@customer.Health.ToString()" Variant="KlyVariant.Soft" Color="HealthColor(customer.Health)" Size="KlySize.Sm" />
                             </Template>
-                        </KlyDataListColumn>
-                        <KlyDataListColumn TItem="Customer" Field="arr" Title="Annual revenue (EUR)" Format="N0" Align="DataListAlign.End"
+                        </KlyDataListTemplateColumn>
+                        <KlyDataListFieldColumn TItem="Customer" Field="arr" Title="Annual revenue (EUR)" Format="N0" Align="DataListAlign.End"
                                            Summary="DataListSummaryKind.Sum" SummaryFormat="N0" />
                     </KlyDataListTable>
                     <KlyDataListPagination TItem="Customer" />
@@ -121,22 +121,22 @@
         var outcome = await Forms.CreateFormAsync(CustomerForms.Schema("New customer", editing: false), mode: FormShellMode.Drawer);
         if (!outcome.IsCompleted) return;
 
-        var (name, contact, region, tier, arr) = CustomerForms.Read(outcome.FormData);
-        Store.Add(name, contact, region, tier, arr);
+        var created = outcome.Model!;
+        Store.Add(created.Name, created.Contact, created.Region, created.Tier, created.Arr);
         Reload();
-        await Toasts.Add(new KlyToast { Title = "Customer created", Description = name, Color = KlyColor.Success });
+        await Toasts.Add(new KlyToast { Title = "Customer created", Description = created.Name, Color = KlyColor.Success });
     }
 
     private async Task EditAsync(DataListRowActionContext<Customer> context)
     {
         var customer = context.Item;
-        var outcome = await Forms.CreateFormAsync(CustomerForms.Schema($"Edit {customer.Name}", editing: true), CustomerForms.Input(customer), FormShellMode.Drawer);
+        var outcome = await Forms.CreateFormAsync(CustomerForms.Schema($"Edit {customer.Name}", editing: true), CustomerForms.Of(customer), FormShellMode.Drawer);
         if (!outcome.IsCompleted) return;
 
-        var (name, contact, region, tier, arr) = CustomerForms.Read(outcome.FormData);
-        Store.Update(customer with { Name = name, Contact = contact, Region = region, Tier = tier, Arr = arr });
+        var edited = outcome.Model!;
+        Store.Update(customer with { Name = edited.Name, Contact = edited.Contact, Region = edited.Region, Tier = edited.Tier, Arr = edited.Arr });
         Reload();
-        await Toasts.Add(new KlyToast { Title = "Customer saved", Description = name, Color = KlyColor.Success });
+        await Toasts.Add(new KlyToast { Title = "Customer saved", Description = edited.Name, Color = KlyColor.Success });
     }
 
     // The list reads a new collection: it loads its rows again, with the search, the filters and the page it had.

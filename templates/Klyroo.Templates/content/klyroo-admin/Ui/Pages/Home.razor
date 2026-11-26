@@ -15,20 +15,20 @@
                               Value="_summary.Data?.Arr" Compare="_summary.Data?.PreviousArr"
                               TextValue="@(_summary.Data is { } s ? Money.Compact(s.Arr) : null)" />
             <KlyDashboardStat Source="_summary" Label="At risk" Span="3" Format="DashboardFormatPreset.Integer" InvertDelta
-                              Value="_summary.Data?.AtRisk" Compare="_summary.Data?.PreviousAtRisk" CompareMode="difference"
+                              Value="_summary.Data?.AtRisk" Compare="_summary.Data?.PreviousAtRisk" CompareMode="DashboardCompareMode.Difference"
                               Caption="Customers with a health score under 50" />
             <KlyDashboardGauge Source="_summary" Title="Average health" Span="3" Format="DashboardFormatPreset.Integer"
                                Value="_summary.Data?.AverageHealth" Target="70" Caption="of 100" />
 
             <KlyDashboardChart Source="_trend" Title="Annual recurring revenue" Subtitle="The last twelve months, from the customers that had signed" Span="8"
-                               Type="line" Format="DashboardFormatPreset.Compact" ShowLegend="false" Height="240"
+                               Type="DashboardChartType.Line" Format="DashboardFormatPreset.Compact" ShowLegend="false" Height="240"
                                Categories="_trend.Data?.Select(p => p.Month).ToList()"
-                               Series="@(_trend.Data is { } points ? new[] { new DashboardChartSeries("arr", "ARR", points.Select(p => p.Arr).ToList(), "line") } : null)" />
+                               Series="@(_trend.Data is { } points ? new[] { new DashboardChartSeries("arr", "ARR", points.Select(p => p.Arr).ToList(), DashboardChartSeriesType.Line) } : null)" />
             <KlyDashboardBars Source="_regions" Title="Revenue by region" Subtitle="All customers" Span="4" Format="DashboardFormatPreset.Compact"
                               Items="_regions.Data?.Select(r => new DashboardBarItem(r.Region, r.Arr, Tag: r.Customers.ToString(), Meta: Money.Compact(r.Arr))).ToList()" />
 
             <KlyDashboardTable Source="_top" Title="Biggest customers" Span="7" Menu="true" Columns="_topColumns"
-                               Rows="TopRows" />
+                               Rows="_top.Data" />
             <KlyDashboardFeed Source="_activity" Title="Recent activity" Subtitle="The newest contracts" Span="5" GroupByDay="false"
                               Items="_activity.Data?.Select(a => new DashboardFeedItem(a.Title, a.Time, a.Detail, a.Initials)).ToList()" />
         </KlyDashboardGrid>
@@ -44,17 +44,13 @@
     private DashboardResource<ActivityEntry[]> _activity = default!;
     private IDisposable? _persistence;
 
-    // One dictionary per row, with the raw value of each column by key.
-    private IReadOnlyList<IReadOnlyDictionary<string, object?>>? TopRows => _top.Data?
-        .Select(c => (IReadOnlyDictionary<string, object?>)new Dictionary<string, object?> { ["name"] = c.Name, ["region"] = c.Region, ["arr"] = c.Arr, ["health"] = c.Health })
-        .ToList();
-
-    private static readonly DashboardTableColumn[] _topColumns =
+    // A column reads its value from the row with a delegate, so a renamed property is a compile error and not an empty cell.
+    private static readonly DashboardTableColumn<TopCustomer>[] _topColumns =
     [
-        new("name", "Customer", Sortable: false),
-        new("region", "Region"),
-        new("arr", "Annual revenue", "number", DashboardFormatPreset.Compact),
-        new("health", "Health", "percent"),
+        DashboardTableColumn.For<TopCustomer, string>("name", "Customer", c => c.Name, sortable: false),
+        DashboardTableColumn.For<TopCustomer, string>("region", "Region", c => c.Region),
+        DashboardTableColumn.For<TopCustomer, double>("arr", "Annual revenue", c => c.Arr, DashboardFormatPreset.Compact, DashboardTableColumnKind.Number),
+        DashboardTableColumn.For<TopCustomer, double>("health", "Health", c => c.Health, kind: DashboardTableColumnKind.Percent),
     ];
 
     protected override async Task OnInitializedAsync()

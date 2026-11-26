@@ -16,9 +16,9 @@
         var outcome = await Forms.CreateFormAsync(AccountForms.Schema("New account", editing: false), mode: FormShellMode.Drawer);
         if (!outcome.IsCompleted) return;
 
-        var (name, owner, plan, mrr) = AccountForms.Read(outcome.FormData);
-        Store.Add(name, owner, plan, mrr);
+        var account = outcome.Model!;
+        Store.Add(account.Name, account.Owner, account.Plan, account.Mrr);
         await List.RefreshAsync();
-        await Toasts.Add(new KlyToast { Title = "Account created", Description = $"{name} started a trial.", Color = KlyColor.Success });
+        await Toasts.Add(new KlyToast { Title = "Account created", Description = $"{account.Name} started a trial.", Color = KlyColor.Success });
     }
 }

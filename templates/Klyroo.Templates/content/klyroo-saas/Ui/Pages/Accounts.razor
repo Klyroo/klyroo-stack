@@ -25,17 +25,17 @@
             <KlyDataListFilterTags TItem="Account" ShowClear="true" />
             <KlyDataListSelectionActions TItem="Account" Actions="_bulkActions" />
             <KlyDataListTable TItem="Account" RowActions="_rowActions">
-                <KlyDataListColumn TItem="Account" Field="name" Title="Account" Required />
-                <KlyDataListColumn TItem="Account" Field="plan" Title="Plan" />
-                <KlyDataListColumn TItem="Account" Field="status" Title="Status">
+                <KlyDataListFieldColumn TItem="Account" Field="name" Title="Account" Required />
+                <KlyDataListFieldColumn TItem="Account" Field="plan" Title="Plan" />
+                <KlyDataListTemplateColumn TItem="Account" Key="status" Title="Status">
                     <Template Context="account">
                         <KlyBadge Label="@account.Status" Variant="KlyVariant.Soft" Color="StatusColor(account.Status)" Size="KlySize.Sm" />
                     </Template>
-                </KlyDataListColumn>
-                <KlyDataListColumn TItem="Account" Field="mrr" Title="MRR" Align="DataListAlign.End">
+                </KlyDataListTemplateColumn>
+                <KlyDataListTemplateColumn TItem="Account" Key="mrr" Title="MRR" Align="DataListAlign.End">
                     <Template Context="account">@Money.Format(account.Mrr)</Template>
-                </KlyDataListColumn>
-                <KlyDataListColumn TItem="Account" Field="since" Title="Customer since" Format="d" />
+                </KlyDataListTemplateColumn>
+                <KlyDataListFieldColumn TItem="Account" Field="since" Title="Customer since" Format="d" />
             </KlyDataListTable>
             <KlyDataListPagination TItem="Account" />
         </div>
@@ -88,12 +88,12 @@
     private async Task EditAsync(DataListRowActionContext<Account> context)
     {
         var account = context.Item;
-        var outcome = await Forms.CreateFormAsync(AccountForms.Schema($"Edit {account.Name}", editing: true), AccountForms.Input(account), FormShellMode.Drawer);
+        var outcome = await Forms.CreateFormAsync(AccountForms.Schema($"Edit {account.Name}", editing: true), AccountForms.Of(account), FormShellMode.Drawer);
         if (!outcome.IsCompleted) return;
 
-        var (name, owner, plan, mrr) = AccountForms.Read(outcome.FormData);
-        Store.Update(account with { Name = name, Owner = owner, Plan = plan, Mrr = mrr });
-        await Toasts.Add(new KlyToast { Title = "Account saved", Description = name, Color = KlyColor.Success });
+        var edited = outcome.Model!;
+        Store.Update(account with { Name = edited.Name, Owner = edited.Owner, Plan = edited.Plan, Mrr = edited.Mrr });
+        await Toasts.Add(new KlyToast { Title = "Account saved", Description = edited.Name, Color = KlyColor.Success });
     }
 
     private static KlyColor StatusColor(string status) => status switch

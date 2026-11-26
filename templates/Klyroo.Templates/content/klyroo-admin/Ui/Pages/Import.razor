@@ -17,7 +17,17 @@
 </AppPage>
 
 @code {
-    private SpreadsheetImporter _importer = default!;
+    // One row of the file, as the importer builds it. The schema below reads and writes these properties.
+    public sealed class CustomerRow
+    {
+        public string Name { get; set; } = "";
+        public string Contact { get; set; } = "";
+        public string Region { get; set; } = "EMEA";
+        public string Tier { get; set; } = "Standard";
+        public decimal Arr { get; set; }
+    }
+
+    private SpreadsheetImporter<CustomerRow> _importer = default!;
 
     private const string Sample =
         "Name,Contact,Region,Tier,Annual revenue\n" +
@@ -29,64 +39,32 @@
 
     protected override void OnInitialized()
     {
-        _importer = new SpreadsheetImporter(new SpreadsheetSchema
+        _importer = new SpreadsheetImporter<CustomerRow>(SpreadsheetSchema.For<CustomerRow>(s =>
         {
-            Key = "customers",
-            RowKeyField = "name",
-            Columns =
+            s.Key = "customers";
+            var name = s.Column(r => r.Name, c => c.Label("Name").Required().Example("Acme Corp"));
+            s.Column(r => r.Contact, c => c.Label("Contact").Required().Example("ada@acme.example"));
+            // A cell is matched against the label, the value and the aliases: "Europe" in a file lands on EMEA.
+            s.Column(r => r.Region, c => c.Label("Region").Required().Example("EMEA").Options(
             [
-                new SpreadsheetColumnSchema { Key = "name", Label = "Name", Required = true, Example = "Acme Corp" },
-                new SpreadsheetColumnSchema { Key = "contact", Label = "Contact", Required = true, Example = "ada@acme.example" },
-                new SpreadsheetColumnSchema
-                {
-                    Key = "region",
-                    Label = "Region",
-                    Kind = SpreadsheetColumnKind.Select,
-                    Required = true,
-                    Example = "EMEA",
-                    // A cell is matched against the label, the value and the aliases: "Europe" in a file lands on EMEA.
-                    Options =
-                    [
-                        new("EMEA", "EMEA", ["Europe"]),
-                        new("Americas", "Americas", ["US", "LATAM"]),
-                        new("APAC", "APAC", ["Asia"]),
-                    ],
-                },
-                new SpreadsheetColumnSchema
-                {
-                    Key = "tier",
-                    Label = "Tier",
-                    Kind = SpreadsheetColumnKind.Select,
-                    HasDefault = true,
-                    DefaultValue = "Standard",
-                    Example = "Plus",
-                    Options = [.. CustomerStore.Tiers.Select(t => new SpreadsheetOption(t, t))],
-                },
-                new SpreadsheetColumnSchema
-                {
-                    Key = "arr",
-                    Label = "Annual revenue",
-                    Kind = SpreadsheetColumnKind.Number,
-                    Required = true,
-                    Example = "48000",
-                    Rules = [SpreadsheetRule.Min(0)],
-                },
-            ],
-            OnSubmit = SaveAsync,
-        });
+                new SpreadsheetOption<string?>("EMEA", "EMEA", ["Europe"]),
+                new SpreadsheetOption<string?>("Americas", "Americas", ["US", "LATAM"]),
+                new SpreadsheetOption<string?>("APAC", "APAC", ["Asia"]),
+            ]));
+            s.Column(r => r.Tier, c => c.Label("Tier").Default("Standard").Example("Plus").Options(CustomerStore.Tiers.Select(t => new SpreadsheetOption<string?>(t, t))));
+            s.Column(r => r.Arr, c => c.Label("Annual revenue").Required().Example("48000").Rule(SpreadsheetRule.Min(0m)));
+            s.RowKey(name);
+            s.OnSubmit = SaveAsync;
+        }));
     }
 
     // Receives the importable rows, in batches. Persist them here; return the rows your server refused, or null.
-    private async Task<IReadOnlyList<SpreadsheetRejectedRow>?> SaveAsync(IReadOnlyList<SpreadsheetRow> rows)
+    private async Task<IReadOnlyList<SpreadsheetRejectedRow>?> SaveAsync(IReadOnlyList<SpreadsheetRow<CustomerRow>> rows)
     {
         foreach (var row in rows)
         {
-            Store.Add(
-                row.Data["name"]?.ToString() ?? "",
-                row.Data["contact"]?.ToString() ?? "",
-                row.Data["region"]?.ToString() ?? "EMEA",
-                row.Data["tier"]?.ToString() ?? "Standard",
-                Convert.ToDecimal(row.Data["arr"] ?? 0.0));
+            var customer = row.Value;
+            Store.Add(customer.Name, customer.Contact, customer.Region, customer.Tier, customer.Arr);
         }
         await Toasts.Add(new KlyToast { Title = "Customers imported", Description = $"{rows.Count} added to the list.", Color = KlyColor.Success });
         return null;

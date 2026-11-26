@@ -80,12 +80,12 @@
     private async Task EditAsync()
     {
         if (_customer is null) return;
-        var outcome = await Forms.CreateFormAsync(CustomerForms.Schema($"Edit {_customer.Name}", editing: true), CustomerForms.Input(_customer), FormShellMode.Drawer);
+        var outcome = await Forms.CreateFormAsync(CustomerForms.Schema($"Edit {_customer.Name}", editing: true), CustomerForms.Of(_customer), FormShellMode.Drawer);
         if (!outcome.IsCompleted) return;
 
-        var (name, contact, region, tier, arr) = CustomerForms.Read(outcome.FormData);
-        Store.Update(_customer with { Name = name, Contact = contact, Region = region, Tier = tier, Arr = arr });
+        var edited = outcome.Model!;
+        Store.Update(_customer with { Name = edited.Name, Contact = edited.Contact, Region = edited.Region, Tier = edited.Tier, Arr = edited.Arr });
         Load();
-        await Toasts.Add(new KlyToast { Title = "Customer saved", Description = name, Color = KlyColor.Success });
+        await Toasts.Add(new KlyToast { Title = "Customer saved", Description = edited.Name, Color = KlyColor.Success });
     }
 }

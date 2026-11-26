@@ -2,55 +2,42 @@ using Klyroo.Form;
 
 namespace KlyrooAdminApp.Services;
 
-/// <summary>The form that creates and edits a customer. FormService opens it in a drawer and returns what the user typed.</summary>
+/// <summary>What the customer form edits. The form reads and writes these properties, so its fields have the types the properties have.</summary>
+public sealed class CustomerForm
+{
+    public string Name { get; set; } = "";
+
+    public string Contact { get; set; } = "";
+
+    public string Region { get; set; } = "EMEA";
+
+    public string Tier { get; set; } = "Plus";
+
+    public decimal Arr { get; set; } = 50_000m;
+}
+
+/// <summary>The form that creates and edits a customer. FormService opens it in a drawer and returns the <see cref="CustomerForm"/> the user filled in.</summary>
 public static class CustomerForms
 {
-    public static FormSchema Schema(string title, bool editing) => new()
+    public static FormSchema<CustomerForm> Schema(string title, bool editing) => FormSchema.For<CustomerForm>(s =>
     {
-        FormKey = editing ? "edit-customer" : "new-customer",
-        Title = title,
-        Description = "Sample data: nothing is stored outside this session.",
-        Fields =
-        [
-            new FormFieldSchema { Key = "name", Label = "Company", Required = true, MaxLength = 80 },
-            new FormFieldSchema { Key = "contact", Label = "Contact email", Required = true, Placeholder = "name@company.com" },
-            new FormFieldSchema
-            {
-                Key = "region",
-                Label = "Region",
-                Kind = FormFieldKind.Select,
-                Required = true,
-                DefaultValue = "EMEA",
-                Options = [.. CustomerStore.Regions.Select(r => new FormOptionItem(r, r))],
-            },
-            new FormFieldSchema
-            {
-                Key = "tier",
-                Label = "Tier",
-                Kind = FormFieldKind.Radio,
-                Required = true,
-                DefaultValue = "Plus",
-                Options = [.. CustomerStore.Tiers.Select(t => new FormOptionItem(t, t))],
-            },
-            new FormFieldSchema { Key = "arr", Label = "Annual revenue (EUR)", Kind = FormFieldKind.Number, Required = true, Min = 0, Max = 10_000_000, Step = 1000, DefaultValue = 50_000.0 },
-        ],
-    };
+        s.FormKey = editing ? "edit-customer" : "new-customer";
+        s.Title = title;
+        s.Description = "Sample data: nothing is stored outside this session.";
+        s.Field(c => c.Name, f => f.Label("Company").Required().MaxLength(80));
+        s.Field(c => c.Contact, f => f.Label("Contact email").Required().Placeholder("name@company.com"));
+        s.Field(c => c.Region, f => f.Required().Options(CustomerStore.Regions.Select(r => new FormOption<string>(r, r))));
+        s.Field(c => c.Tier, f => f.Required().AsRadio().Options(CustomerStore.Tiers.Select(t => new FormOption<string>(t, t))));
+        s.Field(c => c.Arr, f => f.Label("Annual revenue (EUR)").Required().Range(0m, 10_000_000m).StepBy(1000m));
+    });
 
     /// <summary>The values of an existing customer, to show in the form.</summary>
-    public static Dictionary<string, object?> Input(Customer customer) => new()
+    public static CustomerForm Of(Customer customer) => new()
     {
-        ["name"] = customer.Name,
-        ["contact"] = customer.Contact,
-        ["region"] = customer.Region,
-        ["tier"] = customer.Tier,
-        ["arr"] = (double)customer.Arr,
+        Name = customer.Name,
+        Contact = customer.Contact,
+        Region = customer.Region,
+        Tier = customer.Tier,
+        Arr = customer.Arr,
     };
-
-    /// <summary>Reads the values of a submitted form. The number field gives a double, so the amount goes through Convert.ToDecimal.</summary>
-    public static (string Name, string Contact, string Region, string Tier, decimal Arr) Read(IReadOnlyDictionary<string, object?> data) => (
-        data["name"]?.ToString() ?? "",
-        data["contact"]?.ToString() ?? "",
-        data["region"]?.ToString() ?? "EMEA",
-        data["tier"]?.ToString() ?? "Plus",
-        Convert.ToDecimal(data["arr"] ?? 0.0));
 }

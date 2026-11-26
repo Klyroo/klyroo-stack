@@ -14,10 +14,10 @@
         <KlyDashboardStat Source="_summary" Label="Active accounts" Span="4" Format="DashboardFormatPreset.Integer"
                           Value="_summary.Data?.ActiveAccounts" Compare="_summary.Data?.PreviousActiveAccounts" />
         <KlyDashboardStat Source="_summary" Label="Churn rate" Span="4" Format="DashboardFormatPreset.Percent" InvertDelta
-                          Value="_summary.Data?.ChurnRate" Compare="_summary.Data?.PreviousChurnRate" CompareMode="difference" />
+                          Value="_summary.Data?.ChurnRate" Compare="_summary.Data?.PreviousChurnRate" CompareMode="DashboardCompareMode.Difference" />
 
         <KlyDashboardChart Source="_revenue" Title="Recurring revenue" Subtitle="The last twelve months, from the accounts that were paying" Span="8"
-                           Type="bar" Format="DashboardFormatPreset.Compact" ShowLegend="false" Height="240"
+                           Type="DashboardChartType.Bar" Format="DashboardFormatPreset.Compact" ShowLegend="false" Height="240"
                            Categories="_revenue.Data?.Select(p => p.Month).ToList()"
                            Series="@(_revenue.Data is { } points ? new[] { new DashboardChartSeries("mrr", "MRR", points.Select(p => p.Mrr).ToList()) } : null)" />
         <KlyDashboardBars Source="_plans" Title="Revenue by plan" Subtitle="Paying accounts only" Span="4" Format="DashboardFormatPreset.Compact"
