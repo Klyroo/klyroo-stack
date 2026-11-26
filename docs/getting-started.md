@@ -168,8 +168,8 @@ Delete `Components/Pages/Home.razor` if it exists and create `Components/Pages/P
     <div class="mt-4">
         <KlyDataList Schema="Schema" Items="_products" UrlSync="false">
             <KlyDataListTable TItem="Product">
-                <KlyDataListColumn TItem="Product" Field="name" Title="Product" />
-                <KlyDataListColumn TItem="Product" Field="price" Title="Price" Summary="DataListSummaryKind.Sum" />
+                <KlyDataListFieldColumn TItem="Product" Field="name" Title="Product" />
+                <KlyDataListFieldColumn TItem="Product" Field="price" Title="Price" Summary="DataListSummaryKind.Sum" />
             </KlyDataListTable>
         </KlyDataList>
     </div>
@@ -196,31 +196,34 @@ Delete `Components/Pages/Home.razor` if it exists and create `Components/Pages/P
 
     private async Task AddProductAsync()
     {
-        var outcome = await Forms.CreateFormAsync(new FormSchema
-        {
-            FormKey = "new-product",
-            Title = "New product",
-            Fields =
-            [
-                new FormFieldSchema { Key = "name", Label = "Name", Required = true },
-                new FormFieldSchema { Key = "price", Label = "Price", Kind = FormFieldKind.Number, DefaultValue = 50.0 },
-            ],
-        }, mode: FormShellMode.Drawer);
+        var outcome = await Forms.CreateFormAsync(NewProductSchema, mode: FormShellMode.Drawer);
 
-        if (outcome.IsCompleted)
+        if (outcome is { IsCompleted: true, Model: { } created })
         {
-            _products.Add(new Product(
-                _products.Count + 1,
-                outcome.FormData["name"]?.ToString() ?? "Product",
-                Convert.ToDecimal(outcome.FormData["price"] ?? 50m)));
+            _products.Add(new Product(_products.Count + 1, created.Name, created.Price));
         }
     }
+
+    // What the form edits: its fields are the members of this class, with the types the members have.
+    private sealed class NewProduct
+    {
+        public string Name { get; set; } = "";
+        public decimal Price { get; set; }
+    }
+
+    private static readonly FormSchema<NewProduct> NewProductSchema = FormSchema.For<NewProduct>(s =>
+    {
+        s.FormKey = "new-product";
+        s.Title = "New product";
+        s.Field(p => p.Name, f => f.Required());
+        s.Field(p => p.Price, f => f.Default(50m));
+    });
 }
 ```
 
 Run `dotnet run`, open the address it prints, and you see the two stat cards, the list sorted by name with a sum row under the price column, and a button that opens the drawer. `UrlSync="false"` keeps the list state out of the query string, which is what you want for an in-memory list on a single page. `FormService.CreateFormAsync` returns when the drawer closes, and `outcome.IsCompleted` is true only when the user submitted the form.
 
-The form values come back as `outcome.FormData`, a dictionary keyed by field key, so the number field is read with `Convert.ToDecimal`.
+The form fills a `NewProduct`, so the price comes back as a `decimal` in `outcome.Model` with no conversion. A form that is only known at run time uses the `Klyroo.Form.Dynamic` types instead, which key the values by name.
 
 ## Next steps
 

@@ -54,10 +54,10 @@ The `klyroo-maui` template is a complete MAUI Blazor Hybrid app built on the .NE
 
 - **`Klyroo.Stack.Core` and the `.Core` engines** are marked `IsAotCompatible` and `IsTrimmable`. CI builds each `src/*.Core` project of this repository with `EnableAotAnalyzer` and `EnableTrimAnalyzer`, and the `klyroo-headless` template was published with `PublishAot` on linux-x64 and ran: it executes a query, a spreadsheet import, a CSV preview, a form controller, a KPI format and an undo stack from one native binary.
 - **`Klyroo.Stack`** is `IsTrimmable` but not declared AOT compatible. Blazor apps are not NativeAOT-published; the trimming flag matters for the trimmed WebAssembly build.
-- **Headless schemas.** The `klyroo-headless` template builds a `DataListSchema` from Klyroo.Query and runs it under `PublishAot`, so that path works in a native binary. For the rest of its API, see the Klyroo.Query repository.
+- **Headless schemas.** The `klyroo-headless` template builds a `DataListSchema` from Klyroo.Query, a typed `SpreadsheetSchema` and a typed `FormSchema` and runs them under `PublishAot`, so those paths work in a native binary: the schemas read the members of your own classes through expressions that are never compiled. `Klyroo.Form.DataAnnotations` is trim-safe but not NativeAOT-safe, since it reads attributes by reflection. For the rest of the API, see the repository of each library.
 
 ## Limitations
 
-- The meta-package does not include `Klyroo.Query.EntityFrameworkCore`, `Klyroo.UI.Server` or `Klyroo.UI.Images`.
+- The meta-package does not include `Klyroo.Query.EntityFrameworkCore`, `Klyroo.UI.Server`, `Klyroo.UI.Images` or `Klyroo.Form.DataAnnotations`.
 - The MCP server runs on the .NET runtime, not as a native binary.
 - The tool and the templates require the .NET 10 runtime or newer.

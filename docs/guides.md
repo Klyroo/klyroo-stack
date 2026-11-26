@@ -196,19 +196,26 @@ using Microsoft.Extensions.DependencyInjection;
 var services = new ServiceCollection().AddKlyrooStack().BuildServiceProvider();
 var agent = services.GetRequiredService<AgentBridgeService>();
 
-var form = new FormController(new FormSchema
+var schema = FormSchema.For<QuickSetup>(s =>
 {
-    Title = "Quick setup",
-    Fields = [new FormFieldSchema { Key = "org", Label = "Organization" }],
+    s.Title = "Quick setup";
+    s.Field(m => m.Org, f => f.Label("Organization"));
 });
+var org = schema.Field(m => m.Org);
+var form = new FormController<QuickSetup>(schema);
 agent.RegisterForm(form);
 
 var result = await agent.ActAsync([new AgentActStep("Organization", "setValue", ["Acme"])]);
 Console.WriteLine(result.Ok);                       // True
-Console.WriteLine(form.GetValue<string>("org"));    // Acme
+Console.WriteLine(form.Get(org));                   // Acme
+
+sealed class QuickSetup
+{
+    public string Org { get; set; } = "";
+}
 ```
 
-The step targets the field by its label (`Organization`), not by its key (`org`). The same pattern works for dashboards (`RegisterDashboard`) and spreadsheet importers (`RegisterSpreadsheet`). The agent library has its own repository and guides: see [klyroo-agent](https://github.com/klyroo/klyroo-agent).
+The step targets the field by its label (`Organization`); its key (`Org`, the name of the member) works too. `RegisterForm` takes an `IFormRuntime`, so a `FormController<TModel>` and a `DynamicFormController` register the same way. The model cannot write a password or one-time code field, nor a field that belongs to another step of a wizard: name a sensitive field in `allowSensitiveWrites` when you want the model to fill it, and move through the steps with the `nextStep` action. The same pattern works for dashboards (`RegisterDashboard`) and spreadsheet importers (`RegisterSpreadsheet`). The agent library has its own repository and guides: see [klyroo-agent](https://github.com/klyroo/klyroo-agent).
 
 ## Connect a coding agent to the Klyroo.UI documentation
 
@@ -301,18 +308,25 @@ The providers have to sit in the layout, inside `KlyApp`, because the services o
 @code {
     private async Task AddNoteAsync()
     {
-        var outcome = await Forms.CreateFormAsync(new FormSchema
-        {
-            FormKey = "note",
-            Title = "New note",
-            Fields = [new FormFieldSchema { Key = "text", Label = "Note", Kind = FormFieldKind.Textarea, Required = true }],
-        }, mode: FormShellMode.Drawer);
+        var outcome = await Forms.CreateFormAsync(NoteSchema, mode: FormShellMode.Drawer);
 
-        if (outcome.IsCompleted)
+        if (outcome is { IsCompleted: true, Model: { } note })
         {
-            await Toasts.Add(new KlyToast { Title = "Note saved", Description = outcome.FormData["text"]?.ToString() });
+            await Toasts.Add(new KlyToast { Title = "Note saved", Description = note.Text });
         }
     }
+
+    private sealed class Note
+    {
+        public string Text { get; set; } = "";
+    }
+
+    private static readonly FormSchema<Note> NoteSchema = FormSchema.For<Note>(s =>
+    {
+        s.FormKey = "note";
+        s.Title = "New note";
+        s.Field(n => n.Text, f => f.Label("Note").AsTextarea().Required());
+    });
 }
 ```
 

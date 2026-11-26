@@ -39,6 +39,7 @@ Install the hub when you want every library with one registration call, or when 
 | One library with its components | The `Klyroo.<Library>` package, for example `Klyroo.Table` (it brings Klyroo.UI and Klyroo.Query) |
 | EF Core execution of Klyroo.Query | `Klyroo.Query.EntityFrameworkCore`, which `Klyroo.Stack` does not include |
 | Server-only helpers or the image pipeline of Klyroo.UI | `Klyroo.UI.Server` and `Klyroo.UI.Images`, which `Klyroo.Stack` does not include |
+| Forms that read `[Required]`, `[StringLength]`, `[Range]` and the other attributes of your models | `Klyroo.Form.DataAnnotations`, which `Klyroo.Stack` does not include |
 | Your coding agent to know the Klyroo.UI API | `Klyroo.Stack.Mcp` |
 
 ## Prerequisites
@@ -190,12 +191,19 @@ Then Blazor. With `AddKlyrooStack()` registered and the stylesheets loaded, wrap
 <KlyButton Label="New account" Color="KlyColor.Primary" OnClick="OpenFormAsync" />
 
 @code {
-    private Task OpenFormAsync() => Forms.CreateFormAsync(new FormSchema
+    private sealed class Account
     {
-        FormKey = "new-account",
-        Title = "New account",
-        Fields = [new FormFieldSchema { Key = "name", Label = "Company name", Required = true }],
-    }, mode: FormShellMode.Drawer);
+        public string Name { get; set; } = "";
+    }
+
+    private static readonly FormSchema<Account> NewAccount = FormSchema.For<Account>(s =>
+    {
+        s.FormKey = "new-account";
+        s.Title = "New account";
+        s.Field(a => a.Name, f => f.Label("Company name").Required());
+    });
+
+    private Task OpenFormAsync() => Forms.CreateFormAsync(NewAccount, mode: FormShellMode.Drawer);
 }
 ```
 
@@ -229,7 +237,7 @@ Klyroo is a family of independent .NET libraries that compose. Each one has its 
 | [Klyroo.UI](https://github.com/klyroo/klyroo-ui) | Accessible Blazor components for the web and .NET MAUI Blazor Hybrid, styled with Tailwind CSS v4 |
 | [Klyroo.Query](https://github.com/klyroo/klyroo-query) | Typed query model, URL state sync, and IQueryable / EF Core execution |
 | [Klyroo.Table](https://github.com/klyroo/klyroo-table) | Data lists with table and card-grid layouts, filters, selection and actions |
-| [Klyroo.Form](https://github.com/klyroo/klyroo-form) | Schema-driven forms, validation and wizards |
+| [Klyroo.Form](https://github.com/klyroo/klyroo-form) | Forms bound to a C# model (or described as data), validation and wizards |
 | [Klyroo.Dashboard](https://github.com/klyroo/klyroo-dashboard) | Dashboard controller, filters and Blazor blocks: stats, gauges, charts, tables and feeds |
 | [Klyroo.Display](https://github.com/klyroo/klyroo-display) | Read-only display blocks, media player controls and file preview |
 | [Klyroo.Spreadsheet](https://github.com/klyroo/klyroo-spreadsheet) | Import wizard for CSV, TSV and pasted data, with column and value mapping |
