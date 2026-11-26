@@ -2,13 +2,13 @@
 
 <EditForm Model="Model" FormName="signup" OnValidSubmit="Submit" class="flex w-full max-w-sm flex-col gap-4" novalidate>
     <DataAnnotationsValidator />
-    <KlyFormField Label="Email" Required For="() => Model!.Email" Description="We never share it.">
+    <KlyFormField Label="Email" Required Field="FieldIdentifier.Create(() => Model!.Email)" Description="We never share it.">
         <KlyInput Type="InputType.Email" @bind-Value="Model!.Email" Placeholder="you@example.com" />
     </KlyFormField>
     <KlyFormField Label="Role" Hint="Optional">
         <KlySelect @bind-Value="Model!.Role" Items="Roles" Placeholder="Pick one" />
     </KlyFormField>
-    <KlyFormField Label="About you" Help="Markdown is supported." For="() => Model!.Bio">
+    <KlyFormField Label="About you" Help="Markdown is supported." Field="FieldIdentifier.Create(() => Model!.Bio)">
         <KlyTextarea @bind-Value="Model!.Bio" Rows="3" />
     </KlyFormField>
     <KlyCheckbox @bind-Value="Model!.Newsletter" Label="Send me the newsletter" />

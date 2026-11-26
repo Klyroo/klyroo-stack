@@ -1,5 +1,5 @@
 <EditForm Model="Model" FormName="meeting" OnValidSubmit="Save" class="flex w-full max-w-xs flex-col items-start gap-3">
-    <KlyFormField Label="Meeting starts" Description="Posted as HH:mm." For="() => Model!.Start" class="w-full">
+    <KlyFormField Label="Meeting starts" Description="Posted as HH:mm." Field="FieldIdentifier.Create(() => Model!.Start)" class="w-full">
         <KlyInputTime @bind-Value="Model!.Start" Hour12="false" data-testid="meeting" />
     </KlyFormField>
     <KlyButton Type="ButtonType.Submit" Label="Schedule" />

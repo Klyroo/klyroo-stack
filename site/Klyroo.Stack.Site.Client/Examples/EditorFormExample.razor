@@ -2,7 +2,7 @@
 
 <EditForm Model="Model" FormName="editor-notes" OnValidSubmit="Save" class="flex w-full max-w-2xl flex-col items-start gap-3">
     <DataAnnotationsValidator />
-    <KlyFormField Label="Notes" Description="Posted as HTML, also without interactivity." For="() => Model!.Notes" class="w-full">
+    <KlyFormField Label="Notes" Description="Posted as HTML, also without interactivity." Field="FieldIdentifier.Create(() => Model!.Notes)" class="w-full">
         <KlyEditor @bind-Value="Model!.Notes" Placeholder="Write a note..." data-testid="editor-form">
             <KlyEditorToolbar />
         </KlyEditor>

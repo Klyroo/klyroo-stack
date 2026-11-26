@@ -1,7 +1,7 @@
 @using System.ComponentModel.DataAnnotations
 
 <EditForm Model="Model" FormName="select-menu-clear" OnValidSubmit="Save" class="flex w-full max-w-sm flex-col items-start gap-4" novalidate>
-    <KlyFormField Label="Toolset" For="() => Model!.Stack" class="w-full">
+    <KlyFormField Label="Toolset" Field="FieldIdentifier.Create(() => Model!.Stack)" class="w-full">
         <KlySelectMenu Items="Stack" Multiple @bind-Value="Model!.Stack" Placeholder="Pick technologies" />
     </KlyFormField>
     <KlyButton Type="ButtonType.Submit" Label="Save selection" />

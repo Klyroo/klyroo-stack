@@ -1,19 +1,19 @@
 @using System.ComponentModel.DataAnnotations
 
 <KlyForm Model="Model" FormName="enhanced-form" Enhance OnValidSubmit="Save" class="flex w-full max-w-sm flex-col">
-    <KlyFormField Label="Stack" For="() => Model!.Stack">
+    <KlyFormField Label="Stack" Field="FieldIdentifier.Create(() => Model!.Stack)">
         <KlySelectMenu Items="Stack" Multiple @bind-Value="Model!.Stack" Placeholder="Pick technologies" />
     </KlyFormField>
-    <KlyFormField Label="Marks" For="() => Model!.Marks">
+    <KlyFormField Label="Marks" Field="FieldIdentifier.Create(() => Model!.Marks)">
         <KlyToggleGroup Items="Marks" AriaLabel="Marks" Multiple @bind-Value="Model!.Marks" />
     </KlyFormField>
-    <KlyFormField Label="Seats" For="() => Model!.Seats">
+    <KlyFormField Label="Seats" Field="FieldIdentifier.Create(() => Model!.Seats)">
         <KlyInputNumber @bind-Value="Model!.Seats" Min="0" Max="50" />
     </KlyFormField>
-    <KlyFormField Label="Code" For="() => Model!.Code">
+    <KlyFormField Label="Code" Field="FieldIdentifier.Create(() => Model!.Code)">
         <KlyPinInput Length="4" @bind-Value="Model!.Code" />
     </KlyFormField>
-    <KlyFormField Label="Visit" For="() => Model!.Visit">
+    <KlyFormField Label="Visit" Field="FieldIdentifier.Create(() => Model!.Visit)">
         <KlyCalendar @bind-Value="Model!.Visit" AriaLabel="Visit date" />
     </KlyFormField>
     <KlyButton Type="ButtonType.Submit" Label="Save enhanced" />

@@ -1,5 +1,5 @@
 <EditForm Model="Model" FormName="appointment" OnValidSubmit="Save" class="flex w-full max-w-xs flex-col items-start gap-3">
-    <KlyFormField Label="Appointment date" Description="Posted as yyyy-MM-dd." For="() => Model!.Date" class="w-full">
+    <KlyFormField Label="Appointment date" Description="Posted as yyyy-MM-dd." Field="FieldIdentifier.Create(() => Model!.Date)" class="w-full">
         <KlyInputDate @bind-Value="Model!.Date" data-testid="appointment" />
     </KlyFormField>
     <KlyButton Type="ButtonType.Submit" Label="Book" />

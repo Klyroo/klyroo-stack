@@ -1,5 +1,5 @@
 <EditForm Model="Model" FormName="theme" OnValidSubmit="Save" class="flex w-full max-w-xs flex-col items-start gap-3">
-    <KlyFormField Label="Accent color" Description="Posted as #rrggbb." For="() => Model!.Accent">
+    <KlyFormField Label="Accent color" Description="Posted as #rrggbb." Field="FieldIdentifier.Create(() => Model!.Accent)">
         <KlyColorPicker @bind-Value="Model!.Accent" />
     </KlyFormField>
     <KlyButton Type="ButtonType.Submit" Label="Save theme" />

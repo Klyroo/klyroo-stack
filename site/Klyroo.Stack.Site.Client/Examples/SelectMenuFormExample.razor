@@ -2,10 +2,10 @@
 
 <EditForm Model="Model" FormName="select-menu-form" OnValidSubmit="Save" class="flex w-full max-w-sm flex-col items-start gap-4" novalidate>
     <DataAnnotationsValidator />
-    <KlyFormField Label="Stack" For="() => Model!.Stack" class="w-full">
+    <KlyFormField Label="Stack" Field="FieldIdentifier.Create(() => Model!.Stack)" class="w-full">
         <KlySelectMenu Items="Stack" Multiple @bind-Value="Model!.Stack" Placeholder="Pick technologies" />
     </KlyFormField>
-    <KlyFormField Label="Keywords" For="() => Model!.Keywords" class="w-full">
+    <KlyFormField Label="Keywords" Field="FieldIdentifier.Create(() => Model!.Keywords)" class="w-full">
         <KlyInputTags @bind-Value="Model!.Keywords" Placeholder="Type, then Enter" />
     </KlyFormField>
     <KlyButton Type="ButtonType.Submit" Label="Save profile" />

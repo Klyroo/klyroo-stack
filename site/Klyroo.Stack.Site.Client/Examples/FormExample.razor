@@ -1,10 +1,10 @@
 @using System.ComponentModel.DataAnnotations
 
 <KlyForm Model="Model" FormName="kly-form" OnValidSubmit="SaveAsync" ShowSummary class="flex w-full max-w-sm flex-col">
-    <KlyFormField Label="Name" Required For="() => Model!.Name">
+    <KlyFormField Label="Name" Required Field="FieldIdentifier.Create(() => Model!.Name)">
         <KlyInput @bind-Value="Model!.Name" />
     </KlyFormField>
-    <KlyFormField Label="Seats" For="() => Model!.Seats">
+    <KlyFormField Label="Seats" Field="FieldIdentifier.Create(() => Model!.Seats)">
         <KlyInputNumber @bind-Value="Model!.Seats" Min="1" Max="50" />
     </KlyFormField>
     <KlyButton Type="ButtonType.Submit" Label="Create workspace" />
