@@ -49,11 +49,11 @@
     private static readonly IReadOnlyList<BoardLine> _lines =
     [
         new("<KlyCodeBlock Label=\"Orders.sql\" Code=\"@Query\"", "code", "html"),
-        new("              Language=\"CodeLanguage.Sql\" LineNumbers", "code lines", "html"),
-        new("              HighlightLines=\"@([2, new CodeLineRange(4, 5)])\" />", "lines", "html"),
+        new("    Language=\"CodeLanguage.Sql\" LineNumbers", "code lines", "html"),
+        new("    HighlightLines=\"@([2, new CodeLineRange(4, 5)])\" />", "lines", "html"),
         new(""),
         new("<KlySecretBlock Label=\"API key\" Value=\"@ApiKey\"", "secret", "html"),
-        new("                VisibleChars=\"4\" />", "secret", "html"),
+        new("    VisibleChars=\"4\" />", "secret", "html"),
         new(""),
         new("<KlyFileList Title=\"Attachments\" Files=\"_files\" />", "files", "html"),
         new("<KlyFilePreviewProvider />", "preview", "html"),

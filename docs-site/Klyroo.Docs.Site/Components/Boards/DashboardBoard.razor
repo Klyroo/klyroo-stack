@@ -3,16 +3,16 @@
 <DemoBoard File="Program.cs" Lines="_lines" Chips="_chips" Class="is-dense" Label="A DashboardController and what it produces">
     <Results>
         <ResultPanel Title="How RefreshAsync loads" Note="stage by stage, sample values" Class="flush">
-            <ol class="stages" data-target="refresh">
-                <li class="stage" data-target="essential filter">
-                    <span class="stage-name">Essential</span>
-                    <span class="stage-what">loaded first, in parallel</span>
-                    <span class="stage-resource"><code>revenue</code><span class="status ok">Ready</span><span class="stage-value">21.2K</span></span>
+            <ol class="load-stages" data-target="refresh">
+                <li class="load-stage" data-target="essential filter">
+                    <span class="load-name">Essential</span>
+                    <span class="load-what">loaded first, in parallel</span>
+                    <span class="load-resource"><code>revenue</code><span class="status ok">Ready</span><span class="load-value">21.2K</span></span>
                 </li>
-                <li class="stage" data-target="background">
-                    <span class="stage-name">Background</span>
-                    <span class="stage-what">once the essential ones settle</span>
-                    <span class="stage-resource"><code>regions</code><span class="status ok">Ready</span><span class="stage-value">EMEA, AMER</span></span>
+                <li class="load-stage" data-target="background">
+                    <span class="load-name">Background</span>
+                    <span class="load-what">once the essential ones settle</span>
+                    <span class="load-resource"><code>regions</code><span class="status ok">Ready</span><span class="load-value">EMEA, AMER</span></span>
                 </li>
             </ol>
         </ResultPanel>
