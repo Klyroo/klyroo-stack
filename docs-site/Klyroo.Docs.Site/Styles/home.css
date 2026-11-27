@@ -298,11 +298,12 @@ a.ls-stop:hover .ls-dot, a.ls-stop:focus-visible .ls-dot, .ls-stop:focus-visible
   .lh-sign { padding-inline: 1.25rem; }
   .lh-sign .sc-plat { margin-inline: -1.25rem; }
   .lh-title { font-size: clamp(1.625rem, 7.4vw, 1.875rem); }
-  /* The closing line is three short lines on a phone; the browser balances it into 16, 8 and 11 characters, so the box is made as wide as its widest balanced line. */
-  .close-title { max-width: 12ch; }
+  /* The closing line fits two balanced lines on a phone instead of three with a two-word middle. */
+  .close-title { font-size: 1.5rem; }
 }
 @media (max-width: 360px) {
   .lh-sign { padding-inline: 1rem; }
   .lh-sign .sc-plat { margin-inline: -1rem; }
   .lh-title { font-size: 1.5rem; }
+  .close-title { font-size: 1.25rem; }
 }
