@@ -1,0 +1,23 @@
+<div class="grid w-full gap-4 md:grid-cols-2">
+    <KlyBreakdown Title="Invoice" Format="C2" Culture="@_fr" Lines="@_lines" Total="@(new KlyBreakdownLine("Total") { Amount = 1234.5m })" Footnote="VAT included" Surface="KlySurface.Bordered" />
+    <KlyBreakdown Title="Year over year" Format="C0" Culture="@_en" Collapsible CompareColumns="@(new KlyBreakdownColumns("2026", "2025"))" Lines="@_compare"
+                  Total="@(new KlyBreakdownLine("Total") { Amount = 2200m, CompareAmount = 1900m })" Surface="KlySurface.Bordered" />
+</div>
+
+@code {
+    private readonly System.Globalization.CultureInfo _fr = System.Globalization.CultureInfo.GetCultureInfo("fr-FR");
+    private readonly System.Globalization.CultureInfo _en = System.Globalization.CultureInfo.GetCultureInfo("en-US");
+
+    private readonly KlyBreakdownLine[] _lines =
+    [
+        new("Licenses") { Amount = 1400m, Detail = "12 seats", Badge = new KlyBadgeItem("New") },
+        new("Support") { Amount = 0m, IsMuted = true },
+        new("Discount") { Amount = -165.5m, Color = KlyColor.Success },
+    ];
+
+    private readonly KlyBreakdownLine[] _compare =
+    [
+        new("Licenses") { Amount = 1400m, CompareAmount = 1200m },
+        new("Support") { Amount = 800m, CompareAmount = 700m },
+    ];
+}

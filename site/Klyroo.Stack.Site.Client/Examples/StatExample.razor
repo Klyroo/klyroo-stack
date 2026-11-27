@@ -1,0 +1,17 @@
+<div class="grid w-full gap-4 md:grid-cols-2">
+    <KlyStat Title="Monthly revenue" Value="@_revenue" Format="C0" Culture="@_en" Delta="@_change" DeltaFormat="+0.0;-0.0" DeltaUnit="%"
+             Trend="@_trend" Caption="vs last month" Surface="KlySurface.Bordered" />
+    <KlyStat Title="Error rate" Value="@_errors" Format="P1" Delta="@(-0.4)" DeltaFormat="+0.0;-0.0" DeltaUnit=" pt"
+             DeltaDirection="KlyDeltaDirection.Up" Caption="A drop is good news" Surface="KlySurface.Bordered" />
+    <KlyStat Title="Open tickets" Value="@_missing" Caption="No value shows a dash" Surface="KlySurface.Bordered" />
+    <KlyStat Title="Loading" Value="@_revenue" Loading Surface="KlySurface.Bordered" />
+</div>
+
+@code {
+    private readonly System.Globalization.CultureInfo _en = System.Globalization.CultureInfo.GetCultureInfo("en-US");
+    private readonly decimal _revenue = 148_900m;
+    private readonly decimal _change = 14.2m;
+    private readonly double _errors = 0.012;
+    private readonly int? _missing = null;
+    private readonly double[] _trend = [102, 98, 115, 110, 132, 128, 149];
+}

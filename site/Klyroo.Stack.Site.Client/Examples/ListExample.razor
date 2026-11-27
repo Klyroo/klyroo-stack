@@ -1,0 +1,15 @@
+<div class="grid w-full gap-4 md:grid-cols-3">
+    <KlyList Title="Plain" Surface="KlySurface.Bordered" Items="@(new[] { new KlyListItem("Compile") { Meta = "2 s" }, new KlyListItem("Test") { Meta = "14 s" }, new KlyListItem("Publish") })" />
+    <KlyList Title="Steps" Variant="KlyListVariant.Steps" Surface="KlySurface.Bordered" Items="@(new[]
+    {
+        new KlyListItem("Create the account") { Done = true },
+        new KlyListItem("Add a card") { Current = true, Description = "Takes two minutes" },
+        new KlyListItem("Launch"),
+    })" />
+    <KlyList Title="Checks (Max 2, Step 2)" Variant="KlyListVariant.Checks" Max="2" Step="2" Surface="KlySurface.Bordered" Items="@(new[]
+    {
+        new KlyListItem("HTTPS") { Done = true },
+        new KlyListItem("Backups") { Done = true },
+        new KlyListItem("Two-factor sign-in"),
+    })" />
+</div>

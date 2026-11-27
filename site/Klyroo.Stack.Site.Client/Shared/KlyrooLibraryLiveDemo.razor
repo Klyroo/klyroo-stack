@@ -419,34 +419,26 @@
 
             case "display-blocks":
                 <div class="flex flex-col gap-4">
-                    <div class="flex flex-wrap items-center gap-3 font-mono text-xs">
-                        <span class="text-(--klyroo-text-muted)">Test Meter Thresholds (Warn 75 / Error 90):</span>
-                        <KlyButton Label="55% (Normal)" Size="KlySize.Sm" Color="KlyColor.Neutral" Variant="ButtonVariant.Soft" OnClick="@(() => _meterVal = 55)" />
-                        <KlyButton Label="82% (Warning)" Size="KlySize.Sm" Color="KlyColor.Warning" Variant="ButtonVariant.Soft" OnClick="@(() => _meterVal = 82)" />
-                        <KlyButton Label="95% (Error)" Size="KlySize.Sm" Color="KlyColor.Error" Variant="ButtonVariant.Soft" OnClick="@(() => _meterVal = 95)" />
+                    <div class="flex flex-wrap items-center gap-2 font-mono text-xs">
+                        <span class="text-(--klyroo-text-muted)">Emphasized lines of the query:</span>
+                        <KlyButton Label="WHERE clause" Size="KlySize.Sm" Color="KlyColor.Neutral" Variant="@(_codeFocus == "where" ? ButtonVariant.Solid : ButtonVariant.Soft)" OnClick="@(() => _codeFocus = "where")" />
+                        <KlyButton Label="SELECT list" Size="KlySize.Sm" Color="KlyColor.Neutral" Variant="@(_codeFocus == "select" ? ButtonVariant.Solid : ButtonVariant.Soft)" OnClick="@(() => _codeFocus = "select")" />
+                        <KlyButton Label="None" Size="KlySize.Sm" Color="KlyColor.Neutral" Variant="@(_codeFocus == "none" ? ButtonVariant.Solid : ButtonVariant.Soft)" OnClick="@(() => _codeFocus = "none")" />
                     </div>
                     <div class="grid gap-4 lg:grid-cols-2">
-                        <KlyDisplay Kind="DisplayKind.Stat" Title="Monthly Recurring Revenue" Value="€148,900" Delta="+14.2%" Trend="@([102.0, 118.0, 134.0, 148.9])" />
-                        <KlyDisplay Kind="DisplayKind.Meter" Title="Storage Quota" MeterValue="@_meterVal" MeterMax="100" WarningThreshold="75" ErrorThreshold="90" />
-                        <KlyDisplay Kind="DisplayKind.Code" Variant="DisplayVariant.Secret" Title="Production API Token" Value="sk_live_klyroo_3210" VisibleChars="4" Copy="true" />
-                        <KlyDisplay Kind="DisplayKind.Diff" Title="Plan Upgrade" DiffItems="@([new DisplayDiffItem("Tier", "Starter", "Enterprise", Changed: true)])" />
+                        <KlyCodeBlock Label="Orders.sql" Code="@_demoQuery" Language="CodeLanguage.Sql" LineNumbers
+                                      HighlightLines="@(_codeFocus == "where" ? new[] { new CodeLineRange(3, 4) } : _codeFocus == "select" ? new[] { new CodeLineRange(1, 1) } : Array.Empty<CodeLineRange>())" />
+                        <KlyCodeBlock Label="appsettings.json" Code="@_demoJson" Language="CodeLanguage.Json" Copy="false" />
+                        <KlySecretBlock Label="Production API Token" Value="sk_live_klyroo_3210" VisibleChars="4" />
+                        <KlyFileList Title="Attachments" Files="_demoFiles" />
                     </div>
                 </div>
                 break;
 
             case "display-structured":
                 <div class="grid gap-4 lg:grid-cols-2">
-                    <KlyDisplay Kind="DisplayKind.Facts" Surface="DisplaySurface.Bordered" Title="Cluster Metadata" Facts="@([
-                        new DisplayFact { Label = "Environment", Value = "Production", Copy = true, Mono = true },
-                        new DisplayFact { Label = "Region", Value = "eu-west-3", Chip = new DisplayChip("Healthy", KlyColor.Success) },
-                        new DisplayFact { Label = "Failover", Value = null }
-                    ])" />
-                    <KlyDisplay Kind="DisplayKind.Timeline" Surface="DisplaySurface.Bordered" Title="Release Pipeline" TimelineItems="@([
-                        new DisplayTimelineItem("Build NativeAOT Core", Time: "09:12", State: DisplayTimelineState.Done),
-                        new DisplayTimelineItem("Run 860 Tests", Time: "09:14", State: DisplayTimelineState.Done),
-                        new DisplayTimelineItem("Rollout Canary", Time: "In progress", State: DisplayTimelineState.Current),
-                        new DisplayTimelineItem("Global Promotion", Time: "Pending", State: DisplayTimelineState.Upcoming)
-                    ])" />
+                    <KlyFileList Title="Documents (Max=2, Step=2)" Files="_demoFiles" Max="2" Step="2" />
+                    <KlyCodeBlock Label="Program.cs" Code="@_demoCSharp" Language="CodeLanguage.CSharp" LineNumbers HighlightLines="@(new[] { new CodeLineRange(3, 3) })" />
                 </div>
                 break;
 
@@ -463,17 +455,19 @@
 
             case "display-accordion-list":
                 <div class="grid gap-4 lg:grid-cols-2">
-                    <KlyDisplay Kind="DisplayKind.Accordion" Surface="DisplaySurface.Bordered" Title="Platform FAQs" Multiple="true" AccordionItems="@([
-                        new DisplayAccordionItem("NativeAOT Support", "Klyroo.Display.Core ships with IsAotCompatible=true and zero UI dependencies."),
-                        new DisplayAccordionItem("Secret Masking", "DisplayKind.Code with Variant='secret' masks characters and lets users toggle visibility in place."),
-                        new DisplayAccordionItem("Exam Media Quotas", "KlyAudioPlayer and KlyVideoPlayer enforce Start/End clip bounds, Seekable=false, and MaxPlays.")
-                    ])" />
-                    <KlyDisplay Kind="DisplayKind.List" Surface="DisplaySurface.Bordered" Title="Release Checklist (Progressive Reveal)" Max="2" Step="2" ListItems="@([
-                        new DisplayListItem { Text = "1. Compile NativeAOT core assemblies" },
-                        new DisplayListItem { Text = "2. Run xUnit + bUnit verification suites" },
-                        new DisplayListItem { Text = "3. Verify WCAG AA contrast ratios" },
-                        new DisplayListItem { Text = "4. Publish signed NuGet packages" }
-                    ])" />
+                    <KlyAccordion Multiple="true" Items="@(new[]
+                    {
+                        new KlyAccordionItem("NativeAOT Support") { Text = "Klyroo.Display.Core ships with IsAotCompatible=true and zero UI dependencies." },
+                        new KlyAccordionItem("Secret Masking") { Text = "KlySecretBlock masks all but the last characters and lets users toggle visibility in place." },
+                        new KlyAccordionItem("Exam Media Quotas") { Text = "KlyAudioPlayer and KlyVideoPlayer model Start/End clip bounds, Seekable=false and MaxPlays." },
+                    })" />
+                    <KlyList Title="Release Checklist (Progressive Reveal)" Surface="KlySurface.Bordered" Max="2" Step="2" Items="@(new[]
+                    {
+                        new KlyListItem("1. Compile NativeAOT core assemblies"),
+                        new KlyListItem("2. Run xUnit + bUnit verification suites"),
+                        new KlyListItem("3. Verify WCAG AA contrast ratios"),
+                        new KlyListItem("4. Publish signed NuGet packages"),
+                    })" />
                 </div>
                 break;
 
@@ -1002,7 +996,16 @@
     }
 
     // ---- Display Demos ----
-    private double _meterVal = 92;
+    private string _codeFocus = "where";
+    private const string _demoQuery = "SELECT id, total\nFROM orders\nWHERE status = 'paid'\n  AND total > 100\nORDER BY total DESC;\n";
+    private const string _demoJson = "{\n  \"Klyroo\": {\n    \"Display\": { \"Highlight\": true }\n  }\n}\n";
+    private const string _demoCSharp = "builder.Services\n    .AddKlyrooUi()\n    .AddKlyrooDisplay();\n";
+    private readonly IReadOnlyList<FileListItem> _demoFiles =
+    [
+        new FileListItem(new FilePreviewFile { Src = "/files/spec.pdf", Name = "Specification.pdf", Size = 1_572_864 }, Description: "Version 3", Icon: "lock", Tone: KlyColor.Warning),
+        new FileListItem(new FilePreviewFile { Src = "/files/metrics.csv", Name = "metrics.csv", Size = 18_400, Content = "Region,MRR\nEU,148900\nUS,192400" }, Meta: "Updated today"),
+        new FilePreviewFile { Src = "/files/notes.md", Name = "notes.md", Size = 2_048, Content = "# Notes" },
+    ];
 
     // ---- Spreadsheet Demos ----
     public sealed class RateRow

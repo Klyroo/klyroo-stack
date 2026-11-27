@@ -39,7 +39,9 @@ public sealed class StackIntegrationTests : BunitContext
         Assert.Equal("klyroo-table", KlyrooStackCatalog.ResolveComponentModule("KlyDataList<Person>")?.Id);
         Assert.Equal("klyroo-form", KlyrooStackCatalog.ResolveComponentModule("KlyFormEngine")?.Id);
         Assert.Equal("klyroo-dashboard", KlyrooStackCatalog.ResolveComponentModule("KlyDashboardPage")?.Id);
-        Assert.Equal("klyroo-display", KlyrooStackCatalog.ResolveComponentModule("KlyDisplay")?.Id);
+        Assert.Equal("klyroo-display", KlyrooStackCatalog.ResolveComponentModule("KlyCodeBlock")?.Id);
+        Assert.Equal("klyroo-ui", KlyrooStackCatalog.ResolveComponentModule("KlyStat<decimal>")?.Id);
+        Assert.Null(KlyrooStackCatalog.ResolveComponentModule("KlyDisplay"));
         Assert.Equal("klyroo-spreadsheet", KlyrooStackCatalog.ResolveComponentModule("KlySpreadsheetImport")?.Id);
         Assert.Equal("klyroo-agent", KlyrooStackCatalog.ResolveComponentModule("AgentBridgeService")?.Id);
     }

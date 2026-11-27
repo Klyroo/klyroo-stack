@@ -14,7 +14,7 @@ Klyroo is a family of independent .NET libraries, each in its own repository wit
 - **Headless meta-package**: `Klyroo.Stack.Core` references the seven `.Core` engines, none of which depends on Razor or ASP.NET Core, and is marked `IsAotCompatible` and `IsTrimmable`.
 - **Component catalog**: `KlyrooStackCatalog` maps a component or controller name such as `KlyDataList<Order>` to the library, the packages, the template short name and the agent skill that own it.
 - **MCP documentation server**: the `klyroo-stack-mcp` tool answers over stdio, offline, with the components, parameters, events, slots, theme slots, example sources and guides of the Klyroo.UI version it was built with.
-- **Project templates**: `Klyroo.Templates` adds four `dotnet new` templates: `klyroo-saas` and `klyroo-admin`, two Blazor Web App starters with a shell, a dashboard, a data list, forms and display blocks that run in Interactive Server, WebAssembly or Auto, `klyroo-headless` and `klyroo-maui`.
+- **Project templates**: `Klyroo.Templates` adds four `dotnet new` templates: `klyroo-saas` and `klyroo-admin`, two Blazor Web App starters with a shell, a dashboard, a data list, forms and read-only blocks that run in Interactive Server, WebAssembly or Auto, `klyroo-headless` and `klyroo-maui`.
 - **Precompiled stylesheet**: `Klyroo.Stack` ships `klyroo-stack.css`, so an app needs neither Node nor Tailwind to style the components.
 - **Agent skill**: `skills/klyroo-stack/SKILL.md` routes a coding agent to the skill of each library.
 - **Documentation site source**: `site/` holds the Blazor app that documents the ecosystem. It is not deployed yet and runs locally.
@@ -122,7 +122,7 @@ dotnet new install Klyroo.Templates::0.1.0-preview.1
 
 | Short name | Creates |
 | :--- | :--- |
-| `klyroo-saas` | Blazor Web App for a SaaS product: a header with navigation and a color mode button, a dashboard, a filterable accounts list with a form drawer, and a usage page of display blocks |
+| `klyroo-saas` | Blazor Web App for a SaaS product: a header with navigation and a color mode button, a dashboard, a filterable accounts list with a form drawer, and a usage page of read-only blocks |
 | `klyroo-admin` | Blazor Web App for a back office: a sidebar shell, a dashboard, a customer list with selection and bulk actions, a customer page, and a spreadsheet import |
 | `klyroo-headless` | Console app with `PublishAot` that uses `Klyroo.Stack.Core` only |
 | `klyroo-maui` | .NET MAUI Blazor Hybrid app for Android, iOS, Mac Catalyst and Windows, see [Platforms](https://github.com/klyroo/klyroo-stack/blob/main/docs/platforms.md#net-maui-blazor-hybrid) |
@@ -251,7 +251,7 @@ Klyroo is a family of independent .NET libraries that compose. Each one has its 
 | [Klyroo.Table](https://github.com/klyroo/klyroo-table) | Data lists with table and card-grid layouts, filters, selection and actions |
 | [Klyroo.Form](https://github.com/klyroo/klyroo-form) | Forms bound to a C# model (or described as data), validation and wizards |
 | [Klyroo.Dashboard](https://github.com/klyroo/klyroo-dashboard) | Dashboard controller, filters and Blazor blocks: stats, gauges, charts, tables and feeds |
-| [Klyroo.Display](https://github.com/klyroo/klyroo-display) | Read-only display blocks, media player controls and file preview |
+| [Klyroo.Display](https://github.com/klyroo/klyroo-display) | Code highlighting, secret and file list components, media player controls and file preview |
 | [Klyroo.Spreadsheet](https://github.com/klyroo/klyroo-spreadsheet) | Import wizard for CSV, TSV and pasted data, with column and value mapping |
 | [Klyroo.Agent](https://github.com/klyroo/klyroo-agent) | Bridge that lets AI agents read and act on Klyroo forms, dashboards and imports |
 | **[Klyroo.Stack](https://github.com/klyroo/klyroo-stack)** | Meta-package, MCP documentation server and `dotnet new` templates |

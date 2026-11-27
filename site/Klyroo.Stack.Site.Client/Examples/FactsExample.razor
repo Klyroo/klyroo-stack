@@ -1,0 +1,15 @@
+<div class="grid w-full gap-4 md:grid-cols-2">
+    <KlyFacts Surface="KlySurface.Bordered" Items="@(new[]
+    {
+        new KlyFact("Status") { Badge = new KlyBadgeItem("Paid") { Color = KlyColor.Success, Icon = "check" } },
+        new KlyFact("Environment") { Value = "Production", Copy = true, Mono = true },
+        new KlyFact("Site") { Value = "klyroo.dev", Href = "https://klyroo.dev" },
+        new KlyFact("Shipping address") { Value = null },
+        new KlyFact("Plan") { Loading = true },
+    })" />
+    <KlyFacts Surface="KlySurface.Bordered" Max="2" Step="2" Groups="@(new[]
+    {
+        new KlyFactGroup("Order", new[] { new KlyFact("Reference") { Value = "ORD-1042", Mono = true }, new KlyFact("Date") { Value = "Nov 20, 2026" } }),
+        new KlyFactGroup("Customer", new[] { new KlyFact("Name") { Value = "Acme Corp" }, new KlyFact("Region") { Value = "eu-west-3" } }),
+    })" />
+</div>

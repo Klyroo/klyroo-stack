@@ -1,0 +1,8 @@
+<div class="w-full max-w-2xl">
+    <KlyStatGroup Title="This week" Surface="KlySurface.Bordered" Items="@(new[]
+    {
+        new KlyStatItem<int>("Errors", 12) { Color = KlyColor.Error },
+        new KlyStatItem<int>("Users", 340) { Caption = "+8" },
+        new KlyStatItem<int>("Deploys", 27) { Color = KlyColor.Success },
+    })" />
+</div>

@@ -1,0 +1,8 @@
+<div class="w-full max-w-2xl">
+    <KlyRecordList Title="Invoices" Count="3" Max="2" Step="2" Surface="KlySurface.Bordered" Items="@(new[]
+    {
+        new KlyRecordItem("Acme Annual Plan") { Reference = "INV-42", Href = "#", AvatarText = "AC", Trailing = "€12,000", TrailingCaption = "Nov 20", Badge = new KlyBadgeItem("Paid") { Color = KlyColor.Success } },
+        new KlyRecordItem("Globex Seats") { Reference = "INV-43", Description = "12 seats", DescriptionIcon = "users", AvatarText = "GX", Trailing = "€1,080", TrailingCaption = "Nov 22", Badge = new KlyBadgeItem("Due") { Color = KlyColor.Warning } },
+        new KlyRecordItem("Initech Support") { Reference = "INV-44", Icon = "life-buoy", Trailing = "€240", TrailingCaption = "Nov 25" },
+    })" />
+</div>

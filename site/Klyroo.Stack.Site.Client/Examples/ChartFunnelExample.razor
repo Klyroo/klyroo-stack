@@ -1,0 +1,10 @@
+<div class="w-full max-w-lg">
+    <KlyChart TItem="Step" TIndex="string" Type="KlyChartType.Funnel" Data="_steps" Index="@(s => s.Label)"
+              Categories="@(new[] { new KlyChartCategory<Step>("count", s => s.Count) { Label = "Visitors" } })" Width="480" Height="260" />
+</div>
+
+@code {
+    private sealed record Step(string Label, double Count);
+
+    private static readonly Step[] _steps = [new("Visits", 1000), new("Signups", 240), new("Trials", 90), new("Paid", 36)];
+}

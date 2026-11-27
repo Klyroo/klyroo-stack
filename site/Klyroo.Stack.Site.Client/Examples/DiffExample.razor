@@ -1,0 +1,18 @@
+<div class="grid w-full gap-4 md:grid-cols-2">
+    <KlyDiff Title="English" Surface="KlySurface.Bordered" Culture="@_en" ShowUnchanged Items="@_items" />
+    <KlyDiff Title="German" Surface="KlySurface.Bordered" Culture="@_de" Items="@_items" />
+</div>
+
+@code {
+    private readonly System.Globalization.CultureInfo _en = System.Globalization.CultureInfo.GetCultureInfo("en-US");
+    private readonly System.Globalization.CultureInfo _de = System.Globalization.CultureInfo.GetCultureInfo("de-DE");
+
+    private readonly KlyDiffItem[] _items =
+    [
+        KlyDiffItem.Compare("Plan", "Starter", "Team"),
+        KlyDiffItem.Compare("Seats", 12, 12),
+        KlyDiffItem.Compare("Price", 1200.5m, 1500m, "N2"),
+        KlyDiffItem.Compare("Due", new DateOnly(2026, 3, 5), new DateOnly(2026, 4, 1), "d"),
+        new("Role", "Member", "Admin") { Note = new KlyBadgeItem("Needs approval") },
+    ];
+}

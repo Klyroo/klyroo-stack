@@ -1,0 +1,8 @@
+<div class="grid w-full max-w-2xl gap-6">
+    <KlyText Title="Release notes" Value="@Long" MaxLines="2" />
+    <KlyText Variant="KlyTextVariant.Quote" Value="Simplicity is prerequisite for reliability." Author="Edsger W. Dijkstra" Meta="1975" />
+</div>
+
+@code {
+    private const string Long = "Version 0.2 adds typed read-only blocks. Each block is a component of its own with only its own parameters, so a misuse does not compile, and the text of a long note is clamped to a few lines until the reader asks for the rest with the Read more button.";
+}

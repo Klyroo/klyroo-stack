@@ -1,0 +1,36 @@
+<div class="grid w-full gap-6 lg:grid-cols-2">
+    <div>
+        <p class="mb-2 text-sm font-medium text-(--klyroo-text-highlighted)">Pipeline</p>
+        <KlyTimeline Layout="KlyTimelineLayout.Pipeline" Items="@_pipeline" AriaLabel="Release pipeline" />
+    </div>
+    <div>
+        <p class="mb-2 text-sm font-medium text-(--klyroo-text-highlighted)">Log</p>
+        <KlyTimeline Layout="KlyTimelineLayout.Log" Items="@_pipeline" AriaLabel="Release log" />
+    </div>
+    <div class="lg:col-span-2">
+        <p class="mb-2 text-sm font-medium text-(--klyroo-text-highlighted)">Schedule: an agenda grouped by day, Max 3 with Show more</p>
+        <KlyTimeline Layout="KlyTimelineLayout.Schedule" Items="@_events" Now="@_now" Max="3" Step="3" AriaLabel="Agenda" />
+    </div>
+</div>
+
+@code {
+    private static readonly TimeSpan Paris = TimeSpan.FromHours(1);
+    private readonly DateTimeOffset _now = new(2026, 3, 12, 9, 30, 0, Paris);
+
+    private readonly KlyTimelineItem[] _pipeline =
+    [
+        new("Build") { Date = "09:12", State = KlyTimelineState.Done },
+        new("Test") { Date = "09:14", State = KlyTimelineState.Done },
+        new("Canary") { Date = "In progress", State = KlyTimelineState.Current },
+        new("Promote") { Date = "Pending", State = KlyTimelineState.Upcoming },
+    ];
+
+    private readonly KlyTimelineItem[] _events =
+    [
+        new("Standup") { At = new(2026, 3, 12, 9, 0, 0, Paris), EndAt = new(2026, 3, 12, 9, 30, 0, Paris), State = KlyTimelineState.Current },
+        new("Design review") { Description = "Bring the mockups", At = new(2026, 3, 12, 14, 0, 0, Paris), EndAt = new(2026, 3, 12, 15, 30, 0, Paris), Actor = "Alice" },
+        new("Conference") { At = new(2026, 3, 14, 0, 0, 0, Paris), EndAt = new(2026, 3, 16, 0, 0, 0, Paris) },
+        new("Release") { At = new(2026, 3, 20, 10, 0, 0, Paris) },
+        new("Book the venue"),
+    ];
+}

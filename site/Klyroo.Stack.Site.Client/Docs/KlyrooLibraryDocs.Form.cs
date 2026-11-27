@@ -313,17 +313,17 @@ public static partial class KlyrooLibraryDocs
                         [
                             new("DiffBeforeSave.razor", """
                                 @using Klyroo.Form
-                                @using Klyroo.Display
+                                @using Klyroo.UI
 
-                                @* Show a clean side-by-side Klyroo.Display Diff of every dirty field before saving *@
-                                <KlyDisplay Kind="DisplayKind.Diff" Title="Pending Changes" DiffItems="@Changes()" />
+                                @* Show a clean before/after KlyDiff of every dirty field before saving *@
+                                <KlyDiff Title="Pending Changes" Items="@Changes()" />
 
                                 @code {
-                                    private IReadOnlyList<DisplayDiffItem> Changes()
+                                    private IReadOnlyList<KlyDiffItem> Changes()
                                     {
-                                        var items = new List<DisplayDiffItem>();
-                                        if (_form.IsFieldDirty(_name)) items.Add(new DisplayDiffItem("Name", _initial.Name, _form.Get(_name), Changed: true));
-                                        if (_form.IsFieldDirty(_plan)) items.Add(new DisplayDiffItem("Plan", _initial.Plan, _form.Get(_plan), Changed: true));
+                                        var items = new List<KlyDiffItem>();
+                                        if (_form.IsFieldDirty(_name)) items.Add(new KlyDiffItem("Name", _initial.Name, _form.Get(_name)));
+                                        if (_form.IsFieldDirty(_plan)) items.Add(new KlyDiffItem("Plan", _initial.Plan, _form.Get(_plan)));
                                         return items;
                                     }
                                 }

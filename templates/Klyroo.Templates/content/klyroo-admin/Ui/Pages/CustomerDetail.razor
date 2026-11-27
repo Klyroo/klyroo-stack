@@ -18,24 +18,27 @@
     <ChildContent>
         @if (_customer is null)
         {
-            <KlyDisplay Kind="DisplayKind.Empty" Icon="search-x" Title="This customer does not exist" Description="It may have been deleted. Go back to the list to pick another one."
-                        Actions="_backActions" />
+            <KlyEmpty Title="This customer does not exist" Description="It may have been deleted. Go back to the list to pick another one."
+                      ActionItems="_backActions">
+                <Icon>@KlyIcons.Named("search-x")</Icon>
+            </KlyEmpty>
         }
         else
         {
-            @* KlyDisplay renders read-only blocks from data. Set Kind to pick the block and fill the parameters that kind reads. *@
+            @* Each read-only block of Klyroo.UI is a typed component: KlyUser, KlyFacts, KlyMeter, KlyTimeline and KlyAlert take records and plain values. *@
             <div class="two-columns">
                 <div class="stack">
-                    <KlyDisplay Kind="DisplayKind.Person" Title="@_customer.Contact" Description="@($"{_customer.Region}, customer since {_customer.Since:MMMM yyyy}")"
-                                Chip="new DisplayChip(_customer.Tier, KlyColor.Primary)" />
-                    <KlyDisplay Kind="DisplayKind.Facts" Title="Contract" Facts="_facts" />
-                    <KlyDisplay Kind="DisplayKind.Meter" Title="Health score" Value="@($"{_customer.Health} of 100")" MeterValue="_customer.Health" MeterMax="100"
-                                Description="@HealthText" />
+                    <KlyUser Name="@_customer.Contact" Description="@($"{_customer.Region}, customer since {_customer.Since:MMMM yyyy}")"
+                             Badge="new KlyBadgeItem(_customer.Tier) { Color = KlyColor.Primary }" />
+                    <KlyFacts Groups="@(new[] { new KlyFactGroup("Contract", _facts) })" Surface="KlySurface.Muted" />
+                    <KlyMeter Title="Health score" Value="_customer.Health" Max="100" ValueText="@($"{_customer.Health} of 100")"
+                              Description="@HealthText" Surface="KlySurface.Muted" />
                 </div>
                 <div class="stack">
-                    <KlyDisplay Kind="DisplayKind.Timeline" Title="History" TimelineItems="_history" />
-                    <KlyDisplay Kind="DisplayKind.Alert" Tone="@(_customer.Health < 50 ? KlyColor.Warning : KlyColor.Success)"
-                                Title="@(_customer.Health < 50 ? "At risk" : "In good standing")" Value="@HealthText" />
+                    <KlyHeading Title="History" HeadingLevel="2" Surface="KlySurface.Plain" />
+                    <KlyTimeline Items="_history" />
+                    <KlyAlert Color="@(_customer.Health < 50 ? KlyColor.Warning : KlyColor.Success)" Variant="KlyVariant.Soft" StatusIcon="true"
+                              Title="@(_customer.Health < 50 ? "At risk" : "In good standing")" Description="@HealthText" />
                 </div>
             </div>
         }
@@ -46,9 +49,9 @@
     [Parameter] public int Id { get; set; }
 
     private Customer? _customer;
-    private IReadOnlyList<DisplayFact> _facts = [];
-    private IReadOnlyList<DisplayTimelineItem> _history = [];
-    private IReadOnlyList<DisplayAction> _backActions = [new DisplayAction { Label = "All customers", Href = "customers", Variant = ButtonVariant.Solid, Color = KlyColor.Primary }];
+    private IReadOnlyList<KlyFact> _facts = [];
+    private IReadOnlyList<KlyTimelineItem> _history = [];
+    private IReadOnlyList<KlyActionItem> _backActions = [new KlyActionItem("All customers") { Href = "customers", Variant = ButtonVariant.Solid, Color = KlyColor.Primary }];
 
     private string HealthText => _customer is { Health: < 50 } ? "Usage dropped for two months: call the owner of the account." : "Usage is steady: nothing to do.";
 
@@ -61,19 +64,22 @@
 
         _facts =
         [
-            new DisplayFact { Label = "Tier", Chip = new DisplayChip(_customer.Tier, KlyColor.Primary) },
-            new DisplayFact { Label = "Annual revenue", Value = Money.Format(_customer.Arr), Emphasis = true },
-            new DisplayFact { Label = "Region", Value = _customer.Region },
-            new DisplayFact { Label = "Contact", Value = _customer.Contact, Copy = true },
-            new DisplayFact { Label = "Customer id", Value = $"cus_{_customer.Id:D5}", Mono = true, Copy = true },
+            new("Tier") { Badge = new KlyBadgeItem(_customer.Tier) { Color = KlyColor.Primary } },
+            new("Annual revenue") { Value = Money.Format(_customer.Arr), Emphasis = true },
+            new("Region") { Value = _customer.Region },
+            new("Contact") { Value = _customer.Contact, Copy = true },
+            new("Customer id") { Value = $"cus_{_customer.Id:D5}", Mono = true, Copy = true },
         ];
 
         var start = _customer.Since.ToDateTime(new TimeOnly(9, 0));
+        var signed = new DateTimeOffset(start, TimeSpan.Zero);
+        var onboarding = new DateTimeOffset(start.AddDays(6), TimeSpan.Zero);
+        var renewal = new DateTimeOffset(start.AddYears(1), TimeSpan.Zero);
         _history =
         [
-            new("Contract signed", $"{_customer.Tier} tier, {Money.Format(_customer.Arr)} a year", Date: new DateTimeOffset(start, TimeSpan.Zero), State: DisplayTimelineState.Done),
-            new("Onboarding call", "Two people from the customer joined", Date: new DateTimeOffset(start.AddDays(6), TimeSpan.Zero), State: DisplayTimelineState.Done),
-            new("Renewal", "In twelve months", Date: new DateTimeOffset(start.AddYears(1), TimeSpan.Zero), State: DisplayTimelineState.Upcoming),
+            new("Contract signed") { Description = $"{_customer.Tier} tier, {Money.Format(_customer.Arr)} a year", At = signed, Date = signed.ToString("MMM d, yyyy"), State = KlyTimelineState.Done },
+            new("Onboarding call") { Description = "Two people from the customer joined", At = onboarding, Date = onboarding.ToString("MMM d, yyyy"), State = KlyTimelineState.Done },
+            new("Renewal") { Description = "In twelve months", At = renewal, Date = renewal.ToString("MMM d, yyyy"), State = KlyTimelineState.Upcoming },
         ];
     }
 

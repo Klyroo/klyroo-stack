@@ -1,0 +1,20 @@
+<div class="w-full">
+    <KlyTable Items="Lines" Caption="Order lines" Max="3" Step="3" Class="rounded-xl border border-(--klyroo-border)">
+        <KlyColumn Title="Item" Field="l => l.Item" Footer="Total" />
+        <KlyColumn Title="Quantity" Field="l => l.Quantity" Numeric Footer="19" />
+        <KlyColumn Title="SKU" Field="l => l.Sku" Mono />
+        <KlyColumn Title="Price" Field="l => l.Price" Numeric Footer="$1,190.00">
+            <Template>@context.Price.ToString("C2", System.Globalization.CultureInfo.GetCultureInfo("en-US"))</Template>
+        </KlyColumn>
+    </KlyTable>
+</div>
+
+@code {
+    private sealed record Line(string Item, int Quantity, string Sku, decimal Price);
+
+    private static readonly Line[] Lines =
+    [
+        new("Keyboard", 4, "KB-100", 480m), new("Monitor", 2, "MN-27", 640m), new("Cable", 10, "CB-01", 40m),
+        new("Dock", 1, "DK-3", 30m), new("Mouse", 2, "MS-9", 0m),
+    ];
+}

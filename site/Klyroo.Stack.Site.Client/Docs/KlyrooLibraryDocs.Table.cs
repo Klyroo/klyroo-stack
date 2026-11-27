@@ -280,7 +280,7 @@ public static partial class KlyrooLibraryDocs
                         Paragraphs: ["Register builder.Services.AddKlyrooServer() on the ASP.NET Core server so hidden columns, column order, pins, and widths saved in the PreferencesKey cookie are applied on the very first SSR HTML frame with zero layout shift."])
                 ]),
             new("integrations-form-display", "Integration: Klyroo.Form & Klyroo.Display", "Integrations",
-                "Launch row edit drawers with Klyroo.Form (FormService.CreateFormAsync) and preview row attachments or detail modals with Klyroo.Display (FilePreviewService & KlyDisplay).",
+                "Launch row edit drawers with Klyroo.Form (FormService.CreateFormAsync) and preview row attachments or detail modals with Klyroo.Display (FilePreviewService, KlyFileList).",
                 [
                     new("row-edit-form", "1. Row Action -> Klyroo.Form Drawer (Edit & Reload Table)",
                         Paragraphs: ["Wire a DataListRowAction<TItem> to FormService.CreateFormAsync(editSchema, model, FormShellMode.Drawer). When outcome.IsCompleted is true, persist the record and reload the table cleanly."],

@@ -340,10 +340,10 @@ public static class KlyrooStackProducts
             Slug: "display",
             Name: "Klyroo.Display",
             ShortName: "Display",
-            Tagline: "19 read-only display blocks, constrained audio/video players & modal file preview",
-            HeroHeadline: "Rich display blocks",
-            HeroAccent: "& constrained media.",
-            Description: "19 read-only presentation blocks inside <KlyDisplay> (Heading, Alert, Facts, Stat with sparkline, Breakdown, Meter with thresholds, Diff, masked Code/Secret, Timeline, Accordion…), constrained Audio/Video players with clip Start/End bounds and MaxPlays quotas, plus a modal multi-format file previewer.",
+            Tagline: "Highlighted code, secret blocks, file lists, constrained audio/video players & modal file preview",
+            HeroHeadline: "Rich content,",
+            HeroAccent: "code, files & media.",
+            Description: "Syntax-highlighted code with line numbers and emphasized lines (KlyCodeBlock), masked secrets (KlySecretBlock), file lists that open in the preview (KlyFileList), constrained Audio/Video players with clip Start/End bounds and MaxPlays quotas, plus a modal multi-format file previewer.",
             AccentHex: "#ec4899",
             BadgeColor: KlyColor.Secondary,
             RepoName: "klyroo-display",
@@ -354,29 +354,30 @@ public static class KlyrooStackProducts
             Platforms: ["Headless C# / NativeAOT", "Blazor Server / WASM / Auto", ".NET MAUI Blazor Hybrid"],
             Features:
             [
-                ("19 Read-Only Display Blocks", "Heading, Text, expandable Alert, Callout, copyable Facts, Stat with sparkline, Breakdown, threshold Meter, Diff before/after, Timeline, and Secret Code.", "19 Blocks"),
+                ("Highlighted Code", "KlyCodeBlock colors 13 languages with a headless scanner that is safe for NativeAOT, numbers the lines and emphasizes some of them with HighlightLines.", "Code"),
                 ("Constrained Audio & Video Players", "Supports Start/End clip slicing, MaxPlays play quotas (ideal for exams and language assessments), Seekable=false locking, and subtitle tracks.", "Media Quotas"),
                 ("Multi-Format FilePreviewService", "Headless MIME/extension detection in .Core, built-in RFC 4180 CSV parser, and zoomable modal lightbox for images, PDFs, audio, video, and CSV.", "File Lightbox"),
-                ("Secret Masking & One-Click Reveal", "DisplayKind.Code with Variant=\"DisplayVariant.Secret\" automatically masks API keys (••••••••3210) with Reveal/Hide toggle and clipboard copy.", "Security UX")
+                ("Secret Masking & One-Click Reveal", "KlySecretBlock masks API keys (••••••••3210) with a Reveal/Hide toggle and a clipboard copy of the whole value.", "Security UX")
             ],
-            CoreCodeTitle: "Klyroo.Display.Core · FilePreviewService & CSV Parser",
+            CoreCodeTitle: "Klyroo.Display.Core · CodeHighlighter, FilePreviewService & CSV Parser",
             CoreCode: """
 
+                // Headless syntax highlighting for an e-mail, a static page or a PDF
+                var html = CodeHighlighter.Highlight("SELECT 1 -- one", CodeLanguage.Sql);
+
                 // Headless MIME/extension kind detection & modal preview trigger
-                filePreview.Open(
-                    new FilePreviewItem("spec.pdf", "/files/spec.pdf"),
-                    new FilePreviewItem("metrics.csv", "/files/metrics.csv"));
+                var kind = FilePreviewService.DetectKind("spec.pdf");
+                filePreview.Open(new FilePreviewFile { Src = "/files/spec.pdf", Name = "spec.pdf" });
 
                 // Built-in RFC 4180 CSV parser for instant preview tables
                 var csv = FilePreviewService.ParseCsv("Region,MRR\nEurope,148900\nUS,192400");
                 """,
-            UiCodeTitle: "Klyroo.Display · KlyDisplay & KlyAudioPlayer",
+            UiCodeTitle: "Klyroo.Display · KlyCodeBlock, KlySecretBlock & KlyAudioPlayer",
             UiCode: """
-                <KlyDisplay Kind="DisplayKind.Stat" Title="MRR" Value="€148,900"
-                           Delta="+14.2%" Trend="@([102, 118, 134, 149])" />
+                <KlyCodeBlock Label="Orders.sql" Code="@Query" Language="CodeLanguage.Sql"
+                              LineNumbers HighlightLines="@([new CodeLineRange(3, 4)])" />
 
-                <KlyDisplay Kind="DisplayKind.Code" Variant="DisplayVariant.Secret"
-                           Value="sk_live_9876543210" VisibleChars="4" Copy="true" />
+                <KlySecretBlock Label="Webhook secret" Value="sk_live_9876543210" VisibleChars="4" />
 
                 <KlyAudioPlayer Src="/media/listening.mp3" Title="Listening Extract #1"
                                Start="15" End="45" MaxPlays="2" Seekable="false" />
@@ -384,7 +385,9 @@ public static class KlyrooStackProducts
             Components:
             [
                 new("FilePreviewService", "Headless MIME detector, RFC 4180 CSV parser and lightbox queue state.", "/display/docs", "Core"),
-                new("KlyDisplay", "19-kind read-only block component (Stat, Facts, Meter, Diff, Code/Secret, Timeline).", "/display/docs", "UI"),
+                new("KlyCodeBlock", "Syntax-highlighted code with a label, copy button, line numbers and emphasized lines.", "/display/docs", "UI"),
+                new("KlySecretBlock", "A masked secret with a Reveal toggle and a copy button.", "/display/docs", "UI"),
+                new("KlyFileList", "Attachments that open in the file preview, revealed a few at a time.", "/display/docs", "UI"),
                 new("KlyAudioPlayer", "Constrained audio player with Start/End clip bounds, MaxPlays & Seekable guard.", "/display/docs", "UI"),
                 new("KlyVideoPlayer", "Constrained video player with tracks, clip bounds and play-limit locking.", "/display/docs", "UI"),
                 new("KlyFilePreviewProvider", "Modal lightbox host for images, PDFs, audio, video and parsed CSV files.", "/display/docs", "UI")

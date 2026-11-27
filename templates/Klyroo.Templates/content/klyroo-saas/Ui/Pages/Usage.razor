@@ -4,26 +4,29 @@
 
 <PageTitle>Usage - @AppInfo.Name</PageTitle>
 
-@* KlyDisplay renders read-only blocks from data. Set Kind to pick the block and fill the parameters that kind reads. *@
+@* Each read-only block of Klyroo.UI is a typed component: KlyStatGroup, KlyMeter, KlyFacts, KlyBreakdown and KlyTimeline take records, and KlySecretBlock of Klyroo.Display masks a secret. *@
 <div class="stack">
-    <KlyDisplay Kind="DisplayKind.Heading" HeadingLevel="1" Title="Usage and billing"
+    <KlyHeading HeadingLevel="1" Title="Usage and billing"
                 Description="What your plan includes, how much of it you used and what the next invoice contains. Sample figures." />
 
-    <KlyDisplay Kind="DisplayKind.Stat" Variant="DisplayVariant.Row" Title="This month" StatItems="_usage" />
+    <KlyStatGroup Title="This month" Items="_usage" />
 
     <div class="two-columns">
         <div class="stack">
-            <KlyDisplay Kind="DisplayKind.Meter" Title="Seats" Value="@($"{Seats} of {SeatLimit}")" MeterValue="Seats" MeterMax="SeatLimit"
-                        WarningThreshold="70" ErrorThreshold="90" Description="Invite colleagues from the accounts page." />
-            <KlyDisplay Kind="DisplayKind.Meter" Variant="DisplayVariant.Ring" Title="API calls" Value="68%" MeterValue="68" MeterMax="100" WarningThreshold="80" ErrorThreshold="95"
-                        Description="680,000 of 1,000,000 calls, resets on the first of the month." />
-            <KlyDisplay Kind="DisplayKind.Facts" Title="Plan" Facts="_facts" />
+            <KlyMeter Title="Seats" Value="Seats" Max="SeatLimit" ValueText="@($"{Seats} of {SeatLimit}")"
+                      WarningThreshold="70" ErrorThreshold="90" Description="Invite colleagues from the accounts page." Surface="KlySurface.Muted" />
+            <KlyMeter Layout="KlyMeterLayout.Ring" Title="API calls" Value="68" Max="100" ValueText="68%" WarningThreshold="80" ErrorThreshold="95"
+                      Description="680,000 of 1,000,000 calls, resets on the first of the month." Surface="KlySurface.Muted" />
+            <KlyFacts Groups="@(new[] { new KlyFactGroup("Plan", _facts) })" Surface="KlySurface.Muted" />
         </div>
         <div class="stack">
-            <KlyDisplay Kind="DisplayKind.Breakdown" Title="Next invoice" BreakdownLines="_lines" BreakdownTotal="_total"
-                        Details="Prices exclude tax. The invoice is issued on the first of the month." />
-            <KlyDisplay Kind="DisplayKind.Timeline" Title="Billing history" TimelineItems="_history" />
-            <KlyDisplay Kind="DisplayKind.Code" Variant="DisplayVariant.Secret" Title="API key" Value="kly_live_8f3a91c27d4e5b60" />
+            <KlyBreakdown Title="Next invoice" Lines="_lines" Total="_total" Format="€#,0"
+                          Footnote="Prices exclude tax. The invoice is issued on the first of the month." />
+            <div class="stack">
+                <KlyHeading Title="Billing history" HeadingLevel="2" Surface="KlySurface.Plain" />
+                <KlyTimeline Items="_history" />
+            </div>
+            <KlySecretBlock Label="API key" Value="kly_live_8f3a91c27d4e5b60" />
         </div>
     </div>
 
@@ -39,11 +42,11 @@
 
     private int Seats => Math.Min(SeatLimit, Store.All.Count(a => a.Status != "Churned") - 2);
 
-    private IReadOnlyList<DisplayStatItem> _usage = [];
-    private IReadOnlyList<DisplayFact> _facts = [];
-    private IReadOnlyList<DisplayBreakdownLine> _lines = [];
-    private DisplayBreakdownLine _total = new("Total");
-    private IReadOnlyList<DisplayTimelineItem> _history = [];
+    private IReadOnlyList<KlyStatItem<int>> _usage = [];
+    private IReadOnlyList<KlyFact> _facts = [];
+    private IReadOnlyList<KlyBreakdownLine> _lines = [];
+    private KlyBreakdownLine _total = new("Total");
+    private IReadOnlyList<KlyTimelineItem> _history = [];
 
     protected override void OnInitialized()
     {
@@ -54,33 +57,33 @@
 
         _usage =
         [
-            new("Accounts", Store.All.Count.ToString(), "all plans"),
-            new("Paying", paying.Count.ToString(), Money.Format(paying.Sum(a => a.Mrr)) + " a month"),
-            new("Past due", Store.All.Count(a => a.Status == "Past due").ToString(), "to follow up", KlyColor.Warning),
+            new("Accounts", Store.All.Count) { Caption = "all plans" },
+            new("Paying", paying.Count) { Caption = Money.Format(paying.Sum(a => a.Mrr)) + " a month" },
+            new("Past due", Store.All.Count(a => a.Status == "Past due")) { Caption = "to follow up", Color = KlyColor.Warning },
         ];
 
         _facts =
         [
-            new DisplayFact { Label = "Plan", Chip = new DisplayChip("Team", KlyColor.Primary) },
-            new DisplayFact { Label = "Billing", Value = "Monthly, by card" },
-            new DisplayFact { Label = "Workspace id", Value = "ws_4c91e0a7", Mono = true, Copy = true },
-            new DisplayFact { Label = "Renews", Value = DateTime.UtcNow.AddMonths(1).ToString("MMMM 1, yyyy"), Emphasis = true },
+            new("Plan") { Badge = new KlyBadgeItem("Team") { Color = KlyColor.Primary } },
+            new("Billing") { Value = "Monthly, by card" },
+            new("Workspace id") { Value = "ws_4c91e0a7", Mono = true, Copy = true },
+            new("Renews") { Value = DateTime.UtcNow.AddMonths(1).ToString("MMMM 1, yyyy"), Emphasis = true },
         ];
 
         _lines =
         [
-            new("Team plan", Money.Format(subscription)),
-            new($"{Seats} seats", Money.Format(seats), Detail: "9 EUR per seat"),
-            new("Extra API calls", Money.Format(overage), Detail: "24,000 calls over the limit"),
+            new("Team plan") { Amount = subscription },
+            new($"{Seats} seats") { Amount = seats, Detail = "9 EUR per seat" },
+            new("Extra API calls") { Amount = overage, Detail = "24,000 calls over the limit" },
         ];
-        _total = new("Total", Money.Format(subscription + seats + overage), IsSubtotal: true);
+        _total = new("Total") { Amount = subscription + seats + overage, IsSubtotal = true };
 
         var today = DateTimeOffset.UtcNow;
         _history =
         [
-            new("Invoice paid", "Card ending 4242", Date: today.AddDays(-3), State: DisplayTimelineState.Done),
-            new("Seats added", "Two seats were added to the workspace", Date: today.AddDays(-12), State: DisplayTimelineState.Done),
-            new("Plan changed", "From Starter to Team", Date: today.AddDays(-41), State: DisplayTimelineState.Done),
+            new("Invoice paid") { Description = "Card ending 4242", At = today.AddDays(-3), Date = today.AddDays(-3).ToString("MMM d, yyyy"), State = KlyTimelineState.Done },
+            new("Seats added") { Description = "Two seats were added to the workspace", At = today.AddDays(-12), Date = today.AddDays(-12).ToString("MMM d, yyyy"), State = KlyTimelineState.Done },
+            new("Plan changed") { Description = "From Starter to Team", At = today.AddDays(-41), Date = today.AddDays(-41).ToString("MMM d, yyyy"), State = KlyTimelineState.Done },
         ];
     }
 
@@ -89,6 +92,6 @@
         Src = "invoice.csv",
         Name = "invoice.csv",
         Mime = "text/csv",
-        Content = string.Join("\n", _lines.Append(_total).Select(l => $"{l.Label},{l.Value}").Prepend("Item,Amount")),
+        Content = string.Join("\n", _lines.Append(_total).Select(l => $"{l.Label},{Money.Format(l.Amount ?? 0m)}").Prepend("Item,Amount")),
     });
 }

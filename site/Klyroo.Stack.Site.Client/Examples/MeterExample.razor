@@ -1,0 +1,10 @@
+<div class="grid w-full gap-4 md:grid-cols-2">
+    <KlyMeter Title="Storage" Value="92" WarningThreshold="75" ErrorThreshold="90" ValueText="92 GB of 100 GB" Surface="KlySurface.Bordered" />
+    <KlyMeter Layout="KlyMeterLayout.Ring" Title="Quota" Value="64" Surface="KlySurface.Bordered" />
+    <KlyMeter Title="Disk by kind" Max="10" Surface="KlySurface.Bordered" Parts="@(new[]
+    {
+        new KlyMeterPart("Photos", 3) { ValueLabel = "3 GB", Color = KlyColor.Info, Icon = "image" },
+        new KlyMeterPart("Video", 4) { ValueLabel = "4 GB", Color = KlyColor.Warning },
+    })" />
+    <KlyMeter Layout="KlyMeterLayout.Scale" Title="Risk" Levels="@(new[] { "Low", "Medium", "High" })" CurrentLevel="1" Surface="KlySurface.Bordered" />
+</div>

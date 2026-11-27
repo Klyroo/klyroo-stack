@@ -1,0 +1,12 @@
+<div class="grid w-full gap-4 sm:grid-cols-3">
+    <KlyDateTile Mode="KlyDateTileMode.Date" Value="@_renewal" Title="Renewal" Description="Annual plan" Now="@_now" Surface="KlySurface.Bordered" />
+    <KlyDateTile Mode="KlyDateTileMode.Countdown" Value="@_renewal" Title="Renewal" Now="@_now" Surface="KlySurface.Bordered" />
+    <KlyDateTile Mode="KlyDateTileMode.Range" Value="@_start" EndValue="@_end" Title="Conference" Now="@_now" Surface="KlySurface.Bordered" />
+</div>
+
+@code {
+    private readonly DateTimeOffset _now = new(2026, 3, 12, 9, 0, 0, TimeSpan.Zero);
+    private readonly DateTimeOffset _renewal = new(2026, 4, 1, 0, 0, 0, TimeSpan.Zero);
+    private readonly DateTimeOffset _start = new(2026, 3, 14, 0, 0, 0, TimeSpan.Zero);
+    private readonly DateTimeOffset _end = new(2026, 3, 16, 0, 0, 0, TimeSpan.Zero);
+}

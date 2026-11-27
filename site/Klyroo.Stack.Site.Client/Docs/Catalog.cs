@@ -10,11 +10,11 @@ public sealed record ComponentDoc(string Slug, string Name, string Group, string
 public static partial class Catalog
 {
     public static readonly string[] Groups =
-        ["Elements", "Form", "Overlay", "Navigation", "Data", "Layout", "Page", "Dashboard", "Chat", "Editor"];
+        ["Elements", "Form", "Overlay", "Navigation", "Data", "Blocks", "Layout", "Page", "Dashboard", "Chat", "Editor"];
 
     /// <summary>Every documented component. Each family declares its entries in its own Catalog.*.cs file.</summary>
     // Built on first use: static fields of the other partial files may not be initialized yet at type load.
-    public static ComponentDoc[] Components => _components ??= [.. Core, .. DataList, .. Nav, .. Overlay2, .. Elements, .. Pickers, .. Form2, .. Page, .. Layout, .. Marketing, .. Dashboard, .. Chat, .. Editor, .. Chart, .. Content];
+    public static ComponentDoc[] Components => _components ??= [.. Core, .. DataList, .. Blocks, .. Nav, .. Overlay2, .. Elements, .. Pickers, .. Form2, .. Page, .. Layout, .. Marketing, .. Dashboard, .. Chat, .. Editor, .. Chart, .. Content];
 
     private static ComponentDoc[]? _components;
 
@@ -31,7 +31,8 @@ public static partial class Catalog
         new("card", "Card", "Elements", "A surface grouping a header, a body and a footer.",
             [new("Card", typeof(Examples.CardExample))], [typeof(KlyCard)]),
         new("alert", "Alert", "Elements", "A callout that draws attention to a message.",
-            [new("Variants", typeof(Examples.AlertExample)), new("Actions and close", typeof(Examples.AlertActionsExample))], [typeof(KlyAlert)]),
+            [new("Variants", typeof(Examples.AlertExample)), new("Actions and close", typeof(Examples.AlertActionsExample)),
+             new("Details, action items and live region", typeof(Examples.AlertDetailsExample), "Details sits behind a Show details toggle, ActionItems draws KlyActionItem records, StatusIcon shows the icon of the color and Live (Polite or Assertive) makes it a live region for an alert inserted after the page loaded.")], [typeof(KlyAlert)]),
 
         new("input", "Input", "Form", "A single-line text field.",
             [new("Variants and icons", typeof(Examples.InputExample)),
@@ -79,9 +80,11 @@ public static partial class Catalog
         new("tabs", "Tabs", "Navigation", "WAI-ARIA tabs with automatic activation.",
             [new("Pill", typeof(Examples.TabsExample)), new("Link", typeof(Examples.TabsLinkExample))], [typeof(KlyTabs)]),
         new("accordion", "Accordion", "Navigation", "Stacked headings that reveal their section.",
-            [new("Accordion", typeof(Examples.AccordionExample)), new("With controls inside", typeof(Examples.AccordionNestedExample))], [typeof(KlyAccordion)]),
+            [new("Accordion", typeof(Examples.AccordionExample)), new("With controls inside", typeof(Examples.AccordionNestedExample)),
+             new("Text and DefaultOpen", typeof(Examples.AccordionTextExample), "An item takes a Text instead of content, and DefaultOpen opens it first (the first such item only, without Multiple).")], [typeof(KlyAccordion)]),
         new("table", "Table", "Data", "A data table with sortable columns.",
-            [new("Sortable table", typeof(Examples.TableExample))], [typeof(KlyTable<object>), typeof(KlyColumn<object, object>), typeof(KlyTemplateColumn<object>)]),
+            [new("Sortable table", typeof(Examples.TableExample)),
+             new("Footer, alignment and Show more", typeof(Examples.TableFooterExample), "A column takes a Footer (or a FooterTemplate), Align, Numeric and Mono; Max with Step cuts the rows behind a Show more button.")], [typeof(KlyTable<object>), typeof(KlyColumn<object, object>), typeof(KlyTemplateColumn<object>)]),
     ];
 
     public static ComponentDoc? Find(string slug) => Components.FirstOrDefault(c => c.Slug == slug);

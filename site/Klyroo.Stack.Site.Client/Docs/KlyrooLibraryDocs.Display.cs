@@ -11,39 +11,41 @@ public static partial class KlyrooLibraryDocs
             // GROUP 1: GETTING STARTED
             // =========================================================================
             new("", "Introduction & How It Works", "Getting Started",
-                "19 read-only display blocks (KlyDisplay), constrained Audio/Video media players with clip bounds and play quotas (KlyAudioPlayer, KlyVideoPlayer), and a multi-format modal file previewer (FilePreviewService & KlyFilePreviewProvider).",
+                "Highlighted code with line numbers and emphasized lines (KlyCodeBlock), a masked secret (KlySecretBlock), a file list that opens the preview (KlyFileList), constrained Audio/Video media players with clip bounds and play quotas (KlyAudioPlayer, KlyVideoPlayer), and a multi-format modal file previewer (FilePreviewService & KlyFilePreviewProvider).",
                 [
                     new("overview", "What is Klyroo.Display?",
                         Paragraphs:
                         [
-                            "Klyroo.Display gives your application a unified, accessible vocabulary for read-only business data, exam-grade media playback, and multi-format document lightboxes across Blazor Web and .NET MAUI Blazor Hybrid.",
+                            "Klyroo.Display gives your application the rich content that Klyroo.UI does not draw: syntax-highlighted code, masked secrets, file lists with preview, exam-grade media playback and multi-format document lightboxes across Blazor Web and .NET MAUI Blazor Hybrid. The read-only blocks (stats, facts, meters, timelines and the rest) are typed components of Klyroo.UI.",
                             "All MIME/extension kind detection, file size formatting, RFC 4180 CSV parsing, and media track/progress contracts live in 100% NativeAOT C# (Klyroo.Display.Core)."
                         ],
                         LiveDemoKey: "display-blocks",
-                        LiveDemoTitle: "Klyroo.Display · Live Stat, Threshold Meter, Secret Mask & Diff"),
+                        LiveDemoTitle: "Klyroo.Display · Highlighted Code, Secret Mask & File List"),
                     new("pipeline", "How Klyroo.Display Works End-to-End (3 Subsystems)",
                         TableHeaders: ["Subsystem", "Core & UI Types", "What Happens"],
                         TableRows:
                         [
-                            new("1. Structured Blocks", "KlyDisplay + 19 DisplayKind values + DisplaySurface", "Renders typed read-only blocks (Stat, Meter, Facts, Diff, Code/Secret, Timeline, Accordion, List) with automatic Loading skeletons and threshold tones."),
+                            new("1. Code, Secrets & Files", "KlyCodeBlock + CodeLanguage + CodeLineRange · KlySecretBlock · KlyFileList + FileListItem", "Highlights code with a hand-written scanner (13 languages), numbers lines and emphasizes some of them, masks secrets with reveal and copy, and lists files that open in the preview."),
                             new("2. Constrained Media", "KlyAudioPlayer · KlyVideoPlayer · MediaPlayerControl · VideoPlayerTrack", "Enforces Start/End clip bounds, Seekable=false locking, MaxPlays quotas with OnLimitReached, speed presets, and WebVTT caption tracks."),
                             new("3. File Lightbox", "FilePreviewService + <KlyFilePreviewProvider />", "Auto-detects 10 FilePreviewKind formats via DetectKind(), picks Modal vs Fullscreen via DefaultContainerForKind(), parses CSVs via ParseCsv(), and supports multi-file galleries with loop navigation.")
                         ]),
-                    new("all-kinds", "All 19 DisplayKind Values",
-                        TableHeaders: ["Category", "Exact DisplayKind Values", "Highlights"],
+                    new("where-blocks", "Where the Read-Only Blocks Went",
+                        TableHeaders: ["Block", "Component", "Package"],
                         TableRows:
                         [
-                            new("Editorial & Status (4)", "Heading, Text, Alert, Empty", "Section titles with count pills, collapsible Alert details, empty states"),
-                            new("Metrics & Visuals (5)", "Facts, Stat, Breakdown, Meter, Chart", "Copyable fact grids, sparklines, breakdown lines, threshold-colored meters"),
-                            new("Structured Data (6)", "Table, Diff, Record, Person, List, Accordion", "Before/after diffs, record cards, progressive Reveal More lists, accordions"),
-                            new("Rich & Technical (4)", "Timeline, Date, Media, Code", "Timeline states (Done/Current/Upcoming), relative dates, image galleries & Variant=\"DisplayVariant.Secret\" code")
+                            new("Stat, Meter, Facts, Breakdown", "KlyStat<TValue>, KlyStatGroup<TValue>, KlyMeter, KlyFacts, KlyBreakdown", "Klyroo.UI"),
+                            new("Diff, Record, List, Date", "KlyDiff, KlyRecordList, KlyList, KlyDateTile", "Klyroo.UI"),
+                            new("Heading, Text, Alert, Empty, Accordion", "KlyHeading, KlyText, KlyAlert, KlyEmpty, KlyAccordion", "Klyroo.UI"),
+                            new("Chart, Table, Person, Timeline, Media", "KlyChart, KlyTable, KlyUser and KlyAvatarGroup, KlyTimeline, KlyImage and KlyImageGallery", "Klyroo.UI"),
+                            new("Code and Secret", "KlyCodeBlock and KlySecretBlock", "Klyroo.Display"),
+                            new("List of files", "KlyFileList", "Klyroo.Display")
                         ]),
                     new("layers", "Two-Layer Architecture",
                         TableHeaders: ["Package", "Primary Exports", "Compatibility"],
                         TableRows:
                         [
-                            new("Klyroo.Display.Core", "FilePreviewService, FilePreviewFile, FilePreviewOptions, ParsedCsvPreview, MediaPlayerControl, VideoPlayerTrack, MediaPlayerProgress", "Headless C# · IsAotCompatible=true"),
-                            new("Klyroo.Display", "KlyDisplay, KlyAudioPlayer, KlyVideoPlayer, KlyFilePreviewProvider, AddKlyrooDisplay()", "browser, ios, android, maccatalyst, windows")
+                            new("Klyroo.Display.Core", "CodeHighlighter, CodeLanguage, CodeLineRange, FilePreviewService, FilePreviewFile, FilePreviewOptions, ParsedCsvPreview, MediaPlayerControl, VideoPlayerTrack, MediaPlayerProgress", "Headless C# · IsAotCompatible=true"),
+                            new("Klyroo.Display", "KlyCodeBlock, KlySecretBlock, KlyFileList, KlyAudioPlayer, KlyVideoPlayer, KlyFilePreviewProvider, AddKlyrooDisplay()", "browser, ios, android, maccatalyst, windows")
                         ])
                 ]),
             new("installation", "Installation & Setup", "Getting Started",
@@ -53,8 +55,8 @@ public static partial class KlyrooLibraryDocs
                         CodeSamples:
                         [
                             new("Terminal", """
-                                dotnet add package Klyroo.Display.Core   # Headless NativeAOT MIME detector, CSV parser & media models
-                                dotnet add package Klyroo.Display        # KlyDisplay, KlyAudioPlayer, KlyVideoPlayer & Lightbox
+                                dotnet add package Klyroo.Display.Core   # Headless NativeAOT highlighter, MIME detector, CSV parser & media models
+                                dotnet add package Klyroo.Display        # KlyCodeBlock, KlySecretBlock, KlyFileList, players & Lightbox
                                 """)
                         ]),
                     new("di", "2. Register Services & Mount Lightbox Host",
@@ -69,71 +71,89 @@ public static partial class KlyrooLibraryDocs
             // =========================================================================
             // GROUP 2: DISPLAY BLOCKS
             // =========================================================================
-            new("content-blocks", "Typography, Alerts, Facts & Timelines", "Display Blocks",
-                "Render headings with counts, expandable status alerts, copyable key/value fact lists, timelines, accordions, and progressive lists.",
+            new("code-blocks", "Highlighted Code, Line Numbers & Emphasized Lines", "Code, Secrets & Files",
+                "Show a snippet with syntax colors, number its lines and draw the eye to some of them, or color code outside Blazor with the headless CodeHighlighter.",
                 [
-                    new("surfaces", "DisplaySurface & Common Parameters",
-                        Paragraphs: ["Every KlyDisplay block shares Surface (Plain, Muted, Bordered, Elevated), Tone (semantic KlyColor), Loading (skeleton), Title, Description, Chip (DisplayChip), Action, and Actions (DisplayAction)."],
-                        TableHeaders: ["DisplaySurface", "Visual Style", "Best For"],
-                        TableRows:
+                    new("code-block", "KlyCodeBlock: Language, LineNumbers & HighlightLines",
+                        Paragraphs:
                         [
-                            new("Plain", "Transparent background, no border", "Inline embedding inside existing cards"),
-                            new("Muted", "Soft tinted surface", "Callouts, alert details, subtle groupings"),
-                            new("Bordered", "1px hairline border on card background", "Standalone KPI and fact blocks"),
-                            new("Elevated", "Raised surface with subtle shadow", "Primary focus cards and featured summaries")
-                        ]),
-                    new("structured", "Facts & Release Timelines",
-                        LiveDemoKey: "display-structured",
-                        LiveDemoTitle: "KlyDisplay · Copyable Facts & Pipeline Timeline",
+                            "Language is a CodeLanguage (Bash, CSharp, Css, Html, JavaScript, Json, Less, Python, Scss, Sql, TypeScript, Xml, Yaml); without one the code is plain text. HighlightLines is a list of CodeLineRange counted from 1: an int converts to a one-line range and new CodeLineRange(4, 5) is a run.",
+                            "The text content, the selection and the copy button always give the code as it is: line numbers are drawn with CSS and markup in the code is escaped."
+                        ],
+                        LiveDemoKey: "display-blocks",
+                        LiveDemoTitle: "KlyCodeBlock · Line Numbers & Emphasized Lines, KlySecretBlock, KlyFileList",
                         CodeSamples:
                         [
-                            new("FactsAndTimeline.razor", """
-                                <KlyDisplay Kind="DisplayKind.Facts" Surface="DisplaySurface.Bordered" Title="Cluster Metadata" Facts="@([
-                                    new DisplayFact { Label = "Environment", Value = "Production", Copy = true, Mono = true },
-                                    new DisplayFact { Label = "Region", Value = "eu-west-3", Chip = new DisplayChip("Healthy", KlyColor.Success) },
-                                    new DisplayFact { Label = "Failover", Value = null }
-                                ])" />
+                            new("CodeBlock.razor", """
+                                <KlyCodeBlock Label="Orders.sql" Code="@Query" Language="CodeLanguage.Sql" LineNumbers
+                                              HighlightLines="@([2, new CodeLineRange(4, 5)])" />
 
-                                <KlyDisplay Kind="DisplayKind.Timeline" Surface="DisplaySurface.Bordered" Title="Release Pipeline" TimelineItems="@([
-                                    new DisplayTimelineItem("Build NativeAOT Core", Time: "09:12", State: DisplayTimelineState.Done),
-                                    new DisplayTimelineItem("Rollout Canary", Time: "In progress", State: DisplayTimelineState.Current),
-                                    new DisplayTimelineItem("Global Promotion", Time: "Pending", State: DisplayTimelineState.Upcoming)
-                                ])" />
+                                @code {
+                                    private const string Query = "SELECT id, total\nFROM orders\nWHERE status = 'paid'\n  AND total > 100\n  AND shipped_at IS NULL;\n";
+                                }
+                                """)
+                        ]),
+                    new("headless-highlighter", "CodeHighlighter: Highlight Outside Blazor",
+                        Paragraphs: ["CodeHighlighter lives in Klyroo.Display.Core: Highlight returns escaped markup with data-token spans for an e-mail, a static page or a PDF, and Tokenize returns typed CodeToken values for your own rendering. Neither throws, and both work in NativeAOT."],
+                        CodeSamples:
+                        [
+                            new("Highlighter.cs", """
+                                var html = CodeHighlighter.Highlight("SELECT 1 -- one", CodeLanguage.Sql);
+                                var language = CodeHighlighter.ResolveFileName("Program.cs"); // CodeLanguage.CSharp
+                                foreach (var token in CodeHighlighter.Tokenize("var x = 1;", CodeLanguage.CSharp))
+                                {
+                                    Console.WriteLine($"{token.Kind}: {token.Text}");
+                                }
                                 """)
                         ])
                 ]),
-            new("metrics-and-code", "Stats, Threshold Meters, Secret Masking & Diffs", "Display Blocks",
-                "Present inline KPIs with sparklines, threshold-reactive quota meters, masked secrets with reveal/copy controls, accordions, progressive lists, and before/after diffs.",
+            new("secrets-and-lists", "Secrets & File Lists", "Code, Secrets & Files",
+                "Mask a secret with a Reveal toggle and a copy button, and list attachments that open in the file preview, revealed a few at a time.",
                 [
-                    new("metrics", "Stat, Meter, Secret Code & Diff",
+                    new("secret", "KlySecretBlock: Mask, Reveal & Copy",
                         Paragraphs:
                         [
-                            "DisplayKind.Meter automatically transitions its tone to warning at WarningThreshold and error at ErrorThreshold.",
-                            "DisplayKind.Code with Variant=\"DisplayVariant.Secret\" masks leading characters while keeping the last VisibleChars visible, with built-in reveal toggle and unmasked clipboard copy."
+                            "KlySecretBlock shows eight bullets followed by the last VisibleChars characters. While it is masked only those are in the page; the copy button copies the whole value.",
+                            "The mask is a display feature and does not protect the value: do not send a secret to a client that must not hold it."
                         ],
                         LiveDemoKey: "display-blocks",
-                        LiveDemoTitle: "Live Stat, Threshold Meter, Secret Mask & Diff",
+                        LiveDemoTitle: "KlySecretBlock · Masked Secret with Reveal & Copy",
                         CodeSamples:
                         [
-                            new("MetricsAndSecret.razor", """
-                                <KlyDisplay Kind="DisplayKind.Stat" Title="MRR" Value="€148,900" Delta="+14.2%" Trend="@([102.0, 118.0, 134.0, 148.9])" />
-                                <KlyDisplay Kind="DisplayKind.Meter" Title="Storage Quota" MeterValue="@_val" MeterMax="100" WarningThreshold="75" ErrorThreshold="90" />
-                                <KlyDisplay Kind="DisplayKind.Code" Variant="DisplayVariant.Secret" Title="Webhook Secret" Value="sk_live_9876543210" VisibleChars="4" Copy="true" />
-                                <KlyDisplay Kind="DisplayKind.Diff" Title="Plan Upgrade" DiffItems="@([new DisplayDiffItem("Tier", "Starter", "Enterprise", Changed: true)])" />
+                            new("Secret.razor", """
+                                <KlySecretBlock Label="Webhook secret" Value="sk_live_9876543210" VisibleChars="4" />
                                 """)
                         ]),
-                    new("accordion-list", "Accordion & Progressive Reveal Lists",
-                        LiveDemoKey: "display-accordion-list",
-                        LiveDemoTitle: "Interactive Accordion & Progressive Reveal List",
+                    new("file-list", "KlyFileList: Attachments That Open in the Preview",
+                        Paragraphs: ["A FileListItem is a FilePreviewFile plus a Description, Meta, Icon and Tone; a plain FilePreviewFile converts to an item. A click opens the whole list as a gallery when a KlyFilePreviewProvider is mounted, and Max with Step reveals a long list a few files at a time."],
+                        LiveDemoKey: "display-structured",
+                        LiveDemoTitle: "KlyFileList · Progressive Reveal & Highlighted C#",
                         CodeSamples:
                         [
-                            new("AccordionAndList.razor", """
-                                <KlyDisplay Kind="DisplayKind.Accordion" Multiple="true" AccordionItems="@([
-                                    new DisplayAccordionItem("NativeAOT Support", "Klyroo.Display.Core has zero UI dependencies."),
-                                    new DisplayAccordionItem("Secret Masking", "Reveal/hide in place with clipboard copy.")
-                                ])" />
+                            new("FileList.razor", """
+                                <KlyFileList Title="Attachments" Files="_files" Max="3" Step="3" />
 
-                                <KlyDisplay Kind="DisplayKind.List" Max="2" Step="2" ListItems="@_steps" />
+                                @code {
+                                    private readonly IReadOnlyList<FileListItem> _files =
+                                    [
+                                        new FileListItem(new FilePreviewFile { Src = "/files/spec.pdf", Name = "Specification.pdf", Size = 1_572_864 },
+                                            Description: "Version 3", Icon: "lock", Tone: KlyColor.Warning),
+                                        new FilePreviewFile { Src = "/files/metrics.csv", Size = 18_400 },
+                                    ];
+                                }
+                                """)
+                        ]),
+                    new("typed-blocks", "Read-Only Blocks Live in Klyroo.UI",
+                        Paragraphs: ["Stats, meters, facts, breakdowns, diffs, record lists, timelines and the rest are typed Klyroo.UI components, each with only its own parameters, so a misuse does not compile."],
+                        LiveDemoKey: "display-accordion-list",
+                        LiveDemoTitle: "KlyAccordion & KlyList · Progressive Reveal",
+                        CodeSamples:
+                        [
+                            new("TypedBlocks.razor", """
+                                <KlyStat Title="MRR" Value="@_mrr" Format="C0" Delta="@_change" DeltaFormat="+0.0;-0.0" DeltaUnit="%" Trend="@(new double[] { 102, 118, 134, 148.9 })" />
+                                <KlyMeter Title="Storage" Value="@_used" WarningThreshold="75" ErrorThreshold="90" />
+                                <KlyFacts Items="@(new[] { new KlyFact("Environment") { Value = "Production", Copy = true, Mono = true } })" />
+                                <KlyList Items="@(new[] { new KlyListItem("Compile") { Done = true }, new KlyListItem("Test") { Current = true } })" Variant="KlyListVariant.Steps" />
                                 """)
                         ])
                 ]),
@@ -204,7 +224,7 @@ public static partial class KlyrooLibraryDocs
             // GROUP 4: INTEGRATIONS WITH OTHER KLYROO LIBRARIES
             // =========================================================================
             new("integrations-table-query", "Integration: Klyroo.Table & Klyroo.Query", "Integrations",
-                "Open file lightboxes directly from Klyroo.Table row actions and summarize Klyroo.Query results and facet breakdowns with KlyDisplay blocks.",
+                "Open file lightboxes directly from Klyroo.Table row actions and summarize Klyroo.Query results and facet breakdowns with KlyStat and KlyFacts of Klyroo.UI.",
                 [
                     new("table-lightbox", "1. Klyroo.Display + Klyroo.Table (Row Attachment Lightbox & Gallery)",
                         CodeSamples:
@@ -232,29 +252,28 @@ public static partial class KlyrooLibraryDocs
                         CodeSamples:
                         [
                             new("QuerySummaryRibbon.razor", """
-                                <KlyDisplay Kind="DisplayKind.Stat" Title="Matching Records" Value="@(_result.TotalCount?.ToString("N0") ?? "—")" />
-                                <KlyDisplay Kind="DisplayKind.Facts" Title="Facet Counts" Facts="@([.. (_result.Facets?.FirstOrDefault()?.Options ?? [])
-                                    .Select(o => new DisplayFact { Label = o.Value, Value = o.Count.ToString() })])" />
+                                <KlyStat Title="Matching Records" Value="@_result.TotalCount" Format="N0" />
+                                <KlyFacts Items="@([.. (_result.Facets?.FirstOrDefault()?.Options ?? [])
+                                    .Select(o => new KlyFact(o.Value) { Value = o.Count.ToString() })])" />
                                 """)
                         ])
                 ]),
             new("integrations-form-dashboard", "Integration: Klyroo.Form & Klyroo.Dashboard", "Integrations",
-                "Review Klyroo.Form dirty diffs with DisplayKind.Diff before submission and preview Klyroo.Dashboard CSV exports inline with FilePreviewService.",
+                "Review Klyroo.Form dirty diffs with KlyDiff before submission and preview Klyroo.Dashboard CSV exports inline with FilePreviewService.",
                 [
                     new("form-diff", "1. Klyroo.Display + Klyroo.Form (Side-by-Side Change Diff Modal)",
                         CodeSamples:
                         [
                             new("FormChangeDiff.razor", """
-                                <KlyDisplay Kind="DisplayKind.Diff" Title="Review Changes Before Saving"
-                                           DiffItems="@Changes()" />
+                                <KlyDiff Title="Review Changes Before Saving" Items="@Changes()" />
 
                                 @code {
                                     // One item per field whose IsFieldDirty is true: its label, the baseline text and the current text.
-                                    private IReadOnlyList<DisplayDiffItem> Changes() =>
+                                    private IReadOnlyList<KlyDiffItem> Changes() =>
                                     [
                                         .. new[] { (Label: "Name", Field: _name), (Label: "Plan", Field: _plan) }
                                             .Where(x => _form.IsFieldDirty(x.Field))
-                                            .Select(x => new DisplayDiffItem(x.Label, _baseline[x.Label], _form.Get(x.Field), Changed: true)),
+                                            .Select(x => new KlyDiffItem(x.Label, _baseline[x.Label], _form.Get(x.Field))),
                                     ];
                                 }
                                 """)
@@ -306,36 +325,29 @@ public static partial class KlyrooLibraryDocs
             // GROUP 6: LIVE EXAMPLES (5 INTERACTIVE DEMOS)
             // =========================================================================
             new("examples", "Live Examples", "Examples",
-                "5 interactive Klyroo.Display playgrounds exercising Stat/Meter/Secret/Diff blocks, Facts & Timelines, constrained exam audio playback, Accordions & progressive Lists, and headless FilePreviewService CSV/MIME inspection.",
+                "5 interactive Klyroo.Display playgrounds exercising highlighted code with emphasized lines, the secret block and file lists, constrained exam audio playback, Klyroo.UI accordions and progressive lists, and headless FilePreviewService CSV/MIME inspection.",
                 [
-                    new("format-blocks", "1. Stat, Threshold-Reactive Meter, Masked Secret & Diff",
-                        Paragraphs: ["Toggle Storage Quota across Normal (55%), Warning (82%), and Error (95%) thresholds alongside Stat sparklines, masked secret code blocks, and Diff rows."],
+                    new("format-blocks", "1. Highlighted Code with Line Numbers & Emphasized Lines",
+                        Paragraphs: ["Switch which lines of the query are emphasized: HighlightLines takes line numbers and CodeLineRange values, and the copied text stays the code as it is. A masked secret and a file list share the board."],
                         LiveDemoKey: "display-blocks",
-                        LiveDemoTitle: "KlyDisplay · Stat, Meter, Secret Code & Diff",
+                        LiveDemoTitle: "KlyCodeBlock · KlySecretBlock · KlyFileList",
                         CodeSamples:
                         [
                             new("DisplayBlocks.razor", """
-                                <KlyDisplay Kind="DisplayKind.Stat" Title="MRR" Value="€148,900" Delta="+14.2%" Trend="@([102.0, 118.0, 134.0, 148.9])" />
-                                <KlyDisplay Kind="DisplayKind.Meter" Title="Storage Quota" MeterValue="@_val" MeterMax="100" WarningThreshold="75" ErrorThreshold="90" />
-                                <KlyDisplay Kind="DisplayKind.Code" Variant="DisplayVariant.Secret" Title="API Token" Value="sk_live_klyroo_3210" VisibleChars="4" Copy="true" />
-                                <KlyDisplay Kind="DisplayKind.Diff" Title="Plan Upgrade" DiffItems="@([new DisplayDiffItem("Tier", "Starter", "Enterprise", Changed: true)])" />
+                                <KlyCodeBlock Label="Orders.sql" Code="@Query" Language="CodeLanguage.Sql" LineNumbers HighlightLines="@([new CodeLineRange(3, 4)])" />
+                                <KlySecretBlock Label="API Token" Value="sk_live_klyroo_3210" VisibleChars="4" />
+                                <KlyFileList Title="Attachments" Files="_files" />
                                 """)
                         ]),
-                    new("structured-inspector", "2. Copyable Facts & Release Pipeline Timeline",
-                        Paragraphs: ["Combine DisplayKind.Facts (copyable monospace metadata, status chips, null-safe fallbacks) with DisplayKind.Timeline (Done, Current, Upcoming)."],
+                    new("structured-inspector", "2. Progressive File List & Highlighted C#",
+                        Paragraphs: ["KlyFileList with Max and Step reveals rows a few at a time; the C# sample is highlighted by the same headless CodeHighlighter that colors the documentation."],
                         LiveDemoKey: "display-structured",
-                        LiveDemoTitle: "KlyDisplay · Facts & Timeline",
+                        LiveDemoTitle: "KlyFileList · Max & Step, KlyCodeBlock · C#",
                         CodeSamples:
                         [
                             new("StructuredBlocks.razor", """
-                                <KlyDisplay Kind="DisplayKind.Facts" Surface="DisplaySurface.Bordered" Title="Cluster Metadata" Facts="@([
-                                    new DisplayFact { Label = "Environment", Value = "Production", Copy = true, Mono = true },
-                                    new DisplayFact { Label = "Region", Value = "eu-west-3", Chip = new DisplayChip("Healthy", KlyColor.Success) }
-                                ])" />
-                                <KlyDisplay Kind="DisplayKind.Timeline" Surface="DisplaySurface.Bordered" Title="Release Pipeline" TimelineItems="@([
-                                    new DisplayTimelineItem("Build NativeAOT Core", Time: "09:12", State: DisplayTimelineState.Done),
-                                    new DisplayTimelineItem("Rollout Canary", Time: "In progress", State: DisplayTimelineState.Current)
-                                ])" />
+                                <KlyFileList Title="Documents" Files="_files" Max="2" Step="2" />
+                                <KlyCodeBlock Code="@Program" Language="CodeLanguage.CSharp" LineNumbers HighlightLines="@([3])" />
                                 """)
                         ]),
                     new("audio-player", "3. Constrained Exam KlyAudioPlayer (Clip Bounds & MaxPlays)",
@@ -349,15 +361,15 @@ public static partial class KlyrooLibraryDocs
                                                Start="15" End="45" MaxPlays="2" Seekable="false" />
                                 """)
                         ]),
-                    new("accordion-list", "4. Multi-Open Accordion & Progressive Reveal List",
-                        Paragraphs: ["Expand multiple FAQ sections with DisplayKind.Accordion and reveal additional checklist rows incrementally using Max=\"2\" Step=\"2\"."],
+                    new("accordion-list", "4. Klyroo.UI Accordion & Progressive Reveal List",
+                        Paragraphs: ["The read-only blocks that used to be KlyDisplay kinds are Klyroo.UI components: expand several FAQ sections with KlyAccordion and reveal checklist rows with KlyList and Max=\"2\" Step=\"2\"."],
                         LiveDemoKey: "display-accordion-list",
-                        LiveDemoTitle: "KlyDisplay · Accordion & Progressive List",
+                        LiveDemoTitle: "KlyAccordion & KlyList · Progressive Reveal",
                         CodeSamples:
                         [
                             new("AccordionList.razor", """
-                                <KlyDisplay Kind="DisplayKind.Accordion" Multiple="true" AccordionItems="@_faqs" />
-                                <KlyDisplay Kind="DisplayKind.List" Max="2" Step="2" ListItems="@_checklist" />
+                                <KlyAccordion Multiple="true" Items="@_faqs" />
+                                <KlyList Max="2" Step="2" Items="@_checklist" />
                                 """)
                         ]),
                     new("csv-mime-inspector", "5. Live FilePreviewService MIME Detector & RFC 4180 CSV Parser",
@@ -376,6 +388,6 @@ public static partial class KlyrooLibraryDocs
             new("api", "API Reference", "Reference",
                 "Complete public API reference for Klyroo.Display.Core and Klyroo.Display.",
                 [],
-                ApiTypes: [typeof(KlyDisplay), typeof(KlyAudioPlayer), typeof(KlyVideoPlayer), typeof(KlyFilePreviewProvider), typeof(FilePreviewService), typeof(FilePreviewFile), typeof(FilePreviewOptions)])
+                ApiTypes: [typeof(KlyCodeBlock), typeof(KlySecretBlock), typeof(KlyFileList), typeof(CodeHighlighter), typeof(KlyAudioPlayer), typeof(KlyVideoPlayer), typeof(KlyFilePreviewProvider), typeof(FilePreviewService), typeof(FilePreviewFile), typeof(FilePreviewOptions)])
         ]);
 }

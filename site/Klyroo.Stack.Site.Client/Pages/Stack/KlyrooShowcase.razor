@@ -119,8 +119,7 @@
 
                     @if (FilteredAccounts.Count == 0)
                     {
-                        <KlyDisplay Kind="DisplayKind.Empty"
-                                   Title="No matching accounts"
+                        <KlyEmpty Title="No matching accounts"
                                    Description="No accounts match the active region filter and search query." />
                         <div class="flex justify-center pb-2">
                             <KlyButton Label="Reset filters" Size="KlySize.Sm" Color="KlyColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@ResetAllFilters" />
@@ -165,8 +164,7 @@
                 @if (selected is null)
                 {
                     <div class="rounded-2xl border border-(--klyroo-border) bg-(--klyroo-bg) p-6 text-center">
-                        <KlyDisplay Kind="DisplayKind.Empty"
-                                   Title="No account selected"
+                        <KlyEmpty Title="No account selected"
                                    Description="Reset your filters to inspect an active customer dossier." />
                         <div class="mt-4">
                             <KlyButton Label="Reset filters" Size="KlySize.Sm" Color="KlyColor.Neutral" Variant="ButtonVariant.Outline" OnClick="@ResetAllFilters" />
@@ -176,21 +174,28 @@
                 else
                 {
                     <div class="grid gap-6 lg:grid-cols-2">
-                        <KlyDisplay Kind="DisplayKind.Facts" Surface="DisplaySurface.Bordered" Title="@($"Account Dossier · {selected.Name}")" Facts="@([
-                            new DisplayFact { Label = "Account ID", Value = $"ACC-{selected.Id:D4}", Copy = true, Mono = true },
-                            new DisplayFact { Label = "Region", Value = selected.Region, Chip = new DisplayChip(selected.Status, selected.Status == "Active" ? KlyColor.Success : KlyColor.Warning) },
-                            new DisplayFact { Label = "Plan", Value = selected.Plan },
-                            new DisplayFact { Label = "Annual Recurring Revenue", Value = $"€{selected.Arr:N0}" }
-                        ])" />
-                        <KlyDisplay Kind="DisplayKind.Meter" Surface="DisplaySurface.Bordered" Title="Seat Quota Utilization"
-                                   MeterValue="@selected.SeatUsagePct" MeterMax="100" WarningThreshold="75" ErrorThreshold="90" />
-                        <KlyDisplay Kind="DisplayKind.Code" Surface="DisplaySurface.Bordered" Variant="DisplayVariant.Secret"
-                                   Title="Webhook Signing Key (Redacted in AgentBridge)" Value="@($"sk_live_klyroo_{selected.Id:D4}_9921")" VisibleChars="4" Copy="true" />
-                        <KlyDisplay Kind="DisplayKind.Timeline" Surface="DisplaySurface.Bordered" Title="Lifecycle Audit" TimelineItems="@([
-                            new DisplayTimelineItem("Account Provisioned", Time: "Q1 2026", State: DisplayTimelineState.Done),
-                            new DisplayTimelineItem("Enterprise Upgrade", Time: "Q3 2026", State: DisplayTimelineState.Done),
-                            new DisplayTimelineItem("Annual Renewal Review", Time: "Active", State: DisplayTimelineState.Current)
-                        ])" />
+                        <KlyFacts Surface="KlySurface.Bordered" Groups="@(new[]
+                        {
+                            new KlyFactGroup($"Account Dossier · {selected.Name}", new[]
+                            {
+                                new KlyFact("Account ID") { Value = $"ACC-{selected.Id:D4}", Copy = true, Mono = true },
+                                new KlyFact("Region") { Value = selected.Region, Badge = new KlyBadgeItem(selected.Status) { Color = selected.Status == "Active" ? KlyColor.Success : KlyColor.Warning } },
+                                new KlyFact("Plan") { Value = selected.Plan },
+                                new KlyFact("Annual Recurring Revenue") { Value = $"€{selected.Arr:N0}" },
+                            }),
+                        })" />
+                        <KlyMeter Surface="KlySurface.Bordered" Title="Seat Quota Utilization"
+                                  Value="@selected.SeatUsagePct" Max="100" WarningThreshold="75" ErrorThreshold="90" />
+                        <KlySecretBlock Label="Webhook Signing Key (Redacted in AgentBridge)" Value="@($"sk_live_klyroo_{selected.Id:D4}_9921")" VisibleChars="4" />
+                        <div class="rounded-xl border border-(--klyroo-border) p-4">
+                            <KlyHeading Title="Lifecycle Audit" HeadingLevel="3" Surface="KlySurface.Plain" />
+                            <KlyTimeline Items="@(new[]
+                            {
+                                new KlyTimelineItem("Account Provisioned") { Date = "Q1 2026", State = KlyTimelineState.Done },
+                                new KlyTimelineItem("Enterprise Upgrade") { Date = "Q3 2026", State = KlyTimelineState.Done },
+                                new KlyTimelineItem("Annual Renewal Review") { Date = "Active", State = KlyTimelineState.Current },
+                            })" />
+                        </div>
                     </div>
                 }
             }

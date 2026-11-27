@@ -875,23 +875,20 @@ public static partial class KlyrooLibraryDocs
                                 }
                                 """)
                         ]),
-                    new("display-integration", "2. Klyroo.Query + Klyroo.Display (Live Result & Facet Summary Cards)",
-                        Paragraphs: ["Feed DataListResult<T>.TotalCount and DataListResult<T>.Facets directly into KlyDisplay Stat and Facts blocks so summary ribbons stay synchronized with the active query."],
+                    new("display-integration", "2. Klyroo.Query + Klyroo.UI blocks (Live Result & Facet Summary Cards)",
+                        Paragraphs: ["Feed DataListResult<T>.TotalCount and DataListResult<T>.Facets directly into the KlyStat and KlyFacts blocks of Klyroo.UI so summary ribbons stay synchronized with the active query."],
                         CodeSamples:
                         [
                             new("DisplayFromQuery.razor", """
                                 @using Klyroo.Query
-                                @using Klyroo.Display
+                                @using Klyroo.UI
 
                                 <div class="grid gap-4 sm:grid-cols-2">
-                                    <KlyDisplay Kind="DisplayKind.Stat"
-                                               Title="Matching Employees"
-                                               Value="@(_result.TotalCount?.ToString("N0") ?? "—")" />
+                                    <KlyStat Title="Matching Employees" Value="@_result.TotalCount" Format="N0" />
 
-                                    <KlyDisplay Kind="DisplayKind.Facts"
-                                               Title="Breakdown by Department"
-                                               Facts="@([.. (_result.Facets?.FirstOrDefault()?.Options ?? [])
-                                                   .Select(o => new DisplayFact { Label = o.Value, Value = $"{o.Count} people" })])" />
+                                    <KlyFacts Groups="@([new KlyFactGroup("Breakdown by Department",
+                                        [.. (_result.Facets?.FirstOrDefault()?.Options ?? [])
+                                            .Select(o => new KlyFact(o.Value) { Value = $"{o.Count} people" })])])" />
                                 </div>
                                 """)
                         ]),

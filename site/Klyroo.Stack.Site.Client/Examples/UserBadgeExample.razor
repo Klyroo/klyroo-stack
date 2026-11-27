@@ -1,0 +1,12 @@
+<div class="grid w-full gap-6 sm:grid-cols-2">
+    <KlyUser Name="Ada Lovelace" Description="Analyst" AvatarColor="KlyColor.Secondary" Badge="@(new KlyBadgeItem("Admin") { Color = KlyColor.Primary })"
+             Contacts="@(new[] { new KlyContactItem("ada@example.com") { Icon = "envelope", Href = "mailto:ada@example.com" }, new KlyContactItem("+44 20 7946 0000") { Icon = "phone" } })" />
+    <KlyUser Description="No name and no picture shows a person icon" />
+    <KlyAvatarGroup Max="3" Items="@(new[]
+    {
+        new KlyAvatarItem(Alt: "Ada Lovelace") { Description = "Analyst", Badge = new KlyBadgeItem("Admin") },
+        new KlyAvatarItem(Alt: "Grace Hopper") { Description = "Engineer", Color = KlyColor.Info },
+        new KlyAvatarItem(Alt: "Alan Turing"),
+        new KlyAvatarItem(Alt: "Edsger Dijkstra"),
+    })" />
+</div>

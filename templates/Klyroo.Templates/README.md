@@ -1,6 +1,6 @@
 # Klyroo.Templates
 
-`dotnet new` templates that start a project on the Klyroo libraries: Klyroo.UI components, data lists, forms, dashboards, display blocks, spreadsheet import and the agent bridge, wired together by `Klyroo.Stack`.
+`dotnet new` templates that start a project on the Klyroo libraries: Klyroo.UI components, data lists, forms, dashboards, read-only blocks, code and file preview, spreadsheet import and the agent bridge, wired together by `Klyroo.Stack`.
 
 ```bash
 dotnet new install Klyroo.Templates

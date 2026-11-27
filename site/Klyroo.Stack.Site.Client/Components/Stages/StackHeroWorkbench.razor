@@ -224,7 +224,7 @@
                                     @(_revealSecret ? "Hide" : "Reveal")
                                 </button>
                             </div>
-                            <p class="text-[11px] text-(--klyroo-text-muted)">19 read-only blocks + CSV/PDF lightbox</p>
+                            <p class="text-[11px] text-(--klyroo-text-muted)">Highlighted code, file lists + CSV/PDF lightbox</p>
                         </div>
                         break;
 
@@ -324,10 +324,10 @@
             "dashboard.RegisterResource(kpis, Essential);\ndashboard.RegisterResource(charts, Background);\ndashboard.RegisterResource(export, Deferred);",
             ["Blazor Server", "WebAssembly", ".NET MAUI Hybrid", "NativeAOT API", "MCP / AI Agents"],
             "Essential KPIs render first; CSV exports on demand."),
-        new("display", 210, "Klyroo.Display.Core", "Klyroo.Display", "klyroo-display.css", "19 blocks + Lightbox",
-            "<KlyDisplay Kind=\"DisplayKind.Code\"\n           Variant=\"DisplayVariant.Secret\"\n           Value=\"@apiKey\" VisibleChars=\"4\" Copy=\"true\" />",
+        new("display", 210, "Klyroo.Display.Core", "Klyroo.Display", "klyroo-display.css", "Code + Files + Lightbox",
+            "<KlySecretBlock Label=\"API key\" Value=\"@apiKey\" VisibleChars=\"4\" />",
             ["Static SSR", "Blazor Server", "WebAssembly", ".NET MAUI Hybrid", "NativeAOT API"],
-            "Facts, meters, diffs, constrained media & lightbox."),
+            "Highlighted code, secrets, file lists, constrained media & lightbox."),
         new("spreadsheet", 234, "Klyroo.Spreadsheet.Core", "Klyroo.Spreadsheet", "klyroo-spreadsheet.css", "10k CSV rows in 24.9 ms",
             "var importer = new SpreadsheetImporter<RateRow>(schema);\nimporter.LoadText(csv, \"tarifs.csv\");\n// 20-row header scan + NFD + 80% auto-map",
             ["Blazor Server", "WebAssembly", ".NET MAUI Hybrid", "NativeAOT API", "MCP / AI Agents"],
