@@ -19,6 +19,11 @@ on:
         description: The name of the calling repository, which is the address of the site (https://klyroo.github.io/<repo>/).
         required: true
         type: string
+      playground:
+        description: Also publish the library playgrounds (a Blazor WebAssembly app in klyroo-stack/playground) under /playground/. Only klyroo-stack sets it.
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -71,6 +76,18 @@ jobs:
         run: |
           dotnet run -c Release --project klyroo-stack/docs-site/Klyroo.Docs.Site -- \
             export --repo "$GITHUB_WORKSPACE/$REPO" --name "$REPO" --out "$GITHUB_WORKSPACE/_site"
+      # The playground references every library by relative path, so it needs all of them side by side.
+      - name: Check out the other libraries (for the playground)
+        if: inputs.playground
+        run: |
+          for r in klyroo-query klyroo-table klyroo-form klyroo-dashboard klyroo-spreadsheet klyroo-agent; do
+            [ -d "$r" ] || git clone --depth 1 "https://github.com/klyroo/$r.git" "$r"
+          done
+      - name: Publish the playground below /playground/
+        if: inputs.playground
+        env:
+          REPO: ${{ inputs.repo }}
+        run: klyroo-stack/build/publish-playground.sh "$GITHUB_WORKSPACE/_site/playground" "/$REPO/playground/"
       - uses: actions/upload-pages-artifact@v4
         with:
           path: _site
