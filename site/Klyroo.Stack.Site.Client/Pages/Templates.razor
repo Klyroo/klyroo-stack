@@ -166,7 +166,7 @@
                         <div class="flex flex-wrap items-center gap-2">
                             <span class="font-semibold text-(--klyroo-text-highlighted)">@_selected.Title</span>
                             <KlyBadge Label="@_selected.Category" Color="KlyColor.Neutral" Variant="KlyVariant.Subtle" Size="KlySize.Sm" />
-                            <KlyBadge Label="@(IsReady(_selected) ? "Live ready" : "Starting")" Color="@(IsReady(_selected) ? KlyColor.Success : KlyColor.Warning)" Variant="KlyVariant.Subtle" Size="KlySize.Sm" />
+                            <KlyBadge Label="@(IsOffline(_selected) ? "Demo offline" : IsReady(_selected) ? "Live ready" : "Starting")" Color="@(IsReady(_selected) ? KlyColor.Success : KlyColor.Warning)" Variant="KlyVariant.Subtle" Size="KlySize.Sm" />
                         </div>
                         <p class="mt-1 text-sm text-(--klyroo-text-muted)">@_selected.Description</p>
                     </div>
@@ -214,14 +214,28 @@
                 {
                     var state = Demos.StateOf(template.Name);
                     var ready = state == "ready";
+                    // The demo is shown as live only while this host can reach it: switched off, not built or not published, or stopped, it is offline.
+                    var offline = IsOffline(template);
+                    RenderFragment screenshots = @<text>
+                                <KlyImage Src="@template.Screenshot("light")" Provider="none" Alt="@($"The {template.Title} template, light mode")" Width="1280" Height="800" Loading="KlyImageLoading.Lazy" Class="block h-full w-full object-cover object-top transition-transform duration-300 ease-out group-hover:scale-[1.02] dark:hidden" data-testid="template-screenshot-light" />
+                                <KlyImage Src="@template.Screenshot("dark")" Provider="none" Alt="@($"The {template.Title} template, dark mode")" Width="1280" Height="800" Loading="KlyImageLoading.Lazy" Class="hidden h-full w-full object-cover object-top transition-transform duration-300 ease-out group-hover:scale-[1.02] dark:block" data-testid="template-screenshot-dark" />
+                    </text>;
                     var source = Settings.SourceUrl(template);
                     <li class="flex" data-testid="template-card" data-template="@template.Name">
                         <article class="group flex w-full flex-col overflow-hidden rounded-2xl border border-(--klyroo-border) bg-(--klyroo-bg) transition-colors hover:border-(--klyroo-border-accented)"
                                  aria-labelledby="@($"template-{template.Name}")">
-                            <a href="@template.DemoPath" data-enhance-nav="false" class="relative block aspect-[16/10] overflow-hidden border-b border-(--klyroo-border) bg-(--klyroo-bg-muted)">
-                                <KlyImage Src="@template.Screenshot("light")" Provider="none" Alt="@($"The {template.Title} template, light mode")" Width="1280" Height="800" Loading="KlyImageLoading.Lazy" Class="block h-full w-full object-cover object-top transition-transform duration-300 ease-out group-hover:scale-[1.02] dark:hidden" data-testid="template-screenshot-light" />
-                                <KlyImage Src="@template.Screenshot("dark")" Provider="none" Alt="@($"The {template.Title} template, dark mode")" Width="1280" Height="800" Loading="KlyImageLoading.Lazy" Class="hidden h-full w-full object-cover object-top transition-transform duration-300 ease-out group-hover:scale-[1.02] dark:block" data-testid="template-screenshot-dark" />
-                            </a>
+                            @if (offline)
+                            {
+                                <div class="relative block aspect-[16/10] overflow-hidden border-b border-(--klyroo-border) bg-(--klyroo-bg-muted)">
+                                    @screenshots
+                                </div>
+                            }
+                            else
+                            {
+                                <a href="@template.DemoPath" data-enhance-nav="false" class="relative block aspect-[16/10] overflow-hidden border-b border-(--klyroo-border) bg-(--klyroo-bg-muted)">
+                                    @screenshots
+                                </a>
+                            }
 
                             <div class="flex flex-1 flex-col p-5 sm:p-6">
                                 <div class="flex items-start justify-between gap-3">
@@ -229,8 +243,8 @@
                                         <h3 id="@($"template-{template.Name}")" class="text-xl font-semibold tracking-tight text-(--klyroo-text-highlighted)">@template.Title</h3>
                                         <p class="mt-0.5 font-mono text-[11px] text-(--klyroo-text-muted)">@template.RenderMode</p>
                                     </div>
-                                    <KlyBadge Label="@(ready ? "Live demo" : "Starting")"
-                                             Color="@(ready ? KlyColor.Success : KlyColor.Warning)"
+                                    <KlyBadge Label="@(offline ? "Demo offline" : ready ? "Live demo" : "Starting")"
+                                             Color="@(ready && !offline ? KlyColor.Success : KlyColor.Warning)"
                                              Variant="KlyVariant.Subtle"
                                              Size="KlySize.Sm"
                                              data-testid="template-state" />
@@ -249,13 +263,20 @@
                                 </ul>
 
                                 <div class="mt-auto flex flex-wrap items-center gap-2 pt-5">
-                                    <KlyButton Label="Preview Live" Href="@template.DemoPath" data-enhance-nav="false" data-testid="template-preview" Size="KlySize.Sm" Class="rounded-lg">
-                                        <TrailingIcon><svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14m-6-6 6 6-6 6" /></svg></TrailingIcon>
-                                    </KlyButton>
-                                    <KlyButton Label="Inspect Here" Href="#theater" Color="KlyColor.Neutral" Variant="ButtonVariant.Outline" Size="KlySize.Sm" Class="rounded-lg" OnClick="@(() => SelectTemplate(template, activateLive: true))" />
-                                    @if (source is not null)
+                                    @if (offline)
                                     {
-                                        <KlyButton Label="Source" Href="@source" Color="KlyColor.Neutral" Variant="ButtonVariant.Ghost" Size="KlySize.Sm" data-testid="template-source" Class="rounded-lg" />
+                                        <span class="text-sm text-(--klyroo-text-muted)" data-testid="template-offline">This demo is not running on this server</span>
+                                    }
+                                    else
+                                    {
+                                        <KlyButton Label="Preview Live" Href="@template.DemoPath" data-enhance-nav="false" data-testid="template-preview" Size="KlySize.Sm" Class="rounded-lg">
+                                            <TrailingIcon><svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14m-6-6 6 6-6 6" /></svg></TrailingIcon>
+                                        </KlyButton>
+                                        <KlyButton Label="Inspect Here" Href="#theater" Color="KlyColor.Neutral" Variant="ButtonVariant.Outline" Size="KlySize.Sm" Class="rounded-lg" OnClick="@(() => SelectTemplate(template, activateLive: true))" />
+                                        @if (source is not null)
+                                        {
+                                            <KlyButton Label="Source" Href="@source" Color="KlyColor.Neutral" Variant="ButtonVariant.Ghost" Size="KlySize.Sm" data-testid="template-source" Class="rounded-lg" />
+                                        }
                                     }
                                 </div>
                             </div>
@@ -354,6 +375,12 @@
     {
         var state = Demos.StateOf(template.Name);
         return state is not null and not "unavailable" and not "stopped";
+    }
+
+    private bool IsOffline(TemplateInfo template)
+    {
+        var state = Demos.StateOf(template.Name);
+        return template.HasDemo && state is null or "unavailable" or "stopped";
     }
 
     private void SelectTemplate(TemplateInfo template, bool activateLive)
