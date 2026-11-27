@@ -1,0 +1,32 @@
+@* The interchange of a narrow screen: the disc and eight stubs, one per line, each ending in its badge (a link to the chapter). It is static and drawn from the same
+   data as the map; a hover or the focus of a badge isolates its line, as on the map. *@
+<div class="sc-map sc-compact">
+    <svg viewBox="@NetworkLayout.CompactViewBox" role="group" aria-labelledby="compact-title" focusable="false">
+        <title id="compact-title">Eight lines meet at the Klyroo.Stack interchange</title>
+        @foreach (var stub in Layout.CompactStubs())
+        {
+            <g class="line-g" data-line="@stub.Line.Key" style="--c: @stub.Line.Badge.Fill">
+                <g class="line-i">
+                    <path class="route" d="M0 0 L@(N(stub.End.X)) @(N(stub.End.Y))" pathLength="1" />
+                    <a class="badge" href="@("#line-" + stub.Line.Key)" aria-label="@($"{stub.Line.Library.Name}: ride this line")">
+                        <rect class="ring" x="@N(stub.Badge.X - 5)" y="@N(stub.Badge.Y - 5)" width="@N(stub.Badge.Width + 10)" height="@N(stub.Badge.Height + 10)" rx="11" />
+                        <rect class="plate" x="@N(stub.Badge.X)" y="@N(stub.Badge.Y)" width="@N(stub.Badge.Width)" height="@N(stub.Badge.Height)" rx="7" style="fill: @stub.Badge.Fill" />
+                        <text x="@N(stub.Badge.Center.X)" y="@N(stub.Badge.Center.Y + 4.5)" style="fill: @stub.Badge.OnFill">@stub.Name</text>
+                    </a>
+                </g>
+            </g>
+        }
+        <g class="hub" aria-hidden="true">
+            <circle class="hub-ring" r="37" />
+            <circle class="hub-disc" r="30" />
+            <text y="-2">Klyroo</text>
+            <text y="14">Stack</text>
+        </g>
+    </svg>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public NetworkLayout Layout { get; set; } = default!;
+
+    private static string N(double value) => value.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+}

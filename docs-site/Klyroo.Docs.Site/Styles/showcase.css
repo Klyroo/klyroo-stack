@@ -87,7 +87,7 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
 .is-showcase .site-main { padding: 0; min-height: 0; }
 
 /* Surfaces that are black in both modes: the nav band, the signs, the panels, the code. The Klyroo.UI tokens are redrawn for them. */
-.sc-nav, .sc .sign, .sc .sc-plat, .sc .sc-pillars, .sc .ch-card, .sc .sc-templates, .sc .rule-sign, .sc .sc-code, .sc .sc-popover-surface {
+.sc-nav, .sc .sign, .sc .sc-plat, .sc .sc-pillars, .sc .ch-card, .sc .sc-templates, .sc .track-board, .sc .change, .sc .board, .sc .sc-code, .sc .sc-popover-surface {
   --klyroo-bg: var(--sc-panel);
   --klyroo-bg-muted: #14171d;
   --klyroo-bg-elevated: #14171d;
@@ -152,6 +152,9 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
 .sc-link:hover { border-color: var(--sc-sys); }
 .sc-link:focus-visible { outline: 2px solid var(--sc-sys); outline-offset: 4px; border-radius: 2px; }
 .sc-tools { display: flex; align-items: center; gap: 0.5rem; }
+.sc-menu { display: none; }
+.sc-nav .sc-menu-btn { color: #ffffff; }
+.sc-nav .sc-menu-btn:hover { background: #26292f; }
 .sc-nav .sc-search, .sc-nav .sc-mode { color: #ffffff; }
 .sc-nav .sc-search:hover, .sc-nav .sc-mode:hover { background: #26292f; }
 .sc-nav .sc-search kbd { background: #1d2026; color: #ece8dc; border-color: #4a4f5b; }
@@ -272,7 +275,7 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
 
 /* ---------- The stage: the map, sticky ---------- */
 .stage {
-  grid-column: 2;
+  grid-column: 1 / -1;
   grid-row: 1 / span 9;
   align-self: start;
   position: sticky;
@@ -281,8 +284,9 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
   overflow: clip;
   z-index: 1;
 }
-.stage .sc-map { position: absolute; inset: 0; }
-.sc-diagram { display: none; }
+/* The stage spans the page, so a label that the camera pushes toward the chapters goes behind the opaque panel instead of being cut mid-word at an edge of the stage. */
+.stage > .sc-map:not(.sc-compact) { position: absolute; inset: 0 0 0 41.667%; }
+.sc-diagram, .stage > .sc-compact { display: none; }
 .sc-pillars {
   position: absolute;
   right: clamp(1rem, 2.6vw, 2.5rem);
@@ -366,8 +370,9 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
 }
 .sc-map .train, .sc-map .rider { display: none; }
 .sc-map .rider { fill: var(--sc-sys); stroke: var(--sc-ink); stroke-width: 3.5; }
-.sc-map .car { fill: var(--sc-station); stroke: var(--sc-ink); stroke-width: 2.5; }
-.sc-map .head { fill: var(--sc-sys); }
+/* A train is one object, a dark capsule with a yellow nose, so it never reads as a station (a white disc with a ring). */
+.sc-map .train .body { fill: var(--sc-ink); stroke: #ffffff; stroke-width: 2; }
+.sc-map .train .nose { fill: var(--sc-sys); stroke: var(--sc-ink); stroke-width: 1.5; }
 
 /* One line isolated: a hover on it or the focus of its badge dims the others and lights its stations with their labels. */
 .sc-map:has(.line-g:is(:hover, :focus-within)) .line-g:not(:hover, :focus-within) .line-i { opacity: 0.14; }
@@ -378,22 +383,21 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
   .sc-map[data-mode="stage"] .route { stroke-dashoffset: 1; animation: sc-draw 1.2s var(--sc-ease) var(--delay) both; }
   .sc-map[data-mode="stage"] .stn :is(.tick, .lbl) { animation: sc-appear 0.4s var(--sc-ease) var(--sd) both; }
   .sc-map[data-mode="stage"] .badge { animation: sc-appear 0.5s var(--sc-ease) calc(var(--delay) + 1s) both; }
-  .sc-map[data-mode="stage"] .train { display: inline; --tdelay: calc(var(--delay) + 1.6s); }
+  .sc-map[data-mode="stage"] .train { display: inline; --tdelay: calc(1.8s + var(--delay) * 6); }
   .sc-map[data-mode="stage"] .rider { display: inline; opacity: 0; offset-path: var(--path); offset-distance: 0%; offset-rotate: 0deg; }
-  .sc-map .train circle {
+  /* It leaves from under the interchange and ends under its badge, so it never rests on a station; every line has its own start and period. */
+  .sc-map .train .tr {
     offset-path: var(--path);
     offset-distance: 0%;
-    offset-rotate: 0deg;
-    animation: sc-run var(--run) ease-in-out var(--tdelay) infinite alternate backwards;
+    offset-rotate: auto;
+    animation: sc-run var(--run) cubic-bezier(0.45, 0, 0.55, 1) var(--tdelay) infinite backwards;
   }
-  .sc-map .train .car-1 { animation-delay: calc(var(--tdelay) + 0.14s); }
-  .sc-map .train .car-2 { animation-delay: calc(var(--tdelay) + 0.28s); }
-  .sc-map .train .car-3 { animation-delay: calc(var(--tdelay) + 0.42s); }
 }
 @keyframes sc-draw { to { stroke-dashoffset: 0; } }
 @keyframes sc-appear { from { opacity: 0; } to { opacity: 1; } }
-@keyframes sc-run { from { offset-distance: 0%; } to { offset-distance: 100%; } }
-@keyframes sc-station-lit { from { --lit: 0; } to { --lit: 1; } }
+@keyframes sc-run { 0% { offset-distance: 0%; } 66%, 100% { offset-distance: 100%; } }
+@keyframes sc-station-lit { 0% { --lit: 0; } 14% { --lit: 1; } 86% { --lit: 1; } 100% { --lit: 0; } }
+@keyframes sc-lit-once { from { --lit: 0; } to { --lit: 1; } }
 @keyframes sc-pillars-out { to { opacity: 0; visibility: hidden; translate: 0 1rem; } }
 
 /* ---------- The chapters ---------- */
@@ -417,6 +421,13 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
   max-width: 34rem;
 }
 :root.dark .ch-card { outline: 1px solid var(--sc-panel-line); }
+.ch-edge { margin: -1.75rem -1.9rem 1.25rem; border-radius: 1.125rem 1.125rem 0 0; overflow: hidden; }
+.ch-edge .platform { display: block; height: 0.75rem; background: var(--sc-sys) repeating-linear-gradient(90deg, transparent 0 0.9rem, #11111155 0.9rem 1.05rem); }
+.ch-edge .strip { display: block; height: 0.5rem; background: var(--c); }
+.ch-way { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem 1rem; margin-top: 1.1rem; padding-top: 0.9rem; border-top: 1px solid var(--sc-panel-line); }
+.way { display: inline-flex; align-items: center; gap: 0.5rem; color: #ffffff; font: 700 0.875rem/1.2 var(--sc-font); font-variation-settings: "wdth" 108; text-decoration: none; border-radius: 0.375rem; padding: 0.2rem 0; }
+.way svg { color: var(--sc-sys); width: 1.1rem; height: 1.1rem; }
+.way:hover { text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--sc-sys); }
 .ch-head h2 { margin: 0; font-size: 1rem; line-height: 1; }
 .ch-head .ch-pill, .ld-pill {
   --kly-color: var(--c);
@@ -511,28 +522,70 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
 .sc code { font-family: var(--sc-mono); }
 .sc-lede code { font-size: 0.8em; white-space: nowrap; background: color-mix(in srgb, var(--sc-text), transparent 90%); padding: 0.1em 0.35em; border-radius: 4px; }
 
-.rules { list-style: none; margin: 3.5rem 0 0; padding: 0; }
-.rule {
+/* The four rules: four parallel tracks, each a line with its own station and its station-name board. */
+.tracks { list-style: none; margin: 4rem 0 0; padding: 0; display: grid; gap: 3.5rem; }
+.track {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(12rem, 16rem) minmax(0, 1fr) minmax(0, 30rem);
   gap: 1.5rem 3rem;
   align-items: start;
-  padding: 2.25rem 0;
-  border-top: 1px solid var(--sc-line);
+  padding-top: 3.25rem;
   scroll-margin-top: calc(var(--sc-nav-h) + 1rem);
 }
-.rule:last-child { border-bottom: 1px solid var(--sc-line); }
-.rule-sign { display: flex; align-items: center; gap: 0.75rem; padding: 0.9rem 1.1rem; background: var(--sc-panel); border-radius: 0.875rem; }
-:root.dark .rule-sign { outline: 1px solid var(--sc-panel-line); }
-.rule-sign h3 { margin: 0; color: #ffffff; font: 800 1.25rem/1.1 var(--sc-font); font-variation-settings: "wdth" 118; }
+.track::before { content: ""; position: absolute; left: 0; right: 0; top: 0.75rem; height: 14px; border-radius: 7px; background: var(--t); }
+.track::after {
+  content: "";
+  position: absolute;
+  left: 1.25rem;
+  top: 0.1rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: var(--sc-station);
+  border: 4px solid var(--sc-edge);
+}
+.track-board {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1.15rem 1.1rem 0.9rem;
+  background: var(--sc-panel);
+  color: #ffffff;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+:root.dark .track-board { outline: 1px solid var(--sc-panel-line); }
+.board-stripe { position: absolute; left: 0; right: 0; top: 0; height: 6px; background: var(--sc-sys); }
+.track-board h3 { margin: 0; color: #ffffff; font: 800 1.25rem/1.1 var(--sc-font); font-variation-settings: "wdth" 118; }
+.track-board .board-arrow { flex: none; color: var(--sc-sys); width: 1.5rem; height: 1.5rem; }
 .rule-lead { margin: 0; font: 700 1.25rem/1.35 var(--sc-font); color: var(--sc-strong); text-wrap: pretty; }
 .proof { margin: 0.75rem 0 0; font: 400 1rem/1.55 var(--sc-font); color: var(--sc-muted); max-width: 52ch; text-wrap: pretty; }
-.rule-demo { min-width: 0; }
-.modes-lead { margin: 0 0 0.75rem; font: 600 0.9375rem/1.3 var(--sc-font); color: var(--sc-muted); }
-.modes ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.625rem; }
-.mode { background: none; border: 0; padding: 0; border-radius: 0.5rem; cursor: help; color: var(--sc-text); }
+.track-text, .track-demo { min-width: 0; }
+
+/* A "change here for" board: the two ways out of the stop, each with its roundel. */
+.change { display: grid; gap: 0.75rem; padding: 1rem; background: var(--sc-panel); border-radius: 0.75rem; color: #ffffff; min-width: 0; }
+:root.dark .change { outline: 1px solid var(--sc-panel-line); }
+.change-title { margin: 0; color: var(--sc-sys); font: 800 0.9375rem/1 var(--sc-font); font-variation-settings: "wdth" 112; text-transform: uppercase; letter-spacing: 0.06em; }
+.change-row { display: flex; align-items: center; gap: 0.875rem; margin-top: 0.25rem; }
+.change-row h4 { margin: 0; font: 800 1.0625rem/1.2 var(--sc-font); font-variation-settings: "wdth" 108; color: #ffffff; }
+.change-row p { margin: 0.15rem 0 0; font: 400 0.875rem/1.4 var(--sc-font); color: var(--sc-panel-muted); }
+.change-row code { font-size: 0.85em; color: #dcd8cb; }
+.roundel { flex: none; display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; background: var(--r); box-shadow: 0 0 0 3px #ffffff; }
+.roundel span { font: 900 0.8125rem/1 var(--sc-font); font-variation-settings: "wdth" 100; color: #111111; }
+
+/* The render modes: five stops on one line. */
+.modes-lead { margin: 0 0 1.25rem; font: 600 0.9375rem/1.3 var(--sc-font); color: var(--sc-muted); }
+.modes ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.25rem; position: relative; }
+.modes ol::before { content: ""; position: absolute; left: 0.6rem; top: 0.9rem; bottom: 0.9rem; width: 8px; margin-left: -4px; border-radius: 4px; background: var(--t); }
+.modes li { position: relative; display: flex; align-items: center; gap: 1rem; }
+.modes .tick { position: relative; z-index: 1; flex: none; width: 1.2rem; height: 1.2rem; box-sizing: border-box; border-radius: 50%; background: var(--sc-station); border: 3.5px solid var(--sc-edge); }
+.mode { background: none; border: 0; padding: 0.35rem 0.25rem; border-radius: 0.375rem; cursor: help; color: var(--sc-text); font: 700 1.0625rem/1.2 var(--sc-font); font-variation-settings: "wdth" 108; text-align: left; }
+.mode:hover { background: color-mix(in srgb, var(--sc-sys), transparent 55%); }
 .mode:focus-visible { outline: 3px solid var(--sc-focus); outline-offset: 2px; }
-.modes .mode > span { --kly-color: var(--sc-ink); color: var(--sc-text); border-color: var(--sc-edge); font-weight: 700; }
 
 .sc-code { min-width: 0; max-width: 100%; }
 .sc-code > div { min-width: 0; --klyroo-bg-muted: #0a0c10; }
@@ -543,16 +596,25 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
 .demo-panel { display: grid; gap: 0.75rem; padding-top: 0.5rem; }
 .demo-panel p, .tpl-panel p { margin: 0; font: 400 0.9375rem/1.5 var(--sc-font); color: var(--sc-muted); }
 
-.sc-templates { background: var(--sc-panel); color: var(--sc-panel-text); padding-bottom: clamp(4.5rem, 8vw, 7rem); }
+.sc-templates { background: var(--sc-panel); color: var(--sc-panel-muted); padding-bottom: clamp(4.5rem, 8vw, 7rem); }
 :root.dark .sc-templates { border-block: 1px solid var(--sc-panel-line); }
-.sc-templates .sc-wrap { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 3rem clamp(2rem, 6vw, 6rem); align-items: start; }
+.sc-templates .sc-wrap { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 3rem clamp(2rem, 5vw, 5rem); align-items: start; }
 .sc-templates .sc-h2 { color: #ffffff; }
 .sc-templates .sc-lede { color: var(--sc-panel-muted); }
 .sc-templates .sc-lede code { background: #23262d; }
-.tpl-intro { display: grid; gap: 1.5rem; }
-.tpl-panel { display: grid; gap: 0.875rem; padding-top: 1rem; }
-.tpl-panel p { color: var(--sc-panel-muted); }
-.sc-templates .sc-code { border-color: #2a2d35; }
+.tpl-intro { display: grid; gap: 1.5rem; min-width: 0; }
+.sc-templates .sc-code > div { border-color: #2a2d35; }
+
+/* The departure board: a platform number, the template, what it creates, the command. */
+.board { min-width: 0; border: 3px solid #ffffff22; border-radius: 0.875rem; overflow: hidden; background: #0a0c10; }
+.board-head { display: grid; grid-template-columns: 4.5rem minmax(0, 1fr); padding: 0.7rem 1.1rem; background: var(--sc-sys); color: #111111; font: 900 0.8125rem/1 var(--sc-font); font-variation-settings: "wdth" 112; text-transform: uppercase; letter-spacing: 0.08em; }
+.departures { list-style: none; margin: 0; padding: 0; }
+.departure { display: grid; grid-template-columns: 4.5rem minmax(0, 1fr); gap: 0.35rem 0; padding: 1.1rem 1.1rem 1.25rem; border-top: 1px solid #23262d; align-items: baseline; }
+.departure:first-child { border-top: 0; }
+.platform-no { grid-row: 1 / span 3; align-self: start; display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 0.375rem; background: var(--sc-sys); color: #111111; font: 900 1.75rem/1 var(--sc-font); font-variation-settings: "wdth" 125; }
+.departure h3 { margin: 0; color: var(--sc-sys); font: 800 1.375rem/1.1 var(--sc-mono); letter-spacing: -0.01em; }
+.creates { margin: 0.1rem 0 0.6rem; font: 400 0.9375rem/1.5 var(--sc-font); color: var(--sc-panel-muted); text-wrap: pretty; }
+.departure-cmd { min-width: 0; }
 
 .sc-close .close-top { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: 2rem clamp(2rem, 5vw, 5rem); align-items: center; }
 .close-copy { display: grid; gap: 1.25rem; justify-items: start; }
@@ -561,15 +623,19 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
 .close-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
 .close-map { min-width: 0; overflow: clip; }
 .close-map .sc-map { height: clamp(22rem, 46vw, 36rem); }
-.close-libs-title { margin: 5rem 0 1.25rem; font: 800 1.5rem/1.1 var(--sc-font); font-variation-settings: "wdth" 118; color: var(--sc-strong); }
-.close-libs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); gap: 0; border-top: 3px solid var(--sc-ink); }
-:root.dark .close-libs { border-color: var(--sc-line); }
-.close-libs li { display: grid; gap: 0.4rem; align-content: start; padding: 1.1rem 1.25rem 1.25rem 0; border-bottom: 1px solid var(--sc-line); }
-.lib-name { display: inline-flex; align-items: center; gap: 0.6rem; color: var(--sc-strong); font: 800 1.125rem/1.2 var(--sc-font); font-variation-settings: "wdth" 112; text-decoration: none; }
-.lib-name .dot { background: var(--c); width: 0.9rem; height: 0.9rem; border: 3px solid var(--sc-edge); box-sizing: border-box; }
-.lib-name:hover { text-decoration: underline; text-underline-offset: 4px; }
-.close-libs p { margin: 0; font: 400 0.9375rem/1.45 var(--sc-font); color: var(--sc-muted); text-wrap: pretty; }
-.lib-links { display: flex; gap: 1rem; margin-top: 0.25rem; }
+.close-libs-title { margin: 5rem 0 1.5rem; font: 800 1.5rem/1.1 var(--sc-font); font-variation-settings: "wdth" 118; color: var(--sc-strong); }
+
+/* The legend of the network: a strip per line, its stations as ticks on it. */
+.legend { list-style: none; margin: 0; padding: 0; border-top: 3px solid var(--sc-ink); }
+:root.dark .legend { border-color: var(--sc-line); }
+.legend-line { display: grid; grid-template-columns: 13.5rem minmax(8rem, 1fr) auto; gap: 0.2rem 2rem; align-items: center; padding: 1rem 0 1.05rem; border-bottom: 1px solid var(--sc-line); }
+.legend-name { text-decoration: none; justify-self: start; border-radius: 0.5rem; }
+.legend-pill { --kly-color: var(--c); font: 800 1.0625rem/1 var(--sc-font); font-variation-settings: "wdth" 112; }
+.legend-strip { position: relative; display: flex; justify-content: space-evenly; align-items: center; height: 1.5rem; }
+.legend-strip::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 12px; margin-top: -6px; border-radius: 6px; background: var(--c); }
+.legend-strip .tick { position: relative; width: 1.05rem; height: 1.05rem; box-sizing: border-box; border-radius: 50%; background: var(--sc-station); border: 3.5px solid var(--sc-edge); }
+.legend-tag { grid-column: 1 / -1; margin: 0; font: 400 0.9375rem/1.45 var(--sc-font); color: var(--sc-muted); max-width: 70ch; text-wrap: pretty; }
+.lib-links { display: flex; gap: 1.25rem; }
 .lib-link { color: var(--sc-strong); font: 700 0.9375rem/1.2 var(--sc-font); text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px; }
 .lib-link:hover { text-decoration-color: var(--sc-sys); }
 .close-meta { margin: 3.5rem 0 0; font: 500 0.875rem/1.5 var(--sc-font); color: var(--sc-muted); }
@@ -589,10 +655,10 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
     .journey .rider { animation: var(--rider-anim) linear both; animation-timeline: --journey; animation-range: contain 0% contain 100%; }
     .journey .sc-pillars { animation: sc-pillars-out linear both; animation-timeline: --journey; animation-range: contain 0% contain 6%; }
     /* The stations of a chapter light up one after the other as the page reaches them. */
-    .ch-stop { animation: sc-station-lit linear both; animation-timeline: view(); animation-range: entry 40% entry 95%; }
+    .ch-stop { animation: sc-lit-once linear both; animation-timeline: view(); animation-range: entry 40% entry 95%; }
     /* The close pulls the camera back: the whole network again, drawn as it comes into view. */
-    .close-map .cam { animation: sc-pull-back linear both; animation-timeline: view(); animation-range: entry 0% entry 90%; }
-    .close-map .route { stroke-dashoffset: 1; animation: sc-draw linear both; animation-timeline: view(); animation-range: entry 5% entry 80%; }
+    .close-map .cam { animation: sc-pull-back linear both; animation-timeline: view(); animation-range: cover 0% cover 32%; }
+    .close-map .route { stroke-dashoffset: 1; animation: sc-draw linear both; animation-timeline: view(); animation-range: cover 4% cover 28%; }
   }
 }
 @keyframes sc-pull-back { from { transform: scale(1.7); } to { transform: scale(1); } }
@@ -602,21 +668,30 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
   .ch-stop, .sc-map .stn { --lit: 1; }
   .ch-stop { --lit: 1; }
   .sc-map .stn { --lit: 0; }
-  .stage { position: relative; grid-row: 1; }
-  .sc-chapter { grid-column: 1 / -1; min-height: 0; max-width: 46rem; padding-block: 1.5rem; }
+  .stage { position: relative; grid-column: 2; grid-row: 1; }
+  .stage > .sc-map:not(.sc-compact) { inset: 0; }
+  .sc-chapter { grid-column: 1 / -1; min-height: 0; width: 100%; max-width: 46rem; margin-inline: auto; padding: 1.5rem var(--sc-gutter); box-sizing: border-box; }
 }
 @supports not (animation-timeline: view()) {
   .ch-stop { --lit: 1; }
 }
 
 @media (max-width: 1100px) {
-  .rule { grid-template-columns: minmax(0, 1fr); gap: 1rem; }
-  .rule-sign { justify-self: start; }
+  .track { grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+  .track-board { justify-self: start; min-width: 12rem; }
   .sc-templates .sc-wrap, .sc-close .close-top { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 700px) {
+  .legend-line { grid-template-columns: minmax(0, 1fr); gap: 0.6rem; }
+  .legend-strip { max-width: 18rem; }
+  .departure { grid-template-columns: 3.5rem minmax(0, 1fr); }
+  .board-head { grid-template-columns: 3.5rem minmax(0, 1fr); }
 }
 
 @media (max-width: 1000px) {
   .sc-links { display: none; }
+  .sc-menu { display: block; }
 }
 
 @media (max-width: 820px) {
@@ -625,8 +700,8 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
   .stage { order: 1; position: static; height: auto; overflow: visible; padding: 1rem var(--sc-gutter) 0.5rem; }
   .sc-chapter { order: 2; min-height: 0; padding: 0.75rem var(--sc-gutter); }
   .ch-card { max-width: none; }
-  .stage .sc-map { display: none; }
-  .sc-diagram { display: block; }
+  .stage > .sc-map:not(.sc-compact) { display: none; }
+  .sc-diagram, .stage > .sc-compact { display: block; }
   .sc-pillars { position: static; width: 100%; margin-top: 1.5rem; animation: none; }
   .close-map { display: none; }
   .sc-plat { width: 100%; }
@@ -642,3 +717,10 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
   .sc-nav-inner { gap: 0.25rem; }
   .sc-nav .sc-gh { padding-inline: 0.625rem; }
 }
+
+/* ---------- The compact interchange (narrow screens) ---------- */
+.sc-compact { max-width: 26rem; margin: 0 auto 1.75rem; }
+.sc-compact svg { height: auto; }
+.sc-compact .route { stroke-width: 9; stroke-dasharray: none; }
+.sc-compact .badge text { font-size: 12.5px; }
+.sc-compact .hub text { font-size: 12.5px; }

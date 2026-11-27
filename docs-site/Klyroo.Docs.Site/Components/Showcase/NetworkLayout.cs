@@ -10,7 +10,18 @@ public readonly record struct Pt(double X, double Y);
 /// <param name="Distance">How far from the interchange along the line, in map units.</param>
 /// <param name="Anchor"><c>start</c> or <c>end</c>: which end of the label touches the tick.</param>
 /// <param name="Delay">Seconds after the page loads at which the line has been drawn up to this station.</param>
-public sealed record PlacedStation(Station Station, Pt At, double Distance, Pt Label, double Rotation, string Anchor, double Delay);
+public sealed record PlacedStation(Station Station, Pt At, double Distance, Pt Label, double Rotation, string Anchor, double Delay)
+{
+    /// <summary>The corners of the label as drawn (an oriented rectangle: the width is estimated from the characters at 14.5 px), for the tests and the framing of the map.</summary>
+    public IReadOnlyList<Pt> LabelBox()
+    {
+        var width = Station.Label.Length * 7.9 + 4;
+        var (x0, x1) = Anchor == "end" ? (-width, 2.0) : (-2.0, width);
+        var angle = Rotation * Math.PI / 180;
+        Pt Turn(double x, double y) => new(Label.X + x * Math.Cos(angle) - y * Math.Sin(angle), Label.Y + x * Math.Sin(angle) + y * Math.Cos(angle));
+        return [Turn(x0, -13), Turn(x1, -13), Turn(x1, 4), Turn(x0, 4)];
+    }
+}
 
 public sealed record BadgeBox(double X, double Y, double Width, double Height, string Fill, string OnFill)
 {
@@ -22,6 +33,9 @@ public sealed record Camera(double Scale, double X, double Y)
 {
     public string Transform => string.Create(CultureInfo.InvariantCulture, $"translate({X:0.##}px, {Y:0.##}px) scale({Scale:0.###})");
 }
+
+/// <summary>The short form of a line for a narrow screen: a stub from the interchange in the direction of the line, ending in a small badge.</summary>
+public sealed record CompactStub(PlacedLine Line, string Name, Pt End, BadgeBox Badge);
 
 /// <summary>A line of the network with its geometry computed.</summary>
 public sealed record PlacedLine(MetroLine Line, LibraryInfo Library, IReadOnlyList<Pt> Route, string Path, double Length, IReadOnlyList<PlacedStation> Stations, BadgeBox Badge, Camera Camera, double Delay)
@@ -54,6 +68,58 @@ public sealed class NetworkLayout
     public static Camera Overview { get; } = new(1, 0, 0);
 
     private NetworkLayout(IReadOnlyList<PlacedLine> lines) => Lines = lines;
+
+    /// <summary>The visible area of the compact interchange of a narrow screen.</summary>
+    public const string CompactViewBox = "-180 -168 360 336";
+
+    /// <summary>The eight stubs of the compact interchange: each line leaves the disc in its own direction and ends in its badge, so the thesis (eight lines, one interchange) fits a phone.</summary>
+    public IReadOnlyList<CompactStub> CompactStubs()
+    {
+        const double badgeHeight = 28;
+        var stubs = new List<CompactStub>();
+        foreach (var line in Lines)
+        {
+            var heading = line.Line.Legs[0].Heading;
+            var (vx, vy) = Vector(heading);
+            var reach = IsDiagonal(heading) ? 74 : 112;
+            var end = new Pt(vx * reach, vy * reach);
+            var name = line.Library.Name.Replace("Klyroo.", "", StringComparison.Ordinal);
+            var width = Math.Round(22 + name.Length * 7.6);
+            var (x, y) = heading switch
+            {
+                Heading.N => (end.X - width / 2, end.Y - badgeHeight),
+                Heading.S => (end.X - width / 2, end.Y),
+                _ when vx > 0 => (end.X, end.Y - badgeHeight / 2),
+                _ => (end.X - width, end.Y - badgeHeight / 2),
+            };
+            stubs.Add(new CompactStub(line, name, end, new BadgeBox(x, y, width, badgeHeight, line.Badge.Fill, line.Badge.OnFill)));
+        }
+        return stubs;
+    }
+
+    /// <summary>The box that holds the whole network: the interchange, every route, every badge and every label.</summary>
+    public (double MinX, double MinY, double MaxX, double MaxY) Bounds()
+    {
+        var points = new List<Pt> { new(-InterchangeRadius, -InterchangeRadius), new(InterchangeRadius, InterchangeRadius) };
+        foreach (var line in Lines)
+        {
+            points.AddRange(line.Route);
+            points.Add(new Pt(line.Badge.X, line.Badge.Y));
+            points.Add(new Pt(line.Badge.X + line.Badge.Width, line.Badge.Y + line.Badge.Height));
+            foreach (var station in line.Stations)
+            {
+                points.AddRange(station.LabelBox());
+            }
+        }
+        return (points.Min(p => p.X), points.Min(p => p.Y), points.Max(p => p.X), points.Max(p => p.Y));
+    }
+
+    /// <summary>The <c>viewBox</c> that frames the whole network with a margin: the pulled-back view of the close.</summary>
+    public string FramedViewBox(double margin = 28)
+    {
+        var (minX, minY, maxX, maxY) = Bounds();
+        return string.Create(CultureInfo.InvariantCulture, $"{minX - margin:0.#} {minY - margin:0.#} {maxX - minX + 2 * margin:0.#} {maxY - minY + 2 * margin:0.#}");
+    }
 
     public static NetworkLayout Build(Libraries libraries, IReadOnlyList<MetroLine>? data = null)
     {
@@ -204,7 +270,8 @@ public sealed class NetworkLayout
     public string JourneyCss()
     {
         var n = Lines.Count;
-        string P(double fraction) => (fraction * 100).ToString("0.##", CultureInfo.InvariantCulture) + "%";
+        // A keyframe selector past 100% would make the whole rule invalid, so the last chapter holds until the end.
+        string P(double fraction) => (Math.Clamp(fraction, 0, 1) * 100).ToString("0.##", CultureInfo.InvariantCulture) + "%";
         double Center(int i) => (i + 1d) / n;
         double Between(int i) => (i + 0.5) / n;
         const double Hold = 0.02, Dim = 0.16;
@@ -253,9 +320,10 @@ public sealed class NetworkLayout
             for (var s = 0; s < Lines[i].Stations.Count; s++)
             {
                 var from = c - 0.045 + s * 0.065 / Lines[i].Stations.Count;
+                // A station is lit from the moment the reader reaches it until the chapter ends: the line being ridden is the only one with lit labels.
                 css.Append(".sc-map [data-line=\"").Append(key).Append("\"] [data-station=\"").Append(s).Append("\"]{--a:")
                     .Append((from * 100).ToString("0.##", CultureInfo.InvariantCulture)).Append(";--b:")
-                    .Append(((from + 0.014) * 100).ToString("0.##", CultureInfo.InvariantCulture)).Append('}');
+                    .Append(((c + 0.034) * 100).ToString("0.##", CultureInfo.InvariantCulture)).Append('}');
             }
         }
         return css.ToString();

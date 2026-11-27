@@ -54,7 +54,7 @@ public static class NetworkData
                 new("Selection", "Selection and actions", "A checkbox column, a bulk action bar that can target every result of a query, and per-row actions with confirmation dialogs."),
                 new("Columns", "Column control", "Show, hide, reorder, pin and resize columns, with preferences kept in a cookie."),
             ]),
-        new("klyroo-query", [new(Heading.E, 140), new(Heading.SE, 40), new(Heading.E, 110)], LabelSide.Below,
+        new("klyroo-query", [new(Heading.E, 230), new(Heading.SE, 30), new(Heading.E, 30)], LabelSide.Below,
             "A typed query model for data lists in .NET", "Klyroo.Query",
             [
                 new("Typed schema", "Typed schema", "Sortable fields, filters, search fields and defaults are declared with expressions such as c => c.Country!.Name, so there are no field names to mistype."),
@@ -69,7 +69,7 @@ public static class NetworkData
                 new("Rules", "Validation", "Required and required-when checks, number bounds, typed Rule and RuleAsync rules with a pending state, four validation modes and three triggers."),
                 new("Steps", "Wizards and pages", "Multi-step forms with skippable steps and async before-next hooks, and sectioned pages that show a completion status per section."),
                 new("Drafts", "Unsaved changes", "KlyFormNavigationGuard blocks navigation while the form is dirty, and ExportDraft() and RestoreDraft() keep a draft across a reload."),
-            ], Start: 90),
+            ], Start: 108),
         new("klyroo-dashboard", [new(Heading.NW, 55), new(Heading.W, 205)], LabelSide.Above,
             "Analytical dashboards for .NET developers", "Klyroo.Dashboard",
             [

@@ -2,6 +2,7 @@
    (a view timeline in the CSS), and the map beside it rides the same line. *@
 <section class="sc-chapter" id="line-@Line.Key" data-line="@Line.Key" aria-labelledby="ch-@Line.Key-title" style="--c: @Line.Badge.Fill; --on: @Line.Badge.OnFill">
     <div class="ch-card">
+        <div class="ch-edge" aria-hidden="true"><span class="platform"></span><span class="strip"></span></div>
         <header class="ch-head">
             <h2 id="ch-@Line.Key-title"><KlyBadge Label="@Line.Library.Name" Size="KlySize.Xl" Class="ch-pill" style="@($"--kly-color: {Line.Badge.Fill}; --kly-color-contrast: {Line.Badge.OnFill}")" /></h2>
             <p class="ch-tagline">@Line.Line.Tagline</p>
@@ -34,11 +35,20 @@
                 </KlyButton>
             </KlyTooltip>
         </div>
+        <nav class="ch-way" aria-label="Where to next">
+            <KlyLink Href="#libraries" Raw="true" Class="way"><KlyIcon Name="ph:arrow-up-left" />Back to the interchange</KlyLink>
+            @if (Next is not null)
+            {
+                <KlyLink Href="@("#line-" + Next.Key)" Raw="true" Class="way way-next">Next line: @Next.Library.Name<KlyIcon Name="ph:arrow-down-right" /></KlyLink>
+            }
+        </nav>
     </div>
 </section>
 
 @code {
     [Parameter, EditorRequired] public PlacedLine Line { get; set; } = default!;
+    /// <summary>The line after this one: the sign at the foot of the chapter points to it.</summary>
+    [Parameter] public PlacedLine? Next { get; set; }
     [Parameter, EditorRequired] public ShowcaseUrls Urls { get; set; } = default!;
 
     private RenderFragment ArrowIcon => @<KlyIcon Name="ph:arrow-right" />;

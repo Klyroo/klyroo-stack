@@ -2,7 +2,7 @@
    coordinate written by hand. What moves is CSS (Styles/showcase.css): the lines draw themselves on load, the trains follow each route with offset-path, a hover or the focus
    of a badge isolates its line with :has(), and a scroll timeline rides the camera along the lines. Without CSS support or with reduced motion it is the plain map. *@
 <div class="sc-map" data-mode="@Mode">
-    <svg viewBox="@Layout.ViewBox" role="group" aria-labelledby="@Id("title")" focusable="false" preserveAspectRatio="xMidYMid meet">
+    <svg viewBox="@(ViewBox ?? Layout.ViewBox)" role="group" aria-labelledby="@Id("title")" focusable="false" preserveAspectRatio="xMidYMid meet">
         <title id="@Id("title")">The Klyroo network: @Layout.Lines.Count lines, one per library, meet at the Klyroo.Stack interchange. Each line ends in a badge that opens its chapter.</title>
         <g class="cam">
             @foreach (var line in Layout.Lines)
@@ -20,8 +20,8 @@
                         }
                         @if (Mode == "stage")
                         {
-                            <g class="train" aria-hidden="true" style="@Vars(("--run", Math.Round(line.Length / 55 + 2, 1).ToString("0.#", Inv) + "s"))">
-                                <circle class="car car-3" r="4.5" /><circle class="car car-2" r="5" /><circle class="car car-1" r="5.5" /><circle class="car head" r="7" />
+                            <g class="train" aria-hidden="true" style="@Vars(("--run", Math.Round(line.Length / 45 + 3.5, 1).ToString("0.#", Inv) + "s"))">
+                                <g class="tr"><rect class="body" x="-13" y="-5.5" width="26" height="11" rx="5.5" /><circle class="nose" cx="7.5" cy="0" r="4.4" /></g>
                             </g>
                             <circle class="rider" aria-hidden="true" r="9.5" />
                         }
@@ -53,6 +53,9 @@
 
     /// <summary><c>stage</c>: the sticky map of the journey, with the trains and the rider. <c>close</c>: the network pulled back, still.</summary>
     [Parameter] public string Mode { get; set; } = "stage";
+
+    /// <summary>The visible area, when it is not the one of the layout (the close frames the whole network).</summary>
+    [Parameter] public string? ViewBox { get; set; }
 
     private string Id(string name) => Prefix + "-" + name;
 

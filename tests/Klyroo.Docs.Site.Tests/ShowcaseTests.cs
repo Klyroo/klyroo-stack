@@ -124,6 +124,60 @@ public class ShowcaseTests
         }
     }
 
+    [Fact]
+    public void No_two_station_labels_overlap_anywhere_on_the_map()
+    {
+        var boxes = NetworkLayout.Build(RealLibraries()).Lines
+            .SelectMany(l => l.Stations.Select(st => (Name: $"{l.Key}/{st.Station.Label}", Box: st.LabelBox())))
+            .ToList();
+        for (var i = 0; i < boxes.Count; i++)
+        {
+            for (var j = i + 1; j < boxes.Count; j++)
+            {
+                Assert.False(Overlap(boxes[i].Box, boxes[j].Box), $"The labels {boxes[i].Name} and {boxes[j].Name} overlap.");
+            }
+        }
+    }
+
+    [Fact]
+    public void The_framed_view_of_the_close_holds_every_badge_and_label_and_the_compact_view_every_stub()
+    {
+        var layout = NetworkLayout.Build(RealLibraries());
+        var v = layout.FramedViewBox().Split(' ').Select(x => double.Parse(x, System.Globalization.CultureInfo.InvariantCulture)).ToArray();
+        bool Inside(Pt p) => p.X >= v[0] && p.X <= v[0] + v[2] && p.Y >= v[1] && p.Y <= v[1] + v[3];
+        foreach (var line in layout.Lines)
+        {
+            Assert.True(Inside(new Pt(line.Badge.X, line.Badge.Y)) && Inside(new Pt(line.Badge.X + line.Badge.Width, line.Badge.Y + line.Badge.Height)), $"{line.Key}: badge outside the frame");
+            Assert.All(line.Stations.SelectMany(st => st.LabelBox()), p => Assert.True(Inside(p), $"{line.Key}: a label is outside the frame"));
+        }
+        var c = NetworkLayout.CompactViewBox.Split(' ').Select(x => double.Parse(x, System.Globalization.CultureInfo.InvariantCulture)).ToArray();
+        Assert.Equal(layout.Lines.Count, layout.CompactStubs().Count);
+        foreach (var stub in layout.CompactStubs())
+        {
+            Assert.True(stub.Badge.X >= c[0] && stub.Badge.X + stub.Badge.Width <= c[0] + c[2] && stub.Badge.Y >= c[1] && stub.Badge.Y + stub.Badge.Height <= c[1] + c[3], $"{stub.Line.Key}: compact badge outside the view");
+        }
+    }
+
+    // Separating axis test of two oriented rectangles.
+    private static bool Overlap(IReadOnlyList<Pt> a, IReadOnlyList<Pt> b)
+    {
+        foreach (var poly in new[] { a, b })
+        {
+            for (var i = 0; i < 4; i++)
+            {
+                var (p, q) = (poly[i], poly[(i + 1) % 4]);
+                var (nx, ny) = (q.Y - p.Y, p.X - q.X);
+                double Min(IReadOnlyList<Pt> r) => r.Min(t => t.X * nx + t.Y * ny);
+                double Max(IReadOnlyList<Pt> r) => r.Max(t => t.X * nx + t.Y * ny);
+                if (Max(a) < Min(b) || Max(b) < Min(a))
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     private static double DistanceToRoute(IReadOnlyList<Pt> route, Pt p)
     {
         var best = double.MaxValue;

@@ -10,7 +10,7 @@
 </HeadContent>
 
 <div class="sc">
-    @* The journey: the map stays at the right while the opening and the eight chapters scroll past on the left. *@
+    @* The journey: the map stays behind the opening and the eight chapters, which scroll past on the left. *@
     <section class="journey" id="libraries" aria-labelledby="hero-title">
         <div class="rail">
             <div class="opening">
@@ -32,53 +32,72 @@
                 </div>
                 <PlatformSign Command="@InstallCommand" Packages="Site.HomeContent.Packages" Urls="_urls" />
             </div>
-            @foreach (var line in _layout.Lines)
+            @for (var i = 0; i < _layout.Lines.Count; i++)
             {
-                <LineChapter Line="line" Urls="_urls" />
+                <LineChapter Line="_layout.Lines[i]" Next="@(i + 1 < _layout.Lines.Count ? _layout.Lines[i + 1] : null)" Urls="_urls" />
             }
         </div>
         <div class="stage">
             <MetroMap Layout="_layout" Prefix="stage" Mode="stage" />
+            <CompactInterchange Layout="_layout" />
             <LineDiagram Layout="_layout" />
             <Pillars />
         </div>
     </section>
 
+    @* The four rules, as four parallel tracks: each one is a line with its station-name board, what it says, the proof, and a board that shows the proof. *@
     <section class="sc-sec sc-phil" id="philosophy" aria-labelledby="phil-title">
         <div class="sc-wrap">
             <h2 id="phil-title" class="sc-h2">Four rules hold the network together.</h2>
             <p class="sc-lede">Whichever line you ride, the same four rules apply. Each one is stated here with the thing in the repositories that backs it.</p>
-            <ol class="rules" id="features">
+            <ol class="tracks" id="features">
                 @foreach (var pillar in NetworkData.Pillars)
                 {
-                    <li class="rule" id="rule-@pillar.Id" aria-labelledby="rule-@pillar.Id-title">
-                        <div class="rule-sign"><span class="dot" aria-hidden="true"></span><h3 id="rule-@pillar.Id-title">@pillar.Title</h3></div>
-                        <div class="rule-text">
+                    <li class="track" id="rule-@pillar.Id" aria-labelledby="rule-@pillar.Id-title" style="--t: @TrackColor(pillar)">
+                        <div class="track-board">
+                            <span class="board-stripe" aria-hidden="true"></span>
+                            <h3 id="rule-@pillar.Id-title">@pillar.Title</h3>
+                            <KlyIcon Name="ph:arrow-right" Class="board-arrow" />
+                        </div>
+                        <div class="track-text">
                             <p class="rule-lead">@pillar.Rule</p>
                             <p class="proof">@pillar.Proof</p>
                         </div>
-                        <div class="rule-demo">
+                        <div class="track-demo">
                             @switch (pillar.Id)
                             {
                                 case "headless-first":
-                                    <KlyTabs Items="_coreTabs" AriaLabel="Headless or UI package" Variant="TabsVariant.Pill" Class="sc-tabs" />
+                                    <div class="change">
+                                        <p class="change-title">Change here for</p>
+                                        <div class="change-row">
+                                            <span class="roundel" style="--r: var(--sc-sys)"><span>Core</span></span>
+                                            <div><h4>Klyroo.Stack.Core</h4><p>The seven <code>.Core</code> engines, no Razor and no ASP.NET Core.</p></div>
+                                        </div>
+                                        <CodeBlock Language="bash" Title="Terminal" Value="dotnet add package Klyroo.Stack.Core --prerelease" />
+                                        <div class="change-row">
+                                            <span class="roundel" style="--r: #10b981"><span>UI</span></span>
+                                            <div><h4>Klyroo.Stack</h4><p>The Blazor package of all eight libraries, registered with one call.</p></div>
+                                        </div>
+                                        <CodeBlock Language="csharp" Title="Program.cs" Value="using Klyroo.Stack;&#10;&#10;builder.Services.AddKlyrooStack();" />
+                                    </div>
                                     break;
                                 case "typed-end-to-end":
                                     <CodeBlock Language="csharp" Title="Klyroo.Form and Klyroo.Query" Value="@TypedCode" />
                                     break;
                                 case "every-render-mode":
                                     <div class="modes">
-                                        <p class="modes-lead">Point at a mode.</p>
-                                        <ul>
+                                        <p class="modes-lead">Five stops on one line. Point at a stop.</p>
+                                        <ol>
                                             @foreach (var (mode, text) in Modes)
                                             {
                                                 <li>
+                                                    <i class="tick" aria-hidden="true"></i>
                                                     <KlyTooltip Text="@text" Placement="KlyPlacement.Top">
-                                                        <button type="button" class="mode"><KlyBadge Label="@mode" Variant="KlyVariant.Outline" Size="KlySize.Lg" /></button>
+                                                        <button type="button" class="mode">@mode</button>
                                                     </KlyTooltip>
                                                 </li>
                                             }
-                                        </ul>
+                                        </ol>
                                     </div>
                                     break;
                                 default:
@@ -92,6 +111,7 @@
         </div>
     </section>
 
+    @* The templates, as a departure board in the signage world. *@
     <section class="sc-sec sc-templates" id="templates" aria-labelledby="tpl-title">
         <div class="sc-wrap">
             <div class="tpl-intro">
@@ -99,8 +119,20 @@
                 <p class="sc-lede">Four <code>dotnet new</code> templates start a project with the meta-package already registered. The two web templates take an <code>--interactivity</code> option: Server, WebAssembly or Auto.</p>
                 <CodeBlock Language="bash" Title="Terminal" Value="dotnet new install Klyroo.Templates" />
             </div>
-            <div class="tpl-tabs">
-                <KlyTabs Items="_templateTabs" AriaLabel="Templates" Variant="TabsVariant.Link" Class="sc-tabs" />
+            <div class="board" role="group" aria-label="Templates">
+                <div class="board-head" aria-hidden="true"><span>No.</span><span>Template and what it creates</span></div>
+                <ol class="departures">
+                    @for (var i = 0; i < NetworkData.Templates.Count; i++)
+                    {
+                        var template = NetworkData.Templates[i];
+                        <li class="departure">
+                            <span class="platform-no" aria-hidden="true">@(i + 1)</span>
+                            <h3>@template.ShortName</h3>
+                            <p class="creates">@template.Creates</p>
+                            <div class="departure-cmd"><CodeBlock Language="bash" Title="Terminal" Value="@TemplateCommand(template)" /></div>
+                        </li>
+                    }
+                </ol>
             </div>
         </div>
     </section>
@@ -111,7 +143,7 @@
                 <div class="close-copy">
                     <h2 id="close-title" class="sc-h2">One network. Install all of it.</h2>
                     <p class="sc-lede">@Site.Settings.Tagline. Take the whole stack with one registration call, or only the line you need.</p>
-                    <PlatformSign Command="@InstallCommand" Packages="Site.HomeContent.Packages" Urls="_urls" />
+                    <PlatformSign Command="@InstallCommand" Packages="Site.HomeContent.Packages" Urls="_urls" ShowPackages="true" />
                     <div class="close-actions" id="packages">
                         <KlyButton Href="@_urls.Repository" Target="KlyLinkTarget.Blank" Color="KlyColor.Primary" Size="KlySize.Lg" LeadingIcon="@GithubIcon">GitHub</KlyButton>
                         @if (_start is not null)
@@ -122,17 +154,25 @@
                     </div>
                 </div>
                 <div class="close-map">
-                    <MetroMap Layout="_layout" Prefix="close" Mode="close" />
+                    <MetroMap Layout="_layout" Prefix="close" Mode="close" ViewBox="@_layout.FramedViewBox()" />
                 </div>
             </div>
-            <h3 class="close-libs-title">Every line, one click away</h3>
-            <ul class="close-libs">
+            <h3 class="close-libs-title">Every line, with its stops</h3>
+            <ul class="legend">
                 @foreach (var line in _layout.Lines)
                 {
-                    <li style="--c: @line.Badge.Fill">
-                        <KlyLink Href="@_urls.Docs(line.Line)" Raw="true" Class="lib-name"><i class="dot" aria-hidden="true"></i>@line.Library.Name</KlyLink>
-                        <p>@line.Line.Tagline</p>
+                    <li class="legend-line" style="--c: @line.Badge.Fill">
+                        <KlyLink Href="@_urls.Docs(line.Line)" Raw="true" Class="legend-name" aria-label="@($"{line.Library.Name} documentation")">
+                            <KlyBadge Label="@line.Library.Name" Size="KlySize.Lg" Class="legend-pill" style="@($"--kly-color: {line.Badge.Fill}; --kly-color-contrast: {line.Badge.OnFill}")" />
+                        </KlyLink>
+                        <div class="legend-strip" role="img" aria-label="@($"{line.Stations.Count} stations: {string.Join(", ", line.Stations.Select(s => s.Station.Label))}")">
+                            @foreach (var station in line.Stations)
+                            {
+                                <i class="tick"></i>
+                            }
+                        </div>
                         <span class="lib-links"><KlyLink Href="@_urls.Docs(line.Line)" Raw="true" Class="lib-link">Docs</KlyLink><KlyLink Href="@_urls.Playground(line.Line)" Raw="true" Class="lib-link">Playground</KlyLink></span>
+                        <p class="legend-tag">@line.Line.Tagline</p>
                     </li>
                 }
             </ul>
@@ -145,8 +185,6 @@
     private NetworkLayout _layout = default!;
     private ShowcaseUrls _urls = default!;
     private DocPage? _start;
-    private IReadOnlyList<KlyTabItem> _templateTabs = [];
-    private IReadOnlyList<KlyTabItem> _coreTabs = [];
 
     private string InstallCommand => Site.Settings.HeroInstall ?? "dotnet add package Klyroo.Stack --prerelease";
 
@@ -158,37 +196,19 @@
         _layout = NetworkLayout.Build(Libraries);
         _urls = new ShowcaseUrls(Libraries, Site.Settings);
         _start = Site.Pages.FirstOrDefault(p => p.Slug == "getting-started") ?? Site.Find(LibraryDocs.IndexSlug) ?? Site.Pages.FirstOrDefault();
-        _templateTabs = [.. NetworkData.Templates.Select(t => new KlyTabItem(t.ShortName)
-        {
-            Value = t.ShortName,
-            Content = TemplatePanel(t),
-        })];
-        _coreTabs =
-        [
-            new KlyTabItem("Klyroo.Stack.Core") { Value = "core", Content = CorePanel() },
-            new KlyTabItem("Klyroo.Stack") { Value = "stack", Content = StackPanel() },
-        ];
     }
 
-    private RenderFragment TemplatePanel(TemplateInfo template) => @<div class="tpl-panel">
-        <CodeBlock Language="bash" Title="Terminal" Value="@TemplateCommand(template)" />
-        <p>@template.Creates</p>
-    </div>;
+    // Each rule rides the line of the library that proves it best: the headless engine of Query, the typed schema of Form, the render modes of UI, the bridge of Agent.
+    private string TrackColor(Pillar pillar)
+    {
+        var key = pillar.Id switch { "headless-first" => "query", "typed-end-to-end" => "form", "every-render-mode" => "ui", _ => "agent" };
+        return _layout.Lines.First(l => l.Key == key).Badge.Fill;
+    }
 
     private static string TemplateCommand(TemplateInfo template) =>
         template.ShortName is "klyroo-saas" or "klyroo-admin"
             ? $"dotnet new {template.ShortName} -n MyShop --interactivity Auto\ncd MyShop\ndotnet run"
             : $"dotnet new {template.ShortName} -n MyApp";
-
-    private RenderFragment CorePanel() => @<div class="demo-panel">
-        <CodeBlock Language="bash" Title="Terminal" Value="dotnet add package Klyroo.Stack.Core --prerelease" />
-        <p>The seven <code>.Core</code> engines, none of which depends on Razor or ASP.NET Core.</p>
-    </div>;
-
-    private RenderFragment StackPanel() => @<div class="demo-panel">
-        <CodeBlock Language="csharp" Title="Program.cs" Value="using Klyroo.Stack;&#10;&#10;builder.Services.AddKlyrooStack();" />
-        <p>The Blazor package of all eight libraries, registered with one call.</p>
-    </div>;
 
     private const string TypedCode =
         "// Klyroo.Form: the fields are the members of your class\nFormSchema.For<Order>(s => { s.Field(o => o.Seats, f => f.Range(1, 500)); ... })\n\n// Klyroo.Query: sortable fields and filters are expressions\nc => c.Country!.Name";
@@ -202,6 +222,6 @@
         ("Interactive Server", "Interactive components run in an interactive render mode, here a circuit."),
         ("WebAssembly", "Register the services in the server project and in the .Client project."),
         ("Auto", "Register the services in the server project and in the .Client project."),
-        (".NET MAUI Blazor Hybrid", "The same pages run in a BlazorWebView."),
+        (".NET MAUI Hybrid", "The same pages run in a BlazorWebView."),
     ];
 }

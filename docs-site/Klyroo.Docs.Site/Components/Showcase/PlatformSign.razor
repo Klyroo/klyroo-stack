@@ -19,11 +19,11 @@
                 <ChildContent><span class="copy-status sr-only" role="status" aria-live="polite"></span></ChildContent>
             </KlyButton>
         </KlyTooltip>
-        @if (Packages.Count > 0)
+        @if (ShowPackages && Packages.Count > 0)
         {
             <KlyPopover Placement="KlyPlacement.TopEnd" AriaLabel="The packages of the stack" Class="sc-more">
                 <ChildContent>
-                    <KlyButton Variant="ButtonVariant.Ghost" Size="KlySize.Sm" Square="true" Class="sc-more-btn" aria-haspopup="dialog" aria-label="Other packages of the stack"><LeadingIcon><KlyIcon Name="ph:caret-up-down" /></LeadingIcon></KlyButton>
+                    <KlyButton Variant="ButtonVariant.Ghost" Size="KlySize.Sm" Class="sc-more-btn" aria-haspopup="dialog" TrailingIcon="@CaretIcon">All packages</KlyButton>
                 </ChildContent>
                 <Content>
                     <ul class="sc-pkgs">
@@ -43,6 +43,11 @@
 
 @code {
     [Parameter, EditorRequired] public string Command { get; set; } = "";
+    /// <summary>The disclosure of the other packages of the stack. The sign of the first viewport has none: it has no room for it.</summary>
+    [Parameter] public bool ShowPackages { get; set; }
+
+    private RenderFragment CaretIcon => @<KlyIcon Name="ph:caret-down" />;
+
     [Parameter] public IReadOnlyList<HomePackage> Packages { get; set; } = [];
     [Parameter, EditorRequired] public ShowcaseUrls Urls { get; set; } = default!;
 }
