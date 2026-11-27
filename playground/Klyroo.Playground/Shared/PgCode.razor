@@ -1,0 +1,15 @@
+@* A KlyCodeBlock without a border, radius or background of its own, for the panels of a stage: the card around it is the surface. *@
+<KlyCodeBlock Code="@Code" Language="@Language" Label="@Label" Highlight="@Highlight" Copy="@Copy" LineNumbers="@LineNumbers" HighlightLines="@HighlightLines" Ui="Plain" />
+
+@code {
+    /// <summary>The slot classes that remove the surface of the block.</summary>
+    public static readonly CodeBlockUi Plain = new() { Root = "rounded-none border-0 bg-transparent shadow-none" };
+
+    [Parameter, EditorRequired] public string Code { get; set; } = "";
+    [Parameter] public CodeLanguage? Language { get; set; }
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public bool Highlight { get; set; } = true;
+    [Parameter] public bool Copy { get; set; } = true;
+    [Parameter] public bool LineNumbers { get; set; }
+    [Parameter] public IReadOnlyList<CodeLineRange>? HighlightLines { get; set; }
+}

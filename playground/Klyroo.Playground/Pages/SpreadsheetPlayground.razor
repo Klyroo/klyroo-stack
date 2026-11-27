@@ -46,12 +46,17 @@
                     }
                     else
                     {
-                        <KlyDisplay Kind="DisplayKind.Table" TableColumns="_issueColumns" TableRows="_issueRows" Surface="DisplaySurface.Plain" />
+                        <KlyTable Items="_issueRows">
+                            <KlyColumn Title="Line" Field="r => r.Row" Numeric="true" />
+                            <KlyColumn Title="Field" Field="r => r.Field" />
+                            <KlyColumn Title="Level" Field="r => r.Level" />
+                            <KlyColumn Title="Message" Field="r => r.Message" />
+                        </KlyTable>
                     }
                 </div>
             </PgPanel>
             <PgPanel Title="Typed rows" Note="@($"{_typedCount} importable, {_importer?.InvalidRows.Count ?? 0} blocked")">
-                <KlyDisplay Kind="DisplayKind.Code" Value="@_typedJson" Language="json" Surface="DisplaySurface.Plain" />
+                <PgCode Code="@_typedJson" Language="CodeLanguage.Json" />
             </PgPanel>
         </div>
         <PgPanel Title="Submitted to OnSubmit" Note="@(_submittedCount is null ? "not submitted yet" : Words.Plural(_submittedCount.Value, "row"))">
@@ -61,7 +66,7 @@
             }
             else
             {
-                <KlyDisplay Kind="DisplayKind.Code" Value="@_submittedJson" Language="json" Surface="DisplaySurface.Plain" />
+                <PgCode Code="@_submittedJson" Language="CodeLanguage.Json" />
             }
         </PgPanel>
         <CodePanel Tabs="CodeTabs" />
@@ -73,7 +78,6 @@
 
     private static readonly IReadOnlyList<PgOption<string>> _files = PgOptions.Of(("messy-csv", "Messy CSV: banner, French headers, bad rows"), ("messy-xlsx", "Messy Excel file with two sheets"), ("clean-csv", "Clean CSV"), ("none", "No file: bring your own"));
     private static readonly IReadOnlyList<PgOption<string>> _separators = PgOptions.Of((",", "Comma, 49,90"), (".", "Point, 49.90"));
-    private static readonly IReadOnlyList<DisplayTableColumn> _issueColumns = [new("row", "Line", Numeric: true), new("field", "Field"), new("level", "Level"), new("message", "Message")];
 
     private string _file = "messy-csv", _decimal = ",";
     private bool _pattern, _minPrice, _minStock;
@@ -84,7 +88,10 @@
     private int? _submittedCount;
     private int _typedCount;
     private string _typedJson = "[]";
-    private IReadOnlyList<IReadOnlyDictionary<string, string?>> _issueRows = [];
+    private IReadOnlyList<IssueRow> _issueRows = [];
+
+    /// <summary>A line of the issue table: the line of the file and what is wrong with it.</summary>
+    private sealed record IssueRow(int Row, string Field, string Level, string Message);
     private readonly CancellationTokenSource _cts = new();
 
     protected override async Task OnInitializedAsync()
@@ -190,13 +197,7 @@
         var typed = _importer.ImportableRows.Select(r => _importer.ToTyped(r).Value).ToList();
         _typedCount = typed.Count;
         _typedJson = JsonText.Indent(JsonSerializer.Serialize(typed.Take(5).ToList(), ProductJson.Default.ListProductRow)) + (typed.Count > 5 ? $"\n// ... and {typed.Count - 5} more row(s)" : "");
-        _issueRows = [.. _importer.AllRows.Where(r => r.Issues.Count > 0).SelectMany(r => r.Issues.Select(i => (IReadOnlyDictionary<string, string?>)new Dictionary<string, string?>
-        {
-            ["row"] = r.RowNumber.ToString(CultureInfo.InvariantCulture),
-            ["field"] = i.Field,
-            ["level"] = i.Level.ToString(),
-            ["message"] = i.Message,
-        })).Take(40)];
+        _issueRows = [.. _importer.AllRows.Where(r => r.Issues.Count > 0).SelectMany(r => r.Issues.Select(i => new IssueRow(r.RowNumber, i.Field ?? "", i.Level.ToString(), i.Message))).Take(40)];
     }
 
     private IReadOnlyList<CodeTab> CodeTabs => [new("Import.razor", "html", RazorCode()), new("Schema.cs", "csharp", SchemaCode())];

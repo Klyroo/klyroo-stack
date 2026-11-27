@@ -48,11 +48,11 @@
         </PgPanel>
         <div class="grid gap-5 min-[1100px]:grid-cols-2">
             <PgPanel Title="Loading stages" Note="@(_dashboard.Refreshing ? "refreshing" : "idle")">
-                <KlyDisplay Kind="DisplayKind.Facts" Facts="Stages()" Surface="DisplaySurface.Plain" />
+                <KlyFacts Items="Stages()" Surface="KlySurface.Plain" />
                 <p class="m-0 mt-2 text-sm text-(--klyroo-text-muted)">Essential resources load first, in parallel. Background ones start when they are all done. A block shows a skeleton until its own resource is ready.</p>
             </PgPanel>
             <PgPanel Title="URL state" Note="DashboardController.ToQuery()">
-                <KlyDisplay Kind="DisplayKind.Code" Value="@(_dashboard.ToQuery() is { Length: > 0 } q ? "?" + q : "(nothing: every filter is at its default)")" Highlight="false" Surface="DisplaySurface.Plain" />
+                <PgCode Code="@(_dashboard.ToQuery() is { Length: > 0 } q ? "?" + q : "(nothing: every filter is at its default)")" Highlight="false" />
             </PgPanel>
         </div>
         <CodePanel Tabs="CodeTabs" />
@@ -191,8 +191,8 @@
 
     private void ClearDetail() => _detail = null;
 
-    private IReadOnlyList<DisplayFact> Stages() =>
-        [.. _dashboard.Resources.Select(r => new DisplayFact { Label = $"{r.Key} ({r.Stage})", Value = r.State.ToString(), Mono = true, Tone = r.State == DashboardResourceState.Ready ? (KlyColor?)KlyColor.Success : null })];
+    private IReadOnlyList<KlyFact> Stages() =>
+        [.. _dashboard.Resources.Select(r => new KlyFact($"{r.Key} ({r.Stage})") { Value = r.State.ToString(), Mono = true, Color = r.State == DashboardResourceState.Ready ? (KlyColor?)KlyColor.Success : null })];
 
     private IReadOnlyList<CodeTab> CodeTabs => [new("Sales.razor", "html", RazorCode()), new("Controller.cs", "csharp", ControllerCode())];
 

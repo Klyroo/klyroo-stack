@@ -57,7 +57,14 @@
         }
         <PgPanel Title="Result" Note="@($"{_total} matching, {_shown} shown")" Flush>
             <div class="table-scroll py-3">
-                <KlyDisplay Kind="DisplayKind.Table" TableColumns="_columns" TableRows="_rows" Surface="DisplaySurface.Plain" />
+                <KlyTable Items="_rows">
+                    <KlyColumn Title="Name" Field="r => r.Name" />
+                    <KlyColumn Title="Department" Field="r => r.Department" />
+                    <KlyColumn Title="Country" Field="r => r.Country" />
+                    <KlyColumn Title="Status" Field="r => r.Status" />
+                    <KlyColumn Title="Salary" Field="r => r.Salary" Numeric="true" />
+                    <KlyColumn Title="Hired" Field="r => r.Hired" />
+                </KlyTable>
             </div>
             @if (_paging == "cursor")
             {
@@ -76,11 +83,11 @@
                 }
                 else
                 {
-                    <KlyDisplay Kind="DisplayKind.Facts" FactGroups="_facets" Surface="DisplaySurface.Plain" />
+                    <KlyFacts Groups="_facets" Surface="KlySurface.Plain" />
                 }
             </PgPanel>
             <PgPanel Title="URL form" Note="what a list writes to the address">
-                <KlyDisplay Kind="DisplayKind.Code" Value="@_urlForm" Highlight="false" Surface="DisplaySurface.Plain" />
+                <PgCode Code="@_urlForm" Highlight="false" />
                 <p class="m-0 mt-2 text-sm text-(--klyroo-text-muted)">@_urlNote</p>
             </PgPanel>
         </div>
@@ -111,8 +118,11 @@
     private string? _cursor, _nextCursor;
     private readonly List<string> _problems = [];
     private int _total, _shown;
-    private IReadOnlyList<IReadOnlyDictionary<string, string?>> _rows = [];
-    private IReadOnlyList<DisplayFactGroup> _facets = [];
+    private IReadOnlyList<ResultRow> _rows = [];
+
+    /// <summary>A row of the result table, already formatted as the table shows it.</summary>
+    private sealed record ResultRow(string Name, string Department, string Country, string Status, string Salary, string Hired);
+    private IReadOnlyList<KlyFactGroup> _facets = [];
     private string _requestJson = "", _urlForm = "", _urlNote = "", _requestCode = "";
 
     private static readonly FieldSpec[] Fields =
@@ -130,12 +140,6 @@
     private static readonly IReadOnlyList<PgOption<string>> _pagings = PgOptions.Of(("offset", "Offset: skip and take"), ("cursor", "Cursor: after the last row"), ("none", "None: every match"));
     private static readonly IReadOnlyList<PgOption<FilterCombinator>> _combinators = PgOptions.Of<FilterCombinator>();
     private static readonly IReadOnlyList<PgOption<FacetMode>> _facetModes = PgOptions.Of<FacetMode>();
-    private static readonly IReadOnlyList<DisplayTableColumn> _columns =
-    [
-        new("name", "Name"), new("department", "Department"), new("country", "Country"), new("status", "Status"),
-        new("salary", "Salary", Numeric: true), new("hired", "Hired"),
-    ];
-
     private static FieldSpec SpecOf(string key) => Fields.First(f => f.Key == key);
 
     private static IReadOnlyList<PgOption<FilterOperator>> OperatorsFor(RuleSlot rule) => SpecOf(rule.Field).Kind switch
@@ -288,14 +292,12 @@
         _total = result.TotalCount ?? result.Items.Count;
         _shown = result.Items.Count;
         _nextCursor = result.NextCursor;
-        _rows = [.. result.Items.Select(e => (IReadOnlyDictionary<string, string?>)new Dictionary<string, string?>
-        {
-            ["name"] = e.Name, ["department"] = e.Department, ["country"] = e.Country, ["status"] = Words.Humanize(e.Status.ToString()),
-            ["salary"] = "$" + e.Salary.ToString("N0", CultureInfo.InvariantCulture), ["hired"] = e.Hired.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
-        })];
-        _facets = [.. (result.Facets ?? []).Select(f => new DisplayFactGroup(
+        _rows = [.. result.Items.Select(e => new ResultRow(
+            e.Name, e.Department, e.Country, Words.Humanize(e.Status.ToString()),
+            "$" + e.Salary.ToString("N0", CultureInfo.InvariantCulture), e.Hired.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)))];
+        _facets = [.. (result.Facets ?? []).Select(f => new KlyFactGroup(
             $"{f.Key} ({_facetMode})",
-            [.. f.Options.Select(o => new DisplayFact { Label = f.Key == "status" ? Words.Humanize(o.Value) : o.Value, Value = o.Count.ToString(CultureInfo.InvariantCulture), Mono = true })]))];
+            [.. f.Options.Select(o => new KlyFact(f.Key == "status" ? Words.Humanize(o.Value) : o.Value) { Value = o.Count.ToString(CultureInfo.InvariantCulture), Mono = true })]))];
 
         // The URL form holds one flat AND of rules: nested groups and OR are for requests, not for addresses.
         var flat = topRules.OfType<FilterRule>().ToList();

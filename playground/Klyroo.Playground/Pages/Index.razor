@@ -51,21 +51,21 @@
         s.Field(c => c.Email, f => f.Label("Email").Required());
     });
 
-    private IReadOnlyList<IReadOnlyDictionary<string, string?>> _queryRows = [];
-    private IReadOnlyList<DisplayFact> _sheetFacts = [];
-    private string _agentJson = "";
+    private IReadOnlyList<MiniRow> _queryRows = [];
 
-    private static readonly IReadOnlyList<DisplayTableColumn> _queryColumns = [new("name", "Name"), new("department", "Department"), new("salary", "Salary", Numeric: true)];
+    /// <summary>A row of the query miniature, formatted as it is shown.</summary>
+    private sealed record MiniRow(string Name, string Department, string Salary);
+    private IReadOnlyList<KlyFact> _sheetFacts = [];
+    private string _agentJson = "";
+    private const string _miniQuery = "SELECT id, total\nFROM orders\nWHERE status = 'paid'\n  AND total > 100;\n";
 
     protected override void OnInitialized()
     {
         // The query miniature runs a real request on the sample directory.
         var request = new DataListRequest(new DataListPaging.Offset(0, 3), [new DataListSort("salary", true)],
             DataListFilterGroup.And(new FilterRule("department", FilterOperator.Is, new FilterValue.Text("Engineering"))), null);
-        _queryRows = [.. EmployeeSchema.Instance.ExecuteInMemory(Employees.All, request).Items.Select(e => (IReadOnlyDictionary<string, string?>)new Dictionary<string, string?>
-        {
-            ["name"] = e.Name, ["department"] = e.Department, ["salary"] = "$" + e.Salary.ToString("N0", CultureInfo.InvariantCulture),
-        })];
+        _queryRows = [.. EmployeeSchema.Instance.ExecuteInMemory(Employees.All, request).Items.Select(e =>
+            new MiniRow(e.Name, e.Department, "$" + e.Salary.ToString("N0", CultureInfo.InvariantCulture)))];
 
         // The spreadsheet miniature loads three lines into a real importer.
         var importer = new SpreadsheetImporter<ProductRow>(SpreadsheetSchema.For<ProductRow>(s =>
@@ -76,9 +76,9 @@
         importer.LoadText("SKU,Price\nAB-1,12.5\nAB-2,abc\n,9", "sample.csv");
         _sheetFacts =
         [
-            new DisplayFact { Label = "Importable", Value = Words.Plural(importer.ImportableRows.Count, "row") },
-            new DisplayFact { Label = "Blocked", Value = Words.Plural(importer.InvalidRows.Count, "row"), Tone = KlyColor.Error },
-            new DisplayFact { Label = "First issue", Value = importer.InvalidRows[0].Issues[0].Message },
+            new KlyFact("Importable") { Value = Words.Plural(importer.ImportableRows.Count, "row") },
+            new KlyFact("Blocked") { Value = Words.Plural(importer.InvalidRows.Count, "row"), Color = KlyColor.Error },
+            new KlyFact("First issue") { Value = importer.InvalidRows[0].Issues[0].Message },
         ];
 
         // The agent miniature is the snapshot a bridge returns for a one-field form.
@@ -95,7 +95,11 @@
             <KlyBadge Label="New" Variant="KlyVariant.Subtle" />
             <KlySwitch Label="Notifications" Value="true" />
         </div>,
-        "query" => @<KlyDisplay Kind="DisplayKind.Table" TableColumns="_queryColumns" TableRows="_queryRows" Surface="DisplaySurface.Plain" />,
+        "query" => @<KlyTable Items="_queryRows">
+            <KlyColumn Title="Name" Field="r => r.Name" />
+            <KlyColumn Title="Department" Field="r => r.Department" />
+            <KlyColumn Title="Salary" Field="r => r.Salary" Numeric="true" />
+        </KlyTable>,
         "table" => @<div class="pg-flat"><KlyDataList TItem="Employee" Schema="EmployeeSchema.Instance" Items="_three" UrlSync="false" PagingMode="DataListPagingMode.None" Label="Sample employees">
             <KlyDataListTable TItem="Employee">
                 <KlyDataListFieldColumn TItem="Employee" Field="name" Title="Name" />
@@ -105,8 +109,8 @@
         </KlyDataList></div>,
         "form" => @<KlyFormEngine TModel="ContactModel" Schema="_miniForm" SubmitLabel="Send" ShowReset="false" />,
         "dashboard" => @<KlyDashboardGrid Columns="1"><KlyDashboardStat Label="Revenue" Value="148900" Compare="130400" Trend="@(new double[] { 102, 98, 115, 110, 132, 128, 149 })" Format="DashboardFormatPreset.Compact" /></KlyDashboardGrid>,
-        "display" => @<KlyDisplay Kind="DisplayKind.Stat" Title="Monthly revenue" Value="148,900" Unit="EUR" Delta="+14.2%" Trend="@(new double[] { 102, 98, 115, 110, 132, 128, 149 })" />,
-        "spreadsheet" => @<KlyDisplay Kind="DisplayKind.Facts" Facts="_sheetFacts" Surface="DisplaySurface.Plain" />,
-        _ => @<div class="max-h-48 overflow-auto"><KlyDisplay Kind="DisplayKind.Code" Value="@_agentJson" Language="json" Surface="DisplaySurface.Plain" /></div>,
+        "display" => @<KlyCodeBlock Label="Orders.sql" Code="@_miniQuery" Language="CodeLanguage.Sql" LineNumbers HighlightLines="@([new CodeLineRange(3, 4)])" Copy="false" />,
+        "spreadsheet" => @<KlyFacts Items="_sheetFacts" Surface="KlySurface.Plain" />,
+        _ => @<div class="max-h-48 overflow-auto"><PgCode Code="@_agentJson" Language="CodeLanguage.Json" /></div>,
     };
 }

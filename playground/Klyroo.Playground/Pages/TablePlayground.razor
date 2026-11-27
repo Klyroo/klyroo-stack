@@ -104,7 +104,7 @@
         </PgPanel>
 
         <PgPanel Title="URL state" Note="what the list writes to the address">
-            <div data-testid="url-state"><KlyDisplay Kind="DisplayKind.Code" Value="@(_urlState.Length == 0 ? "(nothing yet: the defaults are left out)" : _urlState)" Highlight="false" Surface="DisplaySurface.Plain" /></div>
+            <div data-testid="url-state"><PgCode Code="@(_urlState.Length == 0 ? "(nothing yet: the defaults are left out)" : _urlState)" Highlight="false" /></div>
             <p class="m-0 mt-2 text-sm text-(--klyroo-text-muted)">q is the search, p the page, ps the page size, s the sort (a leading minus is descending), f.&lt;field&gt; a filter, l the layout. The knobs of this page use the k. keys.</p>
         </PgPanel>
 

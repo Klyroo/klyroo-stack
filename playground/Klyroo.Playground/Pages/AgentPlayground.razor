@@ -66,8 +66,8 @@
                                 <span class="text-(--klyroo-text-dimmed)">@turn.Time</span>
                             </div>
                             <div class="grid min-w-0 gap-3 min-[1100px]:grid-cols-2">
-                                <div class="min-w-0"><p class="m-0 mb-1 text-xs text-(--klyroo-text-dimmed)">The model sends</p><div class="max-h-72 overflow-auto"><KlyDisplay Kind="DisplayKind.Code" Value="@turn.Request" Language="json" Surface="DisplaySurface.Plain" /></div></div>
-                                <div class="min-w-0"><p class="m-0 mb-1 text-xs text-(--klyroo-text-dimmed)">The bridge returns</p><div class="max-h-72 overflow-auto"><KlyDisplay Kind="DisplayKind.Code" Value="@turn.Response" Language="json" Surface="DisplaySurface.Plain" /></div></div>
+                                <div class="min-w-0"><p class="m-0 mb-1 text-xs text-(--klyroo-text-dimmed)">The model sends</p><div class="max-h-72 overflow-auto"><PgCode Code="@turn.Request" Language="CodeLanguage.Json" /></div></div>
+                                <div class="min-w-0"><p class="m-0 mb-1 text-xs text-(--klyroo-text-dimmed)">The bridge returns</p><div class="max-h-72 overflow-auto"><PgCode Code="@turn.Response" Language="CodeLanguage.Json" /></div></div>
                             </div>
                         </div>
                     }
@@ -111,8 +111,8 @@
                 @foreach (var tool in AgentBridgeService.GetToolDefinitions())
                 {
                     <div class="min-w-0">
-                        <KlyDisplay Kind="DisplayKind.Facts" Facts="@ToolFacts(tool)" Surface="DisplaySurface.Plain" />
-                        <div class="max-h-64 overflow-auto"><KlyDisplay Kind="DisplayKind.Code" Value="@JsonText.Indent(tool.InputSchema.GetRawText())" Language="json" Surface="DisplaySurface.Plain" /></div>
+                        <KlyFacts Items="@ToolFacts(tool)" Surface="KlySurface.Plain" />
+                        <div class="max-h-64 overflow-auto"><PgCode Code="@JsonText.Indent(tool.InputSchema.GetRawText())" Language="CodeLanguage.Json" /></div>
                     </div>
                 }
             </div>
@@ -334,10 +334,10 @@
 
     private void ClearLog() => _log.Clear();
 
-    private static IReadOnlyList<DisplayFact> ToolFacts(AgentToolDefinition tool) =>
+    private static IReadOnlyList<KlyFact> ToolFacts(AgentToolDefinition tool) =>
     [
-        new DisplayFact { Label = tool.Name, Value = tool.Description },
-        new DisplayFact { Label = "Hints", Value = $"readOnly {tool.ReadOnlyHint.ToString().ToLowerInvariant()}, consequential {tool.ConsequentialHint.ToString().ToLowerInvariant()}, untrusted content {tool.UntrustedContentHint.ToString().ToLowerInvariant()}", Mono = true },
+        new KlyFact(tool.Name) { Value = tool.Description },
+        new KlyFact("Hints") { Value = $"readOnly {tool.ReadOnlyHint.ToString().ToLowerInvariant()}, consequential {tool.ConsequentialHint.ToString().ToLowerInvariant()}, untrusted content {tool.UntrustedContentHint.ToString().ToLowerInvariant()}", Mono = true },
     ];
 
     private void Teardown()

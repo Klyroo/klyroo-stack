@@ -16,14 +16,14 @@
 
 <div class="grid gap-5 min-[1100px]:grid-cols-2">
     <PgPanel Title="Typed model" Note="CreateModel() now">
-        <KlyDisplay Kind="DisplayKind.Code" Value="@ModelJson()" Language="json" Surface="DisplaySurface.Plain" />
+        <PgCode Code="@ModelJson()" Language="CodeLanguage.Json" />
     </PgPanel>
     <PgPanel Title="Validation" Note="@(_form.HasBlockingErrors ? "blocked" : "no blocking error")">
-        <KlyDisplay Kind="DisplayKind.Facts" Facts="Status()" Surface="DisplaySurface.Plain" />
+        <KlyFacts Items="Status()" Surface="KlySurface.Plain" />
         @if (_form.Errors.Count > 0 || _form.FormErrors.Count > 0)
         {
             <div class="mt-3">
-                <KlyDisplay Kind="DisplayKind.Facts" Facts="ErrorFacts()" Surface="DisplaySurface.Plain" />
+                <KlyFacts Items="ErrorFacts()" Surface="KlySurface.Plain" />
             </div>
         }
         else
@@ -40,7 +40,7 @@
     }
     else
     {
-        <KlyDisplay Kind="DisplayKind.Code" Value="@_submitted" Language="json" Surface="DisplaySurface.Plain" />
+        <PgCode Code="@_submitted" Language="CodeLanguage.Json" />
     }
 </PgPanel>
 
@@ -66,18 +66,18 @@
 
     private void OnSubmitted(TModel model) => _submitted = JsonText.Indent(JsonSerializer.Serialize(model, Json));
 
-    private IReadOnlyList<DisplayFact> Status() =>
+    private IReadOnlyList<KlyFact> Status() =>
     [
-        new DisplayFact { Label = "Changed", Value = _form.IsDirty ? "yes" : "no" },
-        new DisplayFact { Label = "Blocking errors", Value = _form.HasBlockingErrors ? "yes" : "no", Tone = _form.HasBlockingErrors ? KlyColor.Error : KlyColor.Success },
-        new DisplayFact { Label = "Submit failed", Value = _form.SubmitFailed ? $"yes, {Words.Plural(_form.SubmitFailureCount, "time")}" : "no" },
-        new DisplayFact { Label = "Step", Value = _form.CurrentStepKey ?? "none: not a wizard" },
+        new KlyFact("Changed") { Value = _form.IsDirty ? "yes" : "no" },
+        new KlyFact("Blocking errors") { Value = _form.HasBlockingErrors ? "yes" : "no", Color = _form.HasBlockingErrors ? KlyColor.Error : KlyColor.Success },
+        new KlyFact("Submit failed") { Value = _form.SubmitFailed ? $"yes, {Words.Plural(_form.SubmitFailureCount, "time")}" : "no" },
+        new KlyFact("Step") { Value = _form.CurrentStepKey ?? "none: not a wizard" },
     ];
 
-    private IReadOnlyList<DisplayFact> ErrorFacts() =>
+    private IReadOnlyList<KlyFact> ErrorFacts() =>
     [
-        .. _form.Errors.Select(e => new DisplayFact { Label = e.Key, Value = e.Value, Tone = KlyColor.Error }),
-        .. _form.FormErrors.Select(e => new DisplayFact { Label = "form", Value = e, Tone = KlyColor.Error }),
+        .. _form.Errors.Select(e => new KlyFact(e.Key) { Value = e.Value, Color = KlyColor.Error }),
+        .. _form.FormErrors.Select(e => new KlyFact("form") { Value = e, Color = KlyColor.Error }),
     ];
 
     public void Dispose() => _form.Changed -= OnChanged;

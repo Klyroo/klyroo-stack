@@ -4,15 +4,31 @@
 @inject Knobs K
 
 <PgShell Library="_lib" DocsPage="getting-started/" DocsLabel="Getting started" OnReset="LoadKnobs"
-         Lead="Pick a component and turn its knobs: variant, size, color, states, icons. The color mode and the accent of the theme are switches too, so you see each component in light and dark with the accent of any Klyroo library.">
+         Lead="Pick a component and turn its knobs: variant, size, color, states, icons. The read-only blocks (stat, meter, facts, breakdown, diff, list, timeline) are typed components with their own knobs. The color mode and the accent of the theme are switches too, so you see each component in light and dark with the accent of any Klyroo library.">
     <Knobs>
         <PgGroup Title="Component">
             <PgSelect Key="component" Label="Component" T="string" Options="_components" @bind-Value="_component" OnChange="ComponentChanged" />
         </PgGroup>
         <PgGroup Title="Look">
-            @if (_component != "avatar" && _component != "input")
+            @if (_component != "avatar" && _component != "input" && !IsBlock)
             {
                 <PgSelect Key="color" Label="Color" T="string" Options="_colors" @bind-Value="_color" />
+            }
+            @if (IsBlock && _component != "timeline")
+            {
+                <PgSelect Key="surface" Label="Surface" T="string" Options="_surfaces" @bind-Value="_surface" Hint="Each block has its own default." />
+            }
+            @if (_component == "meter")
+            {
+                <PgSelect Key="layout" Label="Layout" T="KlyMeterLayout" Options="_meterLayouts" @bind-Value="_meterLayout" />
+            }
+            @if (_component == "list")
+            {
+                <PgSelect Key="listvariant" Label="Variant" T="KlyListVariant" Options="_listVariants" @bind-Value="_listVariant" />
+            }
+            @if (_component == "timeline")
+            {
+                <PgSelect Key="timeline" Label="Layout" T="KlyTimelineLayout" Options="_timelineLayouts" @bind-Value="_timelineLayout" />
             }
             @if (_component is "button" or "badge" or "alert" or "input" or "tabs")
             {
@@ -44,6 +60,49 @@
             {
                 <PgText Key="name" Label="Name, for the initials" @bind-Value="_label" />
             }
+            @if (_component is "stat" or "meter")
+            {
+                <PgText Key="label" Label="Title" @bind-Value="_label" />
+            }
+            @if (_component == "stat")
+            {
+                <PgNumber Key="amount" Label="Value" Min="0" Max="10000000" Step="1000" @bind-Value="_amount" Hint="A decimal: KlyStat is generic over the number type." />
+                <PgSelect Key="format" Label="Format" T="string" Options="_formats" @bind-Value="_format" Hint="A .NET format string, with the culture of the locale." />
+                <PgNumber Key="delta" Label="Change (%)" Min="-50" Max="50" @bind-Value="_delta" Hint="Its sign picks the color of the badge." />
+                <PgSelect Key="direction" Label="Delta direction" T="string" Options="_directions" @bind-Value="_direction" Hint="Set it where a drop is good news." />
+                <PgSwitch Key="trend" Label="Sparkline" @bind-Value="_trend" />
+            }
+            @if (_component == "meter")
+            {
+                <PgNumber Key="value" Label="Value" Min="0" Max="100" @bind-Value="_value" />
+                <PgNumber Key="warn" Label="Warning threshold" Min="0" Max="100" @bind-Value="_warn" Hint="0 turns it off." />
+                <PgNumber Key="error" Label="Error threshold" Min="0" Max="100" @bind-Value="_error" Hint="0 turns it off." />
+            }
+            @if (_component == "facts")
+            {
+                <PgSwitch Key="grouped" Label="Groups" Hint="Facts in titled groups instead of a flat list." @bind-Value="_grouped" />
+                <PgNumber Key="max" Label="Max" Min="0" Max="8" @bind-Value="_blockMax" Hint="Rows shown first, then a Show more button. 0 shows them all." />
+            }
+            @if (_component == "breakdown")
+            {
+                <PgSelect Key="format" Label="Format" T="string" Options="_amountFormats" @bind-Value="_format" Hint="A .NET format string for the decimal amounts." />
+                <PgSelect Key="culture" Label="Culture" T="string" Options="_cultures" @bind-Value="_culture" />
+                <PgSwitch Key="compare" Label="Compare columns" Hint="Two amounts per line." @bind-Value="_compare" />
+                <PgSwitch Key="collapsible" Label="Collapsible" Hint="Hides the lines and keeps the total." @bind-Value="_collapsible" />
+            }
+            @if (_component == "diff")
+            {
+                <PgSelect Key="culture" Label="Culture" T="string" Options="_cultures" @bind-Value="_culture" Hint="The values are formatted when the block renders." />
+                <PgSwitch Key="unchanged" Label="Show unchanged" @bind-Value="_unchanged" />
+            }
+            @if (_component is "list" or "timeline")
+            {
+                <PgNumber Key="max" Label="Max" Min="0" Max="8" @bind-Value="_blockMax" Hint="Rows shown first, then a Show more button. 0 shows them all." />
+            }
+            @if (_component == "timeline" && _timelineLayout == KlyTimelineLayout.Default)
+            {
+                <PgSwitch Key="numbers" Label="Numbered markers" @bind-Value="_numbers" />
+            }
             @if (_component == "progress")
             {
                 <PgNumber Key="value" Label="Value" Min="0" Max="100" @bind-Value="_value" Disabled="_indeterminate" />
@@ -74,7 +133,11 @@
             {
                 <PgSwitch Key="on" Label="On" @bind-Value="_on" />
             }
-            @if (_component is "avatar" or "badge" or "progress" or "tabs")
+            @if (_component is "stat" or "meter" or "facts" or "breakdown" or "diff" or "list")
+            {
+                <PgSwitch Key="loading" Label="Loading" Hint="A skeleton instead of the content." @bind-Value="_loading" />
+            }
+            @if (_component is "avatar" or "badge" or "progress" or "tabs" or "timeline")
             {
                 <p class="m-0 text-sm text-(--klyroo-text-muted)">This component has no interactive state to toggle: change its look above.</p>
             }
@@ -120,6 +183,52 @@
                     case "avatar":
                         <KlyAvatar Alt="@_label" Size="_size" />
                         break;
+                    case "stat":
+                        <div class="w-full max-w-md">
+                            <KlyStat Title="@_label" Value="@((decimal)_amount)" Format="@_format" Delta="@((decimal)_delta)" DeltaFormat="+0.0;-0.0" DeltaUnit="%"
+                                     DeltaDirection="Direction" Trend="@(_trend ? _trendData : null)" Caption="vs last month" Loading="_loading" Surface="Surface" />
+                        </div>
+                        break;
+                    case "meter":
+                        <div class="w-full max-w-md">
+                            <KlyMeter Title="@_label" Value="_value" Max="100" Layout="_meterLayout" WarningThreshold="@(_warn == 0 ? null : _warn)" ErrorThreshold="@(_error == 0 ? null : _error)"
+                                      Levels="@(_meterLayout == KlyMeterLayout.Scale ? _levels : null)" CurrentLevel="@(_meterLayout == KlyMeterLayout.Scale ? Level : null)"
+                                      ValueText="@($"{_value} GB of 100 GB")" Description="Disk used by the workspace" Loading="_loading" Surface="Surface" />
+                        </div>
+                        break;
+                    case "facts":
+                        <div class="w-full max-w-md">
+                            @if (_grouped)
+                            {
+                                <KlyFacts Groups="_factGroups" Max="@(_blockMax == 0 ? null : _blockMax)" Step="@(_blockMax == 0 ? null : 2)" Loading="_loading" Surface="Surface" />
+                            }
+                            else
+                            {
+                                <KlyFacts Items="_facts" Max="@(_blockMax == 0 ? null : _blockMax)" Step="@(_blockMax == 0 ? null : 2)" Loading="_loading" Surface="Surface" />
+                            }
+                        </div>
+                        break;
+                    case "breakdown":
+                        <div class="w-full max-w-md">
+                            <KlyBreakdown Title="Invoice" Lines="@BreakdownLines" Total="@BreakdownTotal" Format="@_format" Culture="@Culture" CompareColumns="@(_compare ? new KlyBreakdownColumns("2026", "2025") : null)"
+                                          Collapsible="_collapsible" Footnote="VAT included" Loading="_loading" Surface="Surface" />
+                        </div>
+                        break;
+                    case "diff":
+                        <div class="w-full max-w-md">
+                            <KlyDiff Title="Plan change" Items="DiffItems" Culture="@Culture" ShowUnchanged="_unchanged" Loading="_loading" Surface="Surface" />
+                        </div>
+                        break;
+                    case "list":
+                        <div class="w-full max-w-md">
+                            <KlyList Title="Launch checklist" Variant="_listVariant" Items="_steps" Max="@(_blockMax == 0 ? null : _blockMax)" Step="@(_blockMax == 0 ? null : 2)" Loading="_loading" Surface="Surface" />
+                        </div>
+                        break;
+                    case "timeline":
+                        <div class="w-full max-w-xl">
+                            <KlyTimeline Layout="_timelineLayout" Items="_events" Now="_now" ShowNumbers="_numbers" Max="@(_blockMax == 0 ? null : _blockMax)" Step="@(_blockMax == 0 ? null : 2)" AriaLabel="Sample timeline" />
+                        </div>
+                        break;
                     default:
                         <div class="w-full max-w-xl"><KlyTabs Items="_tabItems" Variant="Enum.Parse<TabsVariant>(_variant)" Color="new KlyColor(_color)" Orientation="_orientation" AriaLabel="Sample tabs" /></div>
                         break;
@@ -133,7 +242,8 @@
 @code {
     private readonly LibraryInfo _lib = Libraries.Find("ui")!;
 
-    private static readonly IReadOnlyList<PgOption<string>> _components = PgOptions.Of(("button", "Button"), ("badge", "Badge"), ("alert", "Alert"), ("input", "Input"), ("switch", "Switch"), ("progress", "Progress"), ("avatar", "Avatar"), ("tabs", "Tabs"));
+    private static readonly IReadOnlyList<PgOption<string>> _components = PgOptions.Of(("button", "Button"), ("badge", "Badge"), ("alert", "Alert"), ("input", "Input"), ("switch", "Switch"), ("progress", "Progress"), ("avatar", "Avatar"), ("tabs", "Tabs"),
+        ("stat", "Stat"), ("meter", "Meter"), ("facts", "Facts"), ("breakdown", "Breakdown"), ("diff", "Diff"), ("list", "List"), ("timeline", "Timeline"));
     private static readonly IReadOnlyList<PgOption<string>> _colors = PgOptions.Of("primary", "secondary", "success", "info", "warning", "error", "neutral");
     private static readonly IReadOnlyList<PgOption<KlySize>> _sizes = PgOptions.Of<KlySize>();
     private static readonly IReadOnlyList<PgOption<KlyOrientation>> _orientations = PgOptions.Of<KlyOrientation>();
@@ -145,6 +255,84 @@
     private KlyOrientation _orientation;
     private int _value;
     private bool _indeterminate, _status, _leading, _trailing, _disabled, _loading, _block, _close, _on;
+    private bool IsBlock => _component is "stat" or "meter" or "facts" or "breakdown" or "diff" or "list" or "timeline";
+
+    // The read-only blocks.
+    private static readonly IReadOnlyList<PgOption<string>> _surfaces = PgOptions.Of(("default", "Default of the block"), ("Plain", "Plain"), ("Muted", "Muted"), ("Bordered", "Bordered"), ("Elevated", "Elevated"));
+    private static readonly IReadOnlyList<PgOption<string>> _formats = PgOptions.Of(("N0", "N0: 148,900"), ("C0", "C0: $148,900"), ("F1", "F1: 148900.0"), ("#,0.##", "#,0.##"));
+    private static readonly IReadOnlyList<PgOption<string>> _amountFormats = PgOptions.Of(("N2", "N2: 1,234.50"), ("C2", "C2: $1,234.50"), ("N0", "N0: 1,235"));
+    private static readonly IReadOnlyList<PgOption<string>> _directions = PgOptions.Of(("auto", "From the sign"), ("Up", "Up (success)"), ("Down", "Down (error)"), ("Flat", "Flat (neutral)"));
+    private static readonly IReadOnlyList<PgOption<string>> _cultures = PgOptions.Of(("en-US", "English (US)"), ("fr-FR", "French"), ("de-DE", "German"));
+    private static readonly IReadOnlyList<PgOption<KlyMeterLayout>> _meterLayouts = PgOptions.Of<KlyMeterLayout>();
+    private static readonly IReadOnlyList<PgOption<KlyListVariant>> _listVariants = PgOptions.Of<KlyListVariant>();
+    private static readonly IReadOnlyList<PgOption<KlyTimelineLayout>> _timelineLayouts = PgOptions.Of<KlyTimelineLayout>();
+    private int _amount = 148_900, _delta = 14, _warn = 75, _error = 90, _blockMax;
+    private string _format = "N0", _direction = "auto", _surface = "default", _culture = "en-US";
+    private KlyMeterLayout _meterLayout;
+    private KlyListVariant _listVariant;
+    private KlyTimelineLayout _timelineLayout;
+    private bool _trend = true, _grouped, _compare, _collapsible, _unchanged, _numbers;
+
+    private KlySurface? Surface => _surface == "default" ? null : Enum.Parse<KlySurface>(_surface);
+    private KlyDeltaDirection? Direction => _direction == "auto" ? null : Enum.Parse<KlyDeltaDirection>(_direction);
+    private System.Globalization.CultureInfo Culture => System.Globalization.CultureInfo.GetCultureInfo(_culture);
+    private static readonly IReadOnlyList<string> _levels = ["Low", "Medium", "High"];
+    private int Level => _value < 34 ? 0 : _value < 67 ? 1 : 2;
+    private static readonly IReadOnlyList<double> _trendData = [102, 98, 115, 110, 132, 128, 149];
+    private static readonly DateTimeOffset _now = new(2026, 3, 12, 9, 30, 0, TimeSpan.FromHours(1));
+
+    private static readonly IReadOnlyList<KlyFact> _facts =
+    [
+        new("Status") { Badge = new KlyBadgeItem("Paid") { Color = KlyColor.Success, Icon = "check" } },
+        new("Reference") { Value = "ORD-1042", Copy = true, Mono = true },
+        new("Customer") { Value = "Acme Corp", Href = "https://klyroo.github.io/klyroo-ui/" },
+        new("Amount") { Value = "$12,400", Emphasis = true },
+        new("Shipping address") { Value = null },
+        new("Notes") { Loading = true },
+    ];
+
+    private static readonly IReadOnlyList<KlyFactGroup> _factGroups =
+    [
+        new("Order", [new KlyFact("Reference") { Value = "ORD-1042", Copy = true, Mono = true }, new KlyFact("Status") { Badge = new KlyBadgeItem("Paid") { Color = KlyColor.Success } }]),
+        new("Customer", [new KlyFact("Name") { Value = "Acme Corp" }, new KlyFact("Plan") { Value = "Team" }, new KlyFact("Region") { Value = "eu-west-3" }]),
+    ];
+
+    private IReadOnlyList<KlyBreakdownLine> BreakdownLines =>
+    [
+        new("Licenses") { Amount = 1400m, CompareAmount = _compare ? 1200m : null, Detail = "12 seats" },
+        new("Support") { Amount = 240m, CompareAmount = _compare ? 240m : null },
+        new("Discount") { Amount = -165.5m, CompareAmount = _compare ? 0m : null, Color = KlyColor.Success },
+    ];
+
+    private KlyBreakdownLine BreakdownTotal => new("Total") { Amount = 1474.5m, CompareAmount = _compare ? 1440m : null };
+
+    private IReadOnlyList<KlyDiffItem> DiffItems =>
+    [
+        KlyDiffItem.Compare("Plan", "Starter", "Team"),
+        KlyDiffItem.Compare("Seats", 12, 12),
+        KlyDiffItem.Compare("Price", 1200.5m, 1500m, "N2"),
+        KlyDiffItem.Compare("Due", new DateOnly(2026, 3, 5), new DateOnly(2026, 4, 1), "d"),
+        new KlyDiffItem("Role", "Member", "Admin") { Note = new KlyBadgeItem("Needs approval") },
+    ];
+
+    private IReadOnlyList<KlyListItem> _steps =
+    [
+        new("Create the account") { Done = true },
+        new("Add a card") { Current = true, Description = "Takes two minutes" },
+        new("Invite the team"),
+        new("Connect the data") { Meta = "optional" },
+        new("Launch"),
+    ];
+
+    private static readonly IReadOnlyList<KlyTimelineItem> _events =
+    [
+        new("Standup") { At = new(2026, 3, 12, 9, 0, 0, TimeSpan.FromHours(1)), EndAt = new(2026, 3, 12, 9, 30, 0, TimeSpan.FromHours(1)), State = KlyTimelineState.Done, Date = "09:00" },
+        new("Design review") { Description = "Bring the mockups", At = new(2026, 3, 12, 14, 0, 0, TimeSpan.FromHours(1)), EndAt = new(2026, 3, 12, 15, 30, 0, TimeSpan.FromHours(1)), Actor = "Alice", State = KlyTimelineState.Current, Date = "14:00" },
+        new("Conference") { At = new(2026, 3, 14, 0, 0, 0, TimeSpan.FromHours(1)), EndAt = new(2026, 3, 16, 0, 0, 0, TimeSpan.FromHours(1)), State = KlyTimelineState.Upcoming, Date = "Mar 14" },
+        new("Release") { At = new(2026, 3, 20, 10, 0, 0, TimeSpan.FromHours(1)), State = KlyTimelineState.Upcoming, Date = "Mar 20" },
+        new("Book the venue"),
+    ];
+
     private string _componentTitle => _components.First(c => c.Value == _component).Label;
 
     private static readonly IReadOnlyList<KlyTabItem> _tabItems =
@@ -192,7 +380,30 @@
         _on = K.Bool("on", true);
         _accent = K.Str("accent", "default");
         if (_accents.All(a => a.Value != _accent)) _accent = "default";
+        _amount = K.Int("amount", 148_900, 0, 10_000_000);
+        _format = K.Str("format", DefaultFormat(_component));
+        _delta = K.Int("delta", 14, -50, 50);
+        _direction = K.Str("direction", "auto");
+        if (_directions.All(d => d.Value != _direction)) _direction = "auto";
+        _trend = K.Bool("trend", true);
+        _warn = K.Int("warn", 75, 0, 100);
+        _error = K.Int("error", 90, 0, 100);
+        _meterLayout = K.Enum("layout", KlyMeterLayout.Bar);
+        _surface = K.Str("surface", "default");
+        if (_surfaces.All(x => x.Value != _surface)) _surface = "default";
+        _grouped = K.Bool("grouped", false);
+        _blockMax = K.Int("max", 0, 0, 8);
+        _culture = K.Str("culture", "en-US");
+        if (_cultures.All(c => c.Value != _culture)) _culture = "en-US";
+        _compare = K.Bool("compare", false);
+        _collapsible = K.Bool("collapsible", false);
+        _unchanged = K.Bool("unchanged", false);
+        _listVariant = K.Enum("listvariant", KlyListVariant.Steps);
+        _timelineLayout = K.Enum("timeline", KlyTimelineLayout.Schedule);
+        _numbers = K.Bool("numbers", false);
     }
+
+    private static string DefaultFormat(string component) => component == "breakdown" ? "N2" : "N0";
 
     private static string DefaultVariant(string component) => component switch
     {
@@ -201,15 +412,18 @@
 
     private static string DefaultLabel(string component) => component switch
     {
-        "button" => "Save changes", "badge" => "New", "alert" => "Saved", "switch" => "Email notifications", "avatar" => "Ada Lovelace", _ => "",
+        "button" => "Save changes", "badge" => "New", "alert" => "Saved", "switch" => "Email notifications", "avatar" => "Ada Lovelace",
+        "stat" => "Monthly revenue", "meter" => "Storage", _ => "",
     };
 
     private void ComponentChanged()
     {
         _variant = DefaultVariant(_component);
         _label = DefaultLabel(_component);
+        _format = DefaultFormat(_component);
         K.Put("variant", _variant);
         K.Put("label", _label);
+        K.Put("format", _format);
     }
 
     private string AccentCss
@@ -264,6 +478,53 @@
             case "avatar":
                 sb.Append($"<KlyAvatar Alt=\"{_label}\"{size} />\n");
                 break;
+            case "stat":
+                sb.Append($"<KlyStat Title=\"{_label}\" Value=\"@_revenue\"{(_format == "N0" ? "" : $" Format=\"{_format}\"")} Delta=\"@_change\" DeltaFormat=\"+0.0;-0.0\" DeltaUnit=\"%\"");
+                if (_direction != "auto") sb.Append($" DeltaDirection=\"KlyDeltaDirection.{_direction}\"");
+                if (_trend) sb.Append(" Trend=\"@(new double[] { 102, 98, 115, 110, 132, 128, 149 })\"");
+                sb.Append(" Caption=\"vs last month\"").Append(BlockCommon()).Append(" />\n\n");
+                sb.Append($"@code {{\n    private readonly decimal _revenue = {_amount}m;\n    private readonly decimal _change = {_delta}m;\n}}\n");
+                break;
+            case "meter":
+                sb.Append($"<KlyMeter Title=\"{_label}\" Value=\"{_value}\" Max=\"100\"{(_meterLayout == KlyMeterLayout.Bar ? "" : $" Layout=\"KlyMeterLayout.{_meterLayout}\"")}");
+                if (_warn > 0) sb.Append($" WarningThreshold=\"{_warn}\"");
+                if (_error > 0) sb.Append($" ErrorThreshold=\"{_error}\"");
+                if (_meterLayout == KlyMeterLayout.Scale) sb.Append($" Levels=\"@(new[] {{ \"Low\", \"Medium\", \"High\" }})\" CurrentLevel=\"{Level}\"");
+                sb.Append($" ValueText=\"{_value} GB of 100 GB\"").Append(BlockCommon()).Append(" />\n");
+                break;
+            case "facts":
+                sb.Append(_grouped ? "<KlyFacts Groups=\"_groups\"" : "<KlyFacts Items=\"_facts\"");
+                if (_blockMax > 0) sb.Append($" Max=\"{_blockMax}\" Step=\"2\"");
+                sb.Append(BlockCommon()).Append(" />\n\n");
+                sb.Append(_grouped
+                    ? "@code {\n    private readonly KlyFactGroup[] _groups =\n    [\n        new(\"Order\", [new KlyFact(\"Reference\") { Value = \"ORD-1042\", Copy = true, Mono = true }]),\n        new(\"Customer\", [new KlyFact(\"Name\") { Value = \"Acme Corp\" }]),\n    ];\n}\n"
+                    : "@code {\n    private readonly KlyFact[] _facts =\n    [\n        new(\"Status\") { Badge = new KlyBadgeItem(\"Paid\") { Color = KlyColor.Success } },\n        new(\"Reference\") { Value = \"ORD-1042\", Copy = true, Mono = true },\n        new(\"Shipping address\") { Value = null },\n    ];\n}\n");
+                break;
+            case "breakdown":
+                sb.Append($"<KlyBreakdown Title=\"Invoice\" Lines=\"_lines\" Total=\"_total\" Format=\"{_format}\" Culture=\"@_culture\"");
+                if (_compare) sb.Append(" CompareColumns=\"@(new KlyBreakdownColumns(\"2026\", \"2025\"))\"");
+                if (_collapsible) sb.Append(" Collapsible=\"true\"");
+                sb.Append(" Footnote=\"VAT included\"").Append(BlockCommon()).Append(" />\n\n");
+                sb.Append($"@code {{\n    private readonly CultureInfo _culture = CultureInfo.GetCultureInfo(\"{_culture}\");\n    private readonly KlyBreakdownLine[] _lines =\n    [\n        new(\"Licenses\") {{ Amount = 1400m{(_compare ? ", CompareAmount = 1200m" : "")}, Detail = \"12 seats\" }},\n        new(\"Discount\") {{ Amount = -165.5m{(_compare ? ", CompareAmount = 0m" : "")}, Color = KlyColor.Success }},\n    ];\n    private readonly KlyBreakdownLine _total = new(\"Total\") {{ Amount = 1474.5m{(_compare ? ", CompareAmount = 1440m" : "")} }};\n}}\n");
+                break;
+            case "diff":
+                sb.Append($"<KlyDiff Title=\"Plan change\" Items=\"_items\" Culture=\"@_culture\"{(_unchanged ? " ShowUnchanged=\"true\"" : "")}{BlockCommon()} />\n\n");
+                sb.Append($"@code {{\n    private readonly CultureInfo _culture = CultureInfo.GetCultureInfo(\"{_culture}\");\n    private readonly KlyDiffItem[] _items =\n    [\n        KlyDiffItem.Compare(\"Plan\", \"Starter\", \"Team\"),\n        KlyDiffItem.Compare(\"Seats\", 12, 12),\n        KlyDiffItem.Compare(\"Price\", 1200.5m, 1500m, \"N2\"),\n        KlyDiffItem.Compare(\"Due\", new DateOnly(2026, 3, 5), new DateOnly(2026, 4, 1), \"d\"),\n    ];\n}}\n");
+                break;
+            case "list":
+                sb.Append($"<KlyList Title=\"Launch checklist\" Variant=\"KlyListVariant.{_listVariant}\" Items=\"_steps\"");
+                if (_blockMax > 0) sb.Append($" Max=\"{_blockMax}\" Step=\"2\"");
+                sb.Append(BlockCommon()).Append(" />\n\n");
+                sb.Append("@code {\n    private readonly KlyListItem[] _steps =\n    [\n        new(\"Create the account\") { Done = true },\n        new(\"Add a card\") { Current = true, Description = \"Takes two minutes\" },\n        new(\"Invite the team\"),\n    ];\n}\n");
+                break;
+            case "timeline":
+                sb.Append($"<KlyTimeline Layout=\"KlyTimelineLayout.{_timelineLayout}\" Items=\"_events\"");
+                if (_timelineLayout == KlyTimelineLayout.Schedule) sb.Append(" Now=\"_now\"");
+                if (_numbers && _timelineLayout == KlyTimelineLayout.Default) sb.Append(" ShowNumbers=\"true\"");
+                if (_blockMax > 0) sb.Append($" Max=\"{_blockMax}\" Step=\"2\"");
+                sb.Append(" />\n\n");
+                sb.Append("@code {\n    private static readonly TimeSpan Paris = TimeSpan.FromHours(1);\n    private readonly DateTimeOffset _now = new(2026, 3, 12, 9, 30, 0, Paris);\n    private readonly KlyTimelineItem[] _events =\n    [\n        new(\"Standup\") { At = new(2026, 3, 12, 9, 0, 0, Paris), EndAt = new(2026, 3, 12, 9, 30, 0, Paris), State = KlyTimelineState.Done },\n        new(\"Design review\") { At = new(2026, 3, 12, 14, 0, 0, Paris), EndAt = new(2026, 3, 12, 15, 30, 0, Paris), Actor = \"Alice\" },\n        new(\"Conference\") { At = new(2026, 3, 14, 0, 0, 0, Paris), EndAt = new(2026, 3, 16, 0, 0, 0, Paris) },\n        new(\"Book the venue\"),\n    ];\n}\n");
+                break;
             default:
                 sb.Append("<KlyTabs Items=\"_tabs\"" + (_variant == "Pill" ? "" : $" Variant=\"TabsVariant.{_variant}\"") + color + (_orientation == KlyOrientation.Vertical ? " Orientation=\"KlyOrientation.Vertical\"" : "") + " />\n\n");
                 sb.Append(TabsCode);
@@ -271,6 +532,9 @@
         }
         return sb.ToString();
     }
+
+    /// <summary>The parameters every block shares: its surface, when the knob is set, and Loading.</summary>
+    private string BlockCommon() => (_surface == "default" || _component == "timeline" ? "" : $" Surface=\"KlySurface.{_surface}\"") + (_loading && _component != "timeline" ? " Loading=\"true\"" : "");
 
     private const string TabsCode =
         "@code {\n    private readonly IReadOnlyList<KlyTabItem> _tabs =\n    [\n        new(\"Account\") { Value = \"account\", Content = @<p>Account settings.</p> },\n        new(\"Billing\") { Value = \"billing\", Content = @<p>Billing.</p> },\n        new(\"Team\") { Value = \"team\", Content = @<p>Team.</p> },\n    ];\n}\n";
