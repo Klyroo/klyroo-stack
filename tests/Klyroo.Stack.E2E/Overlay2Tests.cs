@@ -128,6 +128,10 @@ public class Overlay2Tests(PlaygroundServer server) : PlaygroundTest(server)
     {
         await Open(mode, "context-menu");
         var area = Page.GetByTestId("context-area");
+        // The menu opens below the pointer only where the viewport has room for it (see the next test): put the area in the middle of the viewport.
+        // Scrolling after the menu opened would dismiss it, so jump (the site scrolls smoothly otherwise) and let the scroll events pass first.
+        await area.EvaluateAsync("element => element.scrollIntoView({ block: 'center', behavior: 'instant' })");
+        await Page.WaitForTimeoutAsync(300);
 
         await area.ClickAsync(new() { Button = MouseButton.Right, Position = new() { X = 40, Y = 30 } });
 
@@ -141,6 +145,30 @@ public class Overlay2Tests(PlaygroundServer server) : PlaygroundTest(server)
         await Page.Mouse.ClickAsync(5, 5);
 
         await Assertions.Expect(menu).ToBeHiddenAsync();
+    }
+
+    [Theory]
+    [MemberData(nameof(AllModes))]
+    public async Task ContextMenu_flips_above_the_pointer_where_the_viewport_has_no_room_below(string mode)
+    {
+        await Page.SetViewportSizeAsync(1280, 500);
+        await Open(mode, "context-menu");
+        var area = Page.GetByTestId("context-area");
+        // The area in the lower part of the viewport: the menu (about 180px) does not fit below the pointer, and fits above it.
+        await area.EvaluateAsync("element => scrollBy({ top: element.getBoundingClientRect().top - 330, behavior: 'instant' })");
+        await Page.WaitForTimeoutAsync(300);
+        var box = (await area.BoundingBoxAsync())!;
+        var pointerY = box.Y + box.Height - 10;
+        var viewportHeight = await Page.EvaluateAsync<int>("() => innerHeight");
+
+        await Page.Mouse.ClickAsync(box.X + 40, pointerY, new() { Button = MouseButton.Right });
+
+        var menu = Page.GetByRole(AriaRole.Menu);
+        await Assertions.Expect(menu).ToBeVisibleAsync();
+        var menuBox = (await menu.BoundingBoxAsync())!;
+        Assert.InRange(menuBox.X, box.X + 40 - 2, box.X + 40 + 6);
+        Assert.True(menuBox.Y + menuBox.Height <= pointerY + 1, $"The menu ends at {menuBox.Y + menuBox.Height}, below the pointer at {pointerY}.");
+        Assert.True(menuBox.Y >= 0 && menuBox.Y + menuBox.Height <= viewportHeight, "The menu is not inside the viewport.");
     }
 
     [Theory]

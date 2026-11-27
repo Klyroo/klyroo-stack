@@ -514,6 +514,11 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
         return await context.NewPageAsync();
     }
 
+    // The documentation site scrolls smoothly, so a plain scrollIntoView has not moved yet when the next line reads a coordinate: jump, and
+    // elementFromPoint (which answers null outside the viewport) then sees the element.
+    private static Task BringIntoView(ILocator locator) =>
+        locator.EvaluateAsync("(e) => e.scrollIntoView({ block: 'center', behavior: 'instant' })");
+
     private static Task<double[]> Size(ILocator locator) =>
         locator.EvaluateAsync<double[]>("(e) => { const r = e.getBoundingClientRect(); return [r.width, r.height]; }");
 
@@ -534,7 +539,7 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
         Assert.True(before[0] < 44 || before[1] < 44, $"the test needs a button under 44px, got {before[0]}x{before[1]}");
         var reaches = await icon.EvaluateAsync<bool[]>("""
             (b) => {
-              b.scrollIntoView({ block: 'center' });
+              b.scrollIntoView({ block: 'center', behavior: 'instant' });
               const r = b.getBoundingClientRect();
               const x = r.x + r.width / 2;
               const y = r.y + r.height / 2;
@@ -740,6 +745,7 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
         await page.EvaluateAsync("() => document.querySelectorAll('kly-input-number').forEach((n) => { n.querySelector('[data-slot=increment]')?.setAttribute('data-hit', 'increment'); n.querySelector('[data-slot=decrement]')?.setAttribute('data-hit', 'decrement'); })");
         var vertical = page.Locator("kly-input-number:has([data-slot='increment'][class*='h-1/2'])").First;
         await Assertions.Expect(vertical).ToBeVisibleAsync();
+        await BringIntoView(vertical);
 
         var increment = vertical.Locator("[data-slot='increment']");
         var decrement = vertical.Locator("[data-slot='decrement']");
@@ -761,6 +767,7 @@ public class HybridTests(PlaygroundServer server) : PlaygroundTest(server)
         var page = await NewTouchPage();
         await Open(page, "server", "calendar");
         var day = page.Locator("button[data-date]").First;
+        await BringIntoView(day);
         var daySize = await Size(day);
         Assert.True(daySize[0] < 44 && daySize[1] < 44, $"day of {daySize[0]}x{daySize[1]}");
         var dayBox = await day.BoundingBoxAsync() ?? throw new InvalidOperationException("No box.");

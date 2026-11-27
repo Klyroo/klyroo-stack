@@ -247,6 +247,9 @@ public abstract class PlaygroundTest(PlaygroundServer server) : IAsyncLifetime
         // The head outlet renders the title again when a page turns interactive (WebAssembly can do it late on a busy
         // machine): a scan in that window reports an empty <title> the page does not really have.
         await Page.WaitForFunctionAsync("() => document.title.length > 0");
+        // A color mode switch or a hover is a transition of colors (transition-colors, 150ms): a scan in the middle of one reads colors that blend the two
+        // modes and reports a contrast no visitor sees. Scan the settled page (the looping animations of a marquee or a spinner are not transitions).
+        await Page.WaitForFunctionAsync("() => document.getAnimations().every((animation) => !(animation instanceof CSSTransition) || animation.playState !== 'running')");
         var result = await Page.RunAxe();
         var violations = result.Violations
             .SelectMany(v => v.Nodes.Select(n => $"{v.Id}: {n.Html} -> {string.Join("; ", n.Any.Select(c => c.Message))}"))
