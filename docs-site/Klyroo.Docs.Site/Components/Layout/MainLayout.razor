@@ -36,6 +36,10 @@
                     {
                         <a class="header-link" href="@_docs.Href" aria-current="@(_inDocs && !_isApi ? "page" : null)">Docs</a>
                     }
+                    @if (Libraries.PlaygroundOf(Site.Settings.RepoName) is { } playground)
+                    {
+                        <a class="header-link" href="@playground">Playground</a>
+                    }
                     @if (_api is not null)
                     {
                         <a class="header-link" href="@_api.Href" aria-current="@(_isApi ? "page" : null)">API</a>

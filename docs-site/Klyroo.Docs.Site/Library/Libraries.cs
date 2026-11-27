@@ -5,7 +5,7 @@ using YamlDotNet.Serialization.NamingConventions;
 namespace Klyroo.Docs.Site.Library;
 
 /// <summary>A Klyroo library that has a documentation site, with the accent color and the ground texture that make its site recognizable among the others.</summary>
-public sealed record LibraryInfo(string Repo, string Name, string? Accent = null, string? Texture = null)
+public sealed record LibraryInfo(string Repo, string Name, string? Accent = null, string? Texture = null, string? Playground = null)
 {
     /// <summary>The name that follows <c>klyroo/</c> in the wordmark: <c>table</c> for <c>klyroo-table</c>.</summary>
     public string ShortName => Repo.StartsWith("klyroo-", StringComparison.OrdinalIgnoreCase) ? Repo["klyroo-".Length..] : Repo;
@@ -19,7 +19,13 @@ public sealed class Libraries
     /// <summary>The address all the sites are below (<c>https://klyroo.github.io</c>), without a trailing slash.</summary>
     public required string PagesUrl { get; init; }
 
+    /// <summary>The address of the playground app (<c>https://klyroo.github.io/klyroo-stack/playground/</c>), with a trailing slash. Null when there is none.</summary>
+    public string? PlaygroundUrl { get; init; }
+
     public required IReadOnlyList<LibraryInfo> Items { get; init; }
+
+    /// <summary>The address of the playground of a library (<c>.../playground/table/</c>), or null when the library has none or no playground is configured.</summary>
+    public string? PlaygroundOf(string repo) => PlaygroundUrl is not null && Find(repo)?.Playground is { Length: > 0 } slug ? $"{PlaygroundUrl}{slug}/" : null;
 
     public LibraryInfo? Find(string repo) => Items.FirstOrDefault(l => l.Repo.Equals(repo, StringComparison.OrdinalIgnoreCase));
 
@@ -39,7 +45,8 @@ public sealed class Libraries
         {
             Organization = file.Organization ?? "klyroo",
             PagesUrl = (file.Pages ?? "https://klyroo.github.io").TrimEnd('/'),
-            Items = [.. (file.Libraries ?? []).Select(l => new LibraryInfo(l.Repo ?? throw new ContentException($"{path}: a library has no repo."), l.Name ?? l.Repo, l.Accent, l.Texture))],
+            PlaygroundUrl = file.Playground is { Length: > 0 } playground ? playground.TrimEnd('/') + "/" : null,
+            Items = [.. (file.Libraries ?? []).Select(l => new LibraryInfo(l.Repo ?? throw new ContentException($"{path}: a library has no repo."), l.Name ?? l.Repo, l.Accent, l.Texture, l.Playground))],
         };
     }
 
@@ -47,6 +54,7 @@ public sealed class Libraries
     {
         public string? Organization { get; set; }
         public string? Pages { get; set; }
+        public string? Playground { get; set; }
         public List<LibraryEntry>? Libraries { get; set; }
     }
 
@@ -56,5 +64,6 @@ public sealed class Libraries
         public string? Name { get; set; }
         public string? Accent { get; set; }
         public string? Texture { get; set; }
+        public string? Playground { get; set; }
     }
 }

@@ -149,6 +149,17 @@ dotnet run --project site/Klyroo.Stack.Site
 
 The site also hosts live demos of templates as child processes. Set `Klyroo__Templates__Enabled=false` to start it without them.
 
+### The playground
+
+`playground/Klyroo.Playground` is a standalone Blazor WebAssembly app with one interactive page per library (`/ui/`, `/query/`, `/table/`, `/form/`, `/dashboard/`, `/display/`, `/spreadsheet/`, `/agent/`) and an index. The result is drawn by the real components and engines running in the browser on sample data, the knobs are real parameters of the library, the code beside the result follows the knobs and can be copied, and the knobs and the state of the lists are kept in the address, so a link restores a view. It needs no server. Publish it for GitHub Pages with:
+
+```bash
+build/publish-playground.sh <out-dir> [base-path]   # base-path defaults to /klyroo-stack/playground/
+python3 -m http.server 8000 --directory <parent-of-out-dir>
+```
+
+The script writes the app, a `404.html` that restores the route on GitHub Pages (a deep link such as `/klyroo-stack/playground/table/?q=ada` lands on it, since Pages has no server routes) and `.nojekyll`. The documentation sites link to it from their header and from the home page of each library (`playground` in `docs-site/Klyroo.Docs.Site/libraries.yml`).
+
 ## Quick start
 
 Headless first. `Klyroo.Stack.Core` brings the query engine of Klyroo.Query, so you can filter, sort and page data without any UI:

@@ -39,7 +39,7 @@
                     <KlyFormField Label="Tool">
                         <KlySelect TValue="string" Items="_toolItems" Value="@_tool" ValueChanged="OnToolChanged" />
                     </KlyFormField>
-                    <KlyFormField Label="Arguments (JSON object)" Error="@_jsonError">
+                    <KlyFormField Label="Arguments (JSON object)" Error="@(_jsonError.Length > 0 ? _jsonError : null)">
                         <KlyTextarea Value="@_arguments" ValueChanged="OnArguments" Rows="6" />
                     </KlyFormField>
                 </div>

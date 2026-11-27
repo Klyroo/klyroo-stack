@@ -77,6 +77,17 @@ python3 -m http.server 8000 --directory preview   # http://localhost:8000/klyroo
 
 Change the look or the behavior of every site in `docs-site/`, and the content, the order of the pages and the links of one site in the repository of that library.
 
+### The playground
+
+`playground/Klyroo.Playground` is the interactive playground of the eight libraries (a standalone Blazor WebAssembly app, published as static files). Build and publish it like this:
+
+```bash
+build/publish-playground.sh /tmp/pg/klyroo-stack/playground            # base path /klyroo-stack/playground/
+python3 -m http.server 8000 --directory /tmp/pg                          # http://localhost:8000/klyroo-stack/playground/
+```
+
+Pass a second argument to publish below another path (`/` for a root). The first build downloads the Tailwind CLI, the fonts and the icons into `~/.klyroo`. Pages and layouts of the playground are kept from trimming (`TrimmerRootAssembly`), the libraries are trimmed, and a trim warning is an error because warnings are errors. Every control, panel, tab and code block is a Klyroo.UI or Klyroo.Display component; a new playground takes its knobs from `Shared/Pg*.razor` (they keep their value in the address through `Knobs`) and its code from the C# that builds it, so keep the generated code and the rendered markup in step when you change one. The Pages workflow of this repository can copy the output to `/playground/` next to the showcase.
+
 ## Workflow
 
 1. **Discuss first** for anything larger than a bug fix: open an issue (or comment on an existing one) so the
