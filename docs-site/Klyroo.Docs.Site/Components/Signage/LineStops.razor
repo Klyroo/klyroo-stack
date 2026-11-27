@@ -1,0 +1,58 @@
+@inject DocsSite Site
+@inject Libraries Libraries
+
+@* The line of one library, drawn as a transit diagram: its plate at the start, its stations (the features of its README, from NetworkData) along the rail with
+   their names turned 45 degrees as on the map of the network, then the 45-degree bend toward the interchange disc, which leads to the other lines. The positions
+   are computed here from the number of stations; the geometry is in a viewBox the width of the box, and the names are HTML so they stay text, links and tooltips.
+   On a narrow box the diagram becomes a vertical strip with the same stations. *@
+<div class="ls-wrap">
+    <figure class="ls" style="--c: @Fill; --on: @OnFill">
+        <figcaption class="sr-only">The @Library.Name line and its @Line.Stations.Count stations</figcaption>
+        <svg class="ls-svg" viewBox="0 0 @W @H" aria-hidden="true" focusable="false">
+            <path class="ls-route" d="@Route" />
+        </svg>
+        <div class="ls-badge"><LineBadge Label="@Library.Name" Fill="@Fill" OnFill="@OnFill" /></div>
+        <ol class="ls-stops">
+            @for (var i = 0; i < Line.Stations.Count; i++)
+            {
+                var station = Line.Stations[i];
+                var x = Line.Stations.Count == 1 ? FirstX : FirstX + i * (LastX - FirstX) / (Line.Stations.Count - 1);
+                var anchor = FeatureId(station);
+                <li style="--x: @Percent(x, W); --y: @Percent(RailY, H)">
+                    <KlyTooltip Text="@station.Text" Placement="KlyPlacement.Top">
+                        @if (anchor is not null)
+                        {
+                            <a class="ls-stop" href="#@anchor"><i class="ls-dot" aria-hidden="true"></i><span>@station.Label</span></a>
+                        }
+                        else
+                        {
+                            <span class="ls-stop" tabindex="0"><i class="ls-dot" aria-hidden="true"></i><span>@station.Label</span></span>
+                        }
+                    </KlyTooltip>
+                </li>
+            }
+        </ol>
+        <a class="ls-hub" href="@Libraries.SiteUrl("klyroo-stack")" style="--x: @Percent(HubX, W); --y: @Percent(HubY, H)">
+            <span class="ls-disc"><b>Klyroo</b><b>Stack</b></span>
+            <span class="ls-change">Change here for the other lines</span>
+        </a>
+    </figure>
+</div>
+
+@code {
+    private const double W = 700, H = 240, RailY = 100, FirstX = 232, LastX = 470, HubX = 640, HubY = 160;
+
+    [Parameter, EditorRequired] public MetroLine Line { get; set; } = default!;
+    [Parameter, EditorRequired] public LibraryInfo Library { get; set; } = default!;
+    [Parameter, EditorRequired] public string Fill { get; set; } = "";
+    [Parameter] public string OnFill { get; set; } = "#111111";
+
+    // Horizontal from under the plate, a rounded 45-degree bend down to the row of the interchange, horizontal again into its disc.
+    private const string Route = "M150 100 H488 Q505 100 517 112 L553 148 Q565 160 582 160 H640";
+
+    private static string Percent(double value, double of) => (value / of * 100).ToString("0.###", System.Globalization.CultureInfo.InvariantCulture) + "%";
+
+    /// <summary>The id of the feature of the README the station stands for, when the home page lists it (it carries the id, so the link lands).</summary>
+    private string? FeatureId(Station station) =>
+        Site.HomeContent.Features.Any(f => f.Title == station.FeatureTitle) ? Slug.Feature(station.FeatureTitle) : null;
+}

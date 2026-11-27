@@ -4,69 +4,11 @@
 @inject NavigationManager Navigation
 
 <KlyApp>
-    <div class="site tex-@Site.Settings.Texture @(_isHome ? "is-home" : "is-doc") @(_isShowcase ? "is-showcase" : "")">
+    <div class="site world @(_isHome ? "is-home" : "is-doc") @(_isShowcase ? "is-showcase" : "")">
         <KlySkipLink />
-        <div class="ground-wrap" aria-hidden="true"><div class="ground"></div></div>
 
         @* Links are relative: they resolve against <base href>, so the site works below the name of the repository, which is where GitHub Pages serves it. *@
-        @if (_isShowcase)
-        {
-            <ShowcaseNav />
-        }
-        else
-        {
-        <header class="site-header">
-            <div class="page-wrap header-inner">
-                <a href="./" class="brand" aria-label="@(Site.Settings.Title) home">
-                    <KlyrooMark />
-                    <span class="wordmark">klyroo<span class="slash">/</span><span class="name">@Site.Settings.ShortName</span></span>
-                </a>
-
-                <div class="header-search">
-                    @* One search for the whole site: Ctrl+K (Cmd+K on a Mac) or this button. The browser fetches search-index.json the first time it opens. *@
-                    <button type="button" class="search-pill" data-kly-content-search-open="" aria-haspopup="dialog" aria-keyshortcuts="Control+K Meta+K" aria-label="Search the documentation">
-                        <KlyIcon Name="ph:magnifying-glass" />
-                        <span class="label">Search the docs</span>
-                        <span class="keys" aria-hidden="true"><kbd data-mod-key>Ctrl</kbd><kbd>K</kbd></span>
-                    </button>
-                </div>
-
-                <div class="header-actions">
-                    @if (_docs is not null)
-                    {
-                        <a class="header-link" href="@_docs.Href" aria-current="@(_inDocs && !_isApi ? "page" : null)">Docs</a>
-                    }
-                    @if (Libraries.PlaygroundOf(Site.Settings.RepoName) is { } playground)
-                    {
-                        <a class="header-link" href="@playground">Playground</a>
-                    }
-                    @if (_api is not null)
-                    {
-                        <a class="header-link" href="@_api.Href" aria-current="@(_isApi ? "page" : null)">API</a>
-                    }
-                    <details class="eco" data-eco>
-                        <summary aria-label="Klyroo libraries"><KlyIcon Name="ph:squares-four" Class="eco-grid" /><span class="eco-text">Klyroo</span><KlyIcon Name="ph:caret-down" Class="eco-caret" /></summary>
-                        <div class="eco-menu">
-                            @foreach (var library in Libraries.Items)
-                            {
-                                <a href="@Libraries.SiteUrl(library.Repo)" aria-current="@(IsCurrent(library) ? "true" : null)" style="--dot: @(library.Accent ?? "var(--dim)")">
-                                    <span class="dot" aria-hidden="true"></span>@library.Name@if (IsCurrent(library))
-                                    {
-                                        <span class="here">this site</span>
-                                    }
-                                </a>
-                            }
-                        </div>
-                    </details>
-                    <a class="icon-button" href="@Site.Settings.GithubUrl" target="_blank" rel="noopener noreferrer" aria-label="@(Site.Settings.Title) on GitHub"><KlyIcon Name="ph:github-logo" /></a>
-                    <button type="button" class="icon-button theme-toggle" data-kly-color-mode="toggle" aria-label="Toggle color mode">
-                        <svg class="moon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.5 11.6A6.75 6.75 0 0 1 8.4 3.5a6.75 6.75 0 1 0 8.1 8.1Z" /></svg>
-                        <svg class="sun" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="3.4" /><path d="M10 2.5v1.6M10 15.9v1.6M2.5 10h1.6M15.9 10h1.6M4.7 4.7l1.1 1.1M14.2 14.2l1.1 1.1M15.3 4.7l-1.1 1.1M5.8 14.2l-1.1 1.1" /></svg>
-                    </button>
-                </div>
-            </div>
-        </header>
-        }
+        <SignNav />
 
         <KlyContentSearch IndexUrl="search-index.json" />
 
@@ -76,55 +18,51 @@
 
         @if (!_isShowcase)
         {
-        <footer class="site-footer">
-            <div class="page-wrap footer-inner">
-                <div class="footer-top">
-                    <a href="./" class="brand" aria-label="@(Site.Settings.Title) home">
-                        <KlyrooMark Size="24" />
-                        <span class="wordmark">klyroo<span class="slash">/</span><span class="name">@Site.Settings.ShortName</span></span>
-                    </a>
-                    <nav aria-label="Klyroo libraries">
-                        <ul class="footer-libs">
-                            @foreach (var library in Libraries.Items)
+            <footer class="sc-foot">
+                <div class="sc-foot-inner">
+                    <div class="sc-foot-top">
+                        <a href="./" class="sc-mark" aria-label="@(Site.Settings.Title) home">
+                            <LineBadge Fill="@(Site.Settings.IsShowcase ? "var(--rail-h)" : "var(--accent)")" />
+                            <span class="sc-wordmark">klyroo<b>/@Site.Settings.ShortName</b></span>
+                        </a>
+                        <nav aria-label="Klyroo libraries">
+                            <ul class="sc-foot-libs">
+                                @foreach (var library in Libraries.Items)
+                                {
+                                    <li>
+                                        <a href="@Libraries.SiteUrl(library.Repo)" aria-current="@(IsCurrent(library) ? "true" : null)" aria-label="@(IsCurrent(library) ? library.Name + " (this line)" : library.Name)">
+                                            <LineBadge Label="@library.Name" Fill="@(library.Accent ?? "#888888")" OnFill="@AccentColor.Compute(library.Accent ?? "#888888").OnFill" Size="KlySize.Sm" />
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </nav>
+                    </div>
+                    <div class="sc-foot-meta">
+                        <span>&copy; @DateTime.UtcNow.Year Klyroo Contributors. Built with <a href="@Libraries.SiteUrl("klyroo-ui")">Klyroo.UI</a>.</span>
+                        <span>
+                            <a href="@Site.Settings.GithubUrl" target="_blank" rel="noopener noreferrer">Source on GitHub</a>
+                            @foreach (var package in Site.Settings.Packages.Take(1))
                             {
-                                <li><a href="@Libraries.SiteUrl(library.Repo)" aria-current="@(IsCurrent(library) ? "true" : null)" style="--dot: @(library.Accent ?? "var(--dim)")"><span class="dot" aria-hidden="true"></span>@library.Name</a></li>
+                                <span aria-hidden="true">&nbsp;&middot;&nbsp;</span><a href="@NugetUrl(package)" target="_blank" rel="noopener noreferrer">NuGet</a>
                             }
-                        </ul>
-                    </nav>
+                        </span>
+                    </div>
                 </div>
-                <div class="footer-meta">
-                    <span>&copy; @DateTime.UtcNow.Year Klyroo Contributors. Built with <a href="@Libraries.SiteUrl("klyroo-ui")">Klyroo.UI</a>.</span>
-                    <span>
-                        <a href="@Site.Settings.GithubUrl" target="_blank" rel="noopener noreferrer">Source on GitHub</a>
-                        @foreach (var package in Site.Settings.Packages.Take(1))
-                        {
-                            <span aria-hidden="true">&nbsp;&middot;&nbsp;</span><a href="@NugetUrl(package)" target="_blank" rel="noopener noreferrer">NuGet</a>
-                        }
-                    </span>
-                </div>
-            </div>
-        </footer>
+            </footer>
         }
     </div>
 </KlyApp>
 
 @code {
-    private DocPage? _docs;
-    private DocPage? _api;
     private bool _isHome;
     private bool _isShowcase;
-    private bool _isApi;
-    private bool _inDocs;
 
     protected override void OnParametersSet()
     {
-        _docs = Site.Find(LibraryDocs.IndexSlug) ?? Site.Pages.FirstOrDefault();
-        _api = Site.Pages.FirstOrDefault(p => p.Slug == "api-reference");
         var path = Navigation.ToBaseRelativePath(Navigation.Uri).Split('?', '#')[0].Trim('/');
         _isHome = path.Length == 0;
         _isShowcase = _isHome && Site.Settings.IsShowcase;
-        _isApi = _api is not null && path == _api.Slug;
-        _inDocs = !_isHome && Site.Find(path) is not null;
     }
 
     private bool IsCurrent(LibraryInfo library) => library.Repo.Equals(Site.Settings.RepoName, StringComparison.OrdinalIgnoreCase);

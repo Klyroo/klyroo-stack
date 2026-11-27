@@ -12,27 +12,31 @@
         <link rel="canonical" href="@(Libraries.SiteUrl(Site.Settings.RepoName) + _page.Slug + "/")" />
     </HeadContent>
 
-    @* Below lg the navigation is one bar under the header that says where you are and opens the menu. *@
+    @* Below lg the line diagram of the navigation is a compact strip under the nav band: the stations of the line as dots with the current one lit, where you are, and the menu behind it. *@
     <div class="docs-subbar">
-        <div class="page-wrap">
-            <details>
-                <summary>
-                    <KlyIcon Name="ph:list" />
-                    <span class="where">@if (_page.Group is not null){<span>@_page.Group</span><span aria-hidden="true"> / </span>}<strong>@_page.NavTitle</strong></span>
-                    <KlyIcon Name="ph:caret-down" Class="caret" />
-                </summary>
-                <div class="menu"><DocNav Items="Site.Navigation" CurrentHref="@_page.Href" AriaLabel="Documentation menu" /></div>
-            </details>
-        </div>
+        <details class="ds">
+            <summary>
+                <span class="ds-strip" aria-hidden="true">
+                    @for (var i = 0; i < Site.Pages.Count; i++)
+                    {
+                        <i class="ds-dot" data-state="@(i == _index ? "here" : i < _index ? "ridden" : "ahead")"></i>
+                    }
+                </span>
+                <span class="where">@if (_page.Group is not null){<span>@_page.Group</span><span aria-hidden="true"> / </span>}<strong>@_page.NavTitle</strong></span>
+                <KlyIcon Name="ph:list" Class="ds-icon" />
+            </summary>
+            <div class="menu"><LineNav Items="Site.Navigation" CurrentHref="@_page.Href" AriaLabel="Documentation menu" IdPrefix="lnm" /></div>
+        </details>
     </div>
 
     <div class="page-wrap doc-layout">
         <aside class="doc-rail" aria-label="Navigation">
-            <DocNav Items="Site.Navigation" CurrentHref="@_page.Href" />
+            <LineNav Items="Site.Navigation" CurrentHref="@_page.Href" />
         </aside>
 
         <article class="doc-main" data-testid="article">
             <nav class="crumbs" aria-label="Breadcrumb">
+                <span class="num" aria-hidden="true">@(_index + 1)</span>
                 <ol>
                     @if (_page.Group is not null)
                     {
@@ -50,7 +54,7 @@
             {
                 <p class="doc-lead">@((MarkupString)_page.LeadHtml)</p>
             }
-            <hr class="doc-rule" />
+            <div class="doc-strip" aria-hidden="true"></div>
 
             @if (_page.Toc.Count > 0)
             {
@@ -75,7 +79,7 @@
                 <nav class="surround" aria-label="Previous and next page">
                     @if (_previous is not null)
                     {
-                        <a href="@_previous.Href" rel="prev"><span class="title"><KlyIcon Name="ph:arrow-left" />@_previous.Title</span><span class="caption">Previous</span></a>
+                        <a href="@_previous.Href" rel="prev" class="stop-sign"><KlyIcon Name="ph:arrow-left" /><span class="title">@_previous.Title</span><span class="caption">Previous stop</span></a>
                     }
                     else
                     {
@@ -83,7 +87,7 @@
                     }
                     @if (_next is not null)
                     {
-                        <a href="@_next.Href" rel="next" class="next"><span class="title"><KlyIcon Name="ph:arrow-right" />@_next.Title</span><span class="caption">Next</span></a>
+                        <a href="@_next.Href" rel="next" class="stop-sign next"><KlyIcon Name="ph:arrow-right" /><span class="title">@_next.Title</span><span class="caption">Next stop</span></a>
                     }
                 </nav>
             }
@@ -107,6 +111,7 @@
     private KlyContentSurroundLink? _next;
     private string _editUrl = "";
     private string? _groupHref;
+    private int _index;
 
     [Parameter] public string? Slug { get; set; }
 
@@ -121,6 +126,7 @@
         }
         (_previous, _next) = Site.Surround(_page);
         _editUrl = $"{Site.Settings.GithubUrl}/edit/{Uri.EscapeDataString(Site.Settings.Branch)}/{_page.SourcePath}";
+        _index = Math.Max(0, Site.Pages.ToList().FindIndex(p => p.Slug == _page.Slug));
         _groupHref = _page.Group is null ? null : Site.Pages.FirstOrDefault(p => p.Group == _page.Group)?.Href;
     }
 }

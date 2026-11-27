@@ -1,7 +1,7 @@
-@* The platform sign: the install command of the whole network, with its copy button (the page script of the site copies what a data-copy attribute carries)
+@* The platform sign: an install command with its copy button (the page script of the site copies what a data-copy attribute carries)
    and a popover with the other packages of the stack. *@
-<div class="sc-plat" role="group" aria-label="Install the whole network">
-    <div class="num" aria-hidden="true">1</div>
+<div class="sc-plat" role="group" aria-label="@AriaLabel">
+    <div class="num" aria-hidden="true">@Number</div>
     <div class="body">
         <span class="lab">Install</span>
         <code class="cmd">
@@ -19,7 +19,7 @@
                 <ChildContent><span class="copy-status sr-only" role="status" aria-live="polite"></span></ChildContent>
             </KlyButton>
         </KlyTooltip>
-        @if (ShowPackages && Packages.Count > 0)
+        @if (ShowPackages && Packages.Count > 0 && Urls is not null)
         {
             <KlyPopover Placement="KlyPlacement.TopEnd" AriaLabel="The packages of the stack" Class="sc-more">
                 <ChildContent>
@@ -30,7 +30,7 @@
                         @foreach (var package in Packages)
                         {
                             <li>
-                                <span class="pkg-name"><a href="@Urls.NuGet(package.Id)" target="_blank" rel="noopener noreferrer">@package.Id</a><KlyBadge Label="@package.Layer" Variant="KlyVariant.Subtle" Size="KlySize.Xs" /></span>
+                                <span class="pkg-name"><a href="@Urls!.NuGet(package.Id)" target="_blank" rel="noopener noreferrer">@package.Id</a><KlyBadge Label="@package.Layer" Variant="KlyVariant.Subtle" Size="KlySize.Xs" /></span>
                                 <code>@package.Install</code>
                             </li>
                         }
@@ -49,5 +49,8 @@
     private RenderFragment CaretIcon => @<KlyIcon Name="ph:caret-down" />;
 
     [Parameter] public IReadOnlyList<HomePackage> Packages { get; set; } = [];
-    [Parameter, EditorRequired] public ShowcaseUrls Urls { get; set; } = default!;
+    /// <summary>Where the packages link to; needed with <see cref="ShowPackages"/> only.</summary>
+    [Parameter] public ShowcaseUrls? Urls { get; set; }
+    [Parameter] public string Number { get; set; } = "1";
+    [Parameter] public string AriaLabel { get; set; } = "Install the whole network";
 }

@@ -1,13 +1,13 @@
 /*
-  What a page of Markdown contains, set in the world of the site: reading column, headings with anchors, code blocks with their bar, tables, callouts.
+  What a page of Markdown contains, set in the world of the network: a calm reading column (the body face at a real measure), headings in Archivo wide with anchors,
+  code in black sign panels with the color of the line as a gutter, tables with a black head, callouts as platform signs.
   The class names are the ones Content/MarkdownRenderer.cs writes. These rules are outside any layer on purpose, so nothing of the Klyroo.UI utilities beats them.
 */
 
 .markdown-body {
   max-width: 100%;
-  font-size: 1.0625rem;
-  line-height: 1.72;
-  color: var(--text);
+  font: 400 1.0625rem/1.72 var(--sc-font);
+  color: var(--sc-text);
   overflow-wrap: break-word;
 }
 
@@ -16,31 +16,31 @@
 
 .markdown-body :where(p) { margin: 1rem 0 0; text-wrap: pretty; }
 .markdown-body > :first-child { margin-top: 0; }
-.markdown-body strong { color: var(--strong); font-weight: 600; }
+.markdown-body strong { color: var(--sc-strong); font-weight: 700; }
 
 .markdown-body :where(h2, h3, h4, h5, h6) {
   position: relative;
-  color: var(--strong);
-  font-family: var(--font-display);
-  line-height: 1.22;
-  letter-spacing: -0.022em;
+  color: var(--sc-strong);
+  font-family: var(--sc-font);
+  line-height: 1.18;
+  letter-spacing: -0.012em;
   text-wrap: balance;
   overflow-wrap: anywhere;
 }
-.markdown-body h2 { margin: 3.5rem 0 0.875rem; font-size: 1.75rem; font-weight: 650; letter-spacing: -0.028em; }
-.markdown-body h3 { margin: 2.5rem 0 0.625rem; font-size: 1.3125rem; font-weight: 620; }
-.markdown-body h4 { margin: 2rem 0 0.5rem; font-size: 1.0625rem; font-weight: 620; }
-.markdown-body h5, .markdown-body h6 { margin: 1.75rem 0 0.5rem; font-size: 1rem; font-weight: 600; }
+.markdown-body h2 { margin: 3.5rem 0 0.875rem; font-size: 1.875rem; font-weight: 900; font-variation-settings: "wdth" 118; }
+.markdown-body h3 { margin: 2.5rem 0 0.625rem; font-size: 1.375rem; font-weight: 800; font-variation-settings: "wdth" 112; }
+.markdown-body h4 { margin: 2rem 0 0.5rem; font-size: 1.125rem; font-weight: 800; font-variation-settings: "wdth" 108; }
+.markdown-body h5, .markdown-body h6 { margin: 1.75rem 0 0.5rem; font-size: 1rem; font-weight: 700; font-variation-settings: "wdth" 108; }
 
-/* Types of the API reference: each one starts under a hairline, and its name reads as a name. */
+/* Types of the API reference: each one starts under the rule of the line, and its name reads as a name. */
 .markdown-body h4:has(> code) {
   max-width: none;
   margin-top: 3rem;
   padding-top: 1.5rem;
-  border-top: 1px solid var(--line);
+  border-top: 4px solid var(--sc-rule);
   font-size: 1.1875rem;
 }
-.markdown-body :is(h2, h3, h4, h5):has(> code) > code { padding: 0; border: 0; background: none; font-size: 0.94em; font-weight: 600; color: inherit; overflow-wrap: anywhere; }
+.markdown-body :is(h2, h3, h4, h5):has(> code) > code { padding: 0; border: 0; background: none; font-size: 0.94em; font-weight: 700; color: inherit; overflow-wrap: anywhere; }
 
 .heading-anchor {
   display: inline-block;
@@ -48,10 +48,10 @@
   height: 1em;
   margin-inline-start: 0.25rem;
   vertical-align: baseline;
-  color: var(--accent-ink);
+  color: var(--sc-strong);
   opacity: 0;
   text-decoration: none;
-  transition: opacity 140ms var(--ease-out);
+  transition: opacity 140ms var(--sc-ease);
 }
 .heading-anchor::before {
   content: "";
@@ -62,51 +62,48 @@
   -webkit-mask: var(--link-icon) center / contain no-repeat;
   mask: var(--link-icon) center / contain no-repeat;
 }
-:root {
-  --link-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6.75 9.25a3 3 0 0 0 4.24 0l2.5-2.5a3 3 0 0 0-4.24-4.24l-.9.9'/%3E%3Cpath d='M9.25 6.75a3 3 0 0 0-4.24 0l-2.5 2.5a3 3 0 0 0 4.24 4.24l.9-.9'/%3E%3C/svg%3E");
-}
 .markdown-body :is(h2, h3, h4, h5):hover > .heading-anchor,
 .heading-anchor:focus-visible { opacity: 1; }
-@media (hover: none) { .heading-anchor { opacity: 0.45; } }
+@media (hover: none) { .heading-anchor { opacity: 0.55; } }
 
-.markdown-body :where(ul, ol) { margin: 1rem 0 0; padding-inline-start: 1.375rem; }
+.markdown-body :where(ul, ol) { margin: 1rem 0 0; padding-inline-start: 1.5rem; }
 .markdown-body :where(ul) { list-style: disc; }
 .markdown-body :where(ol) { list-style: decimal; }
 .markdown-body :where(li) { margin-top: 0.4rem; padding-inline-start: 0.25rem; }
-.markdown-body li::marker { color: var(--dim); }
+.markdown-body li::marker { color: var(--sc-strong); font-weight: 700; }
 .markdown-body :where(li > ul, li > ol) { margin-top: 0.4rem; }
 
-.markdown-body a { color: var(--accent-ink); text-decoration: underline; }
+.markdown-body a { color: var(--sc-strong); font-weight: 600; text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 3px; text-underline-offset: 0.18em; }
+.markdown-body a:hover { background: color-mix(in oklab, var(--sc-sys) 55%, transparent); text-decoration-color: var(--sc-ink); }
+:root.dark .markdown-body a:hover { background: color-mix(in oklab, var(--sc-sys) 24%, transparent); text-decoration-color: var(--sc-sys); }
 .markdown-body a:has(> code) { text-decoration: none; }
-.markdown-body a > code { color: var(--accent-ink); }
+.markdown-body a > code { color: var(--sc-strong); text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 3px; text-underline-offset: 0.18em; }
 
-.markdown-body hr { height: 0; margin: 2.5rem 0; border: 0; border-top: 1px solid var(--line); }
+.markdown-body hr { height: 0; margin: 2.5rem 0; border: 0; border-top: 4px solid var(--sc-rule); }
 
 .markdown-body blockquote {
   margin: 1.5rem 0 0;
-  padding: 0.125rem 0 0.125rem 1.125rem;
-  border-inline-start: 1px solid var(--line-strong);
-  color: var(--muted);
+  padding: 0.75rem 0 0;
+  border-top: 5px solid var(--accent);
+  color: var(--sc-muted);
 }
 .markdown-body blockquote > :first-child { margin-top: 0; }
 
-.markdown-body img { max-width: 100%; height: auto; border-radius: var(--r); border: 1px solid var(--line); }
+.markdown-body img { max-width: 100%; height: auto; border-radius: 0.75rem; border: 3px solid var(--sc-rule); }
 
 /* Inline code */
 .markdown-body :not(pre) > code, .doc-lead code, .prose-inline code {
-  padding: 0.12em 0.38em;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: color-mix(in oklab, var(--accent) 7%, var(--sunken));
-  color: var(--strong);
-  font-family: var(--font-code);
+  padding: 0.1em 0.36em;
+  border-radius: 5px;
+  background: color-mix(in oklab, var(--sc-strong) 10%, transparent);
+  color: var(--sc-strong);
+  font-family: var(--sc-mono);
   font-size: 0.855em;
-  font-weight: 450;
+  font-weight: 500;
   overflow-wrap: anywhere;
 }
-.markdown-body a > code { background: color-mix(in oklab, var(--accent) 9%, var(--sunken)); }
 
-/* Code blocks: the classes of HighlightedCode, which maps the token kinds of Klyroo.Display.Core's CodeHighlighter onto the colors of DESIGN.md (a function is colored as a command, punctuation keeps the text color). */
+/* The classes of HighlightedCode, which maps the token kinds of Klyroo.Display.Core's CodeHighlighter onto the syntax colors (a function is colored as a command, punctuation keeps the text color). */
 .tok-comment { color: var(--tok-comment); font-style: italic; }
 .tok-string { color: var(--tok-string); }
 .tok-keyword { color: var(--tok-keyword); }
@@ -117,17 +114,20 @@
 .tok-tag { color: var(--tok-tag); }
 .tok-type { color: var(--tok-type); }
 
+/* A code block is a black sign panel: the bar with the language, the code on the well, and the color of the line as the gutter at its left edge. */
 .code-block {
   position: relative;
   margin: 1.5rem 0 0;
   overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: var(--r);
-  background: var(--code-bg);
+  border-radius: 0.75rem;
+  background: var(--sc-well);
   font-size: 0.875rem;
   line-height: 1.65;
   max-width: 100%;
 }
+:root.dark .code-block { outline: 1px solid var(--sc-panel-line); }
+/* The gutter: the color of the line down the left edge, over the bar and the code. */
+.code-block::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 7px; background: var(--rail, var(--accent)); z-index: 1; }
 
 .code-head {
   display: flex;
@@ -135,31 +135,30 @@
   justify-content: space-between;
   gap: 0.75rem;
   min-height: 2.5rem;
-  padding: 0 0.5rem 0 1rem;
-  border-bottom: 1px solid var(--line);
-  background: var(--code-head);
+  padding: 0 0.5rem 0 1.5rem;
+  border-bottom: 1px solid var(--sc-panel-line);
+  background: var(--sc-panel);
 }
-.code-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-code); font-size: 0.75rem; color: var(--muted); }
+.code-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 600 0.75rem/1 var(--sc-mono); color: var(--sc-panel-muted); }
 
 .code-copy {
   appearance: none;
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  height: 1.75rem;
+  height: 1.875rem;
   padding: 0 0.625rem;
-  border: 1px solid transparent;
-  border-radius: var(--r-sm);
+  border: 2px solid transparent;
+  border-radius: 0.375rem;
   background: transparent;
-  color: var(--muted);
-  font: inherit;
-  font-size: 0.75rem;
+  color: var(--sc-panel-text);
+  font: 700 0.75rem/1 var(--sc-font);
   cursor: pointer;
-  transition: color 140ms var(--ease-out), background-color 140ms var(--ease-out), border-color 140ms var(--ease-out);
+  transition: color 140ms var(--sc-ease), background-color 140ms var(--sc-ease), border-color 140ms var(--sc-ease);
 }
-.code-copy:hover { color: var(--strong); border-color: var(--line-strong); background: var(--raised); }
+.code-copy:hover { color: #ffffff; border-color: var(--sc-sys); }
 .code-copy .code-check-icon { display: none; }
-.code-copy[data-copied] { color: var(--accent-ink); }
+.code-copy[data-copied] { color: var(--sc-ink); background: var(--sc-sys); border-color: var(--sc-sys); }
 .code-copy[data-copied] .code-copy-icon { display: none; }
 .code-copy[data-copied] .code-check-icon { display: block; }
 
@@ -167,63 +166,62 @@
 
 .code-block pre {
   margin: 0;
-  padding: 1rem 1.25rem 1.125rem;
+  padding: 1rem 1.25rem 1.125rem 1.5rem;
   overflow-x: auto;
   background: transparent;
-  font-family: var(--font-code);
+  font-family: var(--sc-mono);
   font-size: 0.8125rem;
   line-height: 1.7;
   tab-size: 2;
-  color: var(--text);
+  color: var(--sc-panel-text);
 }
-.code-block pre:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: -2px; border-radius: 0 0 var(--r) var(--r); }
+.code-block pre:focus-visible { outline: 3px solid var(--sc-sys); outline-offset: -3px; border-radius: 0 0 0.75rem 0.75rem; }
 .code-block pre code { padding: 0; border: 0; background: transparent; font-size: inherit; white-space: pre; color: inherit; }
 
-/* Callouts: the palette of the site, a hairline and a tint, a title in the ink of the kind. */
+/* Callouts are platform signs: a strip of the kind on the left edge, the sign on signage white with a heavy outline, the title in Archivo wide. */
 .callout {
-  --c: var(--accent-ink);
+  --c: var(--sc-ink);
   margin: 1.5rem 0 0;
-  padding: 0.875rem 1.125rem 1rem;
-  border: 1px solid color-mix(in oklab, var(--c) 30%, transparent);
-  border-radius: var(--r);
-  background: color-mix(in oklab, var(--c) 7%, var(--raised));
-  color: var(--text);
+  padding: 0.875rem 1.125rem 1rem 1.5rem;
+  border: 3px solid var(--sc-rule);
+  border-radius: 0.75rem;
+  background: var(--sc-raised);
+  box-shadow: inset 8px 0 0 var(--c);
+  color: var(--sc-text);
   font-size: 0.9375rem;
   line-height: 1.65;
 }
-.callout[data-color="info"] { --c: #1f55b0; }
-.callout[data-color="success"] { --c: #0d6b3d; }
-.callout[data-color="warning"] { --c: #8a5a00; }
-.callout[data-color="error"] { --c: #a8321f; }
-.dark .callout[data-color="info"] { --c: #86b6ff; }
-.dark .callout[data-color="success"] { --c: #7ee0a0; }
-.dark .callout[data-color="warning"] { --c: #ffd070; }
-.dark .callout[data-color="error"] { --c: #ff8a75; }
+:root.dark .callout { border-width: 2px; }
+.callout[data-color="info"] { --c: #2f6fe0; }
+.callout[data-color="success"] { --c: #1f9d5c; }
+.callout[data-color="warning"] { --c: #f0a500; }
+.callout[data-color="error"] { --c: #d64533; }
 .callout > * { margin-block: 0.5rem 0; max-width: none; }
-.callout > .callout-title { margin: 0; color: var(--c); font-weight: 650; font-size: 0.9375rem; letter-spacing: -0.005em; }
-.callout a, .callout a > code { color: var(--c); }
+.callout > .callout-title { margin: 0; color: var(--sc-strong); font: 800 0.9375rem/1.3 var(--sc-font); font-variation-settings: "wdth" 112; }
+.callout a, .callout a > code { color: var(--sc-strong); }
 
-/* A wide table scrolls inside its own box instead of widening the page. */
+/* A wide table scrolls inside its own box instead of widening the page. The head is a black sign. */
 .table-scroll {
   margin: 1.5rem 0 0;
   overflow-x: auto;
-  border: 1px solid var(--line);
-  border-radius: var(--r);
-  background: color-mix(in oklab, var(--raised) 60%, transparent);
+  border: 3px solid var(--sc-rule);
+  border-radius: 0.75rem;
+  background: var(--sc-raised);
   max-width: 100%;
 }
-.table-scroll:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+:root.dark .table-scroll { border-width: 2px; }
+.table-scroll:focus-visible { outline: 3px solid var(--sc-focus); outline-offset: 3px; }
 
 .table-scroll table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.9rem; line-height: 1.55; font-variant-numeric: tabular-nums; }
-.table-scroll :is(th, td) { padding: 0.625rem 0.875rem; border-bottom: 1px solid var(--line); text-align: start; vertical-align: top; }
+.table-scroll :is(th, td) { padding: 0.625rem 0.875rem; border-bottom: 1px solid var(--sc-line); text-align: start; vertical-align: top; }
 .table-scroll tbody tr:last-child td { border-bottom: 0; }
 .table-scroll th {
-  background: color-mix(in oklab, var(--code-head) 92%, transparent);
-  color: var(--strong);
-  font-size: 0.8125rem;
-  font-weight: 600;
+  background: var(--sc-panel);
+  color: #ffffff;
+  font: 800 0.8125rem/1.3 var(--sc-font);
+  font-variation-settings: "wdth" 112;
   white-space: nowrap;
-  border-bottom-color: var(--line-strong);
+  border-bottom: 4px solid var(--rail-h, var(--accent));
 }
 .table-scroll td code { overflow-wrap: anywhere; }
 .table-scroll td { min-width: 7rem; }
@@ -231,11 +229,11 @@
 
 /* Task lists, footnotes, definition lists */
 .contains-task-list { list-style: none; padding-inline-start: 0.25rem; }
-.task-list-item input { margin-inline-end: 0.5rem; accent-color: var(--accent-ink); }
+.task-list-item input { margin-inline-end: 0.5rem; accent-color: var(--sc-ink); }
 
-.footnotes { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.875rem; }
+.footnotes { margin-top: 3rem; padding-top: 1rem; border-top: 4px solid var(--sc-rule); color: var(--sc-muted); font-size: 0.875rem; }
 .footnotes ol { margin: 0; }
 .footnote-ref { font-size: 0.75em; vertical-align: super; }
 
-.markdown-body dt { margin-top: 1rem; font-weight: 600; color: var(--strong); }
+.markdown-body dt { margin-top: 1rem; font-weight: 800; color: var(--sc-strong); }
 .markdown-body dd { margin-inline-start: 1.5rem; }

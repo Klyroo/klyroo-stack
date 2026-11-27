@@ -1,0 +1,58 @@
+@* The navigation of a documentation page, drawn as the line of the library: the pages are stations along one rail, grouped under the black signs of their
+   sections. The page being read is the lit station (yellow, ringed), the ones before it are filled with the color of the line (already ridden) and the ones
+   after it are white. It is still a nav with lists of links: a screen reader hears the sections and the pages, and the keyboard goes from link to link. *@
+<nav class="ln" aria-label="@AriaLabel">
+    <ul class="ln-list">
+        @foreach (var item in Items)
+        {
+            @if (item.Children is { Count: > 0 })
+            {
+                <li class="ln-section">
+                    <p class="ln-sign" id="@SectionId(item)"><span>@item.Title</span></p>
+                    <ul class="ln-stops" aria-labelledby="@SectionId(item)">
+                        @foreach (var child in item.Children)
+                        {
+                            <li>@Stop(child)</li>
+                        }
+                    </ul>
+                </li>
+            }
+            else if (item.Href is not null)
+            {
+                <li class="ln-solo">@Stop(item)</li>
+            }
+        }
+    </ul>
+</nav>
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<KlyContentNavigationItem> Items { get; set; } = [];
+
+    /// <summary>The address of the page being read, as the pages write it (<c>guides/</c>).</summary>
+    [Parameter] public string? CurrentHref { get; set; }
+
+    [Parameter] public string AriaLabel { get; set; } = "Documentation";
+
+    /// <summary>Distinguishes the ids of two instances on one page (the menu of a narrow screen and the rail of a wide one).</summary>
+    [Parameter] public string IdPrefix { get; set; } = "ln";
+
+    private List<string> _order = [];
+    private int _current = -1;
+
+    protected override void OnParametersSet()
+    {
+        _order = [.. Items.SelectMany(i => i.Children is { Count: > 0 } ? i.Children : [i]).Where(i => i.Href is not null).Select(i => i.Href!)];
+        _current = CurrentHref is null ? -1 : _order.IndexOf(CurrentHref);
+    }
+
+    private string SectionId(KlyContentNavigationItem item) => IdPrefix + "-" + new string(item.Title.ToLowerInvariant().Select(c => char.IsLetterOrDigit(c) ? c : '-').ToArray());
+
+    private string State(KlyContentNavigationItem item)
+    {
+        var index = _order.IndexOf(item.Href!);
+        return index == _current ? "here" : index < _current ? "ridden" : "ahead";
+    }
+
+    private RenderFragment Stop(KlyContentNavigationItem item) =>
+        @<a href="@item.Href" class="ln-stop" data-state="@State(item)" aria-current="@(State(item) == "here" ? "page" : null)"><i class="ln-dot" aria-hidden="true"></i><span>@item.Title</span></a>;
+}

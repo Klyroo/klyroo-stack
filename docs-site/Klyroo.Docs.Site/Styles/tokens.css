@@ -1,55 +1,82 @@
 /*
-  The design tokens of the Klyroo documentation sites, shared by every library. Each site changes only the accent (the four --accent-* variables, which
-  the page writes from docs/site.yml after this file) and its ground texture (ground.css).
-
-  Both modes are authored: the dark ground is a near-black with a faint cool tint, the light one a cool off-white. The tones below are checked against
-  each other (text on ground, on raised surfaces and on the sunken ones) and the accent tones are computed against these grounds (Library/AccentColor.cs
-  holds the same surface colors for its tests).
+  The design tokens of every page of every Klyroo site, the world of the network: signage-white ground (station night in dark mode), black sign panels in both modes,
+  the system yellow for the network itself and for lit states, Archivo with its width axis for signs and titles, JetBrains Mono for what a developer types.
+  The color of a library is its line: the page writes --accent (and, for the stack, the eight lines side by side as --rail) after this file, and it is used for
+  lines, plates, lit stations and strips only, never for text on the ground.
+  Everything is defined on .world, which every page carries, so the showcase home page and the documentation pages are one system.
 */
+@property --sc-lit {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+:root { color-scheme: light; --link-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6.75 9.25a3 3 0 0 0 4.24 0l2.5-2.5a3 3 0 0 0-4.24-4.24l-.9.9'/%3E%3Cpath d='M9.25 6.75a3 3 0 0 0-4.24 0l-2.5 2.5a3 3 0 0 0 4.24 4.24l.9-.9'/%3E%3C/svg%3E"); }
+:root.dark { color-scheme: dark; }
+
+/* The library color; replaced by the inline style of every page. These are the Klyroo.UI green, for a page that has none. */
 :root {
-  color-scheme: light;
-
-  --font-display: var(--klyroo-font-sans, "Geist"), ui-sans-serif, system-ui, sans-serif;
-  --font-body: var(--klyroo-font-sans, "Geist"), ui-sans-serif, system-ui, sans-serif;
-  --font-code: var(--klyroo-font-mono, "Geist Mono"), ui-monospace, SFMono-Regular, Menlo, monospace;
-
-  /* The library accent. Replaced by the inline style of every page: these are the Klyroo.UI green, for a page that has none. */
   --accent: #10b981;
   --on-accent: #090c11;
-  --accent-ink: #067a56;
-  --accent-display: #0a8f66;
+}
 
-  --bg: #f4f6f9;
-  --raised: #ffffff;
-  --sunken: #e6eaf0;
-  --code-bg: #eef1f6;
-  --code-head: #e7ebf1;
-  --text: #1a2230;
-  --strong: #0a1018;
-  --muted: #465163;
-  --dim: #5a6679;
-  --line: #dbe1e9;
-  --line-strong: #c1cad6;
-  --danger: #b3321e;
+.world {
+  --sc-font: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --sc-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --sc-sys: #ffd23f;
+  --sc-ink: #111111;
+  --sc-ground: #f4f1e8;
+  --sc-sunken: #ebe7d9;
+  --sc-raised: #fbf9f3;
+  --sc-text: #1d1b16;
+  --sc-strong: #0b0a08;
+  --sc-muted: #4a463b;
+  --sc-line: #cdc7b5;
+  --sc-rule: #111111;
+  --sc-edge: #111111;
+  --sc-station: #ffffff;
+  --sc-label: #111111;
+  --sc-focus: #0b57d0;
+  --sc-panel: #111111;
+  --sc-well: #0a0c10;
+  --sc-panel-text: #f6f3ea;
+  --sc-panel-muted: #bdb8aa;
+  --sc-panel-line: #34373f;
+  --sc-nav-h: 62px;
+  --sc-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --sc-gutter: clamp(1rem, 3.4vw, 3rem);
 
-  --tx: color-mix(in oklab, var(--accent-ink) 7%, transparent);
-  --tx-major: color-mix(in oklab, var(--accent-ink) 13%, transparent);
-  --accent-soft: color-mix(in oklab, var(--accent) 14%, transparent);
-  --accent-line: color-mix(in oklab, var(--accent-ink) 55%, transparent);
-  --lit: color-mix(in oklab, var(--strong) 6%, transparent);
+  background: var(--sc-ground);
+  color: var(--sc-text);
+  font-family: var(--sc-font);
 
+  /* The names the stylesheets of the Markdown content and of the boards use, drawn from the signage palette. */
+  --font-display: var(--sc-font);
+  --font-body: var(--sc-font);
+  --font-code: var(--sc-mono);
+  --bg: var(--sc-ground);
+  --raised: var(--sc-raised);
+  --sunken: var(--sc-sunken);
+  --text: var(--sc-text);
+  --strong: var(--sc-strong);
+  --muted: var(--sc-muted);
+  --dim: var(--sc-muted);
+  --line: var(--sc-line);
+  --line-strong: #8f8873;
+  --danger: #a8321f;
+  --lit: color-mix(in oklab, var(--sc-sys) 38%, transparent);
+  --accent-ink: var(--sc-strong);
+  --accent-soft: color-mix(in oklab, var(--sc-sys) 38%, transparent);
+  --accent-line: var(--sc-ink);
   --r-sm: 6px;
   --r: 10px;
   --r-lg: 14px;
-  --shadow-panel: 0 1px 2px rgb(15 23 42 / 0.05), 0 14px 32px -18px rgb(15 23 42 / 0.24);
-  --shadow-pop: 0 2px 4px rgb(15 23 42 / 0.06), 0 20px 44px -16px rgb(15 23 42 / 0.3);
-
-  --header-h: 4rem;
+  --header-h: var(--sc-nav-h);
   --page-w: 88rem;
-  --gutter: 1.5rem;
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --gutter: var(--sc-gutter);
+  --ease-out: var(--sc-ease);
 
-  /* Syntax colors, each at least 4.5:1 on --code-bg and on --raised. The accent colors the types, so a library site reads in its own hue. */
+  /* Syntax colors for the ground, each at least 4.5:1 on signage white. The black sign panels use the set below. */
   --tok-comment: #586272;
   --tok-string: #0d6b3d;
   --tok-keyword: #6b3fc4;
@@ -59,32 +86,48 @@
   --tok-variable: #a8321f;
   --tok-tag: #1f55b0;
   --tok-type: #0f6a7a;
+
+  /* The Klyroo.UI components of the page read these. */
+  --klyroo-bg: var(--sc-ground);
+  --klyroo-bg-muted: var(--sc-sunken);
+  --klyroo-bg-elevated: var(--sc-raised);
+  --klyroo-bg-accented: var(--sc-sunken);
+  --klyroo-bg-overlay: var(--sc-raised);
+  --klyroo-text: var(--sc-text);
+  --klyroo-text-highlighted: var(--sc-strong);
+  --klyroo-text-toned: var(--sc-text);
+  --klyroo-text-muted: var(--sc-muted);
+  --klyroo-text-dimmed: var(--sc-muted);
+  --klyroo-border: var(--sc-line);
+  --klyroo-border-muted: var(--sc-line);
+  --klyroo-border-accented: var(--sc-edge);
+  --klyroo-primary: var(--sc-sys);
+  --klyroo-primary-text: var(--sc-ink);
+  --klyroo-primary-contrast: var(--sc-ink);
+  --klyroo-radius: 0.5rem;
+  --klyroo-header-height: var(--sc-nav-h);
 }
 
-:root.dark {
-  color-scheme: dark;
-
-  --bg: #090c11;
-  --raised: #0f141b;
-  --sunken: #06080c;
-  --code-bg: #0c1117;
-  --code-head: #121922;
-  --text: #cdd5df;
-  --strong: #f1f4f8;
-  --muted: #96a2b3;
-  --dim: #8490a2;
-  --line: #1b222c;
-  --line-strong: #2b3544;
+:root.dark .world {
+  --sc-ground: #0d121b;
+  --sc-sunken: #090d14;
+  --sc-raised: #141b27;
+  --sc-text: #e8e4d8;
+  --sc-strong: #fbf8ef;
+  --sc-muted: #b0ab9d;
+  --sc-line: #2b3446;
+  --sc-rule: #596175;
+  --sc-edge: #f4f1e8;
+  --sc-station: #f4f1e8;
+  --sc-label: #ece8dc;
+  --sc-focus: #ffd23f;
+  --sc-panel: #05080d;
+  --sc-panel-line: #2b3446;
+  --line-strong: #4a5266;
   --danger: #ff8a75;
-
-  --tx: color-mix(in oklab, var(--accent) 8%, transparent);
-  --tx-major: color-mix(in oklab, var(--accent) 15%, transparent);
-  --accent-soft: color-mix(in oklab, var(--accent) 16%, transparent);
-  --accent-line: color-mix(in oklab, var(--accent) 70%, transparent);
-  --lit: color-mix(in oklab, var(--strong) 6%, transparent);
-
-  --shadow-panel: 0 1px 0 rgb(255 255 255 / 0.035) inset, 0 22px 44px -24px rgb(0 0 0 / 0.85);
-  --shadow-pop: 0 1px 0 rgb(255 255 255 / 0.05) inset, 0 28px 56px -20px rgb(0 0 0 / 0.9);
+  --lit: color-mix(in oklab, var(--sc-sys) 13%, transparent);
+  --accent-soft: color-mix(in oklab, var(--sc-sys) 20%, transparent);
+  --klyroo-primary-text: var(--sc-sys);
 
   --tok-comment: #8a96a8;
   --tok-string: #7ee0a0;
@@ -97,24 +140,47 @@
   --tok-type: #6fd3e0;
 }
 
-/* The Klyroo.UI components that remain (the search dialog) read the --klyroo-* tokens: they follow the grounds and the accent of the site. */
-:root {
-  --klyroo-radius: 0.625rem;
-  --klyroo-primary: var(--accent);
-  --klyroo-primary-text: var(--accent-ink);
-  --klyroo-primary-contrast: var(--on-accent);
-  --klyroo-bg: var(--bg);
-  --klyroo-bg-muted: var(--sunken);
-  --klyroo-bg-elevated: var(--raised);
-  --klyroo-bg-accented: var(--code-head);
-  --klyroo-bg-overlay: var(--raised);
-  --klyroo-text: var(--text);
-  --klyroo-text-highlighted: var(--strong);
-  --klyroo-text-toned: var(--text);
-  --klyroo-text-muted: var(--muted);
-  --klyroo-text-dimmed: var(--dim);
-  --klyroo-border: var(--line);
-  --klyroo-border-muted: var(--line);
-  --klyroo-border-accented: var(--line-strong);
-  --klyroo-header-height: var(--header-h);
+html:has(.world), body:has(.world) { background: #f4f1e8; }
+:root.dark:has(.world), :root.dark body:has(.world) { background: #0d121b; }
+
+/*
+  Surfaces that are black in both modes: the nav band, the signs, the panels, the code, the footer. The Klyroo.UI tokens are redrawn for them, and so is the syntax
+  palette (code is always read on black), so a component or a token inside a sign needs no restyling.
+*/
+.sc-nav, .sc-sign, .sc-plat, .sc-foot, .sc-code, .sc-popover-surface, .code-block, .board-code, .board-chips, .stop-sign, .crumbs ol, .ln-sign, .pk-board, .cl-sign, .table-scroll thead,
+.sc .sign, .sc .sc-pillars, .sc .ch-card, .sc .sc-templates, .sc .track-board, .sc .change, .sc .board {
+  --klyroo-bg: var(--sc-panel);
+  --klyroo-bg-muted: #14171d;
+  --klyroo-bg-elevated: #14171d;
+  --klyroo-bg-accented: #1c2028;
+  --klyroo-bg-overlay: #14171d;
+  --klyroo-text: var(--sc-panel-text);
+  --klyroo-text-highlighted: #ffffff;
+  --klyroo-text-toned: #dcd8cb;
+  --klyroo-text-muted: var(--sc-panel-muted);
+  --klyroo-text-dimmed: var(--sc-panel-muted);
+  --klyroo-border: var(--sc-panel-line);
+  --klyroo-border-muted: var(--sc-panel-line);
+  --klyroo-border-accented: #4a4f5b;
+  --klyroo-primary: var(--sc-sys);
+  --klyroo-primary-text: var(--sc-sys);
+  --klyroo-primary-contrast: var(--sc-ink);
+  --klyroo-success-text: #7ee0a0;
+  --klyroo-warning-text: #ffd070;
+  --klyroo-secondary-text: #c3a6ff;
+  --klyroo-info-text: #86b6ff;
+  --klyroo-error-text: #ff8a75;
+  --text: var(--sc-panel-text);
+  --strong: #ffffff;
+  --muted: var(--sc-panel-muted);
+  --tok-comment: #8a96a8;
+  --tok-string: #7ee0a0;
+  --tok-keyword: #c3a6ff;
+  --tok-command: #c3a6ff;
+  --tok-property: #ffa066;
+  --tok-number: #ffd070;
+  --tok-variable: #ff8a75;
+  --tok-tag: #86b6ff;
+  --tok-type: #6fd3e0;
+  color: var(--sc-panel-text);
 }

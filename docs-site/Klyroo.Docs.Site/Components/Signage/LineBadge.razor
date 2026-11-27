@@ -1,0 +1,20 @@
+@* The plate of a line: a rounded rectangle in the color of the line (or, for the interchange, the eight lines side by side) with the outline of a station, and, when it
+   has a label, the name of the library on it. *@
+@if (Label is null)
+{
+    <i class="sc-plate @Class" aria-hidden="true" style="background: @Fill"></i>
+}
+else
+{
+    <KlyBadge Label="@Label" Size="@Size" Class="@("sc-pill " + Class)" style="@($"--kly-color: {Fill}; --kly-color-contrast: {OnFill}")" />
+}
+
+@code {
+    /// <summary>The fill: a color, or any CSS background value.</summary>
+    [Parameter, EditorRequired] public string Fill { get; set; } = "";
+    /// <summary>The text color on the fill. Compute it with <see cref="AccentColor.Compute"/>.</summary>
+    [Parameter] public string OnFill { get; set; } = "#111111";
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public KlySize Size { get; set; } = KlySize.Lg;
+    [Parameter] public string? Class { get; set; }
+}

@@ -60,7 +60,7 @@ public class DesignTests
               second line.
             lead: A lead.
             accent: "#FF4154"
-            texture: dot-matrix
+            texture: dot-matrix   # still accepted, ignored
             demo:
               file: Program.cs
               code: |
@@ -80,7 +80,6 @@ public class DesignTests
         Assert.Equal(["First line,", "second line."], settings.Headline);
         Assert.Equal("A lead.", settings.Lead);
         Assert.Equal("#ff4154", settings.Accent);
-        Assert.Equal("dot-matrix", settings.Texture);
         Assert.Equal((2, 2), settings.Demo!.Focus);
         Assert.Equal("3", settings.Demo.Output);
         Assert.Equal("dotnet add package Klyroo.Demo --prerelease", settings.HeroInstall);
@@ -88,7 +87,6 @@ public class DesignTests
 
     [Theory]
     [InlineData("accent: blue", "accent")]
-    [InlineData("texture: stripes", "stripes")]
     [InlineData("headline: |\n  a\n  b\n  c\n", "3 lines")]
     [InlineData("demo:\n  board: nothing\n", "not a board")]
     [InlineData("demo:\n  code: x\n", "no 'result'")]
@@ -122,7 +120,6 @@ public class DesignTests
         using var repo = Repository("title: Klyroo.Demo\n");
         var settings = LibraryDocs.Load(repo.Root, "klyroo-demo", FakeRepository.Libraries).Settings;
         Assert.Equal("#10b981", settings.Accent);
-        Assert.Equal("blueprint-grid", settings.Texture);
         Assert.Equal(["Klyroo.Demo", "documentation"], settings.Headline);
     }
 

@@ -43,6 +43,17 @@ public class ShowcaseTests
     }
 
     [Fact]
+    public void A_feature_has_a_stable_id_and_the_stations_of_a_line_never_share_one()
+    {
+        Assert.Equal("feature-state-in-the-url", Klyroo.Docs.Site.Components.Signage.Slug.Feature("State in the URL"));
+        foreach (var line in NetworkData.Lines)
+        {
+            var ids = line.Stations.Select(s => Klyroo.Docs.Site.Components.Signage.Slug.Feature(s.FeatureTitle)).ToList();
+            Assert.Equal(ids.Count, ids.Distinct().Count());
+        }
+    }
+
+    [Fact]
     public void Every_library_has_exactly_one_line_and_every_line_is_a_library()
     {
         var libraries = RealLibraries();

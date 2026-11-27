@@ -53,15 +53,9 @@
     <None Update="libraries.yml" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
-  <!-- Icons the build cannot see by scanning: the names of the navigation groups are chosen at run time (Components/Shared/DocNav.razor). -->
-  <ItemGroup>
-    <KlyrooIcon Include="ph:book-open-text;ph:rocket-launch;ph:signpost;ph:brackets-curly;ph:lightbulb;ph:gear-six;ph:folder-simple;ph:info" />
-  </ItemGroup>
 
   <!-- Fonts are downloaded at build time and served from the site's own origin (KlyFonts in App.razor links them). -->
   <ItemGroup>
-    <KlyrooFont Include="Geist" Role="sans" Weights="400..700" Subsets="latin" />
-    <KlyrooFont Include="Geist Mono" Role="mono" Weights="400..600" Subsets="latin" />
     <!--
       The signage faces of the showcase home page. Archivo is the variable font with its width axis (wdth 62 to 125, which the signs use through
       font-variation-settings): the Google provider only serves the weight axis, so the file of the Fontsource build (SIL OFL 1.1, Fonts/OFL-Archivo.txt) is

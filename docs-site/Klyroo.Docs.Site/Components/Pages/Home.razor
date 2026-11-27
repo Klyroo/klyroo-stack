@@ -16,39 +16,38 @@ else
         <link rel="canonical" href="@Libraries.SiteUrl(Site.Settings.RepoName)" />
     </HeadContent>
 
-    <section class="hero" aria-labelledby="hero-title">
-        <div class="page-wrap">
-            <div class="hero-top">
-                <h1 class="hero-title" id="hero-title">
+    @* The first viewport: the black sign of the library (headline, lead, the way in, the platform with the install command) beside its line, then the demonstration board. *@
+    <section class="lh" aria-labelledby="hero-title">
+        <div class="lh-top">
+            <div class="sc-sign lh-sign">
+                <h1 class="lh-title" id="hero-title">
                     <span class="line">@Site.Settings.Headline[0]</span>
                     @if (Site.Settings.Headline.Count > 1)
                     {
-                        <span class="line accent">@Site.Settings.Headline[1]</span>
+                        <span class="line"><span class="mark">@Site.Settings.Headline[1]</span></span>
                     }
                 </h1>
-                <div class="hero-side">
-                    <p class="hero-lead">@Site.Settings.Lead</p>
-                    <div class="cta-row">
-                        @if (Start is not null)
-                        {
-                            <a class="button button-accent" href="@Start.Href">@(Start.Slug == "getting-started" ? "Get started" : "Read the docs")<KlyIcon Name="ph:arrow-right" /></a>
-                        }
-                        @if (Libraries.PlaygroundOf(Site.Settings.RepoName) is { } playground)
-                        {
-                            <a class="button button-outline" href="@playground">Try it in the playground<KlyIcon Name="ph:arrow-up-right" /></a>
-                        }
-                        @if (Site.Settings.HeroInstall is { } install)
-                        {
-                            <button type="button" class="install-chip" data-copy="@install" aria-label="Copy: @install">
-                                <code>@install</code>
-                                <span class="chip-icon"><svg class="code-copy-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.75" /><path d="M10.5 3.5v-.25A1.75 1.75 0 0 0 8.75 1.5h-5A1.75 1.75 0 0 0 2 3.25v5C2 9.2 2.8 10 3.75 10h.25" /></svg><svg class="code-check-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3.5 8.5 3 3 6-7" /></svg></span>
-                                <span class="code-copy-label sr-only">Copy</span>
-                                <span class="copy-status sr-only" role="status" aria-live="polite"></span>
-                            </button>
-                        }
-                    </div>
+                <p class="lh-lead">@Site.Settings.Lead</p>
+                <div class="lh-cta">
+                    @if (Start is not null)
+                    {
+                        <KlyButton Href="@Start.Href" Color="KlyColor.Primary" Size="KlySize.Md" TrailingIcon="@ArrowIcon">@(Start.Slug == "getting-started" ? "Get started" : "Read the docs")</KlyButton>
+                    }
+                    @if (Libraries.PlaygroundOf(Site.Settings.RepoName) is { } playground)
+                    {
+                        <KlyButton Href="@playground" Variant="ButtonVariant.Outline" Size="KlySize.Md" TrailingIcon="@ArrowUpRightIcon">Try it in the playground</KlyButton>
+                    }
                 </div>
+                @if (Site.Settings.HeroInstall is { } install)
+                {
+                    <PlatformSign Command="@install" Number="1" AriaLabel="@($"Install {Site.Settings.Title}")" />
+                }
             </div>
+            @if (_line is not null && _library is not null)
+            {
+                <LineStops Line="_line" Library="_library" Fill="@_theme.Fill" OnFill="@_theme.OnFill" />
+            }
+        </div>
 
             @switch (Site.Settings.Demo)
             {
@@ -80,7 +79,6 @@ else
                     <QuickBoard Demo="demo" />
                     break;
             }
-        </div>
     </section>
 
     @switch (Site.Settings.Demo?.Board)
@@ -109,5 +107,18 @@ else
 }
 
 @code {
+    private MetroLine? _line;
+    private LibraryInfo? _library;
+    private AccentTheme _theme = default!;
+    private RenderFragment ArrowIcon => @<KlyIcon Name="ph:arrow-right" />;
+    private RenderFragment ArrowUpRightIcon => @<KlyIcon Name="ph:arrow-up-right" />;
+
+    protected override void OnInitialized()
+    {
+        _line = NetworkData.Lines.FirstOrDefault(l => l.Repo.Equals(Site.Settings.RepoName, StringComparison.OrdinalIgnoreCase));
+        _library = Libraries.Find(Site.Settings.RepoName);
+        _theme = AccentColor.Compute(Site.Settings.Accent);
+    }
+
     private DocPage? Start => Site.Pages.FirstOrDefault(p => p.Slug == "getting-started") ?? Site.Find(LibraryDocs.IndexSlug) ?? Site.Pages.FirstOrDefault();
 }

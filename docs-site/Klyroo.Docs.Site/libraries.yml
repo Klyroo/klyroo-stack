@@ -1,5 +1,5 @@
 # The Klyroo libraries that have a documentation site, in the order of the header menu. A site lives at https://klyroo.github.io/<repo>/.
-# accent is the color of the site of the library (a #rrggbb), texture the ground behind its header and hero (docs/site.yml can override both).
+# accent is the color of the line of the library (a #rrggbb; docs/site.yml can override it).
 # Add a library here and every site lists it after the next deployment of that site.
 organization: klyroo
 pages: https://klyroo.github.io
@@ -10,39 +10,31 @@ libraries:
     name: Klyroo.UI
     playground: ui
     accent: "#10b981"
-    texture: blueprint-grid
   - repo: klyroo-query
     name: Klyroo.Query
     playground: query
     accent: "#ff4154"
-    texture: dot-matrix
   - repo: klyroo-table
     name: Klyroo.Table
     playground: table
     accent: "#00d8ff"
-    texture: ruled-rows
   - repo: klyroo-form
     name: Klyroo.Form
     playground: form
     accent: "#f59e0b"
-    texture: baseline-grid
   - repo: klyroo-dashboard
     name: Klyroo.Dashboard
     playground: dashboard
     accent: "#8b5cf6"
-    texture: chart-ticks
   - repo: klyroo-display
     name: Klyroo.Display
     playground: display
     accent: "#ec4899"
-    texture: halftone
   - repo: klyroo-spreadsheet
     name: Klyroo.Spreadsheet
     playground: spreadsheet
     accent: "#14b8a6"
-    texture: cell-grid
   - repo: klyroo-agent
     name: Klyroo.Agent
     playground: agent
     accent: "#6366f1"
-    texture: node-dots

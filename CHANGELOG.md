@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- Every documentation site is now one line of the Klyroo network, in the world of the showcase: black signage nav band with the wordmark and the plate of the line, the network menu, the library home as a black sign beside its own line diagram with the demonstration board restyled as signage, doc pages with the line diagram of the library as navigation, platform-sign breadcrumb, black code panels with a line-color gutter and previous and next stop signs, in light and station-night modes. The ground textures and the `texture` setting of `docs/site.yml` are gone (the key is still accepted and ignored).
+
 ### Added
 
 - The Klyroo.UI component catalog has a Blocks family (`KlyHeading`, `KlyText`, `KlyStat<TValue>`, `KlyStatGroup<TValue>`, `KlyFacts`, `KlyBreakdown`, `KlyDiff`, `KlyRecordList`, `KlyList`, `KlyDateTile`, `KlyMeter`, `KlyImageGallery`), each with a runnable example, and new examples for what the existing components gained: `KlyAlert` details, action items and live region, the `KlyTimeline` pipeline, log and schedule layouts, `KlyImage.Caption`, the `KlyChart` funnel, `KlyTable` footers and Show more, `KlyUser` badge and contacts, `KlyAccordionItem.Text` and `KlyEmpty.ActionItems`. The generated skill reference (`skills/klyroo-ui/references/components.md`) comes from this catalog again instead of a hand patch.

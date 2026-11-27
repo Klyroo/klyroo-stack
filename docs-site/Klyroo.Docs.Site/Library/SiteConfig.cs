@@ -28,10 +28,8 @@ public sealed record DemoConfig(string? Board, string? File, string Language, st
 /// </summary>
 public sealed class SiteConfig
 {
+    // "texture" is still accepted and ignored: the sites no longer have a ground texture, but the site.yml of a library written before that must keep building.
     private static readonly string[] Keys = ["title", "tagline", "description", "headline", "lead", "install", "github", "branch", "packages", "accent", "texture", "demo", "nav", "repo", "home"];
-
-    /// <summary>The ground textures a site can have, one per library material (see <c>Styles/ground.css</c>).</summary>
-    public static readonly IReadOnlyList<string> Textures = ["blueprint-grid", "dot-matrix", "ruled-rows", "baseline-grid", "chart-ticks", "halftone", "cell-grid", "node-dots"];
 
     /// <summary>The home pages a site can have: the documentation home (a hero with its demonstration board) or the showcase of the Klyroo network (<c>Components/Showcase</c>).</summary>
     public static readonly IReadOnlyList<string> Homes = ["docs", "showcase"];
@@ -53,9 +51,6 @@ public sealed class SiteConfig
 
     /// <summary>The paragraph under the headline of the home page. Without it the tagline.</summary>
     public string? Lead { get; init; }
-
-    /// <summary>The ground texture behind the header and the hero (one of <see cref="Textures"/>). Without it the one of the library in <c>libraries.yml</c>.</summary>
-    public string? Texture { get; init; }
 
     /// <summary>What the home page demonstrates: an authored board, or the code and the result of a simple hero. Without it the home page has no demonstration.</summary>
     public DemoConfig? Demo { get; init; }
@@ -121,7 +116,6 @@ public sealed class SiteConfig
             Accent = AccentText(Text("accent"), path),
             Headline = HeadlineLines(root.GetValueOrDefault("headline"), path),
             Lead = Text("lead"),
-            Texture = TextureText(Text("texture"), path),
             Demo = root.TryGetValue("demo", out var demo) && demo is not null ? ParseDemo(demo, path) : null,
             Repo = Text("repo"),
             Home = HomeText(Text("home"), path),
@@ -143,11 +137,6 @@ public sealed class SiteConfig
         }
         return accent?.ToLowerInvariant();
     }
-
-    private static string? TextureText(string? texture, string path) =>
-        texture is null || Textures.Contains(texture, StringComparer.Ordinal)
-            ? texture
-            : throw new ContentException($"{path}: '{texture}' is not a texture. The textures are: {string.Join(", ", Textures)}.");
 
     // Two lines in one block scalar ("headline: |"), or a list of two strings.
     private static IReadOnlyList<string> HeadlineLines(object? value, string path)

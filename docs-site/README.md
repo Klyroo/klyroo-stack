@@ -68,10 +68,10 @@ Every key is optional, and a key that does not exist is an error. A library keep
 | `packages` | The NuGet package ids, each linked from the header (`https://www.nuget.org/packages/<id>`). |
 | `github` | The address of the repository. Default: `https://github.com/klyroo/<repo>`. |
 | `branch` | The branch links to files of the repository and the "Edit this page" link point at. Default: `main`. |
-| `headline` | The headline of the home page, two lines (a block scalar or a list of two), the second in the accent color. Default: the title and `documentation`. |
+| `headline` | The headline of the home page, two lines (a block scalar or a list of two), the second marked by a strip of the line color. Default: the title and `documentation`. |
 | `lead` | The paragraph under the headline. Default: the tagline. |
-| `accent` | The accent color as `#rrggbb`: buttons, links, marks, the second line of the headline. The text tones for light and dark mode are computed from it so they pass 4.5:1 (3:1 for the headline). Default: the color of the library in `libraries.yml`. |
-| `texture` | The ground behind the header and the hero: `blueprint-grid`, `dot-matrix`, `ruled-rows`, `baseline-grid`, `chart-ticks`, `halftone`, `cell-grid` or `node-dots`. Default: the one of the library in `libraries.yml`. |
+| `accent` | The color of the line of the library as `#rrggbb`: its plates, rails, strips and lit stations (never text on the ground). Default: the color of the library in `libraries.yml`. |
+| `texture` | No longer used: accepted and ignored, so a `site.yml` written before the sites moved to the world of the network keeps building. |
 | `demo` | What the hero demonstrates, below. |
 | `repo` | The name of the repository, which is the path of the site. Default: the name of the folder. |
 | `home` | The home page: `docs` (the hero with its demonstration board, the default) or `showcase` (the metro map of the Klyroo network, see [The showcase home page](#the-showcase-home-page)). The docs pages are the same with both. |
@@ -99,7 +99,7 @@ Pages that are not listed follow in the order of their file names, and `docs/REA
 
 ## The home page and its demonstration
 
-The home page is its own layout, without the navigation: a two-line headline, the lead, a Get started button and a copyable install command (the line of `install` for the main package), then the demonstration board. Below it come the showcases (table and form only), the features, the packages and the close with the other libraries.
+The home page is its own layout, without the navigation: a black sign with the two-line headline, the lead, Get started, the playground link and the platform sign with the install command (the line of `install` for the main package), beside the line of the library with its stations; then the demonstration board. Below it come the showcases (table and form only), the features, the packages and the close with the other libraries.
 
 `demo` takes either a `board` or a simple hero:
 
@@ -182,7 +182,7 @@ The workflows do not change any setting. GitHub Pages has to be switched to the 
 
 - The pages come from a repository layout and `site.yml`, not from a `content/` folder with front matter: `LibraryDocs` instead of `MarkdownSite.Load`, with no `_dir.yml` and no file watcher.
 - `MarkdownRenderer` can take the first `#` heading out of a page as its title, report the first paragraph, and ask a `LinkResolver` where each link leads (`RenderOptions`).
-- The whole look is its own (`Styles/*.css`: tokens for both modes, one accent per library, ground textures): Geist and Geist Mono, a header with the mark and the `klyroo/<name>` wordmark, the search, the ecosystem menu, GitHub and the color mode; a doc page with the navigation rail, breadcrumb, lead, anchored headings, code blocks with a bar and a copy button, the table of contents with scroll-spy, previous and next, and an "Edit this page on GitHub" link. Only the search dialog is still a Klyroo.UI component.
+- The whole look is the world of the network (`Styles/tokens.css`, `signage.css`): signage-white ground and station night, black sign panels, Archivo with its width axis, the system yellow for lit states, the color of a library only as its line. Every page shares the nav band (`klyroo/<name>` with the plate of its line, search, Docs, API, Playground, the network menu, GitHub, color mode), the platform sign, the code panels and the footer (`Components/Signage`); a doc page has the line diagram of the library as its navigation (`LineNav`), a platform-sign breadcrumb, an "On this page" stop list and previous and next stop signs; the home page has the black sign of the library beside its own line (`LineStops`, from `NetworkData`) and the demonstration board.
 - Enhanced navigation is switched off (`data-enhance-nav="false"`): Blazor fetches a page for it, and a static host and the script do not agree about the address.
 - `Export/StaticExporter.cs` is new.
 

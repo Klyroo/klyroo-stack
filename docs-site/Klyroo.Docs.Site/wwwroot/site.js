@@ -1,32 +1,11 @@
 /*
   The browser side of the documentation site, small and optional: everything the pages show is there without it.
-    - the modifier key of the search shortcut follows the platform
-    - the ecosystem menu closes on Escape and on a click elsewhere
     - the table of contents marks the heading being read
     - the demonstration board of the home page: chips pick a feature, which lights its lines of code and the parts of the results it produces,
       joined by dotted leader lines that draw themselves (the one authored motion of the site, off under prefers-reduced-motion)
 */
 (() => {
   const reduceMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  // The key of the shortcut: Cmd on Apple platforms, Ctrl elsewhere (the markup says Ctrl).
-  if (/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent)) {
-    document.querySelectorAll("[data-mod-key]").forEach((key) => (key.textContent = "Cmd"));
-  }
-
-  // Ecosystem menu
-  const eco = document.querySelector("[data-eco]");
-  if (eco) {
-    document.addEventListener("click", (event) => {
-      if (eco.open && !eco.contains(event.target)) eco.removeAttribute("open");
-    });
-    eco.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && eco.open) {
-        eco.removeAttribute("open");
-        eco.querySelector("summary").focus();
-      }
-    });
-  }
 
   // Table of contents: the link of the heading being read is the first heading visible in the upper part of the page, else the last one above it.
   const toc = document.querySelector("[data-toc]");
@@ -137,8 +116,8 @@
         mask.append(reveal);
         defs.append(mask);
         svg.append(el("path", { d, fill: "none", class: "leader", mask: `url(#${id})` }));
-        const start = el("circle", { cx: x1, cy: y1, r: "3.5", class: "leader-dot" });
-        const end = el("circle", { cx: x2, cy: y2, r: "3.5", class: "leader-dot" });
+        const start = el("circle", { cx: x1, cy: y1, r: "5", class: "leader-dot" });
+        const end = el("circle", { cx: x2, cy: y2, r: "5", class: "leader-dot" });
         svg.append(start, end);
         if (animated) {
           end.style.opacity = "0";

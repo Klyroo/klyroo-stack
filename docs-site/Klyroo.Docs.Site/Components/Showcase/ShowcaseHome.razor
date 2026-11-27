@@ -73,16 +73,16 @@
                                             <span class="roundel" style="--r: var(--sc-sys)"><span>Core</span></span>
                                             <div><h4>Klyroo.Stack.Core</h4><p>The seven <code>.Core</code> engines, no Razor and no ASP.NET Core.</p></div>
                                         </div>
-                                        <CodeBlock Language="bash" Title="Terminal" Value="dotnet add package Klyroo.Stack.Core --prerelease" />
+                                        <SignCode Language="bash" Title="Terminal" Value="dotnet add package Klyroo.Stack.Core --prerelease" />
                                         <div class="change-row">
                                             <span class="roundel" style="--r: #10b981"><span>UI</span></span>
                                             <div><h4>Klyroo.Stack</h4><p>The Blazor package of all eight libraries, registered with one call.</p></div>
                                         </div>
-                                        <CodeBlock Language="csharp" Title="Program.cs" Value="using Klyroo.Stack;&#10;&#10;builder.Services.AddKlyrooStack();" />
+                                        <SignCode Language="csharp" Title="Program.cs" Value="using Klyroo.Stack;&#10;&#10;builder.Services.AddKlyrooStack();" />
                                     </div>
                                     break;
                                 case "typed-end-to-end":
-                                    <CodeBlock Language="csharp" Title="Klyroo.Form and Klyroo.Query" Value="@TypedCode" />
+                                    <SignCode Language="csharp" Title="Klyroo.Form and Klyroo.Query" Value="@TypedCode" />
                                     break;
                                 case "every-render-mode":
                                     <div class="modes">
@@ -101,7 +101,7 @@
                                     </div>
                                     break;
                                 default:
-                                    <CodeBlock Language="bash" Title="Terminal" Value="@McpCode" />
+                                    <SignCode Language="bash" Title="Terminal" Value="@McpCode" />
                                     break;
                             }
                         </div>
@@ -117,7 +117,7 @@
             <div class="tpl-intro">
                 <h2 id="tpl-title" class="sc-h2">Start a project from a template.</h2>
                 <p class="sc-lede">Four <code>dotnet new</code> templates start a project with the meta-package already registered. The two web templates take an <code>--interactivity</code> option: Server, WebAssembly or Auto.</p>
-                <CodeBlock Language="bash" Title="Terminal" Value="dotnet new install Klyroo.Templates" />
+                <SignCode Language="bash" Title="Terminal" Value="dotnet new install Klyroo.Templates" />
             </div>
             <div class="board" role="group" aria-label="Templates">
                 <div class="board-head" aria-hidden="true"><span>Type</span><span>Template and what it creates</span></div>
@@ -128,7 +128,7 @@
                             <span class="kind">@template.Kind</span>
                             <h3>@template.ShortName</h3>
                             <p class="creates">@template.Creates</p>
-                            <div class="departure-cmd"><CodeBlock Language="bash" Title="Terminal" Value="@TemplateCommand(template)" /></div>
+                            <div class="departure-cmd"><SignCode Language="bash" Title="Terminal" Value="@TemplateCommand(template)" /></div>
                         </li>
                     }
                 </ol>

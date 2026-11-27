@@ -113,8 +113,7 @@ public sealed record HomeContent(IReadOnlyList<HomeFeature> Features, IReadOnlyL
 
 /// <summary>What the site says about the library: <c>site.yml</c> with the gaps filled from the README and from <c>libraries.yml</c>.</summary>
 /// <param name="Accent">The accent color as <c>#rrggbb</c>: <c>site.yml</c>, else <c>libraries.yml</c>, else the Klyroo.UI green.</param>
-/// <param name="Texture">The ground texture: <c>site.yml</c>, else <c>libraries.yml</c>, else the blueprint grid.</param>
-/// <param name="Headline">The two lines of the headline of the home page (the second in the accent). One line when <c>site.yml</c> gives one.</param>
+/// <param name="Headline">The two lines of the headline of the home page (the second marked by the line color). One line when <c>site.yml</c> gives one.</param>
 /// <param name="Lead">The paragraph under the headline.</param>
 /// <param name="Home">The home page: <c>docs</c> (the hero with its demonstration board) or <c>showcase</c> (the metro map of the Klyroo network).</param>
 /// <param name="HeroInstall">The command of the copyable chip in the hero: the line of <c>install</c> for the main package, without its trailing comment.</param>
@@ -128,7 +127,6 @@ public sealed record SiteSettings(
     string Branch,
     IReadOnlyList<string> Packages,
     string Accent,
-    string Texture,
     IReadOnlyList<string> Headline,
     string Lead,
     string? HeroInstall,

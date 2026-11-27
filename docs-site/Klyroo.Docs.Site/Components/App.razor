@@ -13,7 +13,7 @@
     <ResourcePreloader />
     @* Compiled by the build from Styles/app.css (Tailwind, with the Klyroo theme). *@
     <link rel="stylesheet" href="@Assets["app.css"]" />
-    @* The accent of the library, written after the stylesheet: the four variables it defines are the only thing that differs between the sites. *@
+    @* The line color of the library, written after the stylesheet: the variables it defines are the only thing that differs between the sites. *@
     <style>@((MarkupString)_accentCss)</style>
     <link rel="icon" type="image/svg+xml" href="@_favicon" />
     <ImportMap />
@@ -34,6 +34,7 @@
 @code {
     [Inject] private IConfiguration Configuration { get; set; } = default!;
     [Inject] private DocsSite Site { get; set; } = default!;
+    [Inject] private Libraries Libraries { get; set; } = default!;
 
     private string _accentCss = "";
     private string _favicon = "";
@@ -41,10 +42,16 @@
     protected override void OnInitialized()
     {
         var theme = AccentColor.Compute(Site.Settings.Accent);
-        _accentCss = $":root{{--accent:{theme.Fill};--on-accent:{theme.OnFill};--accent-ink:{theme.InkLight};--accent-display:{theme.DisplayLight}}}" +
-            $":root.dark{{--accent-ink:{theme.InkDark};--accent-display:{theme.DisplayDark}}}";
-        // The mark of the family as the icon of the tab, in the accent of the library.
-        var svg = $"<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'><rect width='28' height='28' rx='8' fill='{theme.Fill}'/><path d='M9.75 7.5v13M19 7.5l-6.75 6.5L19 20.5' fill='none' stroke='{theme.OnFill}' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/></svg>";
+        _accentCss = $":root{{--accent:{theme.Fill};--on-accent:{theme.OnFill}}}";
+        // The stack is the interchange of the network: its rails and plates are the eight lines side by side, in the order of the map.
+        if (Site.Settings.IsShowcase)
+        {
+            var colors = NetworkData.Lines.Select(l => Libraries.Find(l.Repo)?.Accent ?? "#888888").ToList();
+            string Stops(string direction) => $"linear-gradient({direction}," + string.Join(",", colors.Select((c, i) => $"{c} {i * 100.0 / colors.Count:0.##}% {(i + 1) * 100.0 / colors.Count:0.##}%")) + ")";
+            _accentCss += $":root{{--accent:#ffd23f;--on-accent:#111111;--rail:{Stops("to bottom")};--rail-h:{Stops("to right")}}}";
+        }
+        // The plate of the line as the icon of the tab, with the outline of a station.
+        var svg = $"<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='3' y='9' width='26' height='14' rx='4' fill='{theme.Fill}' stroke='#111111' stroke-width='3'/></svg>";
         _favicon = "data:image/svg+xml," + Uri.EscapeDataString(svg);
     }
 

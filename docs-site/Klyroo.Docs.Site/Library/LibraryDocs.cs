@@ -104,7 +104,6 @@ public static partial class LibraryDocs
         var description = config.Description ?? readme.Summary ?? tagline;
         var library = libraries.Find(name);
         var accent = config.Accent ?? library?.Accent ?? "#10b981";
-        var texture = config.Texture ?? library?.Texture ?? "blueprint-grid";
         var headline = config.Headline.Count > 0 ? config.Headline : [title, "documentation"];
         if (config.Demo?.Board is { } board && !Boards.Contains(board))
         {
@@ -114,7 +113,7 @@ public static partial class LibraryDocs
         {
             throw new ContentException($"{configPath}: '{preview}' is not a preview. The previews are: {string.Join(", ", Previews)}.");
         }
-        var settings = new SiteSettings(name, title, tagline, description, config.Install, github, config.Branch, config.Packages, accent, texture, headline,
+        var settings = new SiteSettings(name, title, tagline, description, config.Install, github, config.Branch, config.Packages, accent, headline,
             config.Lead ?? tagline, HeroInstall(config.Install, title, config.Packages), config.Demo, config.Home);
 
         var rendered = files.ToDictionary(f => f.Slug, f => (f.Path, Result: Render(f.Path, f.Slug)), StringComparer.Ordinal);

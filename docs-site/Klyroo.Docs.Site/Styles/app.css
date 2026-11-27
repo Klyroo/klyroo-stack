@@ -3,12 +3,12 @@
 
 /*
   The documentation sites of the Klyroo libraries. The build compiles this file with the Tailwind CLI and serves the result as app.css.
-  tokens.css holds the design tokens (both modes, the accent slots), ground.css the textures, base.css the shell and the header, docs.css the doc page,
-  prose.css the Markdown content, home.css and board.css the home page.
+  tokens.css holds the design tokens of the world of the network (both modes), base.css the page, signage.css the components every page shares (nav band, plate,
+  platform sign, code panel, footer), docs.css the doc page, prose.css the Markdown content, home.css and board.css the home page of a library, showcase.css the map.
 */
 @import "./tokens.css";
-@import "./ground.css";
 @import "./base.css";
+@import "./signage.css";
 @import "./docs.css";
 @import "./prose.css";
 @import "./home.css";

@@ -1,0 +1,113 @@
+@inject DocsSite Site
+@inject Libraries Libraries
+@inject NavigationManager Navigation
+
+@* The black station-sign band of every page: the wordmark klyroo/<name> with the plate of its line, the places of the page, the docs, the API, the playground, the
+   menu of the network (the other lines), the search and the color mode of the whole site, and GitHub. The home page of the showcase has its own places (the
+   sections it scrolls to); every other page links to them. *@
+<header class="sc-nav">
+    <div class="sc-nav-inner">
+        <a href="./" class="sc-mark" aria-label="@(Site.Settings.Title) home">
+            <LineBadge Fill="@PlateFill" />
+            <span class="sc-wordmark">klyroo<b>/@Site.Settings.ShortName</b></span>
+        </a>
+        <nav class="sc-links" aria-label="Primary">
+            @foreach (var link in _links)
+            {
+                <KlyLink Href="@link.Href" Class="sc-link" Raw="true" aria-current="@(link.Current ? "page" : null)">@link.Label</KlyLink>
+            }
+        </nav>
+        <div class="sc-tools">
+            @if (!_showcaseHome)
+            {
+                <div class="sc-net">
+                    <KlyDropdownMenu Items="_network" Placement="KlyPlacement.BottomEnd">
+                        <KlyButton Variant="ButtonVariant.Ghost" Size="KlySize.Sm" Class="sc-net-btn" aria-label="The Klyroo network, change line" TrailingIcon="@CaretIcon">Network</KlyButton>
+                    </KlyDropdownMenu>
+                </div>
+            }
+            <div class="sc-menu">
+                <KlyDropdownMenu Items="_menu" Placement="KlyPlacement.BottomEnd">
+                    <KlyButton Variant="ButtonVariant.Ghost" Size="KlySize.Sm" Square="true" Class="sc-menu-btn" aria-label="Menu" LeadingIcon="@MenuIcon" />
+                </KlyDropdownMenu>
+            </div>
+            <KlyContentSearchButton Collapsed="false" Label="Search" Variant="ButtonVariant.Ghost" Size="KlySize.Sm" Class="sc-search sc-search-wide" />
+            <KlyContentSearchButton Variant="ButtonVariant.Ghost" Size="KlySize.Sm" Class="sc-search sc-search-icon" />
+            <KlyColorModeButton Variant="ButtonVariant.Ghost" Size="KlySize.Sm" Class="sc-mode" />
+            <KlyButton Href="@GithubUrl" Target="KlyLinkTarget.Blank" Size="KlySize.Sm" Color="KlyColor.Primary" Class="sc-gh" LeadingIcon="@GithubIcon">GitHub</KlyButton>
+        </div>
+    </div>
+</header>
+
+@code {
+    private sealed record NavLink(string Label, string Href, bool Current = false);
+
+    private ShowcaseUrls _urls = default!;
+    private bool _showcaseHome;
+    private IReadOnlyList<NavLink> _links = [];
+    private IReadOnlyList<KlyMenuItem> _network = [];
+    private IReadOnlyList<KlyMenuItem> _menu = [];
+
+    private RenderFragment MenuIcon => @<KlyIcon Name="ph:list" />;
+    private RenderFragment GithubIcon => @<KlyIcon Name="ph:github-logo" />;
+    private RenderFragment CaretIcon => @<KlyIcon Name="ph:caret-down" />;
+
+    private string GithubUrl => Site.Settings.IsShowcase ? _urls.Organization : Site.Settings.GithubUrl;
+
+    // A library is one line of the network, so its plate is its color; the stack is the interchange, so its plate is the eight lines side by side.
+    private string PlateFill => Site.Settings.IsShowcase ? "var(--rail-h)" : "var(--accent)";
+
+    protected override void OnParametersSet()
+    {
+        _urls = new ShowcaseUrls(Libraries, Site.Settings);
+        var path = Navigation.ToBaseRelativePath(Navigation.Uri).Split('?', '#')[0].Trim('/');
+        var home = path.Length == 0;
+        _showcaseHome = home && Site.Settings.IsShowcase;
+        var docs = Site.Find(Site.Settings.IsShowcase ? "getting-started" : LibraryDocs.IndexSlug) ?? Site.Find(LibraryDocs.IndexSlug) ?? Site.Pages.FirstOrDefault();
+        var api = Site.Pages.FirstOrDefault(p => p.Slug == "api-reference");
+        var playground = Site.Settings.IsShowcase ? _urls.Playground() : Libraries.PlaygroundOf(Site.Settings.RepoName);
+        var onApi = api is not null && path == api.Slug;
+        var onDocs = !home && !onApi && Site.Find(path) is not null;
+        var places = home ? "" : "./";
+
+        var links = new List<NavLink>();
+        if (Site.Settings.IsShowcase)
+        {
+            links.Add(new("Libraries", places + "#libraries"));
+            links.Add(new("Philosophy", places + "#philosophy"));
+        }
+        if (docs is not null)
+        {
+            links.Add(new("Docs", docs.Href, onDocs));
+        }
+        if (api is not null)
+        {
+            links.Add(new("API", api.Href, onApi));
+        }
+        if (playground is not null)
+        {
+            links.Add(new("Playground", playground));
+        }
+        _links = links;
+
+        // The other lines: where a reader changes. The interchange (the stack) closes the list.
+        var network = new List<KlyMenuItem> { KlyMenuItem.Heading("Change here for") };
+        foreach (var library in Libraries.Items)
+        {
+            var current = library.Repo.Equals(Site.Settings.RepoName, StringComparison.OrdinalIgnoreCase);
+            var fill = library.Accent ?? "#888888";
+            network.Add(new KlyMenuItem
+            {
+                Label = current ? library.Name + " (this line)" : library.Name,
+                Href = Libraries.SiteUrl(library.Repo),
+                Icon = Dot(fill),
+            });
+        }
+        network.Add(KlyMenuItem.Separator());
+        network.Add(new KlyMenuItem { Label = "Klyroo.Stack, the interchange", Href = Libraries.SiteUrl("klyroo-stack"), Icon = Dot("var(--sc-sys)") });
+        _network = network;
+        _menu = [.. links.Select(l => new KlyMenuItem { Label = l.Label, Href = l.Href }), .. (_showcaseHome ? [] : new[] { KlyMenuItem.Separator() }), .. (_showcaseHome ? [] : network)];
+    }
+
+    private static RenderFragment Dot(string fill) => @<i class="sc-net-dot" aria-hidden="true" style="background: @fill"></i>;
+}

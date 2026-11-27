@@ -1,4 +1,4 @@
-@* The features of the README as a specification sheet: the name on the left, what it does on the right, a hairline between rows. *@
+@* The features of the README as the stations of the line of the library: a station for each, its name and what it does. The line diagram of the first viewport links here. *@
 @if (Features.Count > 0)
 {
     <section class="section" id="features" aria-labelledby="features-title">
@@ -7,8 +7,8 @@
             <dl class="spec">
                 @foreach (var feature in Features)
                 {
-                    <div class="spec-row">
-                        <dt>@feature.Title</dt>
+                    <div class="spec-row" id="@Slug.Feature(feature.Title)">
+                        <dt><i class="spec-dot" aria-hidden="true"></i>@feature.Title</dt>
                         <dd>@((MarkupString)feature.Html)</dd>
                     </div>
                 }
