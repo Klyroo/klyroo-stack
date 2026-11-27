@@ -266,9 +266,7 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
 .sc-plat .lab {
   color: var(--sc-sys);
   font: 800 0.9375rem/1 var(--sc-font);
-  font-variation-settings: "wdth" 112;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  font-variation-settings: "wdth" 118;
 }
 .sc-plat .cmd { font: 700 0.9375rem/1.3 var(--sc-mono); color: #ffffff; background: none; padding: 0; flex: 1 1 14rem; }
 .sc-copy[data-copied] .code-copy-icon, .sc-copy:not([data-copied]) .code-check-icon { display: none; }
