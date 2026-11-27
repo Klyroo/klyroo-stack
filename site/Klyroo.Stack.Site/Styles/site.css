@@ -22,22 +22,30 @@
 }
 
 @layer base {
+  /* The yellow brand of the site over the Klyroo.UI defaults: the text color of the primary (-text) is the darker ink that reads on the light surfaces
+     (6.5:1 on white, 5.3:1 on the accented surface), the fill carries #151100 (13:1), and in dark mode the yellow is its own text color (9.9:1 or more). */
   :root {
+    --klyroo-primary: #ffd23f;
+    --klyroo-primary-text: #7a5800;
+    --klyroo-primary-contrast: #151100;
     --pg-dot: #00000012;
     --pg-rain: #1e282e40;
-    --pg-glow: #b6ff0026;
+    --pg-glow: #ffd23f26;
     --pg-code-bg: #0b0f14;
     --pg-code-head: #11161d;
-    --pg-code-line: #b6ff0014;
+    --pg-code-line: #ffd23f14;
   }
 
   .dark {
+    --klyroo-primary: #ffd23f;
+    --klyroo-primary-text: #ffd23f;
+    --klyroo-primary-contrast: #151100;
     --pg-dot: #ffffff14;
     --pg-rain: #dce8ee70;
-    --pg-glow: #b6ff001a;
+    --pg-glow: #ffd23f1a;
     --pg-code-bg: #080b0f;
     --pg-code-head: #0e131a;
-    --pg-code-line: #b6ff0014;
+    --pg-code-line: #ffd23f14;
   }
 
   /* Background and text color of the page come from klyroo.theme.css. */
@@ -66,7 +74,8 @@
   }
 
   :where(a, button, input, select, textarea, summary, [tabindex]):not(kly-command-palette [data-slot="input"]):focus-visible {
-    outline: 2px solid var(--klyroo-primary);
+    /* The -text tone, not the fill: the yellow is 1.4:1 on white, the ring has to be 3:1 (WCAG 1.4.11, 2.4.11). */
+    outline: 2px solid var(--klyroo-primary-text);
     outline-offset: 2px;
   }
 

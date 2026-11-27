@@ -37,6 +37,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- The documentation site keeps its yellow brand over the current Klyroo.UI theme: `Styles/site.css` sets `--klyroo-primary` to `#ffd23f` (with `#7a5800` as its text color in light mode, `#ffd23f` in dark mode, and `#151100` on the fill), and the focus ring uses the text tone, since the yellow is 1.4:1 on white. The text tokens stay those of Klyroo.UI.
 - `site.css` of the documentation site had not been rebuilt since Klyroo.UI changed its theme, so the site still ran the old palette (a yellow primary and a warm gray text-dimmed at 4.41:1 on white). It is rebuilt from `klyroo.theme.css`, and the token table of `/docs/css-variables` and the tests that pin its values follow the current tokens.
 - The platform list of the Klyroo.UI page said "Supported" for iOS, Windows and macOS, which nothing builds or runs yet. It says "Untested" again, and `PlatformsTests` requires that wording.
 - The `/templates` gallery said "Starting" and offered "Preview Live" for a demo that is switched off or not published. It says "Demo offline" again, with no link to the demo, as `TemplatesPathBaseTests` expects.
