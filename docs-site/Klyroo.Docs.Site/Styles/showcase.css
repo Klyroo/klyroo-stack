@@ -15,7 +15,7 @@
   initial-value: 0;
 }
 
-@property --lit {
+@property --sc-lit {
   syntax: "<number>";
   inherits: true;
   initial-value: 0;
@@ -333,7 +333,7 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
 }
 .sc-map .line-i { transition: opacity 0.3s var(--sc-ease); }
 .sc-map .tick {
-  --l: max(var(--lit, 0), var(--hov, 0));
+  --l: max(var(--sc-lit, 0), var(--hov, 0));
   fill: color-mix(in oklab, var(--sc-station), var(--sc-sys) calc(var(--l) * 100%));
   stroke: var(--sc-edge);
   stroke-width: 3.5;
@@ -342,7 +342,7 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
   transform: scale(calc(1 + var(--l) * 0.45));
 }
 .sc-map .lbl {
-  --l: max(var(--lit, 0), var(--hov, 0));
+  --l: max(var(--sc-lit, 0), var(--hov, 0));
   font: 700 14.5px/1 var(--sc-font);
   font-variation-settings: "wdth" 100;
   fill: color-mix(in srgb, var(--sc-label), #111111 calc(var(--l) * 100%));
@@ -400,9 +400,9 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
 @keyframes sc-draw { to { stroke-dashoffset: 0; } }
 @keyframes sc-appear { from { opacity: 0; } to { opacity: 1; } }
 @keyframes sc-run { 0% { offset-distance: 0%; } 66%, 100% { offset-distance: 100%; } }
-@keyframes sc-station-lit { 0% { --lit: 0; } 14% { --lit: 1; } 86% { --lit: 1; } 100% { --lit: 0; } }
+@keyframes sc-station-lit { 0% { --sc-lit: 0; } 14% { --sc-lit: 1; } 86% { --sc-lit: 1; } 100% { --sc-lit: 0; } }
 @keyframes sc-edge-fade { from { --fade: 0; } to { --fade: 1; } }
-@keyframes sc-lit-once { from { --lit: 0; } to { --lit: 1; } }
+@keyframes sc-lit-once { from { --sc-lit: 0; } to { --sc-lit: 1; } }
 @keyframes sc-pillars-out { to { opacity: 0; visibility: hidden; translate: 0 1rem; } }
 
 /* ---------- The chapters ---------- */
@@ -458,7 +458,7 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
   margin: 0;
   font: 800 1rem/1.2 var(--sc-font);
   font-variation-settings: "wdth" 108;
-  color: color-mix(in srgb, #cfcabb, #ffffff calc(var(--lit) * 100%));
+  color: color-mix(in srgb, #cfcabb, #ffffff calc(var(--sc-lit) * 100%));
 }
 .ch-stop p { margin: 0.2rem 0 0; font: 400 0.9375rem/1.45 var(--sc-font); color: var(--sc-panel-muted); text-wrap: pretty; }
 .ch-dot {
@@ -469,10 +469,10 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
   margin-top: 0.1rem;
   box-sizing: border-box;
   border-radius: 50%;
-  background: color-mix(in srgb, #ffffff, var(--sc-sys) calc(var(--lit) * 100%));
+  background: color-mix(in srgb, #ffffff, var(--sc-sys) calc(var(--sc-lit) * 100%));
   border: 3px solid #111111;
-  box-shadow: 0 0 0 calc(2px + var(--lit) * 2px) color-mix(in srgb, var(--c), transparent calc((1 - var(--lit) * 0.35) * 55%));
-  transform: scale(calc(1 + var(--lit) * 0.3));
+  box-shadow: 0 0 0 calc(2px + var(--sc-lit) * 2px) color-mix(in srgb, var(--c), transparent calc((1 - var(--sc-lit) * 0.35) * 55%));
+  transform: scale(calc(1 + var(--sc-lit) * 0.3));
 }
 .ch-actions { display: flex; flex-wrap: wrap; gap: 0.625rem; margin-top: 1.5rem; }
 .ch-actions a { font-weight: 700; }
@@ -611,7 +611,7 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
 .sc-templates .sc-code > div { border-color: #2a2d35; }
 
 /* The departure board: a platform number, the template, what it creates, the command. */
-.board { min-width: 0; border: 3px solid #ffffff22; border-radius: 0.875rem; overflow: hidden; background: #0a0c10; }
+.sc .board { min-width: 0; border: 3px solid #ffffff22; border-radius: 0.875rem; overflow: hidden; background: #0a0c10; }
 .board-head { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); padding: 0.7rem 1.1rem; background: var(--sc-sys); color: #111111; font: 900 1rem/1.1 var(--sc-font); font-variation-settings: "wdth" 118; }
 .departures { list-style: none; margin: 0; padding: 0; }
 .departure { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: 0.35rem 0; padding: 1.1rem 1.1rem 1.25rem; border-top: 1px solid #23262d; align-items: baseline; }
@@ -674,15 +674,15 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
 
 /* Without the journey (reduced motion, a narrow screen, no scroll timelines) every chapter is a plain card and the stations are lit. */
 @media (prefers-reduced-motion: reduce) {
-  .ch-stop, .sc-map .stn { --lit: 1; }
-  .ch-stop { --lit: 1; }
-  .sc-map .stn { --lit: 0; }
+  .ch-stop, .sc-map .stn { --sc-lit: 1; }
+  .ch-stop { --sc-lit: 1; }
+  .sc-map .stn { --sc-lit: 0; }
   .stage { position: relative; grid-column: 2; grid-row: 1; }
   .stage > .sc-map:not(.sc-compact) { inset: 0; }
   .sc-chapter { grid-column: 1 / -1; min-height: 0; width: 100%; max-width: 46rem; margin-inline: auto; padding: 1.5rem var(--sc-gutter); box-sizing: border-box; }
 }
 @supports not (animation-timeline: view()) {
-  .ch-stop { --lit: 1; }
+  .ch-stop { --sc-lit: 1; }
 }
 
 @media (max-width: 1100px) {
@@ -718,7 +718,7 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
   .sc-plat .cmd { font-size: 0.8125rem; }
   .sign { width: 100%; }
   .copy { width: 100%; }
-  .ch-stop { animation: none; --lit: 1; }
+  .ch-stop { animation: none; --sc-lit: 1; }
   .sc-nav .sc-search { display: none; }
 }
 @media (max-width: 520px) {

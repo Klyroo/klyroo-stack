@@ -20,13 +20,13 @@ public static partial class CodeBlockHtml
     /// <summary>The block for <paramref name="code"/>. <paramref name="info"/> is the info string of the fence (<c>csharp title="Program.cs"</c>), which can name a file for the bar.</summary>
     public static string Render(string code, string? language, string? info = null)
     {
-        var label = language is not null && SyntaxHighlighter.Supports(language) ? language.ToLowerInvariant() : "text";
+        var label = language is not null && HighlightedCode.Resolve(language) is not null ? language.ToLowerInvariant() : "text";
         var title = info is not null && Title().Match(info) is { Success: true } named ? named.Groups[1].Value : DisplayName(language, label);
         return $"<div class=\"code-block\" data-language=\"{WebUtility.HtmlEncode(label)}\">" +
             $"<div class=\"code-head\"><span class=\"code-title\">{WebUtility.HtmlEncode(title)}</span>" +
             $"<button type=\"button\" class=\"code-copy\" data-code-copy aria-label=\"Copy code\">{CopyIcons}<span class=\"code-copy-label\">Copy</span></button></div>" +
             "<span class=\"code-copy-status\" role=\"status\" aria-live=\"polite\"></span>" +
-            $"<pre tabindex=\"0\"><code>{SyntaxHighlighter.ToHtml(code, language)}</code></pre></div>";
+            $"<pre tabindex=\"0\"><code>{HighlightedCode.ToHtml(code, language)}</code></pre></div>";
     }
 
     private static string DisplayName(string? language, string label) =>

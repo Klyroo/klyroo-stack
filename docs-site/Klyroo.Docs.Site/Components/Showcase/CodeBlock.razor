@@ -1,7 +1,7 @@
-@* A block of code of the page: a KlyDisplay code block (Klyroo.Display) with the syntax highlighting of the library. The copy button of the block needs an interactive
-   render mode, which this static page does not have, so it is switched off and the page does not offer a button that does nothing. *@
+@* A block of code of the page: a KlyCodeBlock (Klyroo.Display) with the syntax highlighting of the library. It keeps the semantic colors of Klyroo.UI, which the showcase re-tokens for its dark signs. The copy button of the block needs an
+   interactive render mode, which this static page does not have, so it is switched off and the page does not offer a button that does nothing. *@
 <div class="sc-code">
-    <KlyDisplay Kind="DisplayKind.Code" Value="@Value" Language="@Language" Title="@Title" Copy="false" />
+    <KlyCodeBlock Code="@Value" Language="@HighlightedCode.Resolve(Language)" Label="@Title" Copy="false" />
 </div>
 
 @code {

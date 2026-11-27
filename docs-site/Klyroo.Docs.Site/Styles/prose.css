@@ -106,7 +106,7 @@
 }
 .markdown-body a > code { background: color-mix(in oklab, var(--accent) 9%, var(--sunken)); }
 
-/* Code blocks */
+/* Code blocks: the classes of HighlightedCode, which maps the token kinds of Klyroo.Display.Core's CodeHighlighter onto the colors of DESIGN.md (a function is colored as a command, punctuation keeps the text color). */
 .tok-comment { color: var(--tok-comment); font-style: italic; }
 .tok-string { color: var(--tok-string); }
 .tok-keyword { color: var(--tok-keyword); }

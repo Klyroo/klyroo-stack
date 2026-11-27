@@ -63,7 +63,7 @@ if (export)
 }
 
 // The accent of the site is written by the page (Components/App.razor) as CSS variables, so the Klyroo.UI colors need no change here.
-// AddKlyrooDisplay registers Klyroo.UI too: the showcase home page draws its code blocks with KlyDisplay.
+// AddKlyrooDisplay registers Klyroo.UI too: the showcase home page and the boards of the home pages draw their code with KlyCodeBlock, and every code block of every page is colored by its CodeHighlighter.
 builder.Services.AddKlyrooDisplay();
 // Static server rendering only: no circuit, no WebAssembly. Everything that moves runs in the browser (Klyroo's own script).
 builder.Services.AddRazorComponents();

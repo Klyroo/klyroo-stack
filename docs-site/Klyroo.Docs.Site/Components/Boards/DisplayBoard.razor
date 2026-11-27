@@ -1,37 +1,16 @@
-@* The board of Klyroo.Display: five KlyDisplay blocks (facts, statistic, meter, code, secret code) and what each renders. The values are sample data. *@
-<DemoBoard File="Order.razor" Lines="_lines" Chips="_chips" Class="is-dense" Label="KlyDisplay blocks and what they render">
+@* The board of Klyroo.Display: a code block with line numbers and emphasized lines, a secret block and a file list that opens the preview. The values are sample data. *@
+<DemoBoard File="Order.razor" Lines="_lines" Chips="_chips" Class="is-dense" Label="Klyroo.Display components and what they render">
     <Results>
-        <ResultPanel Title="Facts, statistic and meter" Note="sample data" Class="flush">
-            <section class="disp-section" data-target="facts" aria-label="Facts">
-                <dl class="facts">
-                    <div><dt>Reference</dt><dd><code>ORD-1042</code><KlyIcon Name="ph:copy" Class="fact-icon" /></dd></div>
-                    <div><dt>Status</dt><dd><span class="status ok">Paid</span></dd></div>
-                    <div><dt>Shipping address</dt><dd class="no-value">-</dd></div>
-                </dl>
-            </section>
-            <section class="disp-section" data-target="stat" aria-label="Statistic">
-                <div class="stat wide-stat">
-                    <span class="stat-title">Monthly revenue</span>
-                    <span class="stat-value">148,900 <span class="stat-unit">EUR</span> <span class="delta up">+14.2%</span></span>
-                    <svg class="spark" viewBox="0 0 120 40" role="img" aria-label="Trend: 102, 118, 134, 149" preserveAspectRatio="none"><polyline points="4,36 42,24 80,13 116,4" fill="none" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" /><circle cx="116" cy="4" r="3" /></svg>
-                </div>
-            </section>
-            <section class="disp-section" data-target="meter" aria-label="Meter">
-                <div class="meter">
-                    <div class="meter-head"><span class="stat-title">Storage</span><span class="meter-text">46 of 50 GB used</span></div>
-                    <div class="meter-track" role="img" aria-label="92 percent, past the error threshold"><span class="meter-fill" style="width: 92%"></span><span class="meter-mark" style="left: 90%"></span></div>
-                </div>
+        <ResultPanel Title="Code block" Note="sample data" Class="flush">
+            <section class="disp-section" data-target="code lines" aria-label="Code">
+                <pre class="code-value numbered"><code>@foreach (var (line, number) in _sql.Select((text, index) => (text, index + 1))){<span class="cn@(_marked.Contains(number) ? " is-marked" : "")" data-target="@(_marked.Contains(number) ? "lines" : null)" data-n="@number">@BoardMarkup.Code(line, "sql")</span>}</code></pre>
             </section>
             <p class="annot-line">
-                <span class="annot" data-annot-for="facts">a chip for the status, a copy button on the reference, a dash for a missing value</span>
-                <span class="annot" data-annot-for="stat">Delta is shown as given; DeltaDirection only picks its color</span>
-                <span class="annot" data-annot-for="meter">92 percent of MeterMax is past ErrorThreshold, so the bar is red</span>
+                <span class="annot" data-annot-for="code">colored from Language by the CodeHighlighter of Klyroo.Display.Core, 13 languages</span>
+                <span class="annot" data-annot-for="lines">line 2 and lines 4 to 5 are emphasized; the numbers are drawn with CSS, so copying gives the code only</span>
             </p>
         </ResultPanel>
-        <ResultPanel Title="Code values" Note="sample data" Class="flush">
-            <section class="disp-section" data-target="code" aria-label="Code">
-                <pre class="code-value"><code>@BoardMarkup.Code("public record Order(int Id) { public string Label => $\"Order {Id}\"; }", "csharp")</code></pre>
-            </section>
+        <ResultPanel Title="Secret and files" Note="sample data" Class="flush">
             <section class="disp-section" data-target="secret" aria-label="Secret">
                 <div class="secret">
                     <span class="stat-title">API key</span>
@@ -39,41 +18,53 @@
                     <span class="secret-actions"><span class="send ghost">Reveal</span><span class="send ghost icon-only"><KlyIcon Name="ph:copy" /></span></span>
                 </div>
             </section>
+            <section class="disp-section" data-target="files preview" aria-label="Files">
+                <ul class="file-rows">
+                    <li><span class="file-badge">PDF</span><span class="file-main"><span class="file-name">Specification.pdf</span><span class="file-note">Version 3 · 1.5 MB</span></span><span class="file-meta">Updated today</span></li>
+                    <li><span class="file-badge">CSV</span><span class="file-main"><span class="file-name">metrics.csv</span><span class="file-note">18 KB</span></span></li>
+                    <li><span class="file-badge">PDF</span><span class="file-main"><span class="file-name">Q3 summary</span></span></li>
+                </ul>
+            </section>
             <p class="annot-line">
-                <span class="annot" data-annot-for="code">colored from Language; the text stays plain for selection and copy</span>
-                <span class="annot" data-annot-for="secret">eight bullets, then the last four characters</span>
+                <span class="annot" data-annot-for="secret">eight bullets, then the last four characters; the copy button copies the whole value</span>
+                <span class="annot" data-annot-for="files">each row shows a badge, the name, the size and a description</span>
+                <span class="annot" data-annot-for="preview">a click opens all the files as a gallery in the preview, starting at the clicked one</span>
             </p>
         </ResultPanel>
     </Results>
 </DemoBoard>
 
 @code {
+    private static readonly string[] _sql =
+    [
+        "SELECT id, total",
+        "FROM orders",
+        "WHERE status = 'paid'",
+        "  AND total > 100",
+        "  AND shipped_at IS NULL;",
+    ];
+
+    private static readonly HashSet<int> _marked = [2, 4, 5];
+
     private static readonly IReadOnlyList<BoardLine> _lines =
     [
-        new("<KlyDisplay Kind=\"DisplayKind.Facts\" Facts=\"_facts\" />", "facts", "html"),
+        new("<KlyCodeBlock Label=\"Orders.sql\" Code=\"@Query\"", "code", "html"),
+        new("              Language=\"CodeLanguage.Sql\" LineNumbers", "code lines", "html"),
+        new("              HighlightLines=\"@([2, new CodeLineRange(4, 5)])\" />", "lines", "html"),
         new(""),
-        new("<KlyDisplay Kind=\"DisplayKind.Stat\" Title=\"Monthly revenue\"", "stat", "html"),
-        new("            Value=\"148,900\" Unit=\"EUR\" Delta=\"+14.2%\"", "stat", "html"),
-        new("            DeltaDirection=\"DisplayDeltaDirection.Up\"", "stat", "html"),
-        new("            Trend=\"_trend\" />", "stat", "html"),
+        new("<KlySecretBlock Label=\"API key\" Value=\"@ApiKey\"", "secret", "html"),
+        new("                VisibleChars=\"4\" />", "secret", "html"),
         new(""),
-        new("<KlyDisplay Kind=\"DisplayKind.Meter\" Title=\"Storage\"", "meter", "html"),
-        new("            MeterValue=\"46\" MeterMax=\"50\"", "meter", "html"),
-        new("            ErrorThreshold=\"90\"", "meter", "html"),
-        new("            Description=\"46 of 50 GB used\" />", "meter", "html"),
-        new(""),
-        new("<KlyDisplay Kind=\"DisplayKind.Code\" Language=\"csharp\"", "code", "html"),
-        new("            Value=\"@Snippet\" />", "code", "html"),
-        new("<KlyDisplay Kind=\"DisplayKind.Code\" Title=\"API key\"", "secret", "html"),
-        new("            Variant=\"DisplayVariant.Secret\" Value=\"@ApiKey\" />", "secret", "html"),
+        new("<KlyFileList Title=\"Attachments\" Files=\"_files\" />", "files", "html"),
+        new("<KlyFilePreviewProvider />", "preview", "html"),
     ];
 
     private static readonly IReadOnlyList<BoardChip> _chips =
     [
-        new("facts", "Facts", "Facts lists labels and values. A fact can carry a chip, a link or a copy button, and a fact with no value shows a dash."),
-        new("stat", "Statistic", "A statistic shows a value with its unit, a delta badge and a sparkline from Trend. You format the text yourself."),
-        new("meter", "Meter", "A meter fills from MeterValue to MeterMax and changes color at its thresholds: 46 of 50 is past the error threshold."),
-        new("code", "Code", "The code block colors the text from its Language, and keeps it plain text so selecting and copying give the code as it is."),
-        new("secret", "Secret", "The secret variant shows bullets and the last four characters, with Reveal and copy buttons. It hides the value from the eye, not from the client."),
+        new("code", "Highlight", "KlyCodeBlock colors the code from its Language and keeps the text plain, so selecting and copying give the code as it is."),
+        new("lines", "Lines", "LineNumbers numbers the lines with CSS, and HighlightLines emphasizes line numbers and CodeLineRange values with a neutral fill and a marker in the gutter."),
+        new("secret", "Secret", "KlySecretBlock shows bullets and the last VisibleChars characters, with Reveal and copy buttons. It hides the value from the eye, not from the client."),
+        new("files", "File list", "KlyFileList shows the badge, name, size and description of each file, a few at a time with Max and Step."),
+        new("preview", "Preview", "A KlyFilePreviewProvider turns a click on a file into a gallery in an overlay: PDF, images, video, audio, CSV, Markdown and text."),
     ];
 }

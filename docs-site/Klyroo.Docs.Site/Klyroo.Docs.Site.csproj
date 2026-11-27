@@ -19,7 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\klyroo-ui\src\Klyroo.UI\Klyroo.UI.csproj" />
-    <!-- The code blocks of the showcase home page are KlyDisplay blocks of Klyroo.Display, which lives in its own repository next to this one. -->
+    <!-- Klyroo.Display, which lives in its own repository next to this one, gives the site its code blocks (KlyCodeBlock on the showcase and the boards of the home page) and the CodeHighlighter of every code block of every page. -->
     <ProjectReference Include="..\..\..\klyroo-display\src\Klyroo.Display\Klyroo.Display.csproj" />
     <PackageReference Include="Markdig" />
     <PackageReference Include="YamlDotNet" />

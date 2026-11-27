@@ -76,7 +76,11 @@
 
   function initBoard(board) {
     const chips = [...board.querySelectorAll("[data-chip]")];
-    const lines = [...board.querySelectorAll("[data-lines]")];
+    // The lines of the code are the ones of a KlyCodeBlock (data-slot="code-line", the number in data-line). The page is static, so a chip cannot change HighlightLines: the script sets
+    // data-highlighted, the attribute the component writes on an emphasized line, from data-code-lines ({"feature": [line numbers]}).
+    const lines = [...board.querySelectorAll('[data-slot="code-line"]')];
+    let featureLines = {};
+    try { featureLines = JSON.parse(board.querySelector("[data-code-lines]")?.dataset.codeLines || "{}"); } catch { featureLines = {}; }
     const targets = [...board.querySelectorAll("[data-target]")];
     const annots = [...board.querySelectorAll("[data-annot-for]")];
     const code = board.querySelector("[data-board-code]");
@@ -93,7 +97,7 @@
     function draw(animate) {
       svg.replaceChildren();
       if (!wide.matches || !code) return;
-      const litLines = lines.filter((line) => line.classList.contains("is-lit"));
+      const litLines = lines.filter((line) => line.dataset.highlighted === "true");
       const litTargets = targets.filter((target) => target.classList.contains("is-lit"));
       if (litLines.length === 0 || litTargets.length === 0) return;
 
@@ -151,7 +155,11 @@
     function select(feature, animate) {
       active = feature;
       for (const chip of chips) chip.setAttribute("aria-pressed", String(chip.dataset.chip === feature));
-      for (const line of lines) line.classList.toggle("is-lit", has(line, "data-lines", feature));
+      const lit = featureLines[feature] || [];
+      for (const line of lines) {
+        if (lit.includes(Number(line.dataset.line))) line.setAttribute("data-highlighted", "true");
+        else line.removeAttribute("data-highlighted");
+      }
       for (const target of targets) target.classList.toggle("is-lit", has(target, "data-target", feature));
       for (const note of annots) note.classList.toggle("is-lit", has(note, "data-annot-for", feature));
       const chip = chips.find((c) => c.dataset.chip === feature);

@@ -1,13 +1,15 @@
 @* The demonstration board: the code panel with its chips on the left, the result panels on the right, and the leader lines between them, which the script
-   draws (wwwroot/site.js). Without the script every panel is there and nothing is lit. A board is authored in a component of Components/Boards. *@
+   draws (wwwroot/site.js). The code is a KlyCodeBlock (Klyroo.Display) with line numbers: the page is static, so a chip cannot change HighlightLines, and the script
+   sets data-highlighted on the lines of the chosen feature instead (data-code-lines lists them), the attribute the component writes on an emphasized line.
+   Without the script every panel is there and nothing is lit. A board is authored in a component of Components/Boards. *@
 <div class="board @Class" data-board aria-label="@Label" role="group">
     <div class="board-grid">
-        <section class="panel board-code" data-board-code aria-label="@File">
+        <section class="panel board-code" data-board-code data-code-lines="@FeatureLines" aria-label="@File">
             <header class="panel-head">
                 <span class="panel-file">@File</span>
                 <span class="panel-note">@Lines.Count lines</span>
             </header>
-            <pre class="board-pre" tabindex="0"><code>@foreach (var line in Lines){<span class="cl" data-lines="@line.Features">@((MarkupString)SyntaxHighlighter.ToHtml(line.Text, line.Language))</span>}</code></pre>
+            <KlyCodeBlock Code="@Code" Language="@CodeLanguage" LineNumbers Copy="false" Label="@File" Ui="BoardCodeUi.Block" />
             @if (Chips.Count > 0)
             {
                 <div class="board-chips">
@@ -34,4 +36,12 @@
     [Parameter] public string Label { get; set; } = "What the code produces";
     [Parameter] public string? Class { get; set; }
     [Parameter] public RenderFragment? Results { get; set; }
+
+    private string Code => string.Join('\n', Lines.Select(line => line.Text));
+
+    /// <summary>One highlighter for the whole block: the language of the lines, razor lines included, so a board that mixes markup and C# is colored as the language most of its lines are in.</summary>
+    private CodeLanguage? CodeLanguage => BoardCodeUi.LanguageOf(Lines);
+
+    /// <summary>The feature ids with the numbers of the lines they light (counted from 1), as JSON: <c>{"stat":[3,4,5,6]}</c>.</summary>
+    private string FeatureLines => BoardCodeUi.FeatureLines(Lines);
 }
