@@ -458,6 +458,23 @@ public class DataListTests(PlaygroundServer server) : PlaygroundTest(server)
 
     private ILocator UrlSearch => SearchField(Url, "Search Invoices in the URL");
 
+    /// <summary>Types a text into a field character by character, each with the input event of a keystroke, all in one task of the page: no pause between them.</summary>
+    private static async Task TypeInOneTask(ILocator field, string text)
+    {
+        await field.FocusAsync();
+        await field.EvaluateAsync(
+            """
+            (input, text) => {
+              const set = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set;
+              for (const character of text) {
+                set.call(input, input.value + character);
+                input.dispatchEvent(new InputEvent('input', { bubbles: true, data: character, inputType: 'insertText' }));
+              }
+            }
+            """,
+            text);
+    }
+
     private Task<int> HistoryLength() => Page.EvaluateAsync<int>("() => history.length");
 
     [Theory]
@@ -468,8 +485,10 @@ public class DataListTests(PlaygroundServer server) : PlaygroundTest(server)
         await Assertions.Expect(Calls).ToHaveTextAsync("0");
         var history = await HistoryLength();
 
-        // Faster than the pause: one report, one call.
-        await UrlSearch.PressSequentiallyAsync("acme", new() { Delay = 40 });
+        // Faster than the pause: one report, one call. The keystrokes are one task of the page: with a key every 40 ms from the test process, a busy
+        // machine can stretch one interval past the 300 ms pause (the process that sends the keys is starved, not the page), and then the list
+        // rightly reports twice. The pause that does split a search in two is the next test.
+        await TypeInOneTask(UrlSearch, "acme");
 
         await WaitForQuery("?q=acme");
         await Assertions.Expect(Count).ToHaveTextAsync("1–10 of 10");
