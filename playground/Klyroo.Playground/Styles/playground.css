@@ -129,11 +129,11 @@ h1[tabindex="-1"]:focus-visible { outline: none; }
 .pg-links { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; font-size: 0.9rem; }
 
 /* The workbench: knobs on the left, the result and the code on the right. */
-.pg-bench { display: grid; gap: 1.25rem; padding-bottom: 2rem; }
+.pg-bench { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; padding-bottom: 2rem; }
 @media (min-width: 1024px) {
   .pg-bench { grid-template-columns: 17.5rem minmax(0, 1fr); gap: 1.5rem; align-items: start; }
 }
-.pg-stage { display: grid; gap: 1.25rem; min-width: 0; }
+.pg-stage { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; min-width: 0; }
 
 .pg-knobs { min-width: 0; }
 /* The scroll lives in the body of the knob card, so its border survives; a fade at the foot is the cue that more is below. */
