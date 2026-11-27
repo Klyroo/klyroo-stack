@@ -51,6 +51,14 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
+      # The build downloads the Tailwind CLI, the fonts and the icons once and keeps them in ~/.klyroo: reuse them
+      # between runs, so a slow or failing download from GitHub releases does not fail the publication.
+      - name: Cache the Klyroo build tools
+        uses: actions/cache@v4
+        with:
+          path: ~/.klyroo
+          key: klyroo-tools-${{ runner.os }}-${{ hashFiles('klyroo-ui/src/Klyroo.UI/buildTransitive/*.targets', 'klyroo-stack/docs-site/Klyroo.Docs.Site/Klyroo.Docs.Site.csproj') }}
+          restore-keys: klyroo-tools-${{ runner.os }}-
       - name: Export the site
         env:
           REPO: ${{ inputs.repo }}
