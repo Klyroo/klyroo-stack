@@ -120,13 +120,12 @@
                 <CodeBlock Language="bash" Title="Terminal" Value="dotnet new install Klyroo.Templates" />
             </div>
             <div class="board" role="group" aria-label="Templates">
-                <div class="board-head" aria-hidden="true"><span>No.</span><span>Template and what it creates</span></div>
+                <div class="board-head" aria-hidden="true"><span>Type</span><span>Template and what it creates</span></div>
                 <ol class="departures">
-                    @for (var i = 0; i < NetworkData.Templates.Count; i++)
+                    @foreach (var template in NetworkData.Templates)
                     {
-                        var template = NetworkData.Templates[i];
                         <li class="departure">
-                            <span class="platform-no" aria-hidden="true">@(i + 1)</span>
+                            <span class="kind">@template.Kind</span>
                             <h3>@template.ShortName</h3>
                             <p class="creates">@template.Creates</p>
                             <div class="departure-cmd"><CodeBlock Language="bash" Title="Terminal" Value="@TemplateCommand(template)" /></div>
@@ -165,12 +164,12 @@
                         <KlyLink Href="@_urls.Docs(line.Line)" Raw="true" Class="legend-name" aria-label="@($"{line.Library.Name} documentation")">
                             <KlyBadge Label="@line.Library.Name" Size="KlySize.Lg" Class="legend-pill" style="@($"--kly-color: {line.Badge.Fill}; --kly-color-contrast: {line.Badge.OnFill}")" />
                         </KlyLink>
-                        <div class="legend-strip" role="img" aria-label="@($"{line.Stations.Count} stations: {string.Join(", ", line.Stations.Select(s => s.Station.Label))}")">
+                        <ol class="legend-strip" aria-label="@($"Stations of {line.Library.Name}")">
                             @foreach (var station in line.Stations)
                             {
-                                <i class="tick"></i>
+                                <li><i class="tick" aria-hidden="true"></i><span>@station.Station.Label</span></li>
                             }
-                        </div>
+                        </ol>
                         <span class="lib-links"><KlyLink Href="@_urls.Docs(line.Line)" Raw="true" Class="lib-link">Docs</KlyLink><KlyLink Href="@_urls.Playground(line.Line)" Raw="true" Class="lib-link">Playground</KlyLink></span>
                         <p class="legend-tag">@line.Line.Tagline</p>
                     </li>

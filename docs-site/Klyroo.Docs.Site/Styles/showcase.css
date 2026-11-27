@@ -9,6 +9,12 @@
   without scroll timelines and on a narrow screen the map is plain and the chapters are plain.
 */
 
+@property --fade {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
 @property --lit {
   syntax: "<number>";
   inherits: true;
@@ -397,6 +403,7 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
 @keyframes sc-appear { from { opacity: 0; } to { opacity: 1; } }
 @keyframes sc-run { 0% { offset-distance: 0%; } 66%, 100% { offset-distance: 100%; } }
 @keyframes sc-station-lit { 0% { --lit: 0; } 14% { --lit: 1; } 86% { --lit: 1; } 100% { --lit: 0; } }
+@keyframes sc-edge-fade { from { --fade: 0; } to { --fade: 1; } }
 @keyframes sc-lit-once { from { --lit: 0; } to { --lit: 1; } }
 @keyframes sc-pillars-out { to { opacity: 0; visibility: hidden; translate: 0 1rem; } }
 
@@ -567,9 +574,9 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
 .track-text, .track-demo { min-width: 0; }
 
 /* A "change here for" board: the two ways out of the stop, each with its roundel. */
-.change { display: grid; gap: 0.75rem; padding: 1rem; background: var(--sc-panel); border-radius: 0.75rem; color: #ffffff; min-width: 0; }
+.change { display: grid; gap: 0.75rem; padding: 0 1rem 1rem; background: var(--sc-panel); border-radius: 0.75rem; color: #ffffff; min-width: 0; overflow: hidden; }
 :root.dark .change { outline: 1px solid var(--sc-panel-line); }
-.change-title { margin: 0; color: var(--sc-sys); font: 800 0.9375rem/1 var(--sc-font); font-variation-settings: "wdth" 112; text-transform: uppercase; letter-spacing: 0.06em; }
+.change-title { margin: 0 -1rem 0.25rem; padding: 0.75rem 1rem; background: var(--sc-sys); color: #111111; font: 900 1.125rem/1.1 var(--sc-font); font-variation-settings: "wdth" 118; }
 .change-row { display: flex; align-items: center; gap: 0.875rem; margin-top: 0.25rem; }
 .change-row h4 { margin: 0; font: 800 1.0625rem/1.2 var(--sc-font); font-variation-settings: "wdth" 108; color: #ffffff; }
 .change-row p { margin: 0.15rem 0 0; font: 400 0.875rem/1.4 var(--sc-font); color: var(--sc-panel-muted); }
@@ -607,11 +614,11 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
 
 /* The departure board: a platform number, the template, what it creates, the command. */
 .board { min-width: 0; border: 3px solid #ffffff22; border-radius: 0.875rem; overflow: hidden; background: #0a0c10; }
-.board-head { display: grid; grid-template-columns: 4.5rem minmax(0, 1fr); padding: 0.7rem 1.1rem; background: var(--sc-sys); color: #111111; font: 900 0.8125rem/1 var(--sc-font); font-variation-settings: "wdth" 112; text-transform: uppercase; letter-spacing: 0.08em; }
+.board-head { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); padding: 0.7rem 1.1rem; background: var(--sc-sys); color: #111111; font: 900 1rem/1.1 var(--sc-font); font-variation-settings: "wdth" 118; }
 .departures { list-style: none; margin: 0; padding: 0; }
-.departure { display: grid; grid-template-columns: 4.5rem minmax(0, 1fr); gap: 0.35rem 0; padding: 1.1rem 1.1rem 1.25rem; border-top: 1px solid #23262d; align-items: baseline; }
+.departure { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: 0.35rem 0; padding: 1.1rem 1.1rem 1.25rem; border-top: 1px solid #23262d; align-items: baseline; }
 .departure:first-child { border-top: 0; }
-.platform-no { grid-row: 1 / span 3; align-self: start; display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 0.375rem; background: var(--sc-sys); color: #111111; font: 900 1.75rem/1 var(--sc-font); font-variation-settings: "wdth" 125; }
+.kind { grid-row: 1 / span 3; align-self: start; justify-self: start; padding: 0.35rem 0.6rem; border-radius: 0.375rem; background: var(--sc-sys); color: #111111; font: 900 0.9375rem/1.1 var(--sc-font); font-variation-settings: "wdth" 112; }
 .departure h3 { margin: 0; color: var(--sc-sys); font: 800 1.375rem/1.1 var(--sc-mono); letter-spacing: -0.01em; }
 .creates { margin: 0.1rem 0 0.6rem; font: 400 0.9375rem/1.5 var(--sc-font); color: var(--sc-panel-muted); text-wrap: pretty; }
 .departure-cmd { min-width: 0; }
@@ -631,9 +638,11 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
 .legend-line { display: grid; grid-template-columns: 13.5rem minmax(8rem, 1fr) auto; gap: 0.2rem 2rem; align-items: center; padding: 1rem 0 1.05rem; border-bottom: 1px solid var(--sc-line); }
 .legend-name { text-decoration: none; justify-self: start; border-radius: 0.5rem; }
 .legend-pill { --kly-color: var(--c); font: 800 1.0625rem/1 var(--sc-font); font-variation-settings: "wdth" 112; }
-.legend-strip { position: relative; display: flex; justify-content: space-evenly; align-items: center; height: 1.5rem; }
-.legend-strip::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 12px; margin-top: -6px; border-radius: 6px; background: var(--c); }
-.legend-strip .tick { position: relative; width: 1.05rem; height: 1.05rem; box-sizing: border-box; border-radius: 50%; background: var(--sc-station); border: 3.5px solid var(--sc-edge); }
+.legend-strip { list-style: none; margin: 0; padding: 0; position: relative; display: flex; justify-content: space-evenly; align-items: flex-start; }
+.legend-strip::before { content: ""; position: absolute; left: 0; right: 0; top: 0.375rem; height: 12px; border-radius: 6px; background: var(--c); }
+.legend-strip li { position: relative; flex: 1; min-width: 0; display: grid; justify-items: center; gap: 0.35rem; text-align: center; }
+.legend-strip .tick { width: 1.05rem; height: 1.05rem; margin-top: 0.1rem; box-sizing: border-box; border-radius: 50%; background: var(--sc-station); border: 3.5px solid var(--sc-edge); }
+.legend-strip span { font: 600 0.8125rem/1.2 var(--sc-font); color: var(--sc-text); padding: 0 0.15rem; text-wrap: balance; }
 .legend-tag { grid-column: 1 / -1; margin: 0; font: 400 0.9375rem/1.45 var(--sc-font); color: var(--sc-muted); max-width: 70ch; text-wrap: pretty; }
 .lib-links { display: flex; gap: 1.25rem; }
 .lib-link { color: var(--sc-strong); font: 700 0.9375rem/1.2 var(--sc-font); text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px; }
@@ -652,6 +661,8 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
     .journey .cam { animation: journey-camera linear both; animation-timeline: --journey; animation-range: contain 0% contain 100%; }
     .journey .line-g { animation: var(--line-anim) linear both; animation-timeline: --journey; animation-range: contain 0% contain 100%; }
     .journey .stn { animation: sc-station-lit linear both; animation-timeline: --journey; animation-range: contain calc(var(--a) * 1%) contain calc(var(--b) * 1%); }
+    /* The map fades out toward the chapter panel while the journey runs, so no label is cut mid-word at its edge. */
+    .journey .stage > .sc-map:not(.sc-compact) { mask-image: linear-gradient(to right, transparent 0, #000 calc(var(--fade) * 130px)); animation: sc-edge-fade linear both; animation-timeline: --journey; animation-range: contain 0% contain 4%; }
     .journey .rider { animation: var(--rider-anim) linear both; animation-timeline: --journey; animation-range: contain 0% contain 100%; }
     .journey .sc-pillars { animation: sc-pillars-out linear both; animation-timeline: --journey; animation-range: contain 0% contain 6%; }
     /* The stations of a chapter light up one after the other as the page reaches them. */
@@ -684,9 +695,9 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
 
 @media (max-width: 700px) {
   .legend-line { grid-template-columns: minmax(0, 1fr); gap: 0.6rem; }
-  .legend-strip { max-width: 18rem; }
-  .departure { grid-template-columns: 3.5rem minmax(0, 1fr); }
-  .board-head { grid-template-columns: 3.5rem minmax(0, 1fr); }
+  .legend-strip span { font-size: 0.75rem; }
+  .departure { grid-template-columns: 5rem minmax(0, 1fr); }
+  .board-head { grid-template-columns: 5rem minmax(0, 1fr); }
 }
 
 @media (max-width: 1000px) {
@@ -724,3 +735,10 @@ html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
 .sc-compact .route { stroke-width: 9; stroke-dasharray: none; }
 .sc-compact .badge text { font-size: 12.5px; }
 .sc-compact .hub text { font-size: 12.5px; }
+
+/* Under 360px the nav keeps the wordmark, the menu, the color mode and an icon-only GitHub button (its label stays for screen readers). */
+@media (max-width: 360px) {
+  .sc-mark { font-size: 1.125rem; }
+  .sc-nav-inner { padding-inline: 0.75rem; }
+  .sc-nav .sc-gh [data-slot="label"] { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}

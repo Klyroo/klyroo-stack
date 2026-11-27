@@ -35,7 +35,7 @@ public sealed record Pillar(string Title, string Short, string Rule, string Proo
 }
 
 /// <summary>A <c>dotnet new</c> template of <c>Klyroo.Templates</c>, as the README of klyroo-stack lists it.</summary>
-public sealed record TemplateInfo(string ShortName, string Creates);
+public sealed record TemplateInfo(string ShortName, string Kind, string Creates);
 
 /// <summary>
 /// What the showcase says, as data: the eight lines with their stations, the four rules and the templates. Every line is a library of
@@ -130,9 +130,9 @@ public static class NetworkData
 
     public static IReadOnlyList<TemplateInfo> Templates { get; } =
     [
-        new("klyroo-saas", "A Blazor Web App for a SaaS product: a header with navigation and a color mode button, a dashboard, a filterable accounts list with a form drawer, and a usage page of display blocks."),
-        new("klyroo-admin", "A Blazor Web App for a back office: a sidebar shell, a dashboard, a customer list with selection and bulk actions, a customer page, and a spreadsheet import."),
-        new("klyroo-headless", "A console app with PublishAot that uses Klyroo.Stack.Core only."),
-        new("klyroo-maui", "A .NET MAUI Blazor Hybrid app for Android, iOS, Mac Catalyst and Windows."),
+        new("klyroo-saas", "Web", "A Blazor Web App for a SaaS product: a header with navigation and a color mode button, a dashboard, a filterable accounts list with a form drawer, and a usage page of display blocks."),
+        new("klyroo-admin", "Web", "A Blazor Web App for a back office: a sidebar shell, a dashboard, a customer list with selection and bulk actions, a customer page, and a spreadsheet import."),
+        new("klyroo-headless", "Console", "A console app with PublishAot that uses Klyroo.Stack.Core only."),
+        new("klyroo-maui", "MAUI", "A .NET MAUI Blazor Hybrid app for Android, iOS, Mac Catalyst and Windows."),
     ];
 }
