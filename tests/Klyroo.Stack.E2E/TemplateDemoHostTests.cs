@@ -50,7 +50,14 @@ public class TemplatesPathBaseTests(DemosPathBaseFixture demos, PathBaseFixture 
         // The link is relative to the base href, so it lands below the path base.
         Assert.Equal(demos.Instance.Host + "/sub/templates/starter/demo/", await preview.EvaluateAsync<string>("a => a.href"));
         lock (requests) requests.Clear();
-        // The gallery is an interactive page with a circuit of its own: only the WebSockets the click causes are the demo's.
+        // The gallery is an interactive page with a circuit of its own: only the WebSockets the click causes are the demo's. Its circuit can open its
+        // socket a moment after the page loaded, so wait for that socket before clearing the list, or it lands among the demo's.
+        var docsSocket = "ws://" + new Uri(demos.Instance.Host).Authority + "/sub/_blazor";
+        for (var deadline = DateTime.UtcNow.AddSeconds(30); ; await Task.Delay(50, TestContext.Current.CancellationToken))
+        {
+            lock (sockets) if (sockets.Any(url => url.StartsWith(docsSocket, StringComparison.Ordinal))) break;
+            Assert.True(DateTime.UtcNow < deadline, "the gallery opened no circuit of its own");
+        }
         lock (sockets) sockets.Clear();
         await preview.ClickAsync();
         await _page.WaitForURLAsync(url => url.EndsWith("/sub/templates/starter/demo/"));

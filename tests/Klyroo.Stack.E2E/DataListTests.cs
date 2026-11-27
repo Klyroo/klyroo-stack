@@ -508,10 +508,11 @@ public class DataListTests(PlaygroundServer server) : PlaygroundTest(server)
         await OpenList(mode, "?p=3");
         await Assertions.Expect(Cell(Url, 0, 0)).ToHaveTextAsync("21");
 
-        await UrlSearch.PressSequentiallyAsync("stark", new() { Delay = 30 });
+        // Each word is typed in one task of the page (see TypeInOneTask): the only pause longer than the debounce is the one between the words.
+        await TypeInOneTask(UrlSearch, "stark");
         await WaitForQuery("?q=stark");
         await Assertions.Expect(Calls).ToHaveTextAsync("1");
-        await UrlSearch.PressSequentiallyAsync(" ind", new() { Delay = 30 });
+        await TypeInOneTask(UrlSearch, " ind");
 
         await WaitForQuery("?q=stark%20ind");
         await Assertions.Expect(Count).ToHaveTextAsync("1–10 of 10");
