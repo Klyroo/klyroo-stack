@@ -278,7 +278,7 @@ public static partial class LibraryDocs
         {
             foreach (Match item in FeatureItem().Matches(featuresHtml))
             {
-                features.Add(new HomeFeature(PlainText(item.Groups["title"].Value), item.Groups["body"].Value.Trim()));
+                features.Add(new HomeFeature(PlainText(item.Groups["title"].Value), HomeText.Capitalize(item.Groups["body"].Value.Trim())));
             }
             if (features.Count > 0)
             {
