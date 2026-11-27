@@ -45,6 +45,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- The audio demos of the Display pages and hero stage played nothing: the site referenced `/media/sample.mp3` and shipped no such file. `site/Klyroo.Stack.Site/wwwroot/media/sample.mp3` is a 50 second tone.
 - `Styles/showcase.css` leaked into every docs page: its `.board` rule (the departure board of the showcase) gave the demonstration board of each library a black background and a border, and its `@property --lit` registered a number type for `--lit`, so the lit-line color of the boards (`color-mix(...)`) computed to 0 and no line was lit. The board rule is scoped to `.sc` and the showcase animation variable is `--sc-lit`.
 - The documentation site keeps its yellow brand over the current Klyroo.UI theme: `Styles/site.css` sets `--klyroo-primary` to `#ffd23f` (with `#7a5800` as its text color in light mode, `#ffd23f` in dark mode, and `#151100` on the fill), and the focus ring uses the text tone, since the yellow is 1.4:1 on white. The text tokens stay those of Klyroo.UI.
 - `site.css` of the documentation site had not been rebuilt since Klyroo.UI changed its theme, so the site still ran the old palette (a yellow primary and a warm gray text-dimmed at 4.41:1 on white). It is rebuilt from `klyroo.theme.css`, and the token table of `/docs/css-variables` and the tests that pin its values follow the current tokens.
