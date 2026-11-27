@@ -1,0 +1,365 @@
+@page "/query"
+@using System.Globalization
+@using System.Text
+@using System.Text.Json
+@using Klyroo.Playground.Data
+@inject Knobs K
+
+@{ Recompute(); }
+<PgShell Library="_lib" DocsPage="guides/" OnReset="LoadKnobs"
+         Lead="Build a DataListRequest the way a list or an API would: rules with operators in a group and a nested group, sorts, paging, a search and facets. The request is shown as JSON and as the URL a list would write, and it runs against 200 employees in memory.">
+    <Knobs>
+        <PgGroup Title="Search">
+            <PgText Key="q" Label="Search" Placeholder="name, email or title" @bind-Value="_search" />
+        </PgGroup>
+        <PgGroup Title="Rules">
+            <PgSelect Key="comb" Label="Rules 1 and 2 are combined with" T="FilterCombinator" Options="_combinators" @bind-Value="_combinator" />
+            @foreach (var rule in _rules)
+            {
+                var r = rule;
+                <div role="group" aria-label="Rule @r.Number" class="flex flex-col gap-2 border-t border-(--klyroo-border) pt-3">
+                    <PgSwitch Key="@($"r{r.Number}on")" Label="@($"Rule {r.Number}{(r.Number == 3 ? ", in a nested group" : "")}")" @bind-Value="r.Enabled" />
+                    @if (r.Enabled)
+                    {
+                        <PgSelect Key="@($"r{r.Number}f")" Label="Field" T="string" Options="_fieldOptions" @bind-Value="r.Field" OnChange="() => FieldChanged(r)" />
+                        <PgSelect Key="@($"r{r.Number}o")" Label="Operator" T="FilterOperator" Options="OperatorsFor(r)" @bind-Value="r.Operator" />
+                        @if (!IsEmptyOperator(r.Operator))
+                        {
+                            <PgText Key="@($"r{r.Number}v")" Label="@ValueLabel(r)" @bind-Value="r.Value" />
+                        }
+                    }
+                </div>
+            }
+            <PgSelect Key="ncomb" Label="Rule 3 is combined inside its group with" T="FilterCombinator" Options="_combinators" @bind-Value="_nested" Hint="The nested group is the last child of the first group." />
+        </PgGroup>
+        <PgGroup Title="Sort">
+            <PgSelect Key="s1" Label="First sort" T="string" Options="_sortFields" @bind-Value="_sort1" />
+            <PgSwitch Key="s1d" Label="First sort descending" @bind-Value="_sort1Desc" Disabled="@(_sort1 == "none")" />
+            <PgSelect Key="s2" Label="Second sort" T="string" Options="_sortFields" @bind-Value="_sort2" />
+            <PgSwitch Key="s2d" Label="Second sort descending" @bind-Value="_sort2Desc" Disabled="@(_sort2 == "none")" />
+        </PgGroup>
+        <PgGroup Title="Paging">
+            <PgSelect Key="paging" Label="Mode" T="string" Options="_pagings" @bind-Value="_paging" OnChange="ResetCursor" />
+            <PgNumber Key="take" Label="Rows per page" Min="1" Max="100" @bind-Value="_take" OnChange="ResetCursor" Disabled="@(_paging == "none")" />
+            <PgNumber Key="page" Label="Page" Min="1" Max="200" @bind-Value="_page" Disabled="@(_paging != "offset")" />
+        </PgGroup>
+        <PgGroup Title="Facets">
+            <PgSwitch Key="fdept" Label="Count departments" @bind-Value="_facetDepartment" />
+            <PgSwitch Key="fcountry" Label="Count countries" @bind-Value="_facetCountry" />
+            <PgSwitch Key="fstatus" Label="Count statuses" @bind-Value="_facetStatus" />
+            <PgSelect Key="fmode" Label="A count leaves out" T="FacetMode" Options="_facetModes" @bind-Value="_facetMode" Hint="ExcludeSelf: the rules of its own field do not narrow its numbers. IncludeSelf: they do." />
+        </PgGroup>
+    </Knobs>
+    <Stage>
+        @if (_problems.Count > 0)
+        {
+            <KlyAlert Variant="KlyVariant.Soft" Color="KlyColor.Warning" Title="Some input was ignored" Description="@string.Join(" ", _problems)" />
+        }
+        <PgPanel Title="Result" Note="@($"{_total} matching, {_shown} shown")" Flush>
+            <div class="table-scroll py-3">
+                <KlyDisplay Kind="DisplayKind.Table" TableColumns="_columns" TableRows="_rows" Surface="DisplaySurface.Plain" />
+            </div>
+            @if (_paging == "cursor")
+            {
+                <div class="table-footer flex flex-wrap items-center gap-2">
+                    <KlyButton Label="Next page by cursor" Size="KlySize.Sm" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" Disabled="@(_nextCursor is null)" OnClick="NextCursor" />
+                    <KlyButton Label="Back to the first page" Size="KlySize.Sm" Variant="ButtonVariant.Ghost" Color="KlyColor.Neutral" Disabled="@(_cursor is null)" OnClick="ResetCursorClick" />
+                    <span class="mono text-xs text-(--klyroo-text-muted)">after: @(_cursor ?? "(start)") · next: @(_nextCursor ?? "(end)")</span>
+                </div>
+            }
+        </PgPanel>
+        <div class="grid gap-5 min-[1100px]:grid-cols-2">
+            <PgPanel Title="Facet counts" Note="@(_facets.Count == 0 ? "no facet asked" : "from the rows that match")">
+                @if (_facets.Count == 0)
+                {
+                    <p class="m-0 text-sm text-(--klyroo-text-muted)">Turn a facet on to count the rows behind each value.</p>
+                }
+                else
+                {
+                    <KlyDisplay Kind="DisplayKind.Facts" FactGroups="_facets" Surface="DisplaySurface.Plain" />
+                }
+            </PgPanel>
+            <PgPanel Title="URL form" Note="what a list writes to the address">
+                <KlyDisplay Kind="DisplayKind.Code" Value="@_urlForm" Highlight="false" Surface="DisplaySurface.Plain" />
+                <p class="m-0 mt-2 text-sm text-(--klyroo-text-muted)">@_urlNote</p>
+            </PgPanel>
+        </div>
+        <CodePanel Tabs="CodeTabs" />
+    </Stage>
+</PgShell>
+
+@code {
+    private sealed class RuleSlot(int number)
+    {
+        public int Number { get; } = number;
+        public bool Enabled { get; set; }
+        public string Field { get; set; } = "department";
+        public FilterOperator Operator { get; set; } = FilterOperator.Is;
+        public string Value { get; set; } = "";
+    }
+
+    private sealed record FieldSpec(string Key, string Label, FilterKind Kind, string Example);
+
+    private readonly LibraryInfo _lib = Libraries.Find("query")!;
+    private readonly RuleSlot[] _rules = [new(1), new(2), new(3)];
+    private string _search = "";
+    private FilterCombinator _combinator, _nested;
+    private string _sort1 = "name", _sort2 = "none", _paging = "offset";
+    private bool _sort1Desc, _sort2Desc, _facetDepartment, _facetCountry, _facetStatus;
+    private FacetMode _facetMode;
+    private int _take, _page;
+    private string? _cursor, _nextCursor;
+    private readonly List<string> _problems = [];
+    private int _total, _shown;
+    private IReadOnlyList<IReadOnlyDictionary<string, string?>> _rows = [];
+    private IReadOnlyList<DisplayFactGroup> _facets = [];
+    private string _requestJson = "", _urlForm = "", _urlNote = "", _requestCode = "";
+
+    private static readonly FieldSpec[] Fields =
+    [
+        new("name", "Name", FilterKind.Text, "Ada"),
+        new("department", "Department", FilterKind.Option, "Engineering"),
+        new("country", "Country", FilterKind.Option, "France"),
+        new("status", "Status", FilterKind.Option, "Remote"),
+        new("salary", "Salary", FilterKind.Number, "60000"),
+        new("hired", "Hire date", FilterKind.Date, "2020-01-01"),
+    ];
+
+    private static readonly IReadOnlyList<PgOption<string>> _fieldOptions = PgOptions.Of(Fields.Select(f => (f.Key, f.Label)).ToArray());
+    private static readonly IReadOnlyList<PgOption<string>> _sortFields = PgOptions.Of([("none", "None"), .. Fields.Select(f => (f.Key, f.Label))]);
+    private static readonly IReadOnlyList<PgOption<string>> _pagings = PgOptions.Of(("offset", "Offset: skip and take"), ("cursor", "Cursor: after the last row"), ("none", "None: every match"));
+    private static readonly IReadOnlyList<PgOption<FilterCombinator>> _combinators = PgOptions.Of<FilterCombinator>();
+    private static readonly IReadOnlyList<PgOption<FacetMode>> _facetModes = PgOptions.Of<FacetMode>();
+    private static readonly IReadOnlyList<DisplayTableColumn> _columns =
+    [
+        new("name", "Name"), new("department", "Department"), new("country", "Country"), new("status", "Status"),
+        new("salary", "Salary", Numeric: true), new("hired", "Hired"),
+    ];
+
+    private static FieldSpec SpecOf(string key) => Fields.First(f => f.Key == key);
+
+    private static IReadOnlyList<PgOption<FilterOperator>> OperatorsFor(RuleSlot rule) => SpecOf(rule.Field).Kind switch
+    {
+        FilterKind.Text => OperatorOptions(FilterOperator.Contains, FilterOperator.Is, FilterOperator.IsNot, FilterOperator.IsEmpty, FilterOperator.IsNotEmpty),
+        FilterKind.Option => OperatorOptions(FilterOperator.Is, FilterOperator.IsNot, FilterOperator.IsAnyOf),
+        FilterKind.Number => OperatorOptions(FilterOperator.Gte, FilterOperator.Gt, FilterOperator.Lte, FilterOperator.Lt, FilterOperator.Is, FilterOperator.Between),
+        _ => OperatorOptions(FilterOperator.After, FilterOperator.Before, FilterOperator.Between),
+    };
+
+    private static IReadOnlyList<PgOption<FilterOperator>> OperatorOptions(params FilterOperator[] operators) =>
+        [.. operators.Select(o => new PgOption<FilterOperator>(o, o.ToString(), o.ToString()))];
+
+    private static bool IsEmptyOperator(FilterOperator op) => op is FilterOperator.IsEmpty or FilterOperator.IsNotEmpty;
+
+    private static string ValueLabel(RuleSlot rule) => rule.Operator switch
+    {
+        FilterOperator.IsAnyOf => "Values, separated by commas",
+        FilterOperator.Between => "Range, from..to (either side may be empty)",
+        _ => "Value",
+    };
+
+    protected override void OnInitialized()
+    {
+        K.Load();
+        LoadKnobs();
+    }
+
+    private void LoadKnobs()
+    {
+        _search = K.Str("q", "");
+        _combinator = K.Enum("comb", FilterCombinator.And);
+        _nested = K.Enum("ncomb", FilterCombinator.Or);
+        string[] defaultFields = ["department", "salary", "country"];
+        string[] defaultValues = ["Engineering,Design", "60000", "France,Spain"];
+        FilterOperator[] defaultOps = [FilterOperator.IsAnyOf, FilterOperator.Gte, FilterOperator.IsAnyOf];
+        for (var i = 0; i < _rules.Length; i++)
+        {
+            var r = _rules[i];
+            var n = r.Number;
+            r.Enabled = K.Bool($"r{n}on", n <= 2);
+            r.Field = K.Str($"r{n}f", defaultFields[i]);
+            if (Fields.All(f => f.Key != r.Field)) r.Field = defaultFields[i];
+            r.Operator = K.Enum($"r{n}o", defaultOps[i]);
+            if (OperatorsFor(r).All(o => o.Value != r.Operator)) r.Operator = OperatorsFor(r)[0].Value;
+            r.Value = K.Str($"r{n}v", defaultValues[i]);
+        }
+        _sort1 = K.Str("s1", "name");
+        _sort1Desc = K.Bool("s1d", false);
+        _sort2 = K.Str("s2", "none");
+        _sort2Desc = K.Bool("s2d", false);
+        _paging = K.Str("paging", "offset");
+        _take = K.Int("take", 8, 1, 100);
+        _page = K.Int("page", 1, 1, 200);
+        _facetDepartment = K.Bool("fdept", true);
+        _facetCountry = K.Bool("fcountry", false);
+        _facetStatus = K.Bool("fstatus", false);
+        _facetMode = K.Enum("fmode", FacetMode.ExcludeSelf);
+        _cursor = null;
+    }
+
+    private void FieldChanged(RuleSlot rule)
+    {
+        var spec = SpecOf(rule.Field);
+        var operators = OperatorsFor(rule);
+        if (operators.All(o => o.Value != rule.Operator)) rule.Operator = operators[0].Value;
+        rule.Value = rule.Operator == FilterOperator.Between ? "" : spec.Example;
+    }
+
+    private void ResetCursor() => _cursor = null;
+
+    private void ResetCursorClick() => _cursor = null;
+
+    private void NextCursor() => _cursor = _nextCursor;
+
+    private IReadOnlyList<CodeTab> CodeTabs
+    {
+        get
+        {
+            return [new("Request.cs", "csharp", _requestCode), new("request.json", "json", _requestJson)];
+        }
+    }
+
+    private static FilterRule? ParseRule(RuleSlot r, List<string> problems)
+    {
+        var spec = SpecOf(r.Field);
+        var text = r.Value.Trim();
+        if (IsEmptyOperator(r.Operator)) return new FilterRule(spec.Key, r.Operator);
+        if (text.Length == 0) { problems.Add($"Rule {r.Number} has no value."); return null; }
+        FilterValue? Single(string t) => spec.Kind switch
+        {
+            FilterKind.Number => decimal.TryParse(t, NumberStyles.Number, CultureInfo.InvariantCulture, out var n) ? new FilterValue.Number(n) : null,
+            FilterKind.Date => DateOnly.TryParseExact(t, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var d) ? new FilterValue.Date(d) : null,
+            _ => new FilterValue.Text(t),
+        };
+        FilterValue? value;
+        if (r.Operator == FilterOperator.IsAnyOf)
+        {
+            value = new FilterValue.List([.. text.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)]);
+        }
+        else if (r.Operator == FilterOperator.Between)
+        {
+            var parts = text.Split("..", 2);
+            if (parts.Length != 2) { problems.Add($"Rule {r.Number}: write a range as from..to."); return null; }
+            var from = parts[0].Trim().Length == 0 ? null : Single(parts[0].Trim());
+            var to = parts[1].Trim().Length == 0 ? null : Single(parts[1].Trim());
+            if ((parts[0].Trim().Length > 0 && from is null) || (parts[1].Trim().Length > 0 && to is null)) { problems.Add($"Rule {r.Number}: a bound of the range is not a valid {spec.Kind.ToString().ToLowerInvariant()}."); return null; }
+            value = new FilterValue.Range(from, to);
+        }
+        else
+        {
+            value = Single(text);
+        }
+        if (value is null) { problems.Add($"Rule {r.Number}: the value is not a valid {spec.Kind.ToString().ToLowerInvariant()} (dates are yyyy-MM-dd)."); return null; }
+        return new FilterRule(spec.Key, r.Operator, value);
+    }
+
+    private void Recompute()
+    {
+        _problems.Clear();
+        var topRules = new List<DataListFilterNode>();
+        foreach (var r in _rules.Where(r => r.Enabled && r.Number <= 2)) if (ParseRule(r, _problems) is { } rule) topRules.Add(rule);
+        if (_rules[2].Enabled && ParseRule(_rules[2], _problems) is { } nestedRule)
+        {
+            topRules.Add(new DataListFilterGroup(_nested, [nestedRule]));
+        }
+        var filter = new DataListFilterGroup(_combinator, topRules);
+
+        List<DataListSort> sorts = [];
+        if (_sort1 != "none") sorts.Add(new DataListSort(_sort1, _sort1Desc));
+        if (_sort2 != "none" && _sort2 != _sort1) sorts.Add(new DataListSort(_sort2, _sort2Desc));
+
+        DataListPaging paging = _paging switch
+        {
+            "cursor" => new DataListPaging.Cursor(_cursor, _take, Count: true),
+            "none" => DataListPaging.None.Instance,
+            _ => DataListPaging.Offset.ForPage(_page, _take),
+        };
+        List<DataListFacetRequest> facets = [];
+        if (_facetDepartment) facets.Add(new DataListFacetRequest("department", _facetMode));
+        if (_facetCountry) facets.Add(new DataListFacetRequest("country", _facetMode));
+        if (_facetStatus) facets.Add(new DataListFacetRequest("status", _facetMode));
+
+        var request = new DataListRequest(paging, sorts, filter, _search.Trim().Length > 0 ? new DataListSearch(_search.Trim()) : null, facets);
+        _requestJson = JsonText.Indent(JsonSerializer.Serialize(request, DataListJsonContext.Default.DataListRequest));
+        var sanitized = JsonText.Indent(JsonSerializer.Serialize(DataListSchemaOf.Sanitize(request), DataListJsonContext.Default.DataListRequest));
+        if (sanitized != _requestJson) _problems.Add("The schema dropped part of the request: a field, an operator or a value it does not accept.");
+
+        var result = DataListSchemaOf.ExecuteInMemory(Employees.All, request);
+        _total = result.TotalCount ?? result.Items.Count;
+        _shown = result.Items.Count;
+        _nextCursor = result.NextCursor;
+        _rows = [.. result.Items.Select(e => (IReadOnlyDictionary<string, string?>)new Dictionary<string, string?>
+        {
+            ["name"] = e.Name, ["department"] = e.Department, ["country"] = e.Country, ["status"] = e.Status.ToString(),
+            ["salary"] = "$" + e.Salary.ToString("N0", CultureInfo.InvariantCulture), ["hired"] = e.Hired.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+        })];
+        _facets = [.. (result.Facets ?? []).Select(f => new DisplayFactGroup(
+            $"{f.Key} ({_facetMode})",
+            [.. f.Options.Select(o => new DisplayFact { Label = o.Value, Value = o.Count.ToString(CultureInfo.InvariantCulture), Mono = true })]))];
+
+        // The URL form holds one flat AND of rules: nested groups and OR are for requests, not for addresses.
+        var flat = topRules.OfType<FilterRule>().ToList();
+        var state = DataListSchemaOf.DefaultState with
+        {
+            Search = _search.Trim(),
+            Sort = sorts,
+            Filters = [.. DataListSchemaOf.DefaultState.Filters, .. flat],
+            Page = _paging == "offset" ? _page : 1,
+            PageSize = _take,
+        };
+        var query = DataListStateQuery.ToQuery(state, DataListSchemaOf);
+        _urlForm = query.Count == 0 ? "(nothing: this is the default state of the schema)" : "?" + string.Join('&', query.Select(p => $"{p.Key}={p.Value}"));
+        var dropped = (topRules.Count - flat.Count) > 0 || _combinator == FilterCombinator.Or;
+        _urlNote = dropped
+            ? "The address keeps one AND of flat rules, so the nested group or an OR between rules 1 and 2 is not in it: that part of the request has no URL form."
+            : "Only what differs from the defaults of the schema is written, so an untouched list has an empty address.";
+        _requestCode = RequestCode(sorts, facets, flat.Count == topRules.Count);
+    }
+
+    private static DataListSchema<Employee> DataListSchemaOf => EmployeeSchema.Instance;
+
+    private static string Value(FilterValue? v) => v switch
+    {
+        FilterValue.Text t => $"new FilterValue.Text(\"{t.Value}\")",
+        FilterValue.Number n => $"new FilterValue.Number({n.Value.ToString(CultureInfo.InvariantCulture)}m)",
+        FilterValue.Date d => $"new FilterValue.Date(new DateOnly({d.Value.Year}, {d.Value.Month}, {d.Value.Day}))",
+        FilterValue.List l => $"new FilterValue.List([{string.Join(", ", l.Values.Select(x => $"\"{x}\""))}])",
+        FilterValue.Range r => $"new FilterValue.Range({(r.From is null ? "null" : Value(r.From))}, {(r.To is null ? "null" : Value(r.To))})",
+        _ => "null",
+    };
+
+    private string RuleCode(FilterRule r) => r.Value is null
+        ? $"new FilterRule(\"{r.Key}\", FilterOperator.{r.Operator})"
+        : $"new FilterRule(\"{r.Key}\", FilterOperator.{r.Operator}, {Value(r.Value)})";
+
+    private string RequestCode(List<DataListSort> sorts, List<DataListFacetRequest> facets, bool _)
+    {
+        var sb = new StringBuilder();
+        var children = new List<string>();
+        foreach (var r in _rules.Where(r => r.Enabled && r.Number <= 2)) if (ParseRule(r, []) is { } rule) children.Add(RuleCode(rule));
+        if (_rules[2].Enabled && ParseRule(_rules[2], []) is { } n)
+        {
+            children.Add($"DataListFilterGroup.{_nested}(\n            {RuleCode(n)})");
+        }
+        sb.Append("using Klyroo.Query;\n\n");
+        sb.Append("var request = new DataListRequest(\n");
+        sb.Append(_paging switch
+        {
+            "cursor" => $"    new DataListPaging.Cursor(After: {(_cursor is null ? "null" : $"\"{_cursor}\"")}, Take: {_take}, Count: true),\n",
+            "none" => "    DataListPaging.None.Instance,\n",
+            _ => $"    new DataListPaging.Offset(Skip: {(_page - 1) * _take}, Take: {_take}),\n",
+        });
+        sb.Append(sorts.Count == 0 ? "    [],\n" : "    [" + string.Join(", ", sorts.Select(s => s.Descending ? $"new DataListSort(\"{s.Key}\", Descending: true)" : $"new DataListSort(\"{s.Key}\")")) + "],\n");
+        sb.Append(children.Count == 0 ? "    DataListFilterGroup.Empty" : $"    DataListFilterGroup.{_combinator}(\n        " + string.Join(",\n        ", children) + ")");
+        var tail = new List<string>();
+        tail.Add(_search.Trim().Length > 0 ? $"    new DataListSearch(\"{_search.Trim()}\")" : "    null");
+        if (facets.Count > 0) tail.Add("    [" + string.Join(", ", facets.Select(f => f.Mode == FacetMode.ExcludeSelf ? $"new DataListFacetRequest(\"{f.Key}\")" : $"new DataListFacetRequest(\"{f.Key}\", FacetMode.{f.Mode})")) + "]");
+        sb.Append(",\n").Append(string.Join(",\n", tail)).Append(");\n\n");
+        sb.Append("// Rows in memory. The same request runs on EF Core with schema.Apply(query, request).\n");
+        sb.Append("DataListResult<Employee> result = schema.ExecuteInMemory(employees, request);\n");
+        sb.Append("Console.WriteLine($\"{result.TotalCount} match, showing {result.Items.Count}\");\n\n");
+        sb.Append("// The schema says what a request may do with an Employee.\n");
+        sb.Append("static readonly DataListSchema<Employee> schema = DataListSchema.For<Employee>(s => s\n    .RowKey(e => e.Id)\n    .Search(e => e.Name, e => e.Email, e => e.Title)\n    .Field(e => e.Name, f => f.Sortable().Filter(DataListFilter.Text()))\n    .Field(e => e.Department, f => f.Sortable().Filter(DataListFilter.Option().WithFacets()))\n    .Field(e => e.Country, f => f.Sortable().Filter(DataListFilter.Option().WithFacets()))\n    .Field(e => e.Status, f => f.Sortable().Filter(DataListFilter.Option().WithFacets()))\n    .Field(e => e.Salary, f => f.Sortable().Filter(DataListFilter.Number(min: 0)))\n    .Field(e => e.Hired, f => f.Sortable().Filter(DataListFilter.Date()))\n    .DefaultSort(e => e.Name));\n");
+        return sb.ToString();
+    }
+}

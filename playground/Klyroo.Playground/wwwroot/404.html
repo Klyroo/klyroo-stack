@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Klyroo playground</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+        // GitHub Pages has no server routes: any address below the playground lands here. Send the route to index.html as ?/route, which restores it
+        // (see index.html). build/publish-playground.sh rewrites the base path below.
+        (function (l) {
+            var base = '/klyroo-stack/playground/';
+            if (l.pathname.indexOf(base) !== 0) { l.replace(base); return; }
+            var route = l.pathname.slice(base.length);
+            l.replace(base + '?/' + route.replace(/&/g, '~and~') + (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') + l.hash);
+        })(window.location);
+    </script>
+</head>
+<body>
+    <noscript>This page needs JavaScript. <a href="/klyroo-stack/playground/">Open the Klyroo playground.</a></noscript>
+</body>
+</html>

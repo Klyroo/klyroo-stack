@@ -1,0 +1,39 @@
+@typeparam T
+@inject Knobs K
+
+<KlyFormField Label="@Label" Help="@Hint">
+    <KlySelect TValue="T" Items="_items" Value="Value" ValueChanged="HandleChange" Disabled="Disabled" />
+</KlyFormField>
+
+@code {
+    [Parameter, EditorRequired] public string Label { get; set; } = "";
+    [Parameter] public string? Hint { get; set; }
+    [Parameter] public string? Key { get; set; }
+    [Parameter, EditorRequired] public IReadOnlyList<PgOption<T>> Options { get; set; } = [];
+    [Parameter] public T? Value { get; set; }
+    [Parameter] public EventCallback<T> ValueChanged { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    /// <summary>Raised after the value is stored, for a page that has to rebuild something from it.</summary>
+    [Parameter] public EventCallback OnChange { get; set; }
+
+    private IReadOnlyList<IKlySelectItem<T>> _items = [];
+    private IReadOnlyList<PgOption<T>>? _itemsFor;
+
+    protected override void OnParametersSet()
+    {
+        if (ReferenceEquals(_itemsFor, Options)) return;
+        _itemsFor = Options;
+        _items = [.. Options.Select(o => (IKlySelectItem<T>)new KlySelectItem<T>(o.Value, o.Label))];
+    }
+
+    private async Task HandleChange(T? value)
+    {
+        if (value is null) return;
+        var option = Options.FirstOrDefault(o => EqualityComparer<T>.Default.Equals(o.Value, value));
+        if (option is null) return;
+        Value = option.Value;
+        if (Key is not null) K.Put(Key, option.Token);
+        await ValueChanged.InvokeAsync(option.Value);
+        await OnChange.InvokeAsync();
+    }
+}

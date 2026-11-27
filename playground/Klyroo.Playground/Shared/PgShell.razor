@@ -1,0 +1,72 @@
+<PageTitle>@Library.Name playground | Klyroo</PageTitle>
+
+<div class="page-wrap">
+    <div class="pg-head">
+        <h1 class="pg-title">@Library.Name <span class="accent">playground</span></h1>
+        <p class="pg-lead">@Lead</p>
+        <div class="flex flex-wrap items-center gap-2">
+            <KlyButton Href="@Library.DocsUrl" Label="@($"{Library.Name} documentation")" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Sm" Target="KlyLinkTarget.Blank" />
+            @if (DocsPage is not null)
+            {
+                <KlyButton Href="@(Library.DocsUrl + DocsPage)" Label="@DocsLabel" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Sm" Target="KlyLinkTarget.Blank" />
+            }
+            <KlyButton Href="@Library.ApiUrl" Label="API reference" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Sm" Target="KlyLinkTarget.Blank" />
+        </div>
+    </div>
+
+    <div class="pg-bench">
+        @* Beside the result from lg up; below it the same knobs open in a slideover, so the result stays in view on a phone. *@
+        <aside class="pg-knobs hidden lg:block" aria-label="Knobs">
+            <KlyCard Ui="@(new CardUi { Body = "p-0", Header = "px-4 py-2.5" })">
+                <Header>
+                    <div class="flex items-center justify-between gap-2">
+                        <h2 class="m-0 text-sm font-semibold text-(--klyroo-text-highlighted)">Knobs</h2>
+                        <KlyButton Label="Reset" Variant="ButtonVariant.Ghost" Color="KlyColor.Neutral" Size="KlySize.Xs" OnClick="ResetAsync" />
+                    </div>
+                </Header>
+                <ChildContent>@Knobs</ChildContent>
+            </KlyCard>
+        </aside>
+        <div class="lg:hidden">
+            <KlySlideover @bind-Open="_knobsOpen" Title="Knobs" Side="SlideoverSide.Left" Close="true">
+                <ChildContent>
+                    <KlyButton Label="Knobs" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Sm">
+                        <LeadingIcon><KlyIcon Name="ph:sliders-horizontal" /></LeadingIcon>
+                    </KlyButton>
+                </ChildContent>
+                <Body>
+                    @if (_knobsOpen)
+                    {
+                        @Knobs
+                        <div class="p-4"><KlyButton Label="Reset the knobs" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Sm" OnClick="ResetAsync" /></div>
+                    }
+                </Body>
+            </KlySlideover>
+        </div>
+        <div class="pg-stage">
+            @Stage
+        </div>
+    </div>
+</div>
+
+@code {
+    [Inject] private Knobs K { get; set; } = default!;
+
+    [Parameter, EditorRequired] public LibraryInfo Library { get; set; } = default!;
+    [Parameter, EditorRequired] public string Lead { get; set; } = "";
+    /// <summary>A page of the documentation site of the library (<c>guides/</c>) that explains what this playground shows.</summary>
+    [Parameter] public string? DocsPage { get; set; }
+    [Parameter] public string DocsLabel { get; set; } = "Guides";
+    [Parameter] public RenderFragment? Knobs { get; set; }
+    [Parameter] public RenderFragment? Stage { get; set; }
+    /// <summary>Called after the knobs are cleared from the address: the page reads its defaults again.</summary>
+    [Parameter] public EventCallback OnReset { get; set; }
+
+    private bool _knobsOpen;
+
+    private async Task ResetAsync()
+    {
+        K.Reset();
+        await OnReset.InvokeAsync();
+    }
+}

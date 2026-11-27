@@ -11,6 +11,9 @@
     <Project Path="site/Klyroo.Stack.Site.Client/Klyroo.Stack.Site.Client.csproj" />
     <Project Path="site/Klyroo.Stack.Site.DemoWatchdog/Klyroo.Stack.Site.DemoWatchdog.csproj" />
   </Folder>
+  <Folder Name="/playground/">
+    <Project Path="playground/Klyroo.Playground/Klyroo.Playground.csproj" />
+  </Folder>
   <Folder Name="/docs-site/">
     <Project Path="docs-site/Klyroo.Docs.Site/Klyroo.Docs.Site.csproj" />
   </Folder>

@@ -1,0 +1,26 @@
+@inject Knobs K
+
+<KlyFormField Label="@Label" Help="@Hint">
+    <KlyInput Value="@Value" ValueChanged="HandleChange" Placeholder="@Placeholder" Disabled="Disabled" />
+</KlyFormField>
+
+@code {
+    [Parameter, EditorRequired] public string Label { get; set; } = "";
+    [Parameter] public string? Hint { get; set; }
+    [Parameter] public string? Key { get; set; }
+    [Parameter] public string? Placeholder { get; set; }
+    [Parameter] public string Value { get; set; } = "";
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    /// <summary>Raised after the value is stored, for a page that has to rebuild something from it.</summary>
+    [Parameter] public EventCallback OnChange { get; set; }
+
+    private async Task HandleChange(string? value)
+    {
+        var text = value ?? "";
+        Value = text;
+        if (Key is not null) K.Put(Key, text);
+        await ValueChanged.InvokeAsync(text);
+        await OnChange.InvokeAsync();
+    }
+}

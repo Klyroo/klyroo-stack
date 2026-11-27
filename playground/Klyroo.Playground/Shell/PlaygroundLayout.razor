@@ -1,0 +1,77 @@
+@inherits LayoutComponentBase
+@inject NavigationManager Navigation
+@implements IDisposable
+
+<HeadContent>
+    <style>@((MarkupString)_accentCss)</style>
+</HeadContent>
+
+<KlyApp>
+    <KlySkipLink Label="Skip to the playground" />
+    <KlyHeader Sticky="true">
+        <Left>
+            <a href="" class="brand" aria-label="Klyroo playground, all playgrounds">
+                <KlyrooMark />
+                <span class="wordmark">klyroo<span class="slash">/</span><span class="name">playground</span></span>
+            </a>
+        </Left>
+        <Right>
+            @if (_library is not null)
+            {
+                <span class="hidden sm:inline-flex"><KlyButton Href="@_library.DocsUrl" Label="@($"{_library.Name} docs")" Variant="ButtonVariant.Ghost" Color="KlyColor.Neutral" Size="KlySize.Sm" Target="KlyLinkTarget.Blank" /></span>
+            }
+            <KlyButton Href="https://github.com/klyroo/klyroo-stack" Target="KlyLinkTarget.Blank" Variant="ButtonVariant.Ghost" Color="KlyColor.Neutral" Square="true" aria-label="klyroo-stack on GitHub">
+                <LeadingIcon><KlyIcon Name="ph:github-logo" /></LeadingIcon>
+            </KlyButton>
+            <KlyColorModeButton />
+        </Right>
+    </KlyHeader>
+
+    <div class="border-b border-(--klyroo-border)">
+        <div class="page-wrap overflow-x-auto py-1.5">
+            <KlyNavigationMenu Items="_items" AriaLabel="Playgrounds" Orientation="KlyOrientation.Horizontal" Color="KlyColor.Neutral" />
+        </div>
+    </div>
+
+    <main id="main" tabindex="-1" class="min-h-[70vh] outline-none">
+        @Body
+    </main>
+
+    <footer class="mt-12 border-t border-(--klyroo-border) bg-(--klyroo-bg-muted)/50">
+        <div class="page-wrap flex flex-wrap justify-between gap-x-8 gap-y-2 py-6 text-sm text-(--klyroo-text-dimmed)">
+            <span>All data is sample data generated in your browser. Nothing leaves the page.</span>
+            <KlyLink Href="https://github.com/klyroo/klyroo-stack/tree/main/playground" Label="Source of the playground" Target="KlyLinkTarget.Blank" />
+        </div>
+    </footer>
+</KlyApp>
+
+@code {
+    private static readonly IReadOnlyList<KlyNavigationItem> _items =
+    [
+        .. Libraries.All.Select(l => new KlyNavigationItem(l.Name) { Href = l.Slug + "/" }),
+    ];
+
+    private LibraryInfo? _library;
+    private string _accentCss = "";
+
+    protected override void OnInitialized() => Navigation.LocationChanged += OnLocationChanged;
+
+    protected override void OnParametersSet() => Apply();
+
+    private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        Apply();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void Apply()
+    {
+        var path = Navigation.ToBaseRelativePath(Navigation.Uri).Split('?', '#')[0].Trim('/');
+        _library = Libraries.Find(path.Split('/')[0]);
+        var theme = AccentColor.Compute(_library?.Accent ?? "#10b981");
+        _accentCss = $":root{{--accent:{theme.Fill};--on-accent:{theme.OnFill};--accent-ink:{theme.InkLight};--accent-display:{theme.DisplayLight}}}" +
+            $":root.dark{{--accent-ink:{theme.InkDark};--accent-display:{theme.DisplayDark}}}";
+    }
+
+    public void Dispose() => Navigation.LocationChanged -= OnLocationChanged;
+}

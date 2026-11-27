@@ -1,0 +1,238 @@
+@page "/spreadsheet"
+@using System.Globalization
+@using System.Text
+@using System.Text.Json
+@using Klyroo.Playground.Data
+@inject Knobs K
+@inject HttpClient Http
+@implements IDisposable
+
+<PgShell Library="_lib" DocsPage="guides/" OnReset="ReloadAsync"
+         Lead="Import a product file in five steps: file, columns, values, review, import. Start from a bundled sample with a banner, renamed headers and bad rows, or drop a file of your own. The schema is the typed side: switch its rules and watch the review and the typed rows change.">
+    <Knobs>
+        <PgGroup Title="File">
+            <PgSelect Key="file" Label="Sample file" T="string" Options="_files" @bind-Value="_file" OnChange="ReloadAsync" Hint="Or use the file step of the wizard to choose or drop your own CSV, TSV or Excel file." />
+            <div class="flex flex-wrap gap-2">
+                <KlyButton Href="samples/messy-products.csv" Label="messy .csv" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Xs" Download="messy-products.csv" />
+                <KlyButton Href="samples/clean-products.csv" Label="clean .csv" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Xs" Download="clean-products.csv" />
+                <KlyButton Href="samples/messy-products.xlsx" Label="messy .xlsx" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Xs" Download="messy-products.xlsx" />
+            </div>
+        </PgGroup>
+        <PgGroup Title="Schema rules">
+            <PgSwitch Key="pattern" Label="SKU pattern" Hint="Two capitals, a dash and three digits." @bind-Value="_pattern" OnChange="ReloadAsync" />
+            <PgSwitch Key="min" Label="Price must not be negative" @bind-Value="_minPrice" OnChange="ReloadAsync" />
+            <PgSwitch Key="stock" Label="Stock must not be negative" @bind-Value="_minStock" OnChange="ReloadAsync" />
+            <PgSelect Key="dec" Label="Decimal separator of the price" T="string" Options="_separators" @bind-Value="_decimal" OnChange="ReloadAsync" />
+            <PgNumber Key="max" Label="Row limit" Min="1" Max="1000" @bind-Value="_maxRows" OnChange="ReloadAsync" Hint="Rows past the limit are left out." />
+        </PgGroup>
+    </Knobs>
+    <Stage>
+        @if (_error is not null)
+        {
+            <KlyAlert Variant="KlyVariant.Soft" Color="KlyColor.Error" Title="The file could not be read" Description="@_error" />
+        }
+        <PgPanel Title="Import wizard" Note="KlySpreadsheetImport">
+            @if (_importer is not null)
+            {
+                <KlySpreadsheetImport @key="_importerKey" Importer="_importer" Title="Import products" />
+            }
+        </PgPanel>
+        <div class="grid gap-5 min-[1100px]:grid-cols-2">
+            <PgPanel Title="Row issues" Note="@($"{_issueRows.Count} line(s) with an issue")" Flush>
+                <div class="table-scroll py-3">
+                    @if (_issueRows.Count == 0)
+                    {
+                        <p class="m-0 px-1 text-sm text-(--klyroo-text-muted)">No issue: every line of the file is importable.</p>
+                    }
+                    else
+                    {
+                        <KlyDisplay Kind="DisplayKind.Table" TableColumns="_issueColumns" TableRows="_issueRows" Surface="DisplaySurface.Plain" />
+                    }
+                </div>
+            </PgPanel>
+            <PgPanel Title="Typed rows" Note="@($"{_typedCount} importable, {_importer?.InvalidRows.Count ?? 0} blocked")">
+                <KlyDisplay Kind="DisplayKind.Code" Value="@_typedJson" Language="json" Surface="DisplaySurface.Plain" />
+            </PgPanel>
+        </div>
+        <PgPanel Title="Submitted to OnSubmit" Note="@(_submittedCount is null ? "not submitted yet" : $"{_submittedCount} row(s)")">
+            @if (_submittedJson is null)
+            {
+                <p class="m-0 text-sm text-(--klyroo-text-muted)">Walk through the wizard to the last step and import: the rows OnSubmit receives appear here.</p>
+            }
+            else
+            {
+                <KlyDisplay Kind="DisplayKind.Code" Value="@_submittedJson" Language="json" Surface="DisplaySurface.Plain" />
+            }
+        </PgPanel>
+        <CodePanel Tabs="CodeTabs" />
+    </Stage>
+</PgShell>
+
+@code {
+    private readonly LibraryInfo _lib = Libraries.Find("spreadsheet")!;
+
+    private static readonly IReadOnlyList<PgOption<string>> _files = PgOptions.Of(("messy-csv", "Messy CSV: banner, French headers, bad rows"), ("messy-xlsx", "Messy Excel file with two sheets"), ("clean-csv", "Clean CSV"), ("none", "No file: bring your own"));
+    private static readonly IReadOnlyList<PgOption<string>> _separators = PgOptions.Of((",", "Comma, 49,90"), (".", "Point, 49.90"));
+    private static readonly IReadOnlyList<DisplayTableColumn> _issueColumns = [new("row", "Line", Numeric: true), new("field", "Field"), new("level", "Level"), new("message", "Message")];
+
+    private string _file = "messy-csv", _decimal = ",";
+    private bool _pattern, _minPrice, _minStock;
+    private int _maxRows;
+    private SpreadsheetImporter<ProductRow>? _importer;
+    private int _importerKey;
+    private string? _error, _submittedJson;
+    private int? _submittedCount;
+    private int _typedCount;
+    private string _typedJson = "[]";
+    private IReadOnlyList<IReadOnlyDictionary<string, string?>> _issueRows = [];
+    private readonly CancellationTokenSource _cts = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        K.Load();
+        LoadKnobs();
+        await ReloadAsync();
+    }
+
+    private void LoadKnobs()
+    {
+        _file = K.Str("file", "messy-csv");
+        if (_files.All(f => f.Value != _file)) _file = "messy-csv";
+        _pattern = K.Bool("pattern", true);
+        _minPrice = K.Bool("min", true);
+        _minStock = K.Bool("stock", true);
+        _decimal = K.Str("dec", ",");
+        _maxRows = K.Int("max", 500, 1, 1000);
+    }
+
+    private SpreadsheetSchema<ProductRow> BuildSchema() => SpreadsheetSchema.For<ProductRow>(s =>
+    {
+        s.MaxRows = _maxRows;
+        s.Column(r => r.Sku, c =>
+        {
+            c.Label("SKU").Headers("Référence", "Reference", "Code").Required();
+            if (_pattern) c.Rule(SpreadsheetRule.Pattern("^[A-Z]{2}-[0-9]{3}$", "Use the form AB-123"));
+        });
+        s.Column(r => r.Name, c => c.Label("Name").Headers("Désignation", "Designation", "Product").Required());
+        s.Column(r => r.Category, c => c.Label("Category").Headers("Famille", "Family").Options(
+        [
+            new SpreadsheetOption<ProductCategory>(ProductCategory.Hardware, "Hardware", ["Matériel", "Materiel"]),
+            new SpreadsheetOption<ProductCategory>(ProductCategory.Software, "Software", ["Logiciel"]),
+            new SpreadsheetOption<ProductCategory>(ProductCategory.Service, "Service", ["Prestation"]),
+        ]));
+        s.Column(r => r.Price, c =>
+        {
+            c.Label("Unit price").Headers("Prix HT", "Price").DecimalSeparator(_decimal[0]);
+            if (_minPrice) c.Rule(SpreadsheetRule.Min(0m, "The price cannot be negative"));
+        });
+        s.Column(r => r.Stock, c =>
+        {
+            c.Label("Stock").Headers("Quantité");
+            if (_minStock) c.Rule(SpreadsheetRule.Min(0, "The stock cannot be negative"));
+        });
+        s.Column(r => r.Launch, c => c.Label("Launch date").Headers("Date de lancement", "Launch").DateFormats("dd/MM/yyyy", "yyyy-MM-dd"));
+        s.OnSubmit = rows =>
+        {
+            var typed = rows.Select(r => r.Value).ToList();
+            _submittedCount = typed.Count;
+            _submittedJson = JsonText.Indent(JsonSerializer.Serialize(typed, ProductJson.Default.ListProductRow));
+            InvokeAsync(StateHasChanged);
+            return Task.FromResult<IReadOnlyList<SpreadsheetRejectedRow>?>(null);
+        };
+    });
+
+    private async Task ReloadAsync()
+    {
+        if (_importer is not null) _importer.Changed -= OnImporterChanged;
+        _error = null;
+        _submittedJson = null;
+        _submittedCount = null;
+        _importer = new SpreadsheetImporter<ProductRow>(BuildSchema());
+        _importer.Changed += OnImporterChanged;
+        _importerKey++;
+        try
+        {
+            switch (_file)
+            {
+                case "messy-csv":
+                    _importer.LoadText(await Http.GetStringAsync("samples/messy-products.csv", _cts.Token), "messy-products.csv");
+                    break;
+                case "clean-csv":
+                    _importer.LoadText(await Http.GetStringAsync("samples/clean-products.csv", _cts.Token), "clean-products.csv");
+                    break;
+                case "messy-xlsx":
+                    await using (var stream = await Http.GetStreamAsync("samples/messy-products.xlsx", _cts.Token))
+                    {
+                        using var copy = new MemoryStream();
+                        await stream.CopyToAsync(copy, _cts.Token);
+                        copy.Position = 0;
+                        await _importer.LoadFileAsync(copy, "messy-products.xlsx");
+                    }
+                    break;
+            }
+        }
+        catch (Exception e) when (e is HttpRequestException or InvalidDataException or OperationCanceledException)
+        {
+            _error = e.Message;
+        }
+        Summarize();
+    }
+
+    private void OnImporterChanged()
+    {
+        Summarize();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void Summarize()
+    {
+        if (_importer is null) return;
+        var typed = _importer.ImportableRows.Select(r => _importer.ToTyped(r).Value).ToList();
+        _typedCount = typed.Count;
+        _typedJson = JsonText.Indent(JsonSerializer.Serialize(typed.Take(5).ToList(), ProductJson.Default.ListProductRow)) + (typed.Count > 5 ? $"\n// ... and {typed.Count - 5} more row(s)" : "");
+        _issueRows = [.. _importer.AllRows.Where(r => r.Issues.Count > 0).SelectMany(r => r.Issues.Select(i => (IReadOnlyDictionary<string, string?>)new Dictionary<string, string?>
+        {
+            ["row"] = r.RowNumber.ToString(CultureInfo.InvariantCulture),
+            ["field"] = i.Field,
+            ["level"] = i.Level.ToString(),
+            ["message"] = i.Message,
+        })).Take(40)];
+    }
+
+    private IReadOnlyList<CodeTab> CodeTabs => [new("Import.razor", "html", RazorCode()), new("Schema.cs", "csharp", SchemaCode())];
+
+    private string RazorCode() =>
+        "@page \"/products/import\"\n\n<KlySpreadsheetImport Importer=\"_importer\" Title=\"Import products\" />\n\n@code {\n    private SpreadsheetImporter<ProductRow> _importer = default!;\n\n    protected override void OnInitialized() => _importer = new(Schema);\n}\n" +
+        (_file == "none" ? "" : _file == "messy-xlsx"
+            ? "\n// Load a file yourself instead of letting the user choose one:\nawait _importer.LoadFileAsync(stream, \"messy-products.xlsx\");\n"
+            : "\n// Load a file yourself instead of letting the user choose one:\n_importer.LoadText(text, \"" + (_file == "messy-csv" ? "messy" : "clean") + "-products.csv\");\n");
+
+    private string SchemaCode()
+    {
+        var sb = new StringBuilder();
+        sb.Append("public enum ProductCategory { Hardware, Software, Service }\n\npublic sealed class ProductRow\n{\n    public string? Sku { get; set; }\n    public string? Name { get; set; }\n    public ProductCategory Category { get; set; }\n    public decimal Price { get; set; }\n    public int? Stock { get; set; }\n    public DateOnly? Launch { get; set; }\n}\n\n");
+        sb.Append("static readonly SpreadsheetSchema<ProductRow> Schema = SpreadsheetSchema.For<ProductRow>(s =>\n{\n");
+        sb.Append($"    s.MaxRows = {_maxRows};\n");
+        sb.Append("    s.Column(r => r.Sku, c => c.Label(\"SKU\").Headers(\"Référence\", \"Reference\", \"Code\").Required()");
+        if (_pattern) sb.Append("\n        .Rule(SpreadsheetRule.Pattern(\"^[A-Z]{2}-[0-9]{3}$\", \"Use the form AB-123\"))");
+        sb.Append(");\n");
+        sb.Append("    s.Column(r => r.Name, c => c.Label(\"Name\").Headers(\"Désignation\", \"Designation\", \"Product\").Required());\n");
+        sb.Append("    s.Column(r => r.Category, c => c.Label(\"Category\").Headers(\"Famille\", \"Family\").Options(\n    [\n        new SpreadsheetOption<ProductCategory>(ProductCategory.Hardware, \"Hardware\", [\"Matériel\", \"Materiel\"]),\n        new SpreadsheetOption<ProductCategory>(ProductCategory.Software, \"Software\", [\"Logiciel\"]),\n        new SpreadsheetOption<ProductCategory>(ProductCategory.Service, \"Service\", [\"Prestation\"]),\n    ]));\n");
+        sb.Append($"    s.Column(r => r.Price, c => c.Label(\"Unit price\").Headers(\"Prix HT\", \"Price\").DecimalSeparator('{_decimal}')");
+        if (_minPrice) sb.Append("\n        .Rule(SpreadsheetRule.Min(0m, \"The price cannot be negative\"))");
+        sb.Append(");\n");
+        sb.Append("    s.Column(r => r.Stock, c => c.Label(\"Stock\").Headers(\"Quantité\")");
+        if (_minStock) sb.Append("\n        .Rule(SpreadsheetRule.Min(0, \"The stock cannot be negative\"))");
+        sb.Append(");\n");
+        sb.Append("    s.Column(r => r.Launch, c => c.Label(\"Launch date\").Headers(\"Date de lancement\", \"Launch\").DateFormats(\"dd/MM/yyyy\", \"yyyy-MM-dd\"));\n");
+        sb.Append("    s.OnSubmit = rows =>\n    {\n        // row.Value is a ProductRow: the price is a decimal, the category an enum, the date a DateOnly.\n        Save(rows.Select(r => r.Value).ToList());\n        return Task.FromResult<IReadOnlyList<SpreadsheetRejectedRow>?>(null);\n    };\n});\n");
+        return sb.ToString();
+    }
+
+    public void Dispose()
+    {
+        if (_importer is not null) _importer.Changed -= OnImporterChanged;
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+}

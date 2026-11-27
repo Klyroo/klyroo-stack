@@ -1,0 +1,332 @@
+@page "/display"
+@using System.Globalization
+@using System.Text
+@using Klyroo.Playground.Data
+@inject Knobs K
+
+<PgShell Library="_lib" DocsPage="guides/" OnReset="LoadKnobs"
+         Lead="KlyDisplay is one component with 19 kinds. Pick a kind, a variant and a surface, then edit the values: the block and the code that builds it update as you type.">
+    <Knobs>
+        <PgGroup Title="Block">
+            <PgSelect Key="kind" Label="Kind" T="DisplayKind" Options="_kinds" @bind-Value="_kind" OnChange="KindChanged" Hint="@Spec.Summary" />
+            <PgSelect Key="variant" Label="Variant" T="DisplayVariant" Options="VariantOptions" @bind-Value="_variant" Disabled="@(Spec.Variants.Length == 0)" />
+            <PgSelect Key="surface" Label="Surface" T="string" Options="_surfaces" @bind-Value="_surface" />
+            <PgSwitch Key="loading" Label="Loading" Hint="Replaces the content with a skeleton." @bind-Value="_loading" />
+        </PgGroup>
+        <PgGroup Title="Values">
+            @foreach (var field in VisibleFields)
+            {
+                var f = field;
+                @switch (f.Type)
+                {
+                    case DisplayFieldType.Multi:
+                        <KlyFormField Label="@f.Label" Help="@f.Hint">
+                            <KlyTextarea Value="@Get(f)" ValueChanged="@(v => Put(f, v))" Rows="5" />
+                        </KlyFormField>
+                        break;
+                    case DisplayFieldType.Bool:
+                        <KlySwitch Label="@f.Label" Value="@(Get(f) == "1")" ValueChanged="@(v => Put(f, v ? "1" : "0"))" />
+                        break;
+                    case DisplayFieldType.Choice:
+                        <KlyFormField Label="@f.Label">
+                            <KlySelect TValue="string" Items="@ChoiceItems(f)" Value="@Get(f)" ValueChanged="@(v => Put(f, v ?? f.Default))" />
+                        </KlyFormField>
+                        break;
+                    default:
+                        <KlyFormField Label="@f.Label" Help="@f.Hint">
+                            <KlyInput Value="@Get(f)" ValueChanged="@(v => Put(f, v ?? ""))" />
+                        </KlyFormField>
+                        break;
+                }
+            }
+        </PgGroup>
+    </Knobs>
+    <Stage>
+        @{ Build(); }
+        <PgPanel Title="@($"{_kind} block")" Note="sample data, editable">
+            <div class="min-w-0" data-testid="display-result">
+                <KlyDisplay @attributes="_attrs" />
+            </div>
+        </PgPanel>
+        <CodePanel Tabs="CodeTabs" />
+    </Stage>
+</PgShell>
+
+@code {
+    private readonly LibraryInfo _lib = Libraries.Find("display")!;
+
+    private static readonly IReadOnlyList<PgOption<DisplayKind>> _kinds = PgOptions.Of<DisplayKind>();
+    private static readonly IReadOnlyList<PgOption<string>> _surfaces = PgOptions.Of(("default", "Default of the kind"), ("Plain", "Plain"), ("Muted", "Muted"), ("Bordered", "Bordered"), ("Elevated", "Elevated"));
+
+    private DisplayKind _kind;
+    private DisplayVariant _variant;
+    private string _surface = "default";
+    private bool _loading;
+    private readonly Dictionary<string, string> _values = new(StringComparer.Ordinal);
+
+    private DisplayKindSpec Spec => DisplayKinds.Of(_kind);
+    private IEnumerable<DisplayField> VisibleFields => Spec.Fields.Where(f => f.OnlyFor is null || f.OnlyFor.Contains(_variant));
+    private IReadOnlyList<PgOption<DisplayVariant>> VariantOptions =>
+        [new(DisplayVariant.Default, "Default", "Default"), .. Spec.Variants.Select(v => new PgOption<DisplayVariant>(v, v.ToString(), v.ToString()))];
+
+    protected override void OnInitialized()
+    {
+        K.Load();
+        LoadKnobs();
+    }
+
+    private void LoadKnobs()
+    {
+        _kind = K.Enum("kind", DisplayKind.Stat);
+        _variant = K.Enum("variant", DisplayVariant.Default);
+        if (_variant != DisplayVariant.Default && !Spec.Variants.Contains(_variant)) _variant = DisplayVariant.Default;
+        _surface = K.Str("surface", "default");
+        _loading = K.Bool("loading", false);
+        _values.Clear();
+    }
+
+    private void KindChanged()
+    {
+        _variant = DisplayVariant.Default;
+        _values.Clear();
+        K.Put("variant", "Default");
+    }
+
+    private string Get(DisplayField f) => _values.TryGetValue(f.Key, out var v) ? v : f.Default;
+    private void Put(DisplayField f, string v) => _values[f.Key] = v;
+    private string Val(string key) => _values.TryGetValue(key, out var v) ? v : Spec.Fields.FirstOrDefault(f => f.Key == key)?.Default ?? "";
+    private static IReadOnlyList<IKlySelectItem<string>> ChoiceItems(DisplayField f) => [.. f.Choices!.Select(c => (IKlySelectItem<string>)new KlySelectItem<string>(c, c))];
+
+    // The attributes handed to KlyDisplay, and the Razor and C# lines that produce the same parameters.
+    private readonly Dictionary<string, object?> _attrs = new(StringComparer.Ordinal);
+    private readonly List<string> _razor = [];
+    private readonly StringBuilder _data = new();
+
+    private static string Esc(string s) => s.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\r", "").Replace("\n", "\\n");
+    private static string[] Lines(string s) => s.Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+    private static string[] Cells(string line) => line.Split('|', StringSplitOptions.TrimEntries);
+    private static string Cell(string[] cells, int i) => i < cells.Length ? cells[i] : "";
+    private static string? NullIfEmpty(string s) => s.Length == 0 ? null : s;
+    private static string Quote(string s) => "\"" + Esc(s) + "\"";
+    private static string QuoteOrNull(string s) => s.Length == 0 ? "null" : Quote(s);
+
+    private void Set(string name, object? value, string razor)
+    {
+        _attrs[name] = value;
+        _razor.Add(razor);
+    }
+
+    private void SetText(string name, string text)
+    {
+        if (text.Length == 0) return;
+        Set(name, text, $"{name}=\"{text.Replace("\"", "&quot;")}\"");
+    }
+
+    private static KlyColor ToneOf(string name) => name switch
+    {
+        "Info" => KlyColor.Info, "Success" => KlyColor.Success, "Warning" => KlyColor.Warning, "Error" => KlyColor.Error, _ => KlyColor.Primary,
+    };
+
+    private static string Svg(string label, string a, string b) =>
+        "data:image/svg+xml," + Uri.EscapeDataString($"<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 200'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='{a}'/><stop offset='1' stop-color='{b}'/></linearGradient></defs><rect width='320' height='200' fill='url(#g)'/><text x='160' y='108' font-family='sans-serif' font-size='28' fill='white' text-anchor='middle'>{label}</text></svg>");
+
+    private void Build()
+    {
+        _attrs.Clear();
+        _razor.Clear();
+        _data.Clear();
+        Set("Kind", _kind, $"Kind=\"DisplayKind.{_kind}\"");
+        if (_variant != DisplayVariant.Default) Set("Variant", _variant, $"Variant=\"DisplayVariant.{_variant}\"");
+        if (_surface != "default") Set("Surface", Enum.Parse<DisplaySurface>(_surface), $"Surface=\"DisplaySurface.{_surface}\"");
+        if (_loading) Set("Loading", true, "Loading=\"true\"");
+
+        switch (_kind)
+        {
+            case DisplayKind.Heading:
+                SetText("Title", Val("title")); SetText("Description", Val("description")); SetText("Count", Val("count"));
+                break;
+            case DisplayKind.Text:
+                var paragraphs = Lines(Val("paragraphs"));
+                Set("Paragraphs", paragraphs, "Paragraphs=\"_paragraphs\"");
+                _data.Append($"string[] _paragraphs = [{string.Join(", ", paragraphs.Select(Quote))}];\n");
+                if (_variant == DisplayVariant.Quote) { SetText("Author", Val("author")); SetText("Meta", Val("meta")); }
+                if (int.TryParse(Val("maxlines"), NumberStyles.Integer, CultureInfo.InvariantCulture, out var maxLines) && maxLines > 0) Set("MaxLines", (int?)maxLines, $"MaxLines=\"{maxLines}\"");
+                break;
+            case DisplayKind.Alert:
+                SetText("Title", Val("title")); SetText("Description", Val("description")); SetText("Details", Val("details"));
+                Set("Tone", ToneOf(Val("tone")), $"Tone=\"KlyColor.{Val("tone")}\"");
+                if (Val("action").Length > 0)
+                {
+                    Set("Action", new DisplayAction { Label = Val("action") }, "Action=\"_action\"");
+                    _data.Append($"DisplayAction _action = new() {{ Label = {Quote(Val("action"))} }};\n");
+                }
+                break;
+            case DisplayKind.Facts:
+                var facts = Lines(Val("facts")).Select(l => Cells(l)).Select(c => (Label: Cell(c, 0), Value: Cell(c, 1))).ToList();
+                var factItems = facts.Select(f => new DisplayFact { Label = f.Label, Value = NullIfEmpty(f.Value.Replace(":copy", "").Trim()), Copy = f.Value.EndsWith(":copy", StringComparison.Ordinal) }).ToList();
+                Set("Facts", factItems, "Facts=\"_facts\"");
+                _data.Append("IReadOnlyList<DisplayFact> _facts =\n[\n" + string.Join("\n", factItems.Select(f => $"    new DisplayFact {{ Label = {Quote(f.Label)}{(f.Value is null ? "" : $", Value = {Quote(f.Value)}")}{(f.Copy ? ", Copy = true" : "")} }},")) + "\n];\n");
+                break;
+            case DisplayKind.Stat:
+                SetText("Title", Val("title"));
+                Set("DeltaDirection", Enum.Parse<DisplayDeltaDirection>(Val("direction")), $"DeltaDirection=\"DisplayDeltaDirection.{Val("direction")}\"");
+                if (_variant == DisplayVariant.Row)
+                {
+                    var stats = Lines(Val("items")).Select(Cells).Select(c => new DisplayStatItem(Cell(c, 0), Cell(c, 1), NullIfEmpty(Cell(c, 2)))).ToList();
+                    Set("StatItems", stats, "StatItems=\"_stats\"");
+                    _data.Append("IReadOnlyList<DisplayStatItem> _stats =\n[\n" + string.Join("\n", stats.Select(s => $"    new({Quote(s.Label)}, {Quote(s.Value)}{(s.Caption is null ? "" : $", {Quote(s.Caption)}")}),")) + "\n];\n");
+                }
+                else
+                {
+                    SetText("Value", Val("value")); SetText("Unit", Val("unit")); SetText("Delta", Val("delta"));
+                    var trend = Val("trend").Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).Select(t => double.TryParse(t, NumberStyles.Float, CultureInfo.InvariantCulture, out var d) ? d : (double?)null).Where(d => d is not null).Select(d => d!.Value).ToList();
+                    if (trend.Count >= 2)
+                    {
+                        Set("Trend", trend, "Trend=\"_trend\"");
+                        _data.Append($"IReadOnlyList<double> _trend = [{string.Join(", ", trend.Select(t => t.ToString(CultureInfo.InvariantCulture)))}];\n");
+                    }
+                }
+                break;
+            case DisplayKind.Breakdown:
+                var lines = Lines(Val("lines")).Select(Cells).Select(c => new DisplayBreakdownLine(Cell(c, 0), NullIfEmpty(Cell(c, 1)), NullIfEmpty(Cell(c, 2)), IsSubtotal: Cell(c, 0).StartsWith("Subtotal", StringComparison.OrdinalIgnoreCase))).ToList();
+                Set("BreakdownLines", lines, "BreakdownLines=\"_lines\"");
+                _data.Append("IReadOnlyList<DisplayBreakdownLine> _lines =\n[\n" + string.Join("\n", lines.Select(l => $"    new({Quote(l.Label)}, {QuoteOrNull(l.Value ?? "")}{(l.CompareValue is null ? "" : $", {Quote(l.CompareValue)}")}{(l.IsSubtotal ? ", IsSubtotal: true" : "")}),")) + "\n];\n");
+                var totalCells = Cells(Val("total"));
+                if (Val("total").Length > 0)
+                {
+                    var total = new DisplayBreakdownLine(Cell(totalCells, 0), NullIfEmpty(Cell(totalCells, 1)), NullIfEmpty(Cell(totalCells, 2)));
+                    Set("BreakdownTotal", total, "BreakdownTotal=\"_total\"");
+                    _data.Append($"DisplayBreakdownLine _total = new({Quote(total.Label)}, {QuoteOrNull(total.Value ?? "")}{(total.CompareValue is null ? "" : $", {Quote(total.CompareValue)}")});\n");
+                }
+                var cols = Val("compare").Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                if (cols.Length == 2) Set("CompareColumns", ((string, string)?)(cols[0], cols[1]), $"CompareColumns=\"@(({Quote(cols[0])}, {Quote(cols[1])}))\"");
+                break;
+            case DisplayKind.Meter:
+                SetText("Title", Val("title")); SetText("Description", Val("description"));
+                if (double.TryParse(Val("value"), NumberStyles.Float, CultureInfo.InvariantCulture, out var mv)) Set("MeterValue", mv, $"MeterValue=\"{mv.ToString(CultureInfo.InvariantCulture)}\"");
+                if (double.TryParse(Val("max"), NumberStyles.Float, CultureInfo.InvariantCulture, out var mm)) Set("MeterMax", mm, $"MeterMax=\"{mm.ToString(CultureInfo.InvariantCulture)}\"");
+                if (_variant != DisplayVariant.Scale)
+                {
+                    if (double.TryParse(Val("warning"), NumberStyles.Float, CultureInfo.InvariantCulture, out var wt)) Set("WarningThreshold", (double?)wt, $"WarningThreshold=\"{wt.ToString(CultureInfo.InvariantCulture)}\"");
+                    if (double.TryParse(Val("error"), NumberStyles.Float, CultureInfo.InvariantCulture, out var et)) Set("ErrorThreshold", (double?)et, $"ErrorThreshold=\"{et.ToString(CultureInfo.InvariantCulture)}\"");
+                }
+                else
+                {
+                    var levels = Val("levels").Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                    Set("MeterLevels", levels, "MeterLevels=\"_levels\"");
+                    _data.Append($"string[] _levels = [{string.Join(", ", levels.Select(Quote))}];\n");
+                    if (int.TryParse(Val("current"), NumberStyles.Integer, CultureInfo.InvariantCulture, out var cl)) Set("CurrentLevel", (int?)cl, $"CurrentLevel=\"{cl}\"");
+                }
+                break;
+            case DisplayKind.Chart:
+                SetText("Title", Val("title"));
+                var points = Lines(Val("data")).Select(Cells).Where(c => double.TryParse(Cell(c, 1), NumberStyles.Float, CultureInfo.InvariantCulture, out _)).Select(c => new DisplayChartPoint(Cell(c, 0), double.Parse(Cell(c, 1), CultureInfo.InvariantCulture))).ToList();
+                Set("ChartData", points, "ChartData=\"_points\"");
+                _data.Append("IReadOnlyList<DisplayChartPoint> _points =\n[\n" + string.Join("\n", points.Select(p => $"    new({Quote(p.Label)}, {p.Value.ToString(CultureInfo.InvariantCulture)}),")) + "\n];\n");
+                break;
+            case DisplayKind.Table:
+                var headers = Val("columns").Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                var columns = headers.Select((h, i) => new DisplayTableColumn($"c{i}", h)).ToList();
+                var rows = Lines(Val("rows")).Select(l => (IReadOnlyDictionary<string, string?>)Cells(l).Select((c, i) => (Key: $"c{i}", Value: (string?)c)).ToDictionary(x => x.Key, x => x.Value)).ToList();
+                Set("TableColumns", columns, "TableColumns=\"_columns\""); Set("TableRows", rows, "TableRows=\"_rows\"");
+                _data.Append("IReadOnlyList<DisplayTableColumn> _columns = [" + string.Join(", ", columns.Select(c => $"new({Quote(c.Key)}, {Quote(c.Label)})")) + "];\n");
+                _data.Append("IReadOnlyList<IReadOnlyDictionary<string, string?>> _rows =\n[\n" + string.Join("\n", rows.Select(r => "    new Dictionary<string, string?> { " + string.Join(", ", r.Select(kv => $"[{Quote(kv.Key)}] = {Quote(kv.Value ?? "")}")) + " },")) + "\n];\n");
+                break;
+            case DisplayKind.Diff:
+                var diffs = Lines(Val("items")).Select(Cells).Select(c => new DisplayDiffItem(Cell(c, 0), NullIfEmpty(Cell(c, 1)), NullIfEmpty(Cell(c, 2)), Changed: Cell(c, 1) != Cell(c, 2))).ToList();
+                Set("DiffItems", diffs, "DiffItems=\"_diff\"");
+                _data.Append("IReadOnlyList<DisplayDiffItem> _diff =\n[\n" + string.Join("\n", diffs.Select(d => $"    new({Quote(d.Label)}, {QuoteOrNull(d.Before ?? "")}, {QuoteOrNull(d.After ?? "")}{(d.Changed ? "" : ", Changed: false")}),")) + "\n];\n");
+                if (Val("unchanged") == "1") Set("ShowUnchanged", true, "ShowUnchanged=\"true\"");
+                break;
+            case DisplayKind.Record:
+                var records = Lines(Val("records")).Select(Cells).Select(c => new DisplayRecordItem { Reference = NullIfEmpty(Cell(c, 0)), Title = Cell(c, 1), Meta = NullIfEmpty(Cell(c, 2)), Trailing = NullIfEmpty(Cell(c, 3)) }).ToList();
+                Set("Records", records, "Records=\"_records\"");
+                _data.Append("IReadOnlyList<DisplayRecordItem> _records =\n[\n" + string.Join("\n", records.Select(r => $"    new DisplayRecordItem {{ Reference = {QuoteOrNull(r.Reference ?? "")}, Title = {Quote(r.Title)}, Meta = {QuoteOrNull(r.Meta ?? "")}, Trailing = {QuoteOrNull(r.Trailing ?? "")} }},")) + "\n];\n");
+                break;
+            case DisplayKind.Person:
+                var people = Lines(Val("people")).Select(Cells).Select(c => new DisplayPersonItem(Cell(c, 0), NullIfEmpty(Cell(c, 1)))).ToList();
+                Set("People", people, "People=\"_people\"");
+                _data.Append("IReadOnlyList<DisplayPersonItem> _people =\n[\n" + string.Join("\n", people.Select(p => $"    new({Quote(p.Name)}, {QuoteOrNull(p.Description ?? "")}),")) + "\n];\n");
+                if (_variant != DisplayVariant.Group)
+                {
+                    var contacts = Lines(Val("contacts")).Select(c => new DisplayContactItem(c, c.Contains('@') ? "mail" : "phone", c.Contains('@') ? "mailto:" + c : null)).ToList();
+                    Set("Contacts", contacts, "Contacts=\"_contacts\"");
+                    _data.Append("IReadOnlyList<DisplayContactItem> _contacts =\n[\n" + string.Join("\n", contacts.Select(c => $"    new({Quote(c.Value)}, {Quote(c.Icon ?? "")}{(c.Href is null ? "" : $", {Quote(c.Href)}")}),")) + "\n];\n");
+                }
+                break;
+            case DisplayKind.List:
+                var items = Lines(Val("items")).Select(l => (Done: l.StartsWith("x ", StringComparison.OrdinalIgnoreCase), Text: l.StartsWith("x ", StringComparison.OrdinalIgnoreCase) ? l[2..] : l)).Select(l => new DisplayListItem { Text = l.Text, Done = l.Done }).ToList();
+                Set("ListItems", items, "ListItems=\"_items\"");
+                _data.Append("IReadOnlyList<DisplayListItem> _items =\n[\n" + string.Join("\n", items.Select(i => $"    new DisplayListItem {{ Text = {Quote(i.Text)}{(i.Done ? ", Done = true" : "")} }},")) + "\n];\n");
+                break;
+            case DisplayKind.Timeline:
+                var events = Lines(Val("events")).Select(Cells).Select((c, i) => new DisplayTimelineItem(Cell(c, 0), NullIfEmpty(Cell(c, 2)), NullIfEmpty(Cell(c, 1)),
+                    TimeOnly.TryParseExact(Cell(c, 1), "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out var t) ? new DateTimeOffset(DateOnly.FromDateTime(DateTime.Today).ToDateTime(t), TimeSpan.Zero) : null,
+                    State: i < 2 ? DisplayTimelineState.Done : i == 2 ? DisplayTimelineState.Current : DisplayTimelineState.Upcoming)).ToList();
+                Set("TimelineItems", events, "TimelineItems=\"_events\"");
+                _data.Append("IReadOnlyList<DisplayTimelineItem> _events =\n[\n" + string.Join("\n", events.Select((e, i) => $"    new({Quote(e.Title)}, {QuoteOrNull(e.Description ?? "")}, {QuoteOrNull(e.Time ?? "")}, State: DisplayTimelineState.{e.State}),")) + "\n];\n");
+                break;
+            case DisplayKind.Date:
+                SetText("Title", Val("title"));
+                if (DateOnly.TryParseExact(Val("date"), "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
+                    Set("DateValue", (DateTimeOffset?)new DateTimeOffset(date.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero), $"DateValue=\"@(new DateTimeOffset({date.Year}, {date.Month}, {date.Day}, 0, 0, 0, TimeSpan.Zero))\"");
+                if (_variant == DisplayVariant.Range && DateOnly.TryParseExact(Val("end"), "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var end))
+                    Set("EndDateValue", (DateTimeOffset?)new DateTimeOffset(end.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero), $"EndDateValue=\"@(new DateTimeOffset({end.Year}, {end.Month}, {end.Day}, 0, 0, 0, TimeSpan.Zero))\"");
+                break;
+            case DisplayKind.Media:
+                if (_variant == DisplayVariant.Gallery)
+                {
+                    var n = int.TryParse(Val("count"), NumberStyles.Integer, CultureInfo.InvariantCulture, out var c) ? Math.Clamp(c, 1, 12) : 5;
+                    string[] palette = ["#ec4899", "#8b5cf6", "#0ea5e9", "#10b981", "#f59e0b", "#ef4444"];
+                    var images = Enumerable.Range(0, n).Select(i => Svg($"Photo {i + 1}", palette[i % palette.Length], palette[(i + 2) % palette.Length])).ToList();
+                    Set("Images", images, "Images=\"_images\"");
+                    _data.Append($"IReadOnlyList<string> _images = [/* {n} image URLs */];\n");
+                }
+                else
+                {
+                    Set("Src", Svg("Photo", "#ec4899", "#8b5cf6"), "Src=\"/images/photo.jpg\"");
+                }
+                break;
+            case DisplayKind.Code:
+                Set("Value", _variant == DisplayVariant.Secret ? "sk_live_51Hx0Q2eZvKYlo2C3210" : Val("value"), _variant == DisplayVariant.Secret ? "Value=\"@ApiKey\"" : "Value=\"@Snippet\"");
+                if (_variant == DisplayVariant.Secret)
+                {
+                    if (int.TryParse(Val("visible"), NumberStyles.Integer, CultureInfo.InvariantCulture, out var vc)) Set("VisibleChars", vc, $"VisibleChars=\"{vc}\"");
+                    _data.Append("string ApiKey = \"sk_live_51Hx0Q2eZvKYlo2C3210\";\n");
+                }
+                else
+                {
+                    SetText("Language", Val("language"));
+                    _data.Append($"string Snippet = {Quote(Val("value"))};\n");
+                }
+                break;
+            case DisplayKind.Empty:
+                SetText("Title", Val("title")); SetText("Description", Val("description"));
+                if (Val("action").Length > 0)
+                {
+                    Set("Action", new DisplayAction { Label = Val("action"), Variant = ButtonVariant.Solid }, "Action=\"_action\"");
+                    _data.Append($"DisplayAction _action = new() {{ Label = {Quote(Val("action"))}, Variant = ButtonVariant.Solid }};\n");
+                }
+                break;
+            case DisplayKind.Accordion:
+                var sections = Lines(Val("items")).Select(Cells).Select((c, i) => new DisplayAccordionItem(Cell(c, 0), Cell(c, 1), DefaultOpen: i == 0)).ToList();
+                Set("AccordionItems", sections, "AccordionItems=\"_sections\"");
+                _data.Append("IReadOnlyList<DisplayAccordionItem> _sections =\n[\n" + string.Join("\n", sections.Select(s => $"    new({Quote(s.Label)}, {Quote(s.Content ?? "")}{(s.DefaultOpen ? ", DefaultOpen: true" : "")}),")) + "\n];\n");
+                if (Val("multiple") == "1") Set("Multiple", true, "Multiple=\"true\"");
+                break;
+        }
+    }
+
+    private IReadOnlyList<CodeTab> CodeTabs
+    {
+        get
+        {
+            var razor = new StringBuilder("<KlyDisplay");
+            foreach (var part in _razor) razor.Append("\n            ").Append(part);
+            razor.Append(" />\n");
+            return _data.Length == 0
+                ? [new("Block.razor", "html", razor.ToString())]
+                : [new("Block.razor", "html", razor.ToString()), new("Data.cs", "csharp", _data.ToString())];
+        }
+    }
+}

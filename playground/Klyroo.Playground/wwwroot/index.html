@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Klyroo playground</title>
+    <meta name="description" content="Try each Klyroo library in the browser: the real components and engines, running in WebAssembly on sample data." />
+    <!-- The playground is served below a path (GitHub Pages: /klyroo-stack/playground/). build/publish-playground.sh rewrites this line and the one in 404.html. -->
+    <base href="/klyroo-stack/playground/" />
+    <script>
+        // Color mode before the first paint, from the key Klyroo.UI writes.
+        (function () { try { var m = localStorage.getItem('klyroo-color-mode') || 'system'; var d = m === 'dark' || (m === 'system' && matchMedia('(prefers-color-scheme: dark)').matches); document.documentElement.classList.toggle('dark', d); document.documentElement.style.colorScheme = d ? 'dark' : 'light'; } catch (e) { } })();
+        // GitHub Pages answers an unknown address with 404.html, which sends the route here as ?/route: put the address back before Blazor reads it.
+        (function (l) {
+            if (l.search.slice(0, 2) !== '?/') return;
+            var parts = l.search.slice(2).split('&').map(function (s) { return s.replace(/~and~/g, '&'); });
+            var route = parts.shift();
+            history.replaceState(null, '', l.pathname + route + (parts.length ? '?' + parts.join('&') : '') + l.hash);
+        })(window.location);
+    </script>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="stylesheet" href="_klyroo/fonts/klyroo.fonts.css" />
+    <link rel="stylesheet" href="app.css" />
+    <link rel="preload" id="webassembly" />
+    <script type="importmap"></script>
+</head>
+
+<body>
+    <div id="app"><div class="boot" role="status">Starting the playground...</div></div>
+    <div id="blazor-error-ui" hidden style="position:fixed;inset:auto 0 0 0;padding:0.75rem 1rem;background:#b3321e;color:#fff;font:600 0.875rem system-ui;z-index:100">
+        Something went wrong. <a href="" onclick="location.reload();return false" style="color:#fff">Reload</a>
+    </div>
+    <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
+</body>
+
+</html>

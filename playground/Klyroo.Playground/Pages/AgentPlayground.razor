@@ -1,0 +1,383 @@
+@page "/agent"
+@using System.Text
+@using System.Text.Json
+@using Klyroo.Playground.Data
+@inject Knobs K
+@inject HttpClient Http
+@implements IDisposable
+
+<PgShell Library="_lib" DocsPage="guides/" OnReset="ResetAsync"
+         Lead="A console for the three tools of the bridge. It is a simulation: there is no model and no network, you type the JSON a model would send. The bridge runs it against a live form, spreadsheet import or dashboard and returns what a model would read, refusals included.">
+    <Knobs>
+        <PgGroup Title="Target">
+            <PgSelect Key="target" Label="What the agent sees" T="string" Options="_targets" @bind-Value="_target" OnChange="RestartAsync" />
+        </PgGroup>
+        <PgGroup Title="Policy">
+            <PgSelect Key="policy" Label="Confirmation policy" T="string" Options="_policies" @bind-Value="_policy" OnChange="ApplyPolicy" Hint="@PolicyHint" />
+            @if (_target == "form")
+            {
+                <PgSwitch Key="confirm" Label="Submit needs confirmation" Hint="RegisterForm(confirmSubmit)." @bind-Value="_confirmSubmit" OnChange="RestartAsync" />
+                <PgSwitch Key="pwd" Label="Allow writes to the password" Hint="allowSensitiveWrites: a password is never readable, and refused for writing unless named." @bind-Value="_allowPassword" OnChange="RestartAsync" />
+            }
+        </PgGroup>
+        <PgGroup Title="Examples">
+            <p class="m-0 text-sm text-(--klyroo-text-muted)">Load a call into the console, edit it, then send it.</p>
+            <div class="flex flex-col items-start gap-1.5">
+                @foreach (var example in Examples)
+                {
+                    var e = example;
+                    <KlyButton Label="@e.Label" Size="KlySize.Xs" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" OnClick="() => Load(e)" />
+                }
+            </div>
+        </PgGroup>
+    </Knobs>
+    <Stage>
+        <KlyAlert Variant="KlyVariant.Soft" Color="KlyColor.Info" Title="This is a simulation" Description="No model is called and nothing is sent anywhere. The JSON you type is what a model would send to the tools; the results are what AgentBridgeService really returns for the live component below." />
+        <PgPanel Title="Console" Note="InvokeToolAsync(tool, arguments)">
+            <div class="flex flex-col gap-3">
+                <div class="grid gap-3 sm:grid-cols-[12rem_1fr]">
+                    <KlyFormField Label="Tool">
+                        <KlySelect TValue="string" Items="_toolItems" Value="@_tool" ValueChanged="OnToolChanged" />
+                    </KlyFormField>
+                    <KlyFormField Label="Arguments (JSON object)" Error="@_jsonError">
+                        <KlyTextarea Value="@_arguments" ValueChanged="OnArguments" Rows="6" />
+                    </KlyFormField>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <KlyButton Label="Send" Color="KlyColor.Primary" OnClick="SendAsync" Loading="_busy" Disabled="@(_jsonError is not null)" />
+                    <KlyButton Label="Clear the log" Variant="ButtonVariant.Ghost" Color="KlyColor.Neutral" OnClick="ClearLog" Disabled="@(_log.Count == 0)" />
+                </div>
+            </div>
+        </PgPanel>
+        <PgPanel Title="Log" Note="@($"{_log.Count} call(s), newest first")">
+            @if (_log.Count == 0)
+            {
+                <p class="m-0 text-sm text-(--klyroo-text-muted)">Nothing sent yet. Load an example and press Send.</p>
+            }
+            else
+            {
+                <div class="flex flex-col gap-4" data-testid="agent-log">
+                    @foreach (var turn in _log)
+                    {
+                        <div class="flex min-w-0 flex-col gap-2 border-t border-(--klyroo-border) pt-3 first:border-t-0 first:pt-0">
+                            <div class="flex flex-wrap items-center gap-2 text-sm">
+                                <KlyBadge Label="@turn.Tool" Variant="KlyVariant.Subtle" Color="KlyColor.Primary" Size="KlySize.Sm" />
+                                <KlyBadge Label="@(turn.Failed ? "refused or failed" : "ok")" Variant="KlyVariant.Soft" Color="@(turn.Failed ? KlyColor.Error : KlyColor.Success)" Size="KlySize.Sm" />
+                                <span class="text-(--klyroo-text-dimmed)">@turn.Time</span>
+                            </div>
+                            <div class="grid min-w-0 gap-3 min-[1100px]:grid-cols-2">
+                                <div class="min-w-0"><p class="m-0 mb-1 text-xs text-(--klyroo-text-dimmed)">The model sends</p><div class="max-h-72 overflow-auto"><KlyDisplay Kind="DisplayKind.Code" Value="@turn.Request" Language="json" Surface="DisplaySurface.Plain" /></div></div>
+                                <div class="min-w-0"><p class="m-0 mb-1 text-xs text-(--klyroo-text-dimmed)">The bridge returns</p><div class="max-h-72 overflow-auto"><KlyDisplay Kind="DisplayKind.Code" Value="@turn.Response" Language="json" Surface="DisplaySurface.Plain" /></div></div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </PgPanel>
+        <PgPanel Title="@LiveTitle" Note="the real component, driven by the bridge">
+            @switch (_target)
+            {
+                case "form":
+                    @if (_form is not null)
+                    {
+                        <KlyFormEngine @key="_generation" TModel="SignupModel" Form="_form" SubmitLabel="Submit" OnSubmit="OnSubmitted" />
+                    }
+                    break;
+                case "spreadsheet":
+                    @if (_importer is not null)
+                    {
+                        <KlySpreadsheetImport @key="_generation" Importer="_importer" Title="Import products" />
+                    }
+                    break;
+                default:
+                    @if (_dashboard is not null)
+                    {
+                        <KlyDashboardPage @key="_generation" Dashboard="_dashboard" Title="Revenue" ShowRefresh="true" Sticky="false">
+                            <KlyDashboardGrid>
+                                <KlyDashboardStat Source="_revenue" Label="Revenue" Span="6" Value="_revenue!.Data" Format="DashboardFormatPreset.Compact" />
+                                <KlyDashboardStat Source="_revenue" Label="Current view" Span="6" TextValue="@_dashboard!.CurrentView" />
+                            </KlyDashboardGrid>
+                        </KlyDashboardPage>
+                    }
+                    break;
+            }
+            @if (_submittedNote is not null)
+            {
+                <div class="mt-3"><KlyAlert Variant="KlyVariant.Soft" Color="KlyColor.Success" Title="Submitted" Description="@_submittedNote" /></div>
+            }
+        </PgPanel>
+        <KlyCollapsible Label="The tools a model is given (GetToolDefinitions)" ShowIcon="true">
+            <div class="flex flex-col gap-3 pt-3">
+                @foreach (var tool in AgentBridgeService.GetToolDefinitions())
+                {
+                    <div class="min-w-0">
+                        <KlyDisplay Kind="DisplayKind.Facts" Facts="@ToolFacts(tool)" Surface="DisplaySurface.Plain" />
+                        <div class="max-h-64 overflow-auto"><KlyDisplay Kind="DisplayKind.Code" Value="@JsonText.Indent(tool.InputSchema.GetRawText())" Language="json" Surface="DisplaySurface.Plain" /></div>
+                    </div>
+                }
+            </div>
+        </KlyCollapsible>
+        <CodePanel Tabs="CodeTabs" />
+    </Stage>
+</PgShell>
+
+@code {
+    private sealed record Example(string Label, string Tool, string Json);
+    private sealed record Turn(string Tool, string Request, string Response, bool Failed, string Time);
+
+    private readonly LibraryInfo _lib = Libraries.Find("agent")!;
+
+    private static readonly IReadOnlyList<PgOption<string>> _targets = PgOptions.Of(("form", "A form: the signup wizard"), ("spreadsheet", "A spreadsheet import"), ("dashboard", "A dashboard"));
+    private static readonly IReadOnlyList<PgOption<string>> _policies = PgOptions.Of(("none", "No policy: confirmations are refused"), ("deny", "A policy that refuses what needs confirmation"), ("approve", "A policy that approves everything"));
+    private static readonly IReadOnlyList<IKlySelectItem<string>> _toolItems = [new KlySelectItem<string>("snapshot", "snapshot: read the components"), new KlySelectItem<string>("query", "query: list choices and records"), new KlySelectItem<string>("act", "act: run steps in order")];
+
+    private string _target = "form", _policy = "none", _tool = "snapshot", _arguments = "{}", _jsonError = "";
+    private string? _submittedNote;
+    private bool _confirmSubmit, _allowPassword, _busy;
+    private int _generation;
+    private readonly List<Turn> _log = [];
+
+    private AgentBridgeService _agent = new();
+    private readonly List<IDisposable> _registrations = [];
+    private FormController<SignupModel>? _form;
+    private SpreadsheetImporter<ProductRow>? _importer;
+    private DashboardController? _dashboard;
+    private DashboardResource<double>? _revenue;
+    private readonly CancellationTokenSource _cts = new();
+
+    private string LiveTitle => _target switch { "form" => "Signup wizard", "spreadsheet" => "Import products", _ => "Revenue dashboard" };
+    private string PolicyHint => _policy switch
+    {
+        "none" => "AllowPolicy is null: a step that needs confirmation is refused, every other step runs.",
+        "deny" => "AllowPolicy returns true only for steps that need no confirmation.",
+        _ => "AllowPolicy returns true: the confirmation is granted as if a person had approved it.",
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        K.Load();
+        LoadKnobs();
+        await RestartAsync();
+        Load(Examples[0]);
+    }
+
+    private void LoadKnobs()
+    {
+        _target = K.Str("target", "form");
+        if (_targets.All(t => t.Value != _target)) _target = "form";
+        _policy = K.Str("policy", "none");
+        _confirmSubmit = K.Bool("confirm", true);
+        _allowPassword = K.Bool("pwd", false);
+    }
+
+    private async Task ResetAsync()
+    {
+        LoadKnobs();
+        await RestartAsync();
+    }
+
+    private IReadOnlyList<Example> Examples => _target switch
+    {
+        "form" =>
+        [
+            new("Snapshot of the current step", "snapshot", "{}"),
+            new("Snapshot with the other steps", "snapshot", "{\n  \"includeOffPage\": true\n}"),
+            new("List the countries", "query", "{\n  \"within\": \"Country\"\n}"),
+            new("Fill the email", "act", "{\n  \"steps\": [\n    { \"ref\": \"Email\", \"action\": \"setValue\", \"args\": [\"ada@example.test\"] }\n  ]\n}"),
+            new("Write the password", "act", "{\n  \"steps\": [\n    { \"ref\": \"Password\", \"action\": \"setValue\", \"args\": [\"correct horse battery\"] }\n  ]\n}"),
+            new("Write a field of another step", "act", "{\n  \"steps\": [\n    { \"ref\": \"Full name\", \"action\": \"setValue\", \"args\": [\"Ada Lovelace\"] }\n  ]\n}"),
+            new("Go to the next step", "act", "{\n  \"steps\": [\n    { \"ref\": \"Create your account\", \"action\": \"nextStep\" }\n  ]\n}"),
+            new("Submit", "act", "{\n  \"steps\": [\n    { \"ref\": \"Create your account\", \"action\": \"submit\" }\n  ]\n}"),
+        ],
+        "spreadsheet" =>
+        [
+            new("Snapshot", "snapshot", "{}"),
+            new("The invalid rows", "query", "{\n  \"within\": \"products-import\",\n  \"collection\": \"rows\",\n  \"filter\": \"invalid\",\n  \"limit\": 5\n}"),
+            new("The open questions", "query", "{\n  \"within\": \"products-import\",\n  \"collection\": \"questions\"\n}"),
+            new("Fix a cell", "act", "{\n  \"steps\": [\n    { \"ref\": \"products-import\", \"action\": \"editCell\", \"args\": [9, \"price\", \"89.0\"] }\n  ]\n}"),
+            new("Answer the unknown category", "act", "{\n  \"steps\": [\n    { \"ref\": \"products-import\", \"action\": \"answerValue\", \"args\": [\"category\", \"Audio\", \"map\", \"hardware\"] }\n  ]\n}"),
+            new("Discard a row", "act", "{\n  \"steps\": [\n    { \"ref\": \"products-import\", \"action\": \"discardRows\", \"args\": [11] }\n  ]\n}"),
+            new("Submit", "act", "{\n  \"steps\": [\n    { \"ref\": \"products-import\", \"action\": \"submit\" }\n  ]\n}"),
+        ],
+        _ =>
+        [
+            new("Snapshot", "snapshot", "{}"),
+            new("List the regions", "query", "{\n  \"within\": \"Sales region\"\n}"),
+            new("Pick a region", "act", "{\n  \"steps\": [\n    { \"ref\": \"Sales region\", \"action\": \"setValue\", \"args\": [\"us\"] }\n  ]\n}"),
+            new("A region that does not exist", "act", "{\n  \"steps\": [\n    { \"ref\": \"Sales region\", \"action\": \"setValue\", \"args\": [\"mars\"] }\n  ]\n}"),
+            new("Change the view and refresh", "act", "{\n  \"steps\": [\n    { \"ref\": \"revenue\", \"action\": \"setView\", \"args\": [\"cohorts\"] },\n    { \"ref\": \"revenue\", \"action\": \"refresh\" }\n  ]\n}"),
+        ],
+    };
+
+    private void Load(Example example)
+    {
+        _tool = example.Tool;
+        _arguments = example.Json;
+        _jsonError = Validate(_arguments);
+    }
+
+    private void OnToolChanged(string? tool) => _tool = tool ?? "snapshot";
+
+    private void OnArguments(string? text)
+    {
+        _arguments = text ?? "";
+        _jsonError = Validate(_arguments);
+    }
+
+    private static string Validate(string text)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(text) ? "{}" : text);
+            return doc.RootElement.ValueKind == JsonValueKind.Object ? "" : "The arguments must be a JSON object.";
+        }
+        catch (JsonException e)
+        {
+            return "Not valid JSON: " + e.Message;
+        }
+    }
+
+    private async Task RestartAsync()
+    {
+        Teardown();
+        _submittedNote = null;
+        _agent = new AgentBridgeService();
+        ApplyPolicy();
+        switch (_target)
+        {
+            case "form":
+                _form = new FormController<SignupModel>(FormTemplates.Signup(true, true), new SignupModel());
+                _form.Changed += OnChanged;
+                _registrations.Add(_agent.RegisterForm(_form, confirmSubmit: _confirmSubmit, allowSensitiveWrites: _allowPassword ? ["password"] : null));
+                break;
+            case "spreadsheet":
+                _importer = new SpreadsheetImporter<ProductRow>(ProductSchema());
+                _importer.Changed += OnChanged;
+                try { _importer.LoadText(await Http.GetStringAsync("samples/messy-products.csv", _cts.Token), "messy-products.csv"); }
+                catch (HttpRequestException) { }
+                _registrations.Add(_agent.RegisterSpreadsheet(_importer));
+                break;
+            default:
+                _dashboard = new DashboardController("revenue");
+                _dashboard.AddView("overview", "Overview");
+                _dashboard.AddView("cohorts", "Cohorts");
+                _dashboard.AddFilter(new DashboardFilterControl("region", "Sales region", items: [new("eu", "Europe"), new("us", "United States"), new("apac", "Asia-Pacific")], defaultValues: ["eu"]));
+                var region = _dashboard.Controls[0];
+                _revenue = _dashboard.RegisterResource(new DashboardResource<double>("revenue", _ => Task.FromResult(region.Value switch { "us" => 412_000d, "apac" => 188_000d, _ => 356_000d })));
+                region.ChangedEvent += () => _ = _dashboard.RefreshAsync();
+                _dashboard.Changed += OnChanged;
+                _registrations.Add(_agent.RegisterDashboard(_dashboard));
+                await _dashboard.RefreshAsync();
+                break;
+        }
+        _generation++;
+        Load(Examples[0]);
+    }
+
+    private SpreadsheetSchema<ProductRow> ProductSchema() => SpreadsheetSchema.For<ProductRow>(s =>
+    {
+        s.Key = "products-import";
+        s.Column(r => r.Sku, c => c.Label("SKU").Headers("Référence").Required().Rule(SpreadsheetRule.Pattern("^[A-Z]{2}-[0-9]{3}$", "Use the form AB-123")));
+        s.Column(r => r.Name, c => c.Label("Name").Headers("Désignation").Required());
+        s.Column(r => r.Category, c => c.Label("Category").Headers("Famille").Options(
+        [
+            new SpreadsheetOption<ProductCategory>(ProductCategory.Hardware, "Hardware", ["Matériel", "Materiel"]),
+            new SpreadsheetOption<ProductCategory>(ProductCategory.Software, "Software", ["Logiciel"]),
+            new SpreadsheetOption<ProductCategory>(ProductCategory.Service, "Service", ["Prestation"]),
+        ]));
+        s.Column(r => r.Price, c => c.Label("Unit price").Headers("Prix HT").DecimalSeparator(',').Rule(SpreadsheetRule.Min(0m, "The price cannot be negative")));
+        s.Column(r => r.Stock, c => c.Label("Stock").Headers("Quantité"));
+        s.Column(r => r.Launch, c => c.Label("Launch date").Headers("Date de lancement").DateFormats("dd/MM/yyyy", "yyyy-MM-dd"));
+        s.OnSubmit = rows =>
+        {
+            _submittedNote = $"{rows.Count} row(s) reached OnSubmit.";
+            InvokeAsync(StateHasChanged);
+            return Task.FromResult<IReadOnlyList<SpreadsheetRejectedRow>?>(null);
+        };
+    });
+
+    private void ApplyPolicy()
+    {
+        _agent.AllowPolicy = _policy switch
+        {
+            "approve" => (_, _) => Task.FromResult(true),
+            "deny" => (_, confirm) => Task.FromResult(!confirm),
+            _ => null,
+        };
+    }
+
+    private void OnSubmitted(SignupModel model) => _submittedNote = $"The form submitted {model.Email}.";
+
+    private void OnChanged() => InvokeAsync(StateHasChanged);
+
+    private async Task SendAsync()
+    {
+        if (_jsonError.Length > 0) return;
+        _busy = true;
+        string response;
+        var failed = false;
+        try
+        {
+            using var doc = JsonDocument.Parse(string.IsNullOrWhiteSpace(_arguments) ? "{}" : _arguments);
+            var result = await _agent.InvokeToolAsync(_tool, doc.RootElement.Clone());
+            response = AgentJson.Write(result);
+            failed = result is AgentToolError || result is AgentActResult { Ok: false };
+        }
+        catch (JsonException e)
+        {
+            response = "{ \"error\": \"" + e.Message.Replace("\"", "'") + "\" }";
+            failed = true;
+        }
+        _log.Insert(0, new Turn(_tool, JsonText.Indent(string.IsNullOrWhiteSpace(_arguments) ? "{}" : _arguments), response, failed, DateTime.Now.ToString("HH:mm:ss")));
+        _busy = false;
+    }
+
+    private void ClearLog() => _log.Clear();
+
+    private static IReadOnlyList<DisplayFact> ToolFacts(AgentToolDefinition tool) =>
+    [
+        new DisplayFact { Label = tool.Name, Value = tool.Description },
+        new DisplayFact { Label = "Hints", Value = $"readOnly {tool.ReadOnlyHint.ToString().ToLowerInvariant()}, consequential {tool.ConsequentialHint.ToString().ToLowerInvariant()}, untrusted content {tool.UntrustedContentHint.ToString().ToLowerInvariant()}", Mono = true },
+    ];
+
+    private void Teardown()
+    {
+        foreach (var r in _registrations) r.Dispose();
+        _registrations.Clear();
+        if (_form is not null) { _form.Changed -= OnChanged; _form = null; }
+        if (_importer is not null) { _importer.Changed -= OnChanged; _importer = null; }
+        if (_dashboard is not null) { _dashboard.Changed -= OnChanged; _dashboard.Dispose(); _dashboard = null; }
+    }
+
+    private IReadOnlyList<CodeTab> CodeTabs => [new("Agent.cs", "csharp", Code())];
+
+    private string Code()
+    {
+        var sb = new StringBuilder();
+        sb.Append("var agent = new AgentBridgeService();\n\n");
+        sb.Append(_policy switch
+        {
+            "approve" => "agent.AllowPolicy = (step, confirmRequired) => Task.FromResult(true);\n",
+            "deny" => "agent.AllowPolicy = (step, confirmRequired) => Task.FromResult(!confirmRequired);\n",
+            _ => "// No AllowPolicy: a step that needs confirmation is refused, so a missing policy fails closed.\n",
+        });
+        sb.Append(_target switch
+        {
+            "form" => $"agent.RegisterForm(form, confirmSubmit: {(_confirmSubmit ? "true" : "false")}{(_allowPassword ? ", allowSensitiveWrites: [\"password\"]" : "")});\n",
+            "spreadsheet" => "importer.LoadText(text, \"messy-products.csv\");   // the agent cannot load a file: your code does\nagent.RegisterSpreadsheet(importer);\n",
+            _ => "agent.RegisterDashboard(dashboard);\n",
+        });
+        sb.Append("\n// What a model sends is a tool name and a JSON object:\n");
+        sb.Append("AgentToolResult result = await agent.InvokeToolAsync(\"").Append(_tool).Append("\", arguments);\n\n");
+        sb.Append("switch (result)\n{\n    case AgentSnapshotResult snapshot: /* snapshot.Components */ break;\n    case AgentQueryResult query: /* query.Matches */ break;\n    case AgentActResult act: /* act.Ok, act.Steps, act.Values, act.Error */ break;\n    case AgentToolError error: /* a malformed call or an unknown tool: a value, not an exception */ break;\n}\n\n");
+        sb.Append("// The definitions to hand to a model or an MCP server:\nforeach (var tool in AgentBridgeService.GetToolDefinitions())\n{\n    Console.WriteLine($\"{tool.Name}: {tool.Description}\");\n}\n");
+        return sb.ToString();
+    }
+
+    public void Dispose()
+    {
+        Teardown();
+        _cts.Cancel();
+        _cts.Dispose();
+    }
+}

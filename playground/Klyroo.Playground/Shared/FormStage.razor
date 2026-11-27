@@ -1,0 +1,84 @@
+@typeparam TModel where TModel : class
+@using System.Text.Json
+@using System.Text.Json.Serialization.Metadata
+@implements IDisposable
+
+<PgPanel Title="@Title" Note="@(UsePage ? "KlyFormPage" : "KlyFormEngine")">
+    @if (UsePage)
+    {
+        <KlyFormPage TModel="TModel" Form="_form" OnSubmit="OnSubmitted" />
+    }
+    else
+    {
+        <KlyFormEngine TModel="TModel" Form="_form" SubmitLabel="Submit" OnSubmit="OnSubmitted" />
+    }
+</PgPanel>
+
+<div class="grid gap-5 min-[1100px]:grid-cols-2">
+    <PgPanel Title="Typed model" Note="CreateModel() now">
+        <KlyDisplay Kind="DisplayKind.Code" Value="@ModelJson()" Language="json" Surface="DisplaySurface.Plain" />
+    </PgPanel>
+    <PgPanel Title="Validation" Note="@(_form.HasBlockingErrors ? "blocked" : "no blocking error")">
+        <KlyDisplay Kind="DisplayKind.Facts" Facts="Status()" Surface="DisplaySurface.Plain" />
+        @if (_form.Errors.Count > 0 || _form.FormErrors.Count > 0)
+        {
+            <div class="mt-3">
+                <KlyDisplay Kind="DisplayKind.Facts" Facts="ErrorFacts()" Surface="DisplaySurface.Plain" />
+            </div>
+        }
+        else
+        {
+            <p class="m-0 mt-3 text-sm text-(--klyroo-text-muted)">No error to show. Leave a required field empty and press Submit, or touch a field and leave it with a wrong value.</p>
+        }
+    </PgPanel>
+</div>
+
+<PgPanel Title="Submitted model" Note="@(_submitted is null ? "not submitted yet" : "OnSubmit received it")">
+    @if (_submitted is null)
+    {
+        <p class="m-0 text-sm text-(--klyroo-text-muted)">Submit the form: the model OnSubmit receives is shown here, typed, with enums as names.</p>
+    }
+    else
+    {
+        <KlyDisplay Kind="DisplayKind.Code" Value="@_submitted" Language="json" Surface="DisplaySurface.Plain" />
+    }
+</PgPanel>
+
+@code {
+    [Parameter, EditorRequired] public FormSchema<TModel> Schema { get; set; } = default!;
+    [Parameter, EditorRequired] public TModel Initial { get; set; } = default!;
+    [Parameter, EditorRequired] public JsonTypeInfo<TModel> Json { get; set; } = default!;
+    [Parameter] public bool UsePage { get; set; }
+    [Parameter] public string Title { get; set; } = "Live form";
+
+    private FormController<TModel> _form = default!;
+    private string? _submitted;
+
+    protected override void OnInitialized()
+    {
+        _form = new FormController<TModel>(Schema, Initial);
+        _form.Changed += OnChanged;
+    }
+
+    private void OnChanged() => InvokeAsync(StateHasChanged);
+
+    private string ModelJson() => JsonText.Indent(JsonSerializer.Serialize(_form.CreateModel(), Json));
+
+    private void OnSubmitted(TModel model) => _submitted = JsonText.Indent(JsonSerializer.Serialize(model, Json));
+
+    private IReadOnlyList<DisplayFact> Status() =>
+    [
+        new DisplayFact { Label = "Changed", Value = _form.IsDirty ? "yes" : "no" },
+        new DisplayFact { Label = "Blocking errors", Value = _form.HasBlockingErrors ? "yes" : "no", Tone = _form.HasBlockingErrors ? KlyColor.Error : KlyColor.Success },
+        new DisplayFact { Label = "Submit failed", Value = _form.SubmitFailed ? $"yes, {_form.SubmitFailureCount} time(s)" : "no" },
+        new DisplayFact { Label = "Step", Value = _form.CurrentStepKey ?? "none: not a wizard" },
+    ];
+
+    private IReadOnlyList<DisplayFact> ErrorFacts() =>
+    [
+        .. _form.Errors.Select(e => new DisplayFact { Label = e.Key, Value = e.Value, Tone = KlyColor.Error }),
+        .. _form.FormErrors.Select(e => new DisplayFact { Label = "form", Value = e, Tone = KlyColor.Error }),
+    ];
+
+    public void Dispose() => _form.Changed -= OnChanged;
+}

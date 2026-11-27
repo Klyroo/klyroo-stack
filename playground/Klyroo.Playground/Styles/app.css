@@ -1,0 +1,19 @@
+@import "tailwindcss";
+@import "../obj/klyroo/klyroo.theme.css";
+@import "../../../../klyroo-table/src/Klyroo.Table/wwwroot/klyroo-table.theme.css";
+
+/*
+  The Klyroo playground. The build compiles this file with the Tailwind CLI and serves the result as app.css.
+  The libraries' components use Tailwind utilities, so their sources are scanned like the documentation site does; tokens.css holds the design
+  tokens of the documentation sites (DESIGN.md of klyroo-stack), playground.css the shell, the knob panel, the code panel and the result areas.
+*/
+@source "../../../../klyroo-table/src/Klyroo.Table";
+@source "../../../../klyroo-form/src/Klyroo.Form";
+@source "../../../../klyroo-dashboard/src/Klyroo.Dashboard";
+@source "../../../../klyroo-display/src/Klyroo.Display";
+@source "../../../../klyroo-spreadsheet/src/Klyroo.Spreadsheet";
+@source "../../../../klyroo-agent/src/Klyroo.Agent";
+@source "../../../src/Klyroo.Stack";
+
+@import "./tokens.css";
+@import "./playground.css";

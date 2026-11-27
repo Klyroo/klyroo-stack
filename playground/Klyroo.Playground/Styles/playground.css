@@ -1,0 +1,165 @@
+/*
+  The playground shell, drawn with the tokens of tokens.css (DESIGN.md): hairlines instead of cards, one accent per library, Geist, the browser
+  surfaces themed (selection, caret, scrollbars, focus). Only the stage panels and floating menus are lifted.
+*/
+@layer base {
+  html {
+    scroll-padding-top: calc(var(--header-h) + 1rem);
+    -webkit-text-size-adjust: 100%;
+    background: var(--bg);
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: clip;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+}
+
+::selection {
+  background: color-mix(in oklab, var(--accent) 34%, transparent);
+  color: inherit;
+}
+
+html {
+  caret-color: var(--accent-ink);
+  accent-color: var(--accent);
+}
+
+* {
+  scrollbar-color: color-mix(in oklab, var(--accent-ink) 34%, var(--line-strong)) transparent;
+  scrollbar-width: thin;
+}
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--accent-ink) 34%, var(--line-strong));
+  border: 3px solid transparent;
+  background-clip: content-box;
+  border-radius: 999px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-ink);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+@layer base {
+  a {
+    color: var(--accent-ink);
+    text-decoration-color: color-mix(in oklab, var(--accent-ink) 42%, transparent);
+    text-underline-offset: 0.2em;
+    text-decoration-thickness: 1px;
+  }
+  a:hover { text-decoration-color: var(--accent-ink); }
+}
+
+table { font-variant-numeric: tabular-nums; }
+h1, h2, h3 { text-wrap: balance; }
+h1[tabindex="-1"]:focus-visible { outline: none; }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.page-wrap {
+  width: 100%;
+  max-width: var(--page-w);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+@media (min-width: 1024px) { :root { --gutter: 2rem; } }
+
+/* The splash of the first load, before Blazor starts. */
+.boot {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  color: var(--dim);
+  font-family: var(--font-code);
+  font-size: 0.8125rem;
+}
+
+/* The brand in the header: the mark and the wordmark. */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-width: 0;
+  color: var(--strong);
+  text-decoration: none;
+  border-radius: var(--r-sm);
+}
+.mark { flex: none; display: block; }
+.mark-tile { fill: var(--accent); }
+.mark-stroke { stroke: var(--on-accent); }
+.wordmark { font-size: 1.0625rem; font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; }
+.wordmark .slash { color: var(--dim); font-weight: 400; margin-inline: 0.08em; }
+.wordmark .name { color: var(--strong); }
+
+/* Page head */
+.pg-head { padding-block: 1.75rem 1.25rem; display: grid; gap: 0.75rem; }
+.pg-title {
+  margin: 0;
+  color: var(--strong);
+  font-size: clamp(1.75rem, 1.2rem + 1.6vw, 2.25rem);
+  font-weight: 650;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  max-width: 28ch;
+}
+.pg-title .accent { color: var(--accent-display); }
+.pg-lead { margin: 0; max-width: 72ch; color: var(--muted); font-size: 1.0625rem; line-height: 1.55; }
+.pg-links { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; font-size: 0.9rem; }
+
+/* The workbench: knobs on the left, the result and the code on the right. */
+.pg-bench { display: grid; gap: 1.25rem; padding-bottom: 2rem; }
+@media (min-width: 1024px) {
+  .pg-bench { grid-template-columns: 17.5rem minmax(0, 1fr); gap: 1.5rem; align-items: start; }
+}
+.pg-stage { display: grid; gap: 1.25rem; min-width: 0; }
+
+.pg-knobs { min-width: 0; }
+@media (min-width: 1024px) {
+  .pg-knobs { position: sticky; top: calc(var(--header-h) + 1rem); max-height: calc(100vh - var(--header-h) - 2rem); overflow-y: auto; border-radius: var(--r-lg); }
+}
+
+/* Index: a ruled list of the libraries. */
+.lib-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.lib-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.5rem 1.5rem; padding: 1.25rem 0; border-bottom: 1px solid var(--line); }
+@media (min-width: 900px) { .lib-row { grid-template-columns: 15rem minmax(0, 1fr) auto; align-items: baseline; } }
+.lib-row h2 { margin: 0; display: flex; align-items: center; gap: 0.625rem; color: var(--strong); font-size: 1.1875rem; font-weight: 620; letter-spacing: -0.02em; }
+.lib-row h2 .dot { width: 0.75rem; height: 0.75rem; border-radius: 50%; background: var(--dot); flex: none; }
+.lib-row p { margin: 0; color: var(--muted); max-width: 64ch; }
+
+/* Results and tables of the stage */
+.table-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-bottom: 1px solid var(--line); }
+.table-toolbar:empty { display: none; }
+.table-with-side { display: grid; gap: 1rem; padding: 0.75rem 1rem 0; }
+@media (min-width: 900px) { .table-with-side { grid-template-columns: 15rem minmax(0, 1fr); } }
+.table-scroll { overflow-x: auto; max-width: 100%; padding: 0 1rem; }
+.table-footer { padding: 0.75rem 1rem; border-top: 1px solid var(--line); }
+.result-pad { padding: 1rem; }
+.mono { font-family: var(--font-code); }
+.tnum { font-variant-numeric: tabular-nums; }
+.dim { color: var(--dim); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}

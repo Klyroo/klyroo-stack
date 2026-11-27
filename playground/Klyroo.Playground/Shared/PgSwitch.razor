@@ -1,0 +1,22 @@
+@inject Knobs K
+
+<KlySwitch Label="@Label" Description="@Hint" Value="Value" ValueChanged="HandleChange" Disabled="Disabled" />
+
+@code {
+    [Parameter, EditorRequired] public string Label { get; set; } = "";
+    [Parameter] public string? Hint { get; set; }
+    [Parameter] public string? Key { get; set; }
+    [Parameter] public bool Value { get; set; }
+    [Parameter] public EventCallback<bool> ValueChanged { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    /// <summary>Raised after the value is stored, for a page that has to rebuild something from it.</summary>
+    [Parameter] public EventCallback OnChange { get; set; }
+
+    private async Task HandleChange(bool value)
+    {
+        Value = value;
+        if (Key is not null) K.Put(Key, value ? "1" : "0");
+        await ValueChanged.InvokeAsync(value);
+        await OnChange.InvokeAsync();
+    }
+}

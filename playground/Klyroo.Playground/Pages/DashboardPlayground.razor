@@ -1,0 +1,236 @@
+@page "/dashboard"
+@using System.Globalization
+@using System.Text
+@using Klyroo.Playground.Data
+@inject Knobs K
+@inject NavigationManager Nav
+@implements IDisposable
+
+<PgShell Library="_lib" DocsPage="guides/" OnReset="LoadKnobsAndRestart"
+         Lead="A sales dashboard with a filter bar, statistics, a chart, bars and a table. Slow the queries down to watch the three loading stages fill in, click a bar, a point or a row to drill down, and read the filters in the address.">
+    <Knobs>
+        <PgGroup Title="Loading">
+            <PgNumber Key="latency" Label="Query latency (ms)" Min="0" Max="3000" Step="100" @bind-Value="_latency" Hint="Essential queries wait this long, background ones twice as long." />
+            <PgSelect Key="auto" Label="Refresh on a timer" T="int" Options="_autoRefresh" @bind-Value="_autoSeconds" OnChange="ApplyAutoRefresh" />
+        </PgGroup>
+        <PgGroup Title="Blocks">
+            <PgSwitch Key="compare" Label="Compare with 2025" Hint="A previous value on the statistics and a comparison series on the chart." @bind-Value="_compare" />
+            <PgSelect Key="chart" Label="Chart type" T="DashboardChartType" Options="_chartTypes" @bind-Value="_chartType" />
+            <PgSwitch Key="stacked" Label="Stack the series" @bind-Value="_stacked" Disabled="@(_chartType is not (DashboardChartType.Bar or DashboardChartType.Area))" />
+            <PgSwitch Key="menu" Label="Block menus" Hint="View as table, Download CSV, Expand." @bind-Value="_menu" />
+        </PgGroup>
+        <PgGroup Title="Filters and drill-down">
+            <PgSwitch Key="filters" Label="Filter bar" @bind-Value="_showFilters" />
+            <PgSwitch Key="url" Label="Filters in the address" Hint="Written as region=EMEA&amp;channel=Web. Reload to see them come back." @bind-Value="_syncUrl" OnChange="Restart" />
+            <PgSwitch Key="drill" Label="Drill down on a click" Hint="A bar sets the region, a chart point and a row show their detail below." @bind-Value="_drill" />
+        </PgGroup>
+    </Knobs>
+    <Stage>
+        @if (_detail is not null)
+        {
+            <KlyAlert Variant="KlyVariant.Soft" Color="KlyColor.Primary" Title="Drill-down" Description="@_detail" Close="true" OnClose="ClearDetail" />
+        }
+        <section aria-label="Dashboard" class="min-w-0" data-testid="dashboard">
+            <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
+                <h2 class="m-0 text-sm font-semibold text-(--klyroo-text-highlighted)">Dashboard</h2>
+                <KlyBadge Label="sample data" Variant="KlyVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Xs" />
+            </div>
+            <div class="min-w-0">
+                <KlyDashboardPage @key="_pageKey" Dashboard="_dashboard" Title="Sales" ShowFilters="_showFilters" SyncUrl="_syncUrl" Sticky="false"
+                                  Description="Revenue, orders and customers for the filters above">
+                    <KlyDashboardGrid>
+                        <KlyDashboardStat Source="_kpis" Label="Revenue" Span="4" Value="_kpis.Data?.Revenue" Compare="@(_compare ? _kpis.Data?.PreviousRevenue : null)" Format="DashboardFormatPreset.Compact" Menu="_menu" />
+                        <KlyDashboardStat Source="_kpis" Label="Orders" Span="4" Value="@(_kpis.Data is null ? null : (double)_kpis.Data.Orders)" Format="DashboardFormatPreset.Integer" Menu="_menu" />
+                        <KlyDashboardStat Source="_kpis" Label="Average order" Span="4" Value="_kpis.Data?.AverageOrder" Goal="@(_kpis.Data is null ? null : 120d)" Format="DashboardFormatPreset.Decimal" Menu="_menu" />
+                        <KlyDashboardChart Source="_trend" Title="Revenue by month" Span="8" Type="_chartType" Stacked="_stacked" Categories="_trend.Data?.Categories" Series="_trend.Data?.Series" Format="DashboardFormatPreset.Compact" Menu="_menu" OnSelect="PickPoint" />
+                        <KlyDashboardBars Source="_regions" Title="Revenue by region" Span="4" Items="_regions.Data" Format="DashboardFormatPreset.Compact" Menu="_menu" OnSelect="PickRegion" />
+                        <KlyDashboardTable TRow="CustomerRow" Source="_customers" Title="Top customers" Span="12" Columns="_columns" Rows="_customers.Data" @bind-Sort="_sort" Menu="_menu" OnRowClick="PickCustomer" />
+                    </KlyDashboardGrid>
+                </KlyDashboardPage>
+            </div>
+        </section>
+        <div class="grid gap-5 min-[1100px]:grid-cols-2">
+            <PgPanel Title="Loading stages" Note="@(_dashboard.Refreshing ? "refreshing" : "idle")">
+                <KlyDisplay Kind="DisplayKind.Facts" Facts="Stages()" Surface="DisplaySurface.Plain" />
+                <p class="m-0 mt-2 text-sm text-(--klyroo-text-muted)">Essential resources load first, in parallel. Background ones start when they are all done. A block shows a skeleton until its own resource is ready.</p>
+            </PgPanel>
+            <PgPanel Title="URL state" Note="DashboardController.ToQuery()">
+                <KlyDisplay Kind="DisplayKind.Code" Value="@(_dashboard.ToQuery() is { Length: > 0 } q ? "?" + q : "(nothing: every filter is at its default)")" Highlight="false" Surface="DisplaySurface.Plain" />
+            </PgPanel>
+        </div>
+        <CodePanel Tabs="CodeTabs" />
+    </Stage>
+</PgShell>
+
+@code {
+    private readonly LibraryInfo _lib = Libraries.Find("dashboard")!;
+
+    private sealed record Trend(IReadOnlyList<string> Categories, IReadOnlyList<DashboardChartSeries> Series);
+
+    private static readonly IReadOnlyList<PgOption<int>> _autoRefresh = [new(0, "Off", "0"), new(5, "Every 5 seconds", "5"), new(15, "Every 15 seconds", "15")];
+    private static readonly IReadOnlyList<PgOption<DashboardChartType>> _chartTypes = PgOptions.Of<DashboardChartType>();
+
+    private int _latency, _autoSeconds;
+    private bool _compare, _stacked, _menu, _showFilters, _syncUrl, _drill;
+    private DashboardChartType _chartType;
+    private DashboardTableSort? _sort = new("revenue", true);
+    private string? _detail;
+    private int _pageKey;
+
+    private DashboardController _dashboard = null!;
+    private DashboardFilterControl _region = null!, _channel = null!, _period = null!;
+    private DashboardResource<SalesSummary> _kpis = null!;
+    private DashboardResource<Trend> _trend = null!;
+    private DashboardResource<IReadOnlyList<DashboardBarItem>> _regions = null!;
+    private DashboardResource<IReadOnlyList<CustomerRow>> _customers = null!;
+
+    private static readonly IReadOnlyList<DashboardTableColumn<CustomerRow>> _columns =
+    [
+        DashboardTableColumn.For<CustomerRow, string>("customer", "Customer", r => r.Customer),
+        DashboardTableColumn.For<CustomerRow, string>("region", "Region", r => r.Region),
+        DashboardTableColumn.For<CustomerRow, string>("channel", "Channel", r => r.Channel),
+        DashboardTableColumn.For<CustomerRow, double>("revenue", "Revenue", r => r.Revenue, DashboardFormatPreset.Compact, kind: DashboardTableColumnKind.Bar),
+        DashboardTableColumn.For<CustomerRow, int>("orders", "Orders", r => r.Orders, DashboardFormatPreset.Integer),
+        DashboardTableColumn.For<CustomerRow, double>("growth", "Growth", r => r.Growth, kind: DashboardTableColumnKind.Delta),
+    ];
+
+    private int Months => int.TryParse(_period.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var m) ? m : 12;
+
+    protected override async Task OnInitializedAsync()
+    {
+        K.Load();
+        LoadKnobs();
+        await StartAsync();
+    }
+
+    private void LoadKnobs()
+    {
+        _latency = K.Int("latency", 400, 0, 3000);
+        _autoSeconds = K.Int("auto", 0, 0, 15);
+        if (_autoRefresh.All(o => o.Value != _autoSeconds)) _autoSeconds = 0;
+        _compare = K.Bool("compare", true);
+        _chartType = K.Enum("chart", DashboardChartType.Bar);
+        _stacked = K.Bool("stacked", false);
+        _menu = K.Bool("menu", false);
+        _showFilters = K.Bool("filters", true);
+        _syncUrl = K.Bool("url", true);
+        _drill = K.Bool("drill", true);
+    }
+
+    private async Task LoadKnobsAndRestart()
+    {
+        LoadKnobs();
+        await Restart();
+    }
+
+    private async Task Restart()
+    {
+        Teardown();
+        await StartAsync();
+    }
+
+    private async Task StartAsync()
+    {
+        _dashboard = new DashboardController("sales") { AutoRefresh = _autoSeconds };
+        _region = _dashboard.AddFilter(new DashboardFilterControl("region", "Region", items: [.. SalesData.Regions.Select(r => new DashboardOption(r, r))], multiple: false, placeholder: "All regions"));
+        _channel = _dashboard.AddFilter(new DashboardFilterControl("channel", "Channel", items: [.. SalesData.Channels.Select(c => new DashboardOption(c, c))], multiple: true, placeholder: "All channels"));
+        _period = _dashboard.AddFilter(new DashboardFilterControl("months", "Period", items: [new("3", "Last 3 months"), new("6", "Last 6 months"), new("12", "Last 12 months")], multiple: false, placeholder: "Last 12 months"));
+
+        async Task<T> Slow<T>(int factor, Func<T> load, CancellationToken ct)
+        {
+            if (_latency > 0) await Task.Delay(_latency * factor, ct);
+            return load();
+        }
+        IReadOnlySet<string> Channels() => _channel.Values.ToHashSet();
+
+        _kpis = _dashboard.RegisterResource(new DashboardResource<SalesSummary>("kpis", ct => Slow(1, () => SalesData.Summary(_region.Value, Channels(), Months), ct), DashboardQueryStage.Essential));
+        _trend = _dashboard.RegisterResource(new DashboardResource<Trend>("trend", ct => Slow(2, () =>
+        {
+            var series = new List<DashboardChartSeries> { new("rev26", "2026", SalesData.Monthly(_region.Value, Channels(), 2026, Months)) };
+            if (_compare) series.Add(new("rev25", "2025", SalesData.Monthly(_region.Value, Channels(), 2025, Months), IsComparison: true));
+            return new Trend(SalesData.MonthLabels(Months), series);
+        }, ct), DashboardQueryStage.Background));
+        _regions = _dashboard.RegisterResource(new DashboardResource<IReadOnlyList<DashboardBarItem>>("regions", ct => Slow(2, () => (IReadOnlyList<DashboardBarItem>)[.. SalesData.ByRegion(Channels(), Months).Select(r => new DashboardBarItem(r.Region, r.Revenue))], ct), DashboardQueryStage.Background));
+        _customers = _dashboard.RegisterResource(new DashboardResource<IReadOnlyList<CustomerRow>>("customers", ct => Slow(2, () => SalesData.Customers(_region.Value, Channels(), Months), ct), DashboardQueryStage.Background));
+
+        // The address wins at the start, before the first load and before the reload on a change is wired.
+        if (_syncUrl) _dashboard.ApplyQuery(new Uri(Nav.Uri).Query);
+        _dashboard.Changed += OnDashboardChanged;
+        await _dashboard.LoadAsync();
+        foreach (var filter in _dashboard.Controls) filter.ChangedEvent += OnFilterChanged;
+        _pageKey++;
+    }
+
+    private void Teardown()
+    {
+        if (_dashboard is null) return;
+        foreach (var filter in _dashboard.Controls) filter.ChangedEvent -= OnFilterChanged;
+        _dashboard.Changed -= OnDashboardChanged;
+        _dashboard.Dispose();
+    }
+
+    private void OnFilterChanged() => _ = _dashboard.RefreshAsync();
+
+    private void OnDashboardChanged() => InvokeAsync(StateHasChanged);
+
+    private void ApplyAutoRefresh() => _dashboard.AutoRefresh = _autoSeconds;
+
+    private void PickRegion(DashboardBarItem bar)
+    {
+        if (!_drill) return;
+        _region.Value = bar.Label;
+        _detail = $"Region filter set to {bar.Label} from the bar of {bar.Value:N0}.";
+    }
+
+    private void PickPoint(DashboardChartSelection point)
+    {
+        if (_drill) _detail = $"{point.Category} {point.Series}: {point.Value:N0} of revenue. A real page would filter its table to that month.";
+    }
+
+    private void PickCustomer(CustomerRow row)
+    {
+        if (_drill) _detail = $"{row.Customer} ({row.Region}, {row.Channel}): {row.Revenue:N0} of revenue over {row.Orders} orders, {row.Growth:+0.0;-0.0}% against 2025.";
+    }
+
+    private void ClearDetail() => _detail = null;
+
+    private IReadOnlyList<DisplayFact> Stages() =>
+        [.. _dashboard.Resources.Select(r => new DisplayFact { Label = $"{r.Key} ({r.Stage})", Value = r.State.ToString(), Mono = true, Tone = r.State == DashboardResourceState.Ready ? (KlyColor?)KlyColor.Success : null })];
+
+    private IReadOnlyList<CodeTab> CodeTabs => [new("Sales.razor", "html", RazorCode()), new("Controller.cs", "csharp", ControllerCode())];
+
+    private string RazorCode()
+    {
+        var sb = new StringBuilder();
+        sb.Append($"<KlyDashboardPage Dashboard=\"_dashboard\" Title=\"Sales\"{(_showFilters ? "" : " ShowFilters=\"false\"")}{(_syncUrl ? " SyncUrl=\"true\"" : "")}>\n    <KlyDashboardGrid>\n");
+        var menu = _menu ? "" : " Menu=\"false\"";
+        sb.Append($"        <KlyDashboardStat Source=\"_kpis\" Label=\"Revenue\" Span=\"4\" Value=\"_kpis.Data?.Revenue\"{(_compare ? " Compare=\"_kpis.Data?.PreviousRevenue\"" : "")} Format=\"DashboardFormatPreset.Compact\"{menu} />\n");
+        sb.Append($"        <KlyDashboardStat Source=\"_kpis\" Label=\"Orders\" Span=\"4\" Value=\"_kpis.Data?.Orders\" Format=\"DashboardFormatPreset.Integer\"{menu} />\n");
+        sb.Append($"        <KlyDashboardStat Source=\"_kpis\" Label=\"Average order\" Span=\"4\" Value=\"_kpis.Data?.AverageOrder\" Goal=\"120\" Format=\"DashboardFormatPreset.Decimal\"{menu} />\n");
+        sb.Append($"        <KlyDashboardChart Source=\"_trend\" Title=\"Revenue by month\" Span=\"8\"{(_chartType != DashboardChartType.Bar ? $" Type=\"DashboardChartType.{_chartType}\"" : "")}{(_stacked ? " Stacked=\"true\"" : "")}\n                           Categories=\"_trend.Data?.Categories\" Series=\"_trend.Data?.Series\" Format=\"DashboardFormatPreset.Compact\"{menu}{(_drill ? " OnSelect=\"PickPoint\"" : "")} />\n");
+        sb.Append($"        <KlyDashboardBars Source=\"_regions\" Title=\"Revenue by region\" Span=\"4\" Items=\"_regions.Data\" Format=\"DashboardFormatPreset.Compact\"{menu}{(_drill ? " OnSelect=\"PickRegion\"" : "")} />\n");
+        sb.Append($"        <KlyDashboardTable Source=\"_customers\" Title=\"Top customers\" Span=\"12\" Columns=\"_columns\" Rows=\"_customers.Data\" @bind-Sort=\"_sort\"{menu}{(_drill ? " OnRowClick=\"PickCustomer\"" : "")} />\n");
+        sb.Append("    </KlyDashboardGrid>\n</KlyDashboardPage>\n");
+        return sb.ToString();
+    }
+
+    private string ControllerCode()
+    {
+        var sb = new StringBuilder();
+        sb.Append($"var dashboard = new DashboardController(\"sales\"){(_autoSeconds > 0 ? $" {{ AutoRefresh = {_autoSeconds} }}" : "")};\n\n");
+        sb.Append("var region = dashboard.AddFilter(new DashboardFilterControl(\"region\", \"Region\",\n    items: [new(\"EMEA\", \"EMEA\"), new(\"Americas\", \"Americas\"), new(\"APAC\", \"APAC\")],\n    multiple: false, placeholder: \"All regions\"));\n");
+        sb.Append("var channel = dashboard.AddFilter(new DashboardFilterControl(\"channel\", \"Channel\",\n    items: [new(\"Web\", \"Web\"), new(\"Retail\", \"Retail\"), new(\"Partner\", \"Partner\")],\n    multiple: true, placeholder: \"All channels\"));\n");
+        sb.Append("var period = dashboard.AddFilter(new DashboardFilterControl(\"months\", \"Period\",\n    items: [new(\"3\", \"Last 3 months\"), new(\"6\", \"Last 6 months\"), new(\"12\", \"Last 12 months\")],\n    multiple: false, placeholder: \"Last 12 months\"));\n\n");
+        sb.Append("// Essential resources load first, in parallel; Background ones start when all of them are done.\n");
+        sb.Append("var kpis = dashboard.RegisterResource(new DashboardResource<SalesSummary>(\"kpis\",\n    ct => sales.GetSummaryAsync(region.Value, channel.Values, period.Value, ct), DashboardQueryStage.Essential));\n");
+        sb.Append("var trend = dashboard.RegisterResource(new DashboardResource<Trend>(\"trend\",\n    ct => sales.GetTrendAsync(region.Value, channel.Values, period.Value, ct), DashboardQueryStage.Background));\n");
+        sb.Append("var regions = dashboard.RegisterResource(new DashboardResource<IReadOnlyList<DashboardBarItem>>(\"regions\",\n    ct => sales.GetRegionsAsync(channel.Values, period.Value, ct), DashboardQueryStage.Background));\n");
+        sb.Append("var customers = dashboard.RegisterResource(new DashboardResource<IReadOnlyList<CustomerRow>>(\"customers\",\n    ct => sales.GetCustomersAsync(region.Value, channel.Values, period.Value, ct), DashboardQueryStage.Background));\n\n");
+        if (_syncUrl) sb.Append("// The address sets the filters before the first load and before the reload on a change is wired.\ndashboard.ApplyQuery(new Uri(Nav.Uri).Query);\n");
+        sb.Append("await dashboard.LoadAsync();\n\nforeach (var filter in dashboard.Controls)\n{\n    filter.ChangedEvent += () => _ = dashboard.RefreshAsync();\n}\n");
+        if (_drill) sb.Append("\n// Drill down: a block hands the pick to your code, which decides what it means.\nvoid PickRegion(DashboardBarItem bar) => region.Value = bar.Label;\n");
+        return sb.ToString();
+    }
+
+    public void Dispose() => Teardown();
+}

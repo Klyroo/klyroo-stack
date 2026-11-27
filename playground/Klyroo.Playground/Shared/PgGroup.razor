@@ -1,0 +1,12 @@
+@* One group of knobs: a titled set of controls, separated from the next by a hairline. *@
+<div role="group" aria-labelledby="@_id" class="flex min-w-0 flex-col gap-3 border-b border-(--klyroo-border) p-4 last:border-b-0">
+    <h3 id="@_id" class="m-0 text-sm font-semibold text-(--klyroo-text-highlighted)">@Title</h3>
+    @ChildContent
+</div>
+
+@code {
+    private readonly string _id = "grp-" + Guid.NewGuid().ToString("N")[..8];
+
+    [Parameter, EditorRequired] public string Title { get; set; } = "";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

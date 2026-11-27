@@ -1,0 +1,146 @@
+@page "/form"
+@using System.Text
+@using Klyroo.Playground.Data
+@inject Knobs K
+
+<PgShell Library="_lib" DocsPage="guides/" OnReset="LoadKnobs"
+         Lead="Pick a model, switch its rules and conditions on and off, and fill the live form. Below it you see the typed model the form builds, the errors it reports and the model it submits.">
+    <Knobs>
+        <PgGroup Title="Model">
+            <PgSelect Key="tpl" Label="Template" T="string" Options="_templates" @bind-Value="_template" OnChange="Rebuild" />
+            <PgSwitch Key="prefill" Label="Start with sample data" Hint="Off starts from an empty model." @bind-Value="_prefill" OnChange="Rebuild" />
+        </PgGroup>
+        <PgGroup Title="Rules and conditions">
+            <PgSelect Key="src" Label="Rules come from" T="string" Options="_sources" @bind-Value="_source" OnChange="Rebuild" Disabled="@(_template != "contact")" Hint="@(_template != "contact" ? "Attributes are available on the contact model." : "The attributes of a twin of the contact model.")" />
+            <PgSwitch Key="rules" Label="Rules" Hint="Required fields, an email check, lengths and ranges." @bind-Value="_rules" OnChange="Rebuild" Disabled="@(_template == "contact" && _source == "annotations")" />
+            <PgSwitch Key="cond" Label="Conditions" Hint="Fields shown or required from other answers, a step skipped." @bind-Value="_conditions" OnChange="Rebuild" Disabled="@(_template == "contact" && _source == "annotations")" />
+        </PgGroup>
+    </Knobs>
+    <Stage>
+        @switch ((_template, _source))
+        {
+            case ("contact", "annotations"):
+                <FormStage @key="_signature" TModel="AnnotatedContactModel" Schema="_annotated" Initial="_annotatedInitial" Json="FormJson.Default.AnnotatedContactModel" />
+                break;
+            case ("contact", _):
+                <FormStage @key="_signature" TModel="ContactModel" Schema="_contact" Initial="_contactInitial" Json="FormJson.Default.ContactModel" />
+                break;
+            case ("wizard", _):
+                <FormStage @key="_signature" TModel="SignupModel" Schema="_signup" Initial="_signupInitial" Json="FormJson.Default.SignupModel" Title="Signup wizard" />
+                break;
+            case ("settings", _):
+                <FormStage @key="_signature" TModel="SettingsModel" Schema="_settings" Initial="_settingsInitial" Json="FormJson.Default.SettingsModel" UsePage="true" Title="Settings sections" />
+                break;
+            default:
+                <FormStage @key="_signature" TModel="OrderModel" Schema="_order" Initial="_orderInitial" Json="FormJson.Default.OrderModel" Title="Order with lines" />
+                break;
+        }
+        <CodePanel Tabs="CodeTabs" />
+    </Stage>
+</PgShell>
+
+@code {
+    private readonly LibraryInfo _lib = Libraries.Find("form")!;
+
+    private static readonly IReadOnlyList<PgOption<string>> _templates = PgOptions.Of(("contact", "Contact"), ("wizard", "Signup wizard"), ("settings", "Settings sections"), ("order", "Order with repeatable lines"));
+    private static readonly IReadOnlyList<PgOption<string>> _sources = PgOptions.Of(("schema", "The schema"), ("annotations", "DataAnnotations attributes"));
+
+    private string _template = "contact", _source = "schema", _signature = "";
+    private bool _prefill, _rules, _conditions;
+    private FormSchema<ContactModel> _contact = null!;
+    private FormSchema<AnnotatedContactModel> _annotated = null!;
+    private FormSchema<SignupModel> _signup = null!;
+    private FormSchema<SettingsModel> _settings = null!;
+    private FormSchema<OrderModel> _order = null!;
+    private ContactModel _contactInitial = null!;
+    private AnnotatedContactModel _annotatedInitial = null!;
+    private SignupModel _signupInitial = null!;
+    private SettingsModel _settingsInitial = null!;
+    private OrderModel _orderInitial = null!;
+
+    protected override void OnInitialized()
+    {
+        K.Load();
+        LoadKnobs();
+    }
+
+    private void LoadKnobs()
+    {
+        _template = K.Str("tpl", "contact");
+        if (_templates.All(t => t.Value != _template)) _template = "contact";
+        _source = K.Str("src", "schema");
+        _prefill = K.Bool("prefill", false);
+        _rules = K.Bool("rules", true);
+        _conditions = K.Bool("cond", true);
+        _signature = "";
+        Rebuild();
+    }
+
+    // A schema is fixed for the life of a form: a new combination of knobs builds a new schema and a new form.
+    private void Rebuild()
+    {
+        var signature = $"{_template}/{_source}/{_prefill}/{_rules}/{_conditions}";
+        if (signature == _signature) return;
+        _signature = signature;
+        _contact = FormTemplates.Contact(_rules, _conditions);
+        _annotated = FormTemplates.AnnotatedContact();
+        _signup = FormTemplates.Signup(_rules, _conditions);
+        _settings = FormTemplates.Settings(_rules, _conditions);
+        _order = FormTemplates.Order(_rules, _conditions);
+        _contactInitial = _prefill ? FormTemplates.ContactSample() : new();
+        _annotatedInitial = _prefill ? new() { Name = "Ada Lovelace", Email = "ada@example.test", Message = "My order arrived without the second box.", AcceptTerms = true } : new();
+        _signupInitial = _prefill ? FormTemplates.SignupSample() : new();
+        _settingsInitial = _prefill ? FormTemplates.SettingsSample() : new();
+        _orderInitial = _prefill ? FormTemplates.OrderSample() : new();
+    }
+
+    private IReadOnlyList<CodeTab> CodeTabs => _template switch
+    {
+        "contact" when _source == "annotations" => [new("Contact.razor", "html", "<KlyFormEngine TModel=\"AnnotatedContact\" Schema=\"Schema\" SubmitLabel=\"Submit\" OnSubmit=\"Sent\" />\n"), new("Model.cs", "csharp", AnnotatedCode)],
+        "contact" => [new("Contact.razor", "html", "<KlyFormEngine TModel=\"Contact\" Schema=\"Schema\" SubmitLabel=\"Submit\" OnSubmit=\"Sent\" />\n"), new("Schema.cs", "csharp", ContactCode())],
+        "wizard" => [new("Signup.razor", "html", "<KlyFormEngine TModel=\"Signup\" Schema=\"Schema\" SubmitLabel=\"Submit\" OnSubmit=\"Sent\" />\n"), new("Schema.cs", "csharp", SignupCode())],
+        "settings" => [new("Settings.razor", "html", "<KlyFormPage TModel=\"Settings\" Schema=\"Schema\" OnSubmit=\"Saved\" />\n"), new("Schema.cs", "csharp", SettingsCode())],
+        _ => [new("Order.razor", "html", "<KlyFormEngine TModel=\"Order\" Schema=\"Schema\" SubmitLabel=\"Place order\" OnSubmit=\"Placed\" />\n"), new("Schema.cs", "csharp", OrderCode())],
+    };
+
+    private static string If(bool on, string text) => on ? text : "";
+
+    private string ContactCode() =>
+        "public enum Topic { Sales, Support, Press }\n\npublic sealed class Contact\n{\n    public string Name { get; set; } = \"\";\n    public string Email { get; set; } = \"\";\n    public Topic Topic { get; set; }\n    public string OrderNumber { get; set; } = \"\";\n    public string Message { get; set; } = \"\";\n}\n\n" +
+        "// A static field: a new schema instance starts a new controller and drops what the user typed.\nstatic readonly FormSchema<Contact> Schema = FormSchema.For<Contact>(s =>\n{\n    s.FormKey = \"contact\";\n    s.Title = \"Contact us\";\n" +
+        "    s.Field(c => c.Name, f => f.Label(\"Your name\")" + If(_rules, ".Required()") + ");\n" +
+        "    s.Field(c => c.Email, f => f.Label(\"Email\")" + If(_rules, "\n        .Required()\n        .Rule(v => v.Contains('@'), \"Enter a valid email address\")") + ");\n" +
+        "    var topic = s.Field(c => c.Topic, f => f.AsRadio());\n" +
+        "    s.Field(c => c.OrderNumber, f => f.Label(\"Order number\")" + If(_conditions, "\n        .VisibleWhen(c => c.Get(topic) == Topic.Support)\n        .Required(c => c.Get(topic) == Topic.Support)\n        .DependsOn(topic)") + ");\n" +
+        "    s.Field(c => c.Message, f => f.AsTextarea()" + If(_rules, ".Required().MaxLength(500)") + ");\n});\n";
+
+    private const string AnnotatedCode =
+        "using System.ComponentModel.DataAnnotations;\n\npublic sealed class AnnotatedContact : IValidatableObject\n{\n    [Required, StringLength(60), Display(Name = \"Your name\", Prompt = \"Ada Lovelace\", Order = 1)]\n    public string Name { get; set; } = \"\";\n\n    [Required, EmailAddress, Display(Order = 2)]\n    public string Email { get; set; } = \"\";\n\n    [Display(Order = 3)]\n    public Topic Topic { get; set; }\n\n    [Required, StringLength(500, MinimumLength = 10), DataType(DataType.MultilineText), Display(Order = 4)]\n    public string Message { get; set; } = \"\";\n\n    public bool AcceptTerms { get; set; }\n\n    public IEnumerable<ValidationResult> Validate(ValidationContext context)\n    {\n        if (!AcceptTerms) yield return new ValidationResult(\"You must accept the terms\", [nameof(AcceptTerms)]);\n    }\n}\n\n" +
+        "// Klyroo.Form.DataAnnotations: every member with a default control becomes a field, the attributes become its rules,\n// and IValidatableObject runs at submit.\nstatic readonly FormSchema<AnnotatedContact> Schema = FormSchema.For<AnnotatedContact>(s =>\n{\n    s.Title = \"Contact us\";\n    s.FromDataAnnotations();\n});\n";
+
+    private string SignupCode() =>
+        "public enum PlanTier { Free, Team }\n\npublic sealed class Signup\n{\n    public string Email { get; set; } = \"\";\n    public string Password { get; set; } = \"\";\n    public string Name { get; set; } = \"\";\n    public string Country { get; set; } = \"FR\";\n    public bool Newsletter { get; set; }\n    public PlanTier Plan { get; set; }\n    public string VatNumber { get; set; } = \"\";\n}\n\n" +
+        "static readonly FormSchema<Signup> Schema = FormSchema.For<Signup>(s =>\n{\n    s.FormKey = \"signup\";\n    s.Title = \"Create your account\";\n    s.Step(\"account\", \"Account\", step =>\n    {\n" +
+        "        step.Field(m => m.Email, f => f.Label(\"Email\")" + If(_rules, "\n            .Required()\n            .Rule(v => v.Contains('@'), \"Enter a valid email address\")") + ");\n" +
+        "        step.Field(m => m.Password, f => f.AsPassword()" + If(_rules, "\n            .Required()\n            .Rule(v => v.Length >= 8, \"Use at least 8 characters\")") + ");\n    });\n" +
+        "    s.Step(\"profile\", \"Profile\", step =>\n    {\n        step.Field(m => m.Name, f => f.Label(\"Full name\")" + If(_rules, ".Required()") + ");\n        step.Field(m => m.Country, f => f.Options([new FormOption<string>(\"FR\", \"France\"), new FormOption<string>(\"DE\", \"Germany\"), new FormOption<string>(\"US\", \"United States\")]));\n        step.Field(m => m.Newsletter, f => f.Label(\"Send me the newsletter\").AsSwitch());\n    });\n" +
+        "    FormField<Signup, PlanTier> plan = null!;\n    s.Step(\"plan\", \"Plan\", step => plan = step.Field(m => m.Plan, f => f.AsRadio()));\n" +
+        "    s.Step(\"billing\", \"Billing\", step =>\n    {\n        step.Field(m => m.VatNumber, f => f.Label(\"VAT number\")" + If(_rules, ".Required()") + ");\n    }" + If(_conditions, ",\n    skipWhen: c => c.Get(plan) == PlanTier.Free") + ");\n});\n";
+
+    private string SettingsCode() =>
+        "public sealed class Settings\n{\n    public string Name { get; set; } = \"\";\n    public string Domain { get; set; } = \"\";\n    public bool Notifications { get; set; }\n    public string SlackChannel { get; set; } = \"\";\n    public bool TwoFactor { get; set; }\n    public int SessionMinutes { get; set; } = 60;\n}\n\n" +
+        "static readonly FormSchema<Settings> Schema = FormSchema.For<Settings>(s =>\n{\n    s.FormKey = \"settings\";\n    s.Title = \"Workspace settings\";\n    s.Section(\"general\", \"General\", section =>\n    {\n" +
+        "        section.Field(m => m.Name, f => f.Label(\"Workspace name\")" + If(_rules, ".Required()") + ");\n" +
+        "        section.Field(m => m.Domain, f => f.Label(\"Domain\").Placeholder(\"acme.example\")" + If(_rules, "\n            .Required()\n            .Rule(v => v.Contains('.'), \"Enter a domain such as acme.example\")") + ");\n    });\n" +
+        "    FormField<Settings, bool> notifications = null!;\n    s.Section(\"notifications\", \"Notifications\", section =>\n    {\n        notifications = section.Field(m => m.Notifications, f => f.Label(\"Send notifications\").AsSwitch());\n" +
+        "        section.Field(m => m.SlackChannel, f => f.Label(\"Slack channel\").Placeholder(\"#general\")" + If(_conditions, "\n            .VisibleWhen(c => c.Get(notifications))\n            .Required(c => c.Get(notifications))\n            .DependsOn(notifications)") + ");\n    }, optional: true);\n" +
+        "    s.Section(\"security\", \"Security\", section =>\n    {\n        section.Field(m => m.TwoFactor, f => f.Label(\"Require two-factor sign-in\").AsSwitch());\n        section.Field(m => m.SessionMinutes, f => f.Label(\"Session length (minutes)\")" + If(_rules, ".Range(5, 240)") + ");\n    }, optional: true);\n});\n";
+
+    private string OrderCode() =>
+        "public sealed class Order\n{\n    public string Customer { get; set; } = \"\";\n    public bool Gift { get; set; }\n    public string GiftMessage { get; set; } = \"\";\n    public List<OrderLine> Lines { get; set; } = [];\n}\n\npublic sealed class OrderLine\n{\n    public int Id { get; set; }\n    public string Sku { get; set; } = \"\";\n    public int Qty { get; set; } = 1;\n    public decimal Price { get; set; }\n}\n\n" +
+        "static readonly FormSchema<Order> Schema = FormSchema.For<Order>(s =>\n{\n    s.FormKey = \"order\";\n    s.Title = \"New order\";\n" +
+        "    s.Field(m => m.Customer, f => f.Label(\"Customer\")" + If(_rules, ".Required()") + ");\n" +
+        "    var gift = s.Field(m => m.Gift, f => f.Label(\"This is a gift\").AsSwitch());\n" +
+        "    s.Field(m => m.GiftMessage, f => f.Label(\"Gift message\").AsTextarea()" + If(_conditions, "\n        .VisibleWhen(c => c.Get(gift))\n        .DependsOn(gift)") + ");\n" +
+        "    s.List(m => m.Lines, row =>\n    {\n        row.Field(l => l.Sku, f => f.Label(\"SKU\")" + If(_rules, ".Required().MaxLength(12)") + ");\n        row.Field(l => l.Qty, f => f.Label(\"Quantity\")" + If(_rules, ".Range(1, 99)") + ");\n        row.Field(l => l.Price, f => f.Label(\"Unit price\")" + If(_rules, ".Rule(p => p > 0, \"The price must be above zero\")") + ");\n    },\n    addLabel: \"Add line\"" + If(_rules, ",\n    configure: f => f.Required()") + ");\n});\n";
+}

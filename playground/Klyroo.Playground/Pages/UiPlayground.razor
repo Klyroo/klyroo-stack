@@ -1,0 +1,286 @@
+@page "/ui"
+@using System.Text
+@using Klyroo.Playground.Shell
+@inject Knobs K
+
+<PgShell Library="_lib" DocsPage="getting-started/" DocsLabel="Getting started" OnReset="LoadKnobs"
+         Lead="Pick a component and turn its knobs: variant, size, color, states, icons. The color mode and the accent of the theme are switches too, so you see each component in light and dark with the accent of any Klyroo library.">
+    <Knobs>
+        <PgGroup Title="Component">
+            <PgSelect Key="component" Label="Component" T="string" Options="_components" @bind-Value="_component" OnChange="ComponentChanged" />
+        </PgGroup>
+        <PgGroup Title="Look">
+            @if (_component != "avatar" && _component != "input")
+            {
+                <PgSelect Key="color" Label="Color" T="string" Options="_colors" @bind-Value="_color" />
+            }
+            @if (_component is "button" or "badge" or "alert" or "input" or "tabs")
+            {
+                <PgSelect Key="variant" Label="Variant" T="string" Options="VariantOptions" @bind-Value="_variant" />
+            }
+            @if (_component is "button" or "badge" or "input" or "progress" or "avatar" or "switch")
+            {
+                <PgSelect Key="size" Label="Size" T="KlySize" Options="_sizes" @bind-Value="_size" />
+            }
+            @if (_component == "tabs")
+            {
+                <PgSelect Key="orientation" Label="Orientation" T="KlyOrientation" Options="_orientations" @bind-Value="_orientation" />
+            }
+        </PgGroup>
+        <PgGroup Title="Content">
+            @if (_component is "button" or "badge" or "switch" or "alert")
+            {
+                <PgText Key="label" Label="@(_component == "alert" ? "Title" : "Label")" @bind-Value="_label" />
+            }
+            @if (_component == "alert")
+            {
+                <PgText Key="description" Label="Description" @bind-Value="_description" />
+            }
+            @if (_component == "input")
+            {
+                <PgText Key="placeholder" Label="Placeholder" @bind-Value="_placeholder" />
+            }
+            @if (_component == "avatar")
+            {
+                <PgText Key="name" Label="Name, for the initials" @bind-Value="_label" />
+            }
+            @if (_component == "progress")
+            {
+                <PgNumber Key="value" Label="Value" Min="0" Max="100" @bind-Value="_value" Disabled="_indeterminate" />
+                <PgSwitch Key="indeterminate" Label="Indeterminate" Hint="Work of unknown duration." @bind-Value="_indeterminate" />
+                <PgSwitch Key="status" Label="Show the percentage" @bind-Value="_status" />
+            }
+            @if (_component is "button" or "badge")
+            {
+                <PgSwitch Key="leading" Label="Leading icon" @bind-Value="_leading" />
+                <PgSwitch Key="trailing" Label="Trailing icon" @bind-Value="_trailing" />
+            }
+        </PgGroup>
+        <PgGroup Title="States">
+            @if (_component is "button" or "input" or "switch")
+            {
+                <PgSwitch Key="disabled" Label="Disabled" @bind-Value="_disabled" />
+            }
+            @if (_component == "button")
+            {
+                <PgSwitch Key="loading" Label="Loading" Hint="A spinner replaces the leading icon and the button is inert." @bind-Value="_loading" />
+                <PgSwitch Key="block" Label="Full width" @bind-Value="_block" />
+            }
+            @if (_component == "alert")
+            {
+                <PgSwitch Key="close" Label="Close button" @bind-Value="_close" />
+            }
+            @if (_component == "switch")
+            {
+                <PgSwitch Key="on" Label="On" @bind-Value="_on" />
+            }
+            @if (_component is "avatar" or "badge" or "progress" or "tabs")
+            {
+                <p class="m-0 text-sm text-(--klyroo-text-muted)">This component has no interactive state to toggle: change its look above.</p>
+            }
+        </PgGroup>
+        <PgGroup Title="Theme">
+            <KlyFormField Label="Color mode" Help="Light, dark or the system setting, remembered by the browser.">
+                <KlyColorModeSelect />
+            </KlyFormField>
+            <PgSelect Key="accent" Label="Accent" T="string" Options="_accents" @bind-Value="_accent" Hint="The primary color of the theme: the accent of a Klyroo library." />
+        </PgGroup>
+    </Knobs>
+    <Stage>
+        @* The accent is a set of Klyroo.UI token overrides, scoped to the preview; the dark tone is picked by the color mode class of the page. *@
+        <style>@((MarkupString)AccentCss)</style>
+        <PgPanel Title="@(_componentTitle)" Note="the real Klyroo.UI component">
+            <div class="ui-preview flex min-h-40 min-w-0 flex-wrap items-center justify-center gap-4 p-6" data-accent="@_accent" data-testid="ui-preview">
+                @switch (_component)
+                {
+                    case "button":
+                        <KlyButton Label="@_label" Variant="Enum.Parse<ButtonVariant>(_variant)" Color="new KlyColor(_color)" Size="_size" Disabled="_disabled" Loading="_loading" Block="_block">
+                            <LeadingIcon>@if (_leading) {<KlyIcon Name="ph:check" />}</LeadingIcon>
+                            <TrailingIcon>@if (_trailing) {<KlyIcon Name="ph:arrow-right" />}</TrailingIcon>
+                        </KlyButton>
+                        break;
+                    case "badge":
+                        <KlyBadge Label="@_label" Variant="Enum.Parse<KlyVariant>(_variant)" Color="new KlyColor(_color)" Size="_size">
+                            <LeadingIcon>@if (_leading) {<KlyIcon Name="ph:check" />}</LeadingIcon>
+                            <TrailingIcon>@if (_trailing) {<KlyIcon Name="ph:arrow-right" />}</TrailingIcon>
+                        </KlyBadge>
+                        break;
+                    case "alert":
+                        <div class="w-full max-w-xl"><KlyAlert Title="@_label" Description="@_description" Variant="Enum.Parse<KlyVariant>(_variant)" Color="new KlyColor(_color)" Close="_close" /></div>
+                        break;
+                    case "input":
+                        <div class="w-full max-w-sm"><KlyInput Placeholder="@_placeholder" Variant="Enum.Parse<FieldVariant>(_variant)" Size="_size" Disabled="_disabled" aria-label="Sample field" /></div>
+                        break;
+                    case "switch":
+                        <KlySwitch Label="@_label" Color="new KlyColor(_color)" Size="_size" Disabled="_disabled" Value="_on" ValueChanged="v => _on = v" />
+                        break;
+                    case "progress":
+                        <div class="w-full max-w-md"><KlyProgress Value="@(_indeterminate ? null : _value)" Color="new KlyColor(_color)" Size="_size" Status="_status" /></div>
+                        break;
+                    case "avatar":
+                        <KlyAvatar Alt="@_label" Size="_size" />
+                        break;
+                    default:
+                        <div class="w-full max-w-xl"><KlyTabs Items="_tabItems" Variant="Enum.Parse<TabsVariant>(_variant)" Color="new KlyColor(_color)" Orientation="_orientation" AriaLabel="Sample tabs" /></div>
+                        break;
+                }
+            </div>
+        </PgPanel>
+        <CodePanel Tabs="CodeTabs" />
+    </Stage>
+</PgShell>
+
+@code {
+    private readonly LibraryInfo _lib = Libraries.Find("ui")!;
+
+    private static readonly IReadOnlyList<PgOption<string>> _components = PgOptions.Of(("button", "Button"), ("badge", "Badge"), ("alert", "Alert"), ("input", "Input"), ("switch", "Switch"), ("progress", "Progress"), ("avatar", "Avatar"), ("tabs", "Tabs"));
+    private static readonly IReadOnlyList<PgOption<string>> _colors = PgOptions.Of("primary", "secondary", "success", "info", "warning", "error", "neutral");
+    private static readonly IReadOnlyList<PgOption<KlySize>> _sizes = PgOptions.Of<KlySize>();
+    private static readonly IReadOnlyList<PgOption<KlyOrientation>> _orientations = PgOptions.Of<KlyOrientation>();
+    private static readonly IReadOnlyList<PgOption<string>> _accents =
+        PgOptions.Of([("default", "Klyroo.UI theme"), .. Libraries.All.Select(l => (l.Slug, l.Name))]);
+
+    private string _component = "button", _color = "primary", _variant = "Solid", _label = "Save changes", _description = "Your changes were saved to the workspace.", _placeholder = "Search the workspace", _accent = "default";
+    private KlySize _size;
+    private KlyOrientation _orientation;
+    private int _value;
+    private bool _indeterminate, _status, _leading, _trailing, _disabled, _loading, _block, _close, _on;
+    private string _componentTitle => _components.First(c => c.Value == _component).Label;
+
+    private static readonly IReadOnlyList<KlyTabItem> _tabItems =
+    [
+        new("Account") { Value = "account", Content = @<p class="m-0 p-3 text-sm">Account settings: name, email and password.</p> },
+        new("Billing") { Value = "billing", Content = @<p class="m-0 p-3 text-sm">Billing: plan, invoices and payment method.</p> },
+        new("Team") { Value = "team", Content = @<p class="m-0 p-3 text-sm">Team: members and roles.</p> },
+    ];
+
+    private IReadOnlyList<PgOption<string>> VariantOptions => _component switch
+    {
+        "button" => PgOptions.Of<ButtonVariant>().Select(o => new PgOption<string>(o.Value.ToString(), o.Label, o.Token)).ToList(),
+        "input" => PgOptions.Of<FieldVariant>().Select(o => new PgOption<string>(o.Value.ToString(), o.Label, o.Token)).ToList(),
+        "tabs" => PgOptions.Of<TabsVariant>().Select(o => new PgOption<string>(o.Value.ToString(), o.Label, o.Token)).ToList(),
+        _ => PgOptions.Of<KlyVariant>().Select(o => new PgOption<string>(o.Value.ToString(), o.Label, o.Token)).ToList(),
+    };
+
+    protected override void OnInitialized()
+    {
+        K.Load();
+        LoadKnobs();
+    }
+
+    private void LoadKnobs()
+    {
+        _component = K.Str("component", "button");
+        if (_components.All(c => c.Value != _component)) _component = "button";
+        _color = K.Str("color", "primary");
+        _variant = K.Str("variant", DefaultVariant(_component));
+        if (VariantOptions.All(o => o.Value != _variant)) _variant = DefaultVariant(_component);
+        _size = K.Enum("size", KlySize.Md);
+        _orientation = K.Enum("orientation", KlyOrientation.Horizontal);
+        _label = K.Str("label", DefaultLabel(_component));
+        _description = K.Str("description", "Your changes were saved to the workspace.");
+        _placeholder = K.Str("placeholder", "Search the workspace");
+        _value = K.Int("value", 60, 0, 100);
+        _indeterminate = K.Bool("indeterminate", false);
+        _status = K.Bool("status", true);
+        _leading = K.Bool("leading", true);
+        _trailing = K.Bool("trailing", false);
+        _disabled = K.Bool("disabled", false);
+        _loading = K.Bool("loading", false);
+        _block = K.Bool("block", false);
+        _close = K.Bool("close", true);
+        _on = K.Bool("on", true);
+        _accent = K.Str("accent", "default");
+        if (_accents.All(a => a.Value != _accent)) _accent = "default";
+    }
+
+    private static string DefaultVariant(string component) => component switch
+    {
+        "button" => "Solid", "input" => "Outline", "tabs" => "Pill", "badge" => "Subtle", "alert" => "Soft", _ => "Solid",
+    };
+
+    private static string DefaultLabel(string component) => component switch
+    {
+        "button" => "Save changes", "badge" => "New", "alert" => "Saved", "switch" => "Email notifications", "avatar" => "Ada Lovelace", _ => "",
+    };
+
+    private void ComponentChanged()
+    {
+        _variant = DefaultVariant(_component);
+        _label = DefaultLabel(_component);
+        K.Put("variant", _variant);
+        K.Put("label", _label);
+    }
+
+    private string AccentCss
+    {
+        get
+        {
+            if (_accent == "default") return "";
+            var hex = Libraries.Find(_accent)!.Accent;
+            var t = AccentColor.Compute(hex);
+            return $".ui-preview[data-accent]{{--klyroo-primary:{t.Fill};--klyroo-primary-contrast:{t.OnFill};--klyroo-primary-text:{t.InkLight}}}" +
+                   $".dark .ui-preview[data-accent]{{--klyroo-primary-text:{t.InkDark}}}";
+        }
+    }
+
+    private static string Pascal(string color) => char.ToUpperInvariant(color[0]) + color[1..];
+
+    private IReadOnlyList<CodeTab> CodeTabs => [new("Sample.razor", "html", Razor()), .. (_accent == "default" ? [] : new[] { new CodeTab("app.css", "css", AccentCode()) })];
+
+    private string AccentCode()
+    {
+        var t = AccentColor.Compute(Libraries.Find(_accent)!.Accent);
+        return $"/* The accent of the theme: override the primary tokens of Klyroo.UI where you want it. */\n:root {{\n  --klyroo-primary: {t.Fill};\n  --klyroo-primary-contrast: {t.OnFill};\n  --klyroo-primary-text: {t.InkLight};\n}}\n:root.dark {{\n  --klyroo-primary-text: {t.InkDark};\n}}\n";
+    }
+
+    private string Razor()
+    {
+        var sb = new StringBuilder();
+        var color = _color == "primary" ? "" : $" Color=\"KlyColor.{Pascal(_color)}\"";
+        var size = _size == KlySize.Md ? "" : $" Size=\"KlySize.{_size}\"";
+        switch (_component)
+        {
+            case "button":
+                sb.Append($"<KlyButton Label=\"{_label}\"{(_variant == "Solid" ? "" : $" Variant=\"ButtonVariant.{_variant}\"")}{color}{size}{(_disabled ? " Disabled=\"true\"" : "")}{(_loading ? " Loading=\"true\"" : "")}{(_block ? " Block=\"true\"" : "")}");
+                AppendIcons(sb, "KlyButton");
+                break;
+            case "badge":
+                sb.Append($"<KlyBadge Label=\"{_label}\"{(_variant == "Subtle" ? "" : $" Variant=\"KlyVariant.{_variant}\"")}{color}{size}");
+                AppendIcons(sb, "KlyBadge");
+                break;
+            case "alert":
+                sb.Append($"<KlyAlert Title=\"{_label}\" Description=\"{_description}\"{(_variant == "Soft" ? "" : $" Variant=\"KlyVariant.{_variant}\"")}{color}{(_close ? " Close=\"true\"" : "")} />\n");
+                break;
+            case "input":
+                sb.Append($"<KlyInput Placeholder=\"{_placeholder}\"{(_variant == "Outline" ? "" : $" Variant=\"FieldVariant.{_variant}\"")}{size}{(_disabled ? " Disabled=\"true\"" : "")} />\n");
+                break;
+            case "switch":
+                sb.Append($"<KlySwitch Label=\"{_label}\"{color}{size}{(_disabled ? " Disabled=\"true\"" : "")} @bind-Value=\"_on\" />\n");
+                break;
+            case "progress":
+                sb.Append($"<KlyProgress{(_indeterminate ? "" : $" Value=\"{_value}\"")}{color}{size}{(_status ? " Status=\"true\"" : "")} />\n");
+                break;
+            case "avatar":
+                sb.Append($"<KlyAvatar Alt=\"{_label}\"{size} />\n");
+                break;
+            default:
+                sb.Append("<KlyTabs Items=\"_tabs\"" + (_variant == "Pill" ? "" : $" Variant=\"TabsVariant.{_variant}\"") + color + (_orientation == KlyOrientation.Vertical ? " Orientation=\"KlyOrientation.Vertical\"" : "") + " />\n\n");
+                sb.Append(TabsCode);
+                break;
+        }
+        return sb.ToString();
+    }
+
+    private const string TabsCode =
+        "@code {\n    private readonly IReadOnlyList<KlyTabItem> _tabs =\n    [\n        new(\"Account\") { Value = \"account\", Content = @<p>Account settings.</p> },\n        new(\"Billing\") { Value = \"billing\", Content = @<p>Billing.</p> },\n        new(\"Team\") { Value = \"team\", Content = @<p>Team.</p> },\n    ];\n}\n";
+
+    private void AppendIcons(StringBuilder sb, string tag)
+    {
+        if (!_leading && !_trailing) { sb.Append(" />\n"); return; }
+        sb.Append(">\n");
+        if (_leading) sb.Append("    <LeadingIcon><KlyIcon Name=\"ph:check\" /></LeadingIcon>\n");
+        if (_trailing) sb.Append("    <TrailingIcon><KlyIcon Name=\"ph:arrow-right\" /></TrailingIcon>\n");
+        sb.Append($"</{tag}>\n");
+    }
+}

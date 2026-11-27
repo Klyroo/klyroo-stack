@@ -1,0 +1,36 @@
+@page "/"
+
+<PageTitle>Klyroo playground</PageTitle>
+
+<div class="page-wrap">
+    <div class="pg-head">
+        <h1 class="pg-title">Try each Klyroo library <span class="accent">in the browser</span></h1>
+        <p class="pg-lead">
+            Eight playgrounds, one per library. The result is drawn by the real components and engines running in WebAssembly on sample data, the knobs are real parameters of
+            the library, and the code beside the result is the C# and Razor that produces it, copyable as it stands. Nothing is sent to a server.
+        </p>
+    </div>
+
+    <ul class="lib-list">
+        @foreach (var library in Libraries.All)
+        {
+            <li class="lib-row" style="--dot: @library.Accent">
+                <h2><span class="dot" aria-hidden="true"></span><a href="@library.Slug/">@library.Name</a></h2>
+                <div>
+                    <p>@library.Summary</p>
+                    <div class="mt-2.5 flex flex-wrap gap-1.5">
+                        @foreach (var feature in library.Features)
+                        {
+                            <KlyBadge Label="@feature" Variant="KlyVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Sm" />
+                        }
+                    </div>
+                </div>
+                <div>
+                    <KlyButton Href="@(library.Slug + "/")" Label="Open the playground" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Sm">
+                        <TrailingIcon><KlyIcon Name="ph:arrow-right" /></TrailingIcon>
+                    </KlyButton>
+                </div>
+            </li>
+        }
+    </ul>
+</div>

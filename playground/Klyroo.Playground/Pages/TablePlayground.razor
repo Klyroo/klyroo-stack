@@ -1,0 +1,370 @@
+@page "/table"
+@using System.Text
+@using Klyroo.Playground.Data
+@inject Knobs K
+@inject NavigationManager Nav
+@implements IDisposable
+
+<PgShell Library="_lib" DocsPage="guides/" OnReset="LoadKnobs"
+         Lead="A KlyDataList over 200 employees. Turn parts on and off, change how it pages and groups, select rows and run an action, export what you see as CSV. Search, sort and page are written to the address, so a reload or a shared link comes back to the same view.">
+    <Knobs>
+        <PgGroup Title="Search and filters">
+            <PgSwitch Key="search" Label="Search field" Hint="Looks in name, email and title." @bind-Value="_search" />
+            <PgSwitch Key="fopt" Label="Option filters" Hint="Department, country and status, with counts." @bind-Value="_fOption" OnChange="Rebuild" />
+            <PgSwitch Key="fnum" Label="Number filter" Hint="Salary, with a minimum." @bind-Value="_fNumber" OnChange="Rebuild" />
+            <PgSwitch Key="fdate" Label="Date filter" Hint="Hire date." @bind-Value="_fDate" OnChange="Rebuild" />
+            <PgSelect Key="fui" Label="Where the filters sit" T="string" Options="_filterUis" @bind-Value="_filterUi" />
+        </PgGroup>
+        <PgGroup Title="Sorting and paging">
+            <PgSelect Key="sort" Label="Default sort" T="string" Options="_sorts" @bind-Value="_sort" OnChange="Rebuild" />
+            <PgSwitch Key="multi" Label="Sort menu for several columns" Hint="Shift+click on a header adds a sort in any case." @bind-Value="_multiSort" />
+            <PgSelect Key="paging" Label="Paging mode" T="DataListPagingMode" Options="_pagingModes" @bind-Value="_paging" OnChange="Rebuild" Disabled="_tree" Hint="@(_tree ? "A tree shows every top-level row: paging is off." : null)" />
+            <PgNumber Key="size" Label="Page size" Min="5" Max="100" Step="5" @bind-Value="_pageSize" OnChange="Rebuild" Disabled="@(_tree || _paging == DataListPagingMode.None)" />
+        </PgGroup>
+        <PgGroup Title="Rows">
+            <PgSwitch Key="tree" Label="Tree of reporting lines" Hint="Rows carry their reports. Off shows the flat list." @bind-Value="_tree" OnChange="Rebuild" />
+            <PgSelect Key="group" Label="Group by" T="string" Options="_groups" @bind-Value="_group" Disabled="_tree" OnChange="Rebuild" />
+            <PgSwitch Key="totals" Label="Totals in the footer" Hint="Sum of salary for the page and for the filtered rows." @bind-Value="_totals" Disabled="_tree" OnChange="Rebuild" />
+            <PgSelect Key="density" Label="Density" T="DataListDensity" Options="_densities" @bind-Value="_density" />
+        </PgGroup>
+        <PgGroup Title="Columns">
+            <PgSwitch Key="cols" Label="Column picker" Hint="Show, hide, reorder and pin columns. Resizable headers." @bind-Value="_columnPicker" />
+            <PgSwitch Key="pin" Label="Pin the name column" Hint="It stays in view when the table scrolls sideways." @bind-Value="_pin" />
+            <PgSwitch Key="menu" Label="Header menus" Hint="Sort, pin or hide from each header." @bind-Value="_headerMenu" />
+        </PgGroup>
+        <PgGroup Title="Selection and export">
+            <PgSwitch Key="select" Label="Selection with bulk actions" Hint="Tick rows, then raise salaries or put people on leave." @bind-Value="_selection" OnChange="Rebuild" />
+            <PgSwitch Key="csv" Label="CSV export" Hint="This page, the selection or every result." @bind-Value="_csv" />
+        </PgGroup>
+    </Knobs>
+    <Stage>
+        <PgPanel Title="Employees" Note="@(_tree ? "sample data, reporting tree" : "sample data, 200 rows")" Flush>
+            @{ var items = _tree ? Employees.Tree : Employees.All; }
+            <KlyDataList @key="_signature" @ref="_list" TItem="Employee" Schema="_schemaInstance" Items="items" Label="Employees"
+                             PagingMode="EffectivePaging" Density="_density" Selectable="@(_selection ? true : null)">
+                    <div class="table-toolbar">
+                        @if (_search)
+                        {
+                            <KlyDataListSearch TItem="Employee" />
+                        }
+                        @if (_filterUi == "tags" && HasFilters)
+                        {
+                            <KlyDataListFilterTags TItem="Employee" ShowAdd="true" ShowClear="true" />
+                        }
+                        @if (_multiSort)
+                        {
+                            <KlyDataListSortMenu TItem="Employee" Multiple="true" />
+                        }
+                        @if (_columnPicker)
+                        {
+                            <KlyDataListColumnPanel TItem="Employee" />
+                        }
+                        @if (_csv)
+                        {
+                            <KlyDataListExport TItem="Employee" FileName="employees" />
+                        }
+                    </div>
+                    @if (_selection)
+                    {
+                        <KlyDataListSelectionActions TItem="Employee" Actions="_bulk" />
+                    }
+                    <div class="@(_filterUi == "panel" && HasFilters ? "table-with-side" : null)">
+                        @if (_filterUi == "panel" && HasFilters)
+                        {
+                            <KlyDataListFilterPanel TItem="Employee" Description="Narrow the employees" />
+                        }
+                        <div class="table-scroll">
+                            <KlyDataListTable TItem="Employee" HeaderMenu="_headerMenu" Resizable="_columnPicker"
+                                              GroupBy="@(_tree ? null : GroupByOf(_group))"
+                                              Tree="@(_tree ? _treeConfig : null)"
+                                              Summaries="@(_totals && !_tree ? _summaries : null)">
+                                <KlyDataListFieldColumn TItem="Employee" Field="name" Title="Name" Width="@(_pin ? 220 : null)" Pinned="@(_pin ? DataListPin.Start : DataListPin.None)" Required="@_pin" />
+                                <KlyDataListFieldColumn TItem="Employee" Field="department" Title="Department" />
+                                <KlyDataListFieldColumn TItem="Employee" Field="title" Title="Title" />
+                                <KlyDataListFieldColumn TItem="Employee" Field="country" Title="Country" />
+                                <KlyDataListFieldColumn TItem="Employee" Field="status" Title="Status" />
+                                <KlyDataListFieldColumn TItem="Employee" Field="salary" Title="Salary" Format="C0" Align="DataListAlign.End" Summary="@(_totals && !_tree ? DataListSummaryKind.Sum : DataListSummaryKind.None)" />
+                                <KlyDataListFieldColumn TItem="Employee" Field="hired" Title="Hired" Format="d" />
+                            </KlyDataListTable>
+                        </div>
+                    </div>
+                    @if (EffectivePaging == DataListPagingMode.Offset)
+                    {
+                        <div class="table-footer"><KlyDataListPagination TItem="Employee" ShowPageSize="true" ShowFirstLast="true" PageSizes="@(new[] { 5, 10, 25, 50, 100 })" /></div>
+                    }
+                    else if (EffectivePaging == DataListPagingMode.Cursor)
+                    {
+                        <div class="table-footer"><KlyDataListInfiniteLoader TItem="Employee" /></div>
+                    }
+            </KlyDataList>
+            @if (_message is not null)
+            {
+                <div class="p-4 pt-0" role="status"><KlyAlert Variant="KlyVariant.Soft" Title="Last action" Description="@_message" Color="KlyColor.Primary" /></div>
+            }
+        </PgPanel>
+
+        <PgPanel Title="URL state" Note="what the list writes to the address">
+            <div data-testid="url-state"><KlyDisplay Kind="DisplayKind.Code" Value="@(_urlState.Length == 0 ? "(nothing yet: the defaults are left out)" : _urlState)" Highlight="false" Surface="DisplaySurface.Plain" /></div>
+            <p class="m-0 mt-2 text-sm text-(--klyroo-text-muted)">q is the search, p the page, ps the page size, s the sort (a leading minus is descending), f.&lt;field&gt; a filter, l the layout. The knobs of this page use the k. keys.</p>
+        </PgPanel>
+
+        <CodePanel Tabs="CodeTabs" />
+    </Stage>
+</PgShell>
+
+@code {
+    private readonly LibraryInfo _lib = Libraries.Find("table")!;
+
+    private bool _search, _fOption, _fNumber, _fDate, _multiSort, _tree, _totals, _columnPicker, _pin, _headerMenu, _selection, _csv;
+    private string _filterUi = "tags", _sort = "name", _group = "none";
+    private DataListPagingMode _paging;
+    private DataListDensity _density;
+    private int _pageSize;
+    private string _message = null!;
+    private string _urlState = "";
+    private string _signature = "";
+    private DataListSchema<Employee> _schemaInstance = null!;
+    private KlyDataList<Employee>? _list;
+    private IReadOnlyList<DataListAction<Employee>> _bulk = [];
+
+    private static readonly IReadOnlyList<PgOption<string>> _filterUis = PgOptions.Of(("tags", "Tags above the table"), ("panel", "Panel beside the table"));
+    private static readonly IReadOnlyList<PgOption<string>> _sorts = PgOptions.Of(("none", "None"), ("name", "Name"), ("salary", "Salary, highest first"), ("hired", "Hire date, newest first"));
+    private static readonly IReadOnlyList<PgOption<string>> _groups = PgOptions.Of(("none", "No grouping"), ("department", "Department"), ("country", "Country"), ("status", "Status"));
+    private static readonly IReadOnlyList<PgOption<DataListPagingMode>> _pagingModes = PgOptions.Of<DataListPagingMode>();
+    private static readonly IReadOnlyList<PgOption<DataListDensity>> _densities = PgOptions.Of<DataListDensity>();
+
+    private static readonly DataListGroupBy<Employee> ByDepartment = DataListGroupBy<Employee>.By(e => e.Department);
+    private static readonly DataListGroupBy<Employee> ByCountry = DataListGroupBy<Employee>.By(e => e.Country);
+    private static readonly DataListGroupBy<Employee> ByStatus = DataListGroupBy<Employee>.By(e => e.Status);
+    private static readonly DataListSummaries<Employee> _summaries = new() { Scopes = [DataListSummaryScope.Page, DataListSummaryScope.Filtered] };
+    private static readonly DataListTree<Employee> _treeConfig = new() { Children = e => e.Reports, DefaultExpandedDepth = 1 };
+
+    private DataListPagingMode EffectivePaging => _tree ? DataListPagingMode.None : _paging;
+    private bool HasFilters => _fOption || _fNumber || _fDate;
+
+    private static DataListGroupBy<Employee>? GroupByOf(string group) => group switch
+    {
+        "department" => ByDepartment,
+        "country" => ByCountry,
+        "status" => ByStatus,
+        _ => null,
+    };
+
+    protected override void OnInitialized()
+    {
+        K.Load();
+        LoadKnobs();
+        Nav.LocationChanged += OnLocation;
+        UpdateUrlState();
+    }
+
+    private void LoadKnobs()
+    {
+        _search = K.Bool("search", true);
+        _fOption = K.Bool("fopt", true);
+        _fNumber = K.Bool("fnum", true);
+        _fDate = K.Bool("fdate", false);
+        _filterUi = K.Str("fui", "tags");
+        _sort = K.Str("sort", "name");
+        _multiSort = K.Bool("multi", false);
+        _paging = K.Enum("paging", DataListPagingMode.Offset);
+        _pageSize = K.Int("size", 10, 5, 100);
+        _tree = K.Bool("tree", false);
+        _group = K.Str("group", "none");
+        _totals = K.Bool("totals", false);
+        _density = K.Enum("density", DataListDensity.Default);
+        _columnPicker = K.Bool("cols", false);
+        _pin = K.Bool("pin", false);
+        _headerMenu = K.Bool("menu", true);
+        _selection = K.Bool("select", false);
+        _csv = K.Bool("csv", false);
+        _bulk = BuildBulk();
+        Rebuild();
+    }
+
+    // The schema is fixed for the life of a list: a new one means a new list, which reads its state from the address again.
+    private void Rebuild()
+    {
+        var signature = $"{_fOption}{_fNumber}{_fDate}{_sort}{_paging}{_pageSize}{_tree}{_selection}";
+        if (signature == _signature) return;
+        _signature = signature;
+        _schemaInstance = BuildSchema();
+    }
+
+    private static Action<DataListFieldBuilder<Employee, TProp>> Sort<TProp>(DataListFilter? filter = null) => f =>
+    {
+        f.Sortable();
+        if (filter is not null) f.Filter(filter);
+    };
+
+    private DataListSchema<Employee> BuildSchema() => DataListSchema.For<Employee>(s =>
+    {
+        s.RowKey(e => e.Id);
+        s.Search(e => e.Name, e => e.Email, e => e.Title);
+        s.Field(e => e.Name, Sort<string>());
+        s.Field(e => e.Department, Sort<string>(_fOption ? DataListFilter.Option().WithFacets() : null));
+        s.Field(e => e.Title, Sort<string>());
+        s.Field(e => e.Country, Sort<string>(_fOption ? DataListFilter.Option().WithFacets() : null));
+        s.Field(e => e.Status, Sort<EmployeeStatus>(_fOption ? DataListFilter.Option().WithFacets() : null));
+        s.Field(e => e.Salary, Sort<decimal>(_fNumber ? DataListFilter.Number(min: 0) : null));
+        s.Field(e => e.Hired, Sort<DateOnly>(_fDate ? DataListFilter.Date() : null));
+        switch (_sort)
+        {
+            case "name": s.DefaultSort(e => e.Name); break;
+            case "salary": s.DefaultSort(e => e.Salary, descending: true); break;
+            case "hired": s.DefaultSort(e => e.Hired, descending: true); break;
+        }
+        s.DefaultPageSize(_pageSize);
+    });
+
+    private IReadOnlyList<DataListAction<Employee>> BuildBulk() =>
+    [
+        new DataListAction<Employee>
+        {
+            Key = "raise",
+            Label = "Raise by 5%",
+            Color = KlyColor.Primary,
+            ClearSelection = DataListSelectionClear.Success,
+            OnExecute = c =>
+            {
+                foreach (var e in c.SelectedItems) e.Salary = Math.Round(e.Salary * 1.05m / 100m) * 100m;
+                _list?.UpdateRows(c.SelectedItems);
+                _message = $"{c.TargetCount} salaries raised by 5%.";
+                return Task.CompletedTask;
+            },
+        },
+        new DataListAction<Employee>
+        {
+            Key = "leave",
+            Label = "Put on leave",
+            Confirm = new DataListActionConfirm<Employee>
+            {
+                Title = "Put people on leave",
+                Description = c => $"{c.TargetCount} people will be marked as on leave.",
+                ConfirmLabel = "Put on leave",
+            },
+            ClearSelection = DataListSelectionClear.Success,
+            OnExecute = c =>
+            {
+                foreach (var e in c.SelectedItems) e.Status = EmployeeStatus.OnLeave;
+                _list?.UpdateRows(c.SelectedItems);
+                _message = $"{c.TargetCount} people marked as on leave.";
+                return Task.CompletedTask;
+            },
+        },
+    ];
+
+    private void OnLocation(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        UpdateUrlState();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void UpdateUrlState()
+    {
+        var query = new Uri(Nav.Uri).Query.TrimStart('?');
+        var parts = query.Split('&', StringSplitOptions.RemoveEmptyEntries).Where(p => !p.StartsWith(Knobs.Prefix, StringComparison.Ordinal));
+        var text = string.Join('&', parts.Select(Uri.UnescapeDataString));
+        _urlState = text.Length == 0 ? "" : "?" + text;
+    }
+
+    public void Dispose() => Nav.LocationChanged -= OnLocation;
+
+    private IReadOnlyList<CodeTab> CodeTabs => [new("Employees.razor", "html", RazorCode()), new("Schema.cs", "csharp", SchemaCode())];
+
+    private string RazorCode()
+    {
+        var sb = new StringBuilder();
+        var items = _tree ? "Roots" : "Staff";
+        sb.Append($"<KlyDataList TItem=\"Employee\" Schema=\"Schema\" Items=\"{items}\" Label=\"Employees\"");
+        if (EffectivePaging != DataListPagingMode.Offset) sb.Append($"\n             PagingMode=\"DataListPagingMode.{EffectivePaging}\"");
+        if (_density != DataListDensity.Default) sb.Append($"\n             Density=\"DataListDensity.{_density}\"");
+        if (_selection) sb.Append("\n             Selectable=\"true\"");
+        sb.Append(">\n");
+        var toolbar = new List<string>();
+        if (_search) toolbar.Add("<KlyDataListSearch TItem=\"Employee\" />");
+        if (_filterUi == "tags" && HasFilters) toolbar.Add("<KlyDataListFilterTags TItem=\"Employee\" ShowAdd=\"true\" ShowClear=\"true\" />");
+        if (_multiSort) toolbar.Add("<KlyDataListSortMenu TItem=\"Employee\" Multiple=\"true\" />");
+        if (_columnPicker) toolbar.Add("<KlyDataListColumnPanel TItem=\"Employee\" />");
+        if (_csv) toolbar.Add("<KlyDataListExport TItem=\"Employee\" FileName=\"employees\" />");
+        if (toolbar.Count > 0)
+        {
+            sb.Append("    <div class=\"flex flex-wrap items-center gap-2\">\n");
+            foreach (var line in toolbar) sb.Append("        ").Append(line).Append('\n');
+            sb.Append("    </div>\n");
+        }
+        if (_selection) sb.Append("    <KlyDataListSelectionActions TItem=\"Employee\" Actions=\"_bulk\" />\n");
+        var side = _filterUi == "panel" && HasFilters;
+        var pad = side ? "    " : "";
+        if (side)
+        {
+            sb.Append("    <div class=\"grid gap-4 md:grid-cols-[16rem_1fr]\">\n");
+            sb.Append("        <KlyDataListFilterPanel TItem=\"Employee\" Description=\"Narrow the employees\" />\n");
+        }
+        var table = new StringBuilder("<KlyDataListTable TItem=\"Employee\"");
+        if (_headerMenu) table.Append(" HeaderMenu=\"true\"");
+        if (_columnPicker) table.Append(" Resizable=\"true\"");
+        if (!_tree && _group != "none") table.Append(" GroupBy=\"_groupBy\"");
+        if (_tree) table.Append(" Tree=\"_tree\"");
+        if (_totals && !_tree) table.Append(" Summaries=\"_summaries\"");
+        table.Append('>');
+        sb.Append(pad).Append("    ").Append(table).Append('\n');
+        var name = "<KlyDataListFieldColumn TItem=\"Employee\" Field=\"name\" Title=\"Name\"" + (_pin ? " Width=\"220\" Pinned=\"DataListPin.Start\" Required=\"true\"" : "") + " />";
+        string[] cols =
+        [
+            name,
+            "<KlyDataListFieldColumn TItem=\"Employee\" Field=\"department\" Title=\"Department\" />",
+            "<KlyDataListFieldColumn TItem=\"Employee\" Field=\"title\" Title=\"Title\" />",
+            "<KlyDataListFieldColumn TItem=\"Employee\" Field=\"country\" Title=\"Country\" />",
+            "<KlyDataListFieldColumn TItem=\"Employee\" Field=\"status\" Title=\"Status\" />",
+            "<KlyDataListFieldColumn TItem=\"Employee\" Field=\"salary\" Title=\"Salary\" Format=\"C0\" Align=\"DataListAlign.End\"" + (_totals && !_tree ? " Summary=\"DataListSummaryKind.Sum\"" : "") + " />",
+            "<KlyDataListFieldColumn TItem=\"Employee\" Field=\"hired\" Title=\"Hired\" Format=\"d\" />",
+        ];
+        foreach (var c in cols) sb.Append(pad).Append("        ").Append(c).Append('\n');
+        sb.Append(pad).Append("    </KlyDataListTable>\n");
+        if (side) sb.Append("    </div>\n");
+        if (EffectivePaging == DataListPagingMode.Offset) sb.Append("    <KlyDataListPagination TItem=\"Employee\" ShowPageSize=\"true\" ShowFirstLast=\"true\" />\n");
+        else if (EffectivePaging == DataListPagingMode.Cursor) sb.Append("    <KlyDataListInfiniteLoader TItem=\"Employee\" />\n");
+        sb.Append("</KlyDataList>\n");
+        return sb.ToString();
+    }
+
+    private string SchemaCode()
+    {
+        var sb = new StringBuilder();
+        sb.Append("public enum EmployeeStatus { Active, Remote, OnLeave }\n\n");
+        sb.Append("public sealed class Employee\n{\n    public int Id { get; init; }\n    public string Name { get; init; } = \"\";\n    public string Email { get; init; } = \"\";\n    public string Department { get; init; } = \"\";\n    public string Title { get; init; } = \"\";\n    public string Country { get; init; } = \"\";\n    public EmployeeStatus Status { get; set; }\n    public decimal Salary { get; set; }\n    public DateOnly Hired { get; init; }\n");
+        if (_tree) sb.Append("    public List<Employee>? Reports { get; set; }\n");
+        sb.Append("}\n\n");
+        sb.Append("// A static field: the list reads its schema once, a new instance would be ignored.\n");
+        sb.Append("static readonly DataListSchema<Employee> Schema = DataListSchema.For<Employee>(s => s\n    .RowKey(e => e.Id)\n    .Search(e => e.Name, e => e.Email, e => e.Title)\n");
+        string Field(string member, string filter) => filter.Length == 0 ? $"    .Field(e => e.{member}, f => f.Sortable())\n" : $"    .Field(e => e.{member}, f => f.Sortable().Filter({filter}))\n";
+        sb.Append(Field("Name", ""));
+        sb.Append(Field("Department", _fOption ? "DataListFilter.Option().WithFacets()" : ""));
+        sb.Append(Field("Title", ""));
+        sb.Append(Field("Country", _fOption ? "DataListFilter.Option().WithFacets()" : ""));
+        sb.Append(Field("Status", _fOption ? "DataListFilter.Option().WithFacets()" : ""));
+        sb.Append(Field("Salary", _fNumber ? "DataListFilter.Number(min: 0)" : ""));
+        sb.Append(Field("Hired", _fDate ? "DataListFilter.Date()" : ""));
+        sb.Append(_sort switch
+        {
+            "name" => "    .DefaultSort(e => e.Name)\n",
+            "salary" => "    .DefaultSort(e => e.Salary, descending: true)\n",
+            "hired" => "    .DefaultSort(e => e.Hired, descending: true)\n",
+            _ => "",
+        });
+        sb.Append($"    .DefaultPageSize({_pageSize}));\n");
+        if (!_tree && _group != "none")
+        {
+            var member = _group switch { "department" => "Department", "country" => "Country", _ => "Status" };
+            sb.Append($"\nstatic readonly DataListGroupBy<Employee> _groupBy = DataListGroupBy<Employee>.By(e => e.{member});\n");
+        }
+        if (_totals && !_tree) sb.Append("\nstatic readonly DataListSummaries<Employee> _summaries = new()\n{\n    Scopes = [DataListSummaryScope.Page, DataListSummaryScope.Filtered],\n};\n");
+        if (_tree) sb.Append("\nstatic readonly DataListTree<Employee> _tree = new() { Children = e => e.Reports, DefaultExpandedDepth = 1 };\n");
+        if (_selection)
+        {
+            sb.Append("\nIReadOnlyList<DataListAction<Employee>> _bulk =\n[\n    new DataListAction<Employee>\n    {\n        Key = \"raise\",\n        Label = \"Raise by 5%\",\n        Color = KlyColor.Primary,\n        ClearSelection = DataListSelectionClear.Success,\n        OnExecute = c =>\n        {\n            foreach (var e in c.SelectedItems) e.Salary = Math.Round(e.Salary * 1.05m / 100m) * 100m;\n            _list?.UpdateRows(c.SelectedItems);\n            return Task.CompletedTask;\n        },\n    },\n    new DataListAction<Employee>\n    {\n        Key = \"leave\",\n        Label = \"Put on leave\",\n        Confirm = new DataListActionConfirm<Employee> { Title = \"Put people on leave\", ConfirmLabel = \"Put on leave\" },\n        OnExecute = c =>\n        {\n            foreach (var e in c.SelectedItems) e.Status = EmployeeStatus.OnLeave;\n            _list?.UpdateRows(c.SelectedItems);\n            return Task.CompletedTask;\n        },\n    },\n];\n");
+        }
+        return sb.ToString();
+    }
+}

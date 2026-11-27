@@ -1,0 +1,30 @@
+@* The code of the current knobs: one tab per file, each a KlyDisplay code block (colored from its Language, with its copy button). *@
+<section aria-label="Code for the current knobs" class="min-w-0">
+    <KlyCard Ui="@(new CardUi { Body = "p-0", Header = "px-4 py-2.5" })">
+        <Header>
+            <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                <h2 class="m-0 text-sm font-semibold text-(--klyroo-text-highlighted)">Code</h2>
+                <KlyBadge Label="updates with the knobs" Variant="KlyVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Xs" />
+            </div>
+        </Header>
+        <ChildContent>
+            <KlyTabs Items="_items" Value="@_current" ValueChanged="OnTab" AriaLabel="Files" Ui="@(new TabsUi { List = "px-3 pt-2" })" />
+        </ChildContent>
+    </KlyCard>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<CodeTab> Tabs { get; set; } = [];
+
+    private string? _current = "0";
+    private IReadOnlyList<KlyTabItem> _items = [];
+
+    protected override void OnParametersSet() =>
+        _items = [.. Tabs.Select((tab, i) => new KlyTabItem($"{tab.Name}") { Value = i.ToString(), Content = Render(tab) })];
+
+    private void OnTab(string? value) => _current = value;
+
+    private static RenderFragment Render(CodeTab tab) => @<div class="max-h-[30rem] min-w-0 overflow-auto">
+        <KlyDisplay Kind="DisplayKind.Code" Value="@tab.Text" Language="@tab.Language" Surface="DisplaySurface.Plain" />
+    </div>;
+}

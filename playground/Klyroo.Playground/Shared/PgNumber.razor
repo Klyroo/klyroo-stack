@@ -1,0 +1,28 @@
+@inject Knobs K
+
+<KlyFormField Label="@Label" Help="@Hint">
+    <KlyInputNumber TNumber="int" Value="Value" ValueChanged="HandleChange" Min="Min" Max="Max" Step="Step" Disabled="Disabled" />
+</KlyFormField>
+
+@code {
+    [Parameter, EditorRequired] public string Label { get; set; } = "";
+    [Parameter] public string? Hint { get; set; }
+    [Parameter] public string? Key { get; set; }
+    [Parameter] public int Value { get; set; }
+    [Parameter] public int Min { get; set; }
+    [Parameter] public int Max { get; set; } = 1_000_000;
+    [Parameter] public int Step { get; set; } = 1;
+    [Parameter] public EventCallback<int> ValueChanged { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    /// <summary>Raised after the value is stored, for a page that has to rebuild something from it.</summary>
+    [Parameter] public EventCallback OnChange { get; set; }
+
+    private async Task HandleChange(int value)
+    {
+        value = Math.Clamp(value, Min, Max);
+        Value = value;
+        if (Key is not null) K.Put(Key, value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        await ValueChanged.InvokeAsync(value);
+        await OnChange.InvokeAsync();
+    }
+}

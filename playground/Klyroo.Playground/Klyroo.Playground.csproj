@@ -1,0 +1,83 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <!--
+    The Klyroo playground: one interactive page per library, running the real components and engines in WebAssembly with sample data,
+    published as static files (build/publish-playground.sh) for GitHub Pages at https://klyroo.github.io/klyroo-stack/playground/.
+    It is a standalone app (no server), so it is also the host of its page: the Klyroo.UI build features (Tailwind, fonts, icons)
+    come from the sibling klyroo-ui checkout, imported by hand like the other projects of this repository do.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Klyroo.Playground</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
+    <StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
+    <!-- Trimming is on for publish (the default of a Blazor WebAssembly app). The libraries are IsTrimmable and the playground reads its JSON through source-generated contexts. -->
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimMode>full</TrimMode>
+    <!-- GitHub Pages compresses what it serves and ignores precompressed files: do not publish them twice. -->
+    <BlazorEnableCompression>false</BlazorEnableCompression>
+    <CompressionEnabled>false</CompressionEnabled>
+    <!-- Fingerprints the framework files and fills the placeholders of index.html (the import map, the preload link, blazor.webassembly#[.{fingerprint}].js). -->
+    <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+    <!-- Tailwind compiled by the build (no Node): Styles/app.css becomes app.css, which index.html links. -->
+    <KlyrooTailwind>true</KlyrooTailwind>
+  </PropertyGroup>
+
+  <!-- Pages and layouts are created by the router from their type, with no reference the trimmer can follow: keep the whole assembly of the playground (the libraries stay trimmed). -->
+  <ItemGroup>
+    <TrimmerRootAssembly Include="Klyroo.Playground" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Klyroo.UI" />
+    <Using Include="Klyroo.Query" />
+    <Using Include="Klyroo.Table" />
+    <Using Include="Klyroo.Form" />
+    <Using Include="Klyroo.Dashboard" />
+    <Using Include="Klyroo.Display" />
+    <Using Include="Klyroo.Spreadsheet" />
+    <Using Include="Klyroo.Agent" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
+    <ProjectReference Include="..\..\src\Klyroo.Stack\Klyroo.Stack.csproj" />
+    <ProjectReference Include="..\..\..\klyroo-form\src\Klyroo.Form.DataAnnotations\Klyroo.Form.DataAnnotations.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\klyroo-ui\src\Klyroo.UI.Build.Tasks\Klyroo.UI.Build.Tasks.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+  <PropertyGroup>
+    <KlyrooBuildTasksAssembly>$(MSBuildThisFileDirectory)..\..\..\klyroo-ui\src\Klyroo.UI.Build.Tasks\bin\$(Configuration)\netstandard2.0\Klyroo.UI.Build.Tasks.dll</KlyrooBuildTasksAssembly>
+  </PropertyGroup>
+  <Import Project="..\..\..\klyroo-ui\src\Klyroo.UI\buildTransitive\Klyroo.UI.Tasks.targets" />
+  <Import Project="..\..\..\klyroo-ui\src\Klyroo.UI\buildTransitive\Klyroo.UI.Fonts.targets" />
+  <Import Project="..\..\..\klyroo-ui\src\Klyroo.UI\buildTransitive\Klyroo.UI.Icons.targets" />
+  <Import Project="..\..\..\klyroo-ui\src\Klyroo.UI\buildTransitive\Klyroo.UI.Tailwind.targets" />
+
+  <!-- A standalone app has no server to render the head: it is the host of its page, so the check that keeps fonts out of a client project does not apply. -->
+  <Target Name="KlyrooFontsCheckProject" />
+
+  <!-- Styles/app.css imports obj/klyroo/klyroo.theme.css, which the Klyroo.UI package copies there; from source it is copied by hand. -->
+  <Target Name="KlyrooCopyTailwindTheme" BeforeTargets="BeforeBuild">
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)..\..\..\klyroo-ui\src\Klyroo.UI\wwwroot\klyroo.theme.css"
+          DestinationFolder="$([MSBuild]::NormalizeDirectory($(MSBuildProjectDirectory), $(BaseIntermediateOutputPath), klyroo))"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+  <!-- Fonts are downloaded at build time and served from the app's own origin: index.html links _klyroo/fonts/klyroo.fonts.css. -->
+  <ItemGroup>
+    <KlyrooFont Include="Geist" Role="sans" Weights="400..700" Subsets="latin" Preload="false" />
+    <KlyrooFont Include="Geist Mono" Role="mono" Weights="400..600" Subsets="latin" Preload="false" />
+  </ItemGroup>
+
+  <!-- Icons the build cannot see by scanning: the names of the navigation entries are chosen at run time. -->
+  <ItemGroup>
+    <KlyrooIcon Include="ph:squares-four;ph:github-logo;ph:copy;ph:check;ph:arrow-up-right;ph:arrow-right;ph:sliders-horizontal;ph:code" />
+  </ItemGroup>
+
+</Project>
