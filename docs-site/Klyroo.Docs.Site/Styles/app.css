@@ -13,3 +13,6 @@
 @import "./prose.css";
 @import "./home.css";
 @import "./board.css";
+@import "./showcase.css";
+/* The classes of the Klyroo.Display blocks of the showcase home page. */
+@source "../../../../klyroo-display/src/Klyroo.Display";

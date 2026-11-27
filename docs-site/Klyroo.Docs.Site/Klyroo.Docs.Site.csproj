@@ -19,6 +19,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\klyroo-ui\src\Klyroo.UI\Klyroo.UI.csproj" />
+    <!-- The code blocks of the showcase home page are KlyDisplay blocks of Klyroo.Display, which lives in its own repository next to this one. -->
+    <ProjectReference Include="..\..\..\klyroo-display\src\Klyroo.Display\Klyroo.Display.csproj" />
     <PackageReference Include="Markdig" />
     <PackageReference Include="YamlDotNet" />
   </ItemGroup>
@@ -41,6 +43,11 @@
           SkipUnchangedFiles="true" />
   </Target>
 
+  <!-- Klyroo.Display and the classes its blocks use: the stylesheet is compiled from the sources of the page and of the libraries it shows. -->
+  <ItemGroup>
+    <KlyrooTailwindAdditionalInput Include="..\..\..\klyroo-display\src\Klyroo.Display\**\*.razor" />
+  </ItemGroup>
+
   <!-- The list of the Klyroo libraries shown in the header of every site. -->
   <ItemGroup>
     <None Update="libraries.yml" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
@@ -55,6 +62,13 @@
   <ItemGroup>
     <KlyrooFont Include="Geist" Role="sans" Weights="400..700" Subsets="latin" />
     <KlyrooFont Include="Geist Mono" Role="mono" Weights="400..600" Subsets="latin" />
+    <!--
+      The signage faces of the showcase home page. Archivo is the variable font with its width axis (wdth 62 to 125, which the signs use through
+      font-variation-settings): the Google provider only serves the weight axis, so the file of the Fontsource build (SIL OFL 1.1, Fonts/OFL-Archivo.txt) is
+      read by the local provider of the same pipeline. JetBrains Mono sets the code of the page.
+    -->
+    <KlyrooFont Include="Archivo" Provider="local" Src="Fonts" Weights="100..900" Subsets="latin" Preload="true" />
+    <KlyrooFont Include="JetBrains Mono" Provider="google" Weights="400..800" Subsets="latin" />
   </ItemGroup>
 
 </Project>

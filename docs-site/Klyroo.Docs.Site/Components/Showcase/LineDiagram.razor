@@ -1,0 +1,27 @@
+@* The same network as a vertical line diagram: one rail per line, the stations stacked along it. It takes the place of the map on a narrow screen, and
+   it has the same interactions: a hover or the focus of a badge isolates its line. *@
+<div class="sc-diagram" id="line-diagram">
+    <h2 class="sr-only">The lines and their stations</h2>
+    <ol class="ld-lines">
+        @foreach (var line in Layout.Lines)
+        {
+            <li class="ld-line" data-line="@line.Key" style="--c: @line.Badge.Fill">
+                <div class="ld-head">
+                    <KlyLink Href="@("#line-" + line.Key)" Raw="true" Class="ld-badge" aria-label="@($"{line.Library.Name}: ride this line")">
+                        <KlyBadge Label="@line.Library.Name" Size="KlySize.Lg" Class="ld-pill" style="@($"--kly-color: {line.Badge.Fill}; --kly-color-contrast: {line.Badge.OnFill}")" />
+                    </KlyLink>
+                </div>
+                <ul class="ld-stops">
+                    @foreach (var station in line.Stations)
+                    {
+                        <li><i class="ld-dot" aria-hidden="true"></i>@station.Station.Label</li>
+                    }
+                </ul>
+            </li>
+        }
+    </ol>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public NetworkLayout Layout { get; set; } = default!;
+}

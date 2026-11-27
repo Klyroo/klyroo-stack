@@ -3,6 +3,7 @@ using Klyroo.Docs.Site.Components;
 using Klyroo.Docs.Site.Content;
 using Klyroo.Docs.Site.Export;
 using Klyroo.Docs.Site.Library;
+using Klyroo.Display;
 using Klyroo.UI;
 
 // Two ways to run: serve the site of one library, or write it as static files.
@@ -62,7 +63,8 @@ if (export)
 }
 
 // The accent of the site is written by the page (Components/App.razor) as CSS variables, so the Klyroo.UI colors need no change here.
-builder.Services.AddKlyrooUi();
+// AddKlyrooDisplay registers Klyroo.UI too: the showcase home page draws its code blocks with KlyDisplay.
+builder.Services.AddKlyrooDisplay();
 // Static server rendering only: no circuit, no WebAssembly. Everything that moves runs in the browser (Klyroo's own script).
 builder.Services.AddRazorComponents();
 builder.Services.AddSingleton(site);

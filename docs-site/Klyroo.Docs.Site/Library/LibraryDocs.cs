@@ -115,7 +115,7 @@ public static partial class LibraryDocs
             throw new ContentException($"{configPath}: '{preview}' is not a preview. The previews are: {string.Join(", ", Previews)}.");
         }
         var settings = new SiteSettings(name, title, tagline, description, config.Install, github, config.Branch, config.Packages, accent, texture, headline,
-            config.Lead ?? tagline, HeroInstall(config.Install, title, config.Packages), config.Demo);
+            config.Lead ?? tagline, HeroInstall(config.Install, title, config.Packages), config.Demo, config.Home);
 
         var rendered = files.ToDictionary(f => f.Slug, f => (f.Path, Result: Render(f.Path, f.Slug)), StringComparer.Ordinal);
 

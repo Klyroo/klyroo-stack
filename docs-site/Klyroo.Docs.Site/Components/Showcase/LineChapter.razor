@@ -1,0 +1,45 @@
+@* One chapter of the journey: the line, its stations with what each one is, and where to go next. The stations light up one by one while the chapter is read
+   (a view timeline in the CSS), and the map beside it rides the same line. *@
+<section class="sc-chapter" id="line-@Line.Key" data-line="@Line.Key" aria-labelledby="ch-@Line.Key-title" style="--c: @Line.Badge.Fill; --on: @Line.Badge.OnFill">
+    <div class="ch-card">
+        <header class="ch-head">
+            <h2 id="ch-@Line.Key-title"><KlyBadge Label="@Line.Library.Name" Size="KlySize.Xl" Class="ch-pill" style="@($"--kly-color: {Line.Badge.Fill}; --kly-color-contrast: {Line.Badge.OnFill}")" /></h2>
+            <p class="ch-tagline">@Line.Line.Tagline</p>
+        </header>
+        <ol class="ch-stops" aria-label="Stations of the @Line.Library.Name line">
+            @foreach (var station in Line.Stations)
+            {
+                <li class="ch-stop">
+                    <i class="ch-dot" aria-hidden="true"></i>
+                    <div>
+                        <h3>@station.Station.Label</h3>
+                        <p>@station.Station.Text</p>
+                    </div>
+                </li>
+            }
+        </ol>
+        <div class="ch-actions">
+            <KlyButton Href="@Urls.Docs(Line.Line)" Color="KlyColor.Primary" Size="KlySize.Md" TrailingIcon="@ArrowIcon">Read the docs</KlyButton>
+            <KlyButton Href="@Urls.Playground(Line.Line)" Variant="ButtonVariant.Outline" Size="KlySize.Md" Class="ch-play" TrailingIcon="@ArrowIcon">Open the playground</KlyButton>
+        </div>
+        <div class="ch-install">
+            <code>@Line.Line.InstallCommand</code>
+            <KlyTooltip Text="Copy the install line" Placement="KlyPlacement.Top">
+                <KlyButton Variant="ButtonVariant.Ghost" Size="KlySize.Xs" Square="true" Class="sc-copy" data-copy="@Line.Line.InstallCommand" aria-label="@($"Copy the install line of {Line.Library.Name}")">
+                    <LeadingIcon>
+                        <svg class="code-copy-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.75" /><path d="M10.5 3.5v-.25A1.75 1.75 0 0 0 8.75 1.5h-5A1.75 1.75 0 0 0 2 3.25v5C2 9.2 2.8 10 3.75 10h.25" /></svg>
+                        <svg class="code-check-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3.5 8.5 3 3 6-7" /></svg>
+                    </LeadingIcon>
+                    <ChildContent><span class="copy-status sr-only" role="status" aria-live="polite"></span></ChildContent>
+                </KlyButton>
+            </KlyTooltip>
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public PlacedLine Line { get; set; } = default!;
+    [Parameter, EditorRequired] public ShowcaseUrls Urls { get; set; } = default!;
+
+    private RenderFragment ArrowIcon => @<KlyIcon Name="ph:arrow-right" />;
+}

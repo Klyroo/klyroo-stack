@@ -1,0 +1,644 @@
+/*
+  The home page of the Klyroo network (Components/Showcase), chosen by "home: showcase" in docs/site.yml. It has a world of its own, drawn from the direction contract
+  .impeccable/surfaces/showcase.md: a transit diagram (Beck, Vignelli) with black signage bands, the system yellow #ffd23f, a warm signage white ground in light mode and
+  a station-night ground in dark, Archivo (its width axis) for the signs and JetBrains Mono for the code. Nothing here touches the docs pages: every rule is below .is-showcase,
+  which only the home page of a site with "home: showcase" carries.
+
+  The effects are CSS: the lines draw themselves (stroke-dashoffset), the trains follow the routes (offset-path), a hover or the focus of a badge isolates its line (:has()),
+  and one scroll timeline (animation-timeline: --journey, the view timeline of the journey section) rides the camera along the lines. Under prefers-reduced-motion, in a browser
+  without scroll timelines and on a narrow screen the map is plain and the chapters are plain.
+*/
+
+@property --lit {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+.is-showcase {
+  --sc-font: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --sc-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --sc-sys: #ffd23f;
+  --sc-ink: #111111;
+  --sc-ground: #f4f1e8;
+  --sc-sunken: #ebe7d9;
+  --sc-raised: #fbf9f3;
+  --sc-text: #1d1b16;
+  --sc-strong: #0b0a08;
+  --sc-muted: #4a463b;
+  --sc-line: #cdc7b5;
+  --sc-edge: #111111;
+  --sc-station: #ffffff;
+  --sc-label: #111111;
+  --sc-focus: #0b57d0;
+  --sc-panel: #111111;
+  --sc-panel-text: #f6f3ea;
+  --sc-panel-muted: #bdb8aa;
+  --sc-panel-line: #34373f;
+  --sc-nav-h: 62px;
+  --sc-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --sc-gutter: clamp(1rem, 3.4vw, 3rem);
+
+  background: var(--sc-ground);
+  color: var(--sc-text);
+  font-family: var(--sc-font);
+
+  /* The Klyroo.UI components of the page read these. */
+  --klyroo-bg: var(--sc-ground);
+  --klyroo-bg-muted: var(--sc-sunken);
+  --klyroo-bg-elevated: var(--sc-raised);
+  --klyroo-bg-accented: var(--sc-sunken);
+  --klyroo-bg-overlay: var(--sc-raised);
+  --klyroo-text: var(--sc-text);
+  --klyroo-text-highlighted: var(--sc-strong);
+  --klyroo-text-toned: var(--sc-text);
+  --klyroo-text-muted: var(--sc-muted);
+  --klyroo-text-dimmed: var(--sc-muted);
+  --klyroo-border: var(--sc-line);
+  --klyroo-border-muted: var(--sc-line);
+  --klyroo-border-accented: var(--sc-edge);
+  --klyroo-primary: var(--sc-sys);
+  --klyroo-primary-text: var(--sc-ink);
+  --klyroo-primary-contrast: var(--sc-ink);
+  --klyroo-radius: 0.5rem;
+}
+
+:root.dark .is-showcase {
+  --sc-ground: #0d121b;
+  --sc-sunken: #090d14;
+  --sc-raised: #141b27;
+  --sc-text: #e8e4d8;
+  --sc-strong: #fbf8ef;
+  --sc-muted: #b0ab9d;
+  --sc-line: #2b3446;
+  --sc-edge: #f4f1e8;
+  --sc-station: #f4f1e8;
+  --sc-label: #ece8dc;
+  --sc-focus: #ffd23f;
+  --sc-panel: #05080d;
+  --sc-panel-line: #2b3446;
+  --klyroo-primary-text: var(--sc-sys);
+}
+
+html:has(.is-showcase), body:has(.is-showcase) { background: #f4f1e8; }
+:root.dark:has(.is-showcase), :root.dark body:has(.is-showcase) { background: #0d121b; }
+
+.is-showcase .ground-wrap { display: none; }
+.is-showcase .site-main { padding: 0; min-height: 0; }
+
+/* Surfaces that are black in both modes: the nav band, the signs, the panels, the code. The Klyroo.UI tokens are redrawn for them. */
+.sc-nav, .sc .sign, .sc .sc-plat, .sc .sc-pillars, .sc .ch-card, .sc .sc-templates, .sc .rule-sign, .sc .sc-code, .sc .sc-popover-surface {
+  --klyroo-bg: var(--sc-panel);
+  --klyroo-bg-muted: #14171d;
+  --klyroo-bg-elevated: #14171d;
+  --klyroo-bg-accented: #1c2028;
+  --klyroo-bg-overlay: #14171d;
+  --klyroo-text: var(--sc-panel-text);
+  --klyroo-text-highlighted: #ffffff;
+  --klyroo-text-toned: #dcd8cb;
+  --klyroo-text-muted: var(--sc-panel-muted);
+  --klyroo-text-dimmed: var(--sc-panel-muted);
+  --klyroo-border: var(--sc-panel-line);
+  --klyroo-border-muted: var(--sc-panel-line);
+  --klyroo-border-accented: #4a4f5b;
+  --klyroo-primary: var(--sc-sys);
+  --klyroo-primary-text: var(--sc-sys);
+  --klyroo-primary-contrast: var(--sc-ink);
+  --klyroo-success-text: #7ee0a0;
+  --klyroo-warning-text: #ffd070;
+  --klyroo-secondary-text: #c3a6ff;
+  --klyroo-info-text: #86b6ff;
+  --klyroo-error-text: #ff8a75;
+  color: var(--sc-panel-text);
+}
+
+/* ---------- The nav band ---------- */
+.sc-nav {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  box-sizing: border-box;
+  height: var(--sc-nav-h);
+  background: #111111;
+  border-bottom: 6px solid var(--sc-sys);
+}
+.sc-nav-inner {
+  display: flex;
+  align-items: center;
+  height: 56px;
+  padding: 0 var(--sc-gutter);
+  gap: 1rem;
+}
+.sc-mark {
+  margin-right: auto;
+  color: #ffffff;
+  font: 800 1.5rem/1 var(--sc-font);
+  font-variation-settings: "wdth" 125;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.sc-mark b { color: var(--sc-sys); font-weight: 800; }
+.sc-links { display: flex; gap: 2.5rem; margin-right: 1rem; }
+.sc-link {
+  color: #ffffff;
+  font: 700 0.9375rem/1 var(--sc-font);
+  font-variation-settings: "wdth" 112;
+  text-decoration: none;
+  padding: 0.5rem 0;
+  border-bottom: 3px solid transparent;
+  transition: border-color 0.15s;
+}
+.sc-link:hover { border-color: var(--sc-sys); }
+.sc-link:focus-visible { outline: 2px solid var(--sc-sys); outline-offset: 4px; border-radius: 2px; }
+.sc-tools { display: flex; align-items: center; gap: 0.5rem; }
+.sc-nav .sc-search, .sc-nav .sc-mode { color: #ffffff; }
+.sc-nav .sc-search:hover, .sc-nav .sc-mode:hover { background: #26292f; }
+.sc-nav .sc-search kbd { background: #1d2026; color: #ece8dc; border-color: #4a4f5b; }
+.sc-nav .sc-gh { font-weight: 700; }
+.sc-nav :focus-visible { outline: 2px solid var(--sc-sys); outline-offset: 2px; }
+
+/* ---------- The journey ---------- */
+.journey {
+  --stage-h: calc(100svh - var(--sc-nav-h));
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  /* The view timeline of the whole journey. The inset is zero because the page has a scroll-padding for its anchors, which a view timeline would otherwise take for the edge of the screen. */
+  view-timeline: --journey block;
+  view-timeline-inset: 0px;
+}
+.rail { display: contents; }
+
+.opening {
+  grid-column: 1;
+  grid-row: 1;
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-height: var(--stage-h);
+  padding: 2.5rem 0 2.5rem var(--sc-gutter);
+}
+.sign {
+  box-sizing: border-box;
+  width: min(100%, 28.25rem);
+  padding: 1.9rem 2.1rem 2.1rem;
+  background: var(--sc-panel);
+  border-radius: 1.125rem;
+}
+:root.dark .sign { outline: 1px solid var(--sc-panel-line); }
+.sign h1 {
+  margin: 0;
+  color: #ffffff;
+  font: 900 clamp(3.25rem, 5.6vw, 5.25rem) / 0.92 var(--sc-font);
+  font-variation-settings: "wdth" 125;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+.sign h1 i { font-style: normal; color: var(--sc-sys); }
+.sign .bar { display: flex; height: 10px; margin-top: 1.5rem; border-radius: 5px; overflow: hidden; }
+.sign .bar span { flex: 1; }
+.copy {
+  width: min(100%, 27.5rem);
+  font: 500 1.1875rem/1.38 var(--sc-font);
+  color: var(--sc-text);
+}
+.copy p { margin: 0 0 0.75rem; }
+.copy strong { font-weight: 800; color: var(--sc-strong); }
+.copy .hint { display: flex; align-items: center; gap: 0.75rem; font-size: 0.9375rem; font-weight: 600; color: var(--sc-muted); }
+.hint-badge {
+  flex: none;
+  width: 2.125rem;
+  height: 1.125rem;
+  border-radius: 6px;
+  background: var(--sc-sys);
+  border: 3px solid var(--sc-edge);
+  box-sizing: border-box;
+}
+.hint kbd { vertical-align: 1px; }
+
+/* The platform sign */
+.sc-plat {
+  display: flex;
+  width: min(46rem, calc(100% + 9rem));
+  margin-top: auto;
+  border-radius: 0.875rem;
+  overflow: visible;
+  box-shadow: 0 0 0 4px var(--sc-ink);
+  position: relative;
+  z-index: 4;
+}
+:root.dark .sc-plat { box-shadow: 0 0 0 4px var(--sc-panel-line); }
+.sc-plat .num {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 4.5rem;
+  background: var(--sc-sys);
+  color: var(--sc-ink);
+  font: 900 2.75rem/1 var(--sc-font);
+  font-variation-settings: "wdth" 125;
+  border-radius: 0.875rem 0 0 0.875rem;
+}
+.sc-plat .body {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  flex: 1;
+  min-width: 0;
+  padding: 0.875rem 1rem 0.875rem 1.375rem;
+  background: var(--sc-panel);
+  border-radius: 0 0.875rem 0.875rem 0;
+}
+.sc-plat .cmd .w { white-space: nowrap; }
+.sc-plat .lab {
+  color: var(--sc-sys);
+  font: 800 0.9375rem/1 var(--sc-font);
+  font-variation-settings: "wdth" 112;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.sc-plat .cmd { font: 700 0.9375rem/1.3 var(--sc-mono); color: #ffffff; background: none; padding: 0; flex: 1 1 14rem; }
+.sc-copy[data-copied] .code-copy-icon, .sc-copy:not([data-copied]) .code-check-icon { display: none; }
+.sc-more-btn { color: var(--sc-panel-text); }
+.sc-pkgs { list-style: none; margin: 0; padding: 0.25rem; display: grid; gap: 0.75rem; min-width: min(22rem, 80vw); }
+.sc-pkgs li { display: grid; gap: 0.25rem; }
+.sc-pkgs .pkg-name { display: flex; align-items: center; gap: 0.5rem; font: 700 0.9375rem/1.2 var(--sc-font); }
+.sc-pkgs .pkg-name a { color: #ffffff; text-underline-offset: 3px; }
+.sc-pkgs code { font: 500 0.8125rem/1.4 var(--sc-mono); color: #dcd8cb; background: none; padding: 0; overflow-wrap: anywhere; }
+
+/* ---------- The stage: the map, sticky ---------- */
+.stage {
+  grid-column: 2;
+  grid-row: 1 / span 9;
+  align-self: start;
+  position: sticky;
+  top: var(--sc-nav-h);
+  height: var(--stage-h);
+  overflow: clip;
+  z-index: 1;
+}
+.stage .sc-map { position: absolute; inset: 0; }
+.sc-diagram { display: none; }
+.sc-pillars {
+  position: absolute;
+  right: clamp(1rem, 2.6vw, 2.5rem);
+  top: clamp(1rem, 3vh, 2rem);
+  width: 13.5rem;
+  box-sizing: border-box;
+  padding: 0.5rem 1rem;
+  background: var(--sc-panel);
+  border-radius: 0.875rem;
+  z-index: 2;
+}
+:root.dark .sc-pillars { outline: 1px solid var(--sc-panel-line); }
+.sc-pillars ul { list-style: none; margin: 0; padding: 0; }
+.sc-pillars li + li { border-top: 1px solid var(--sc-panel-line); }
+.sc-pillars a {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 0;
+  color: #ffffff;
+  font: 700 0.84375rem/1.25 var(--sc-font);
+  text-decoration: none;
+}
+.sc-pillars a:hover { color: var(--sc-sys); }
+.sc-pillars a:focus-visible { outline: 2px solid var(--sc-sys); outline-offset: 2px; border-radius: 4px; }
+.dot { flex: none; display: inline-block; width: 0.6875rem; height: 0.6875rem; border-radius: 50%; background: var(--sc-sys); }
+
+/* ---------- The map ---------- */
+.sc-map { display: block; }
+.sc-map svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.sc-map .cam { transform-origin: 0 0; transform-box: view-box; }
+.sc-map .route {
+  fill: none;
+  stroke: var(--c);
+  stroke-width: 14;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+.sc-map .line-i { transition: opacity 0.3s var(--sc-ease); }
+.sc-map .tick {
+  --l: max(var(--lit, 0), var(--hov, 0));
+  fill: color-mix(in oklab, var(--sc-station), var(--sc-sys) calc(var(--l) * 100%));
+  stroke: var(--sc-edge);
+  stroke-width: 3.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(calc(1 + var(--l) * 0.45));
+}
+.sc-map .lbl {
+  --l: max(var(--lit, 0), var(--hov, 0));
+  font: 700 14.5px/1 var(--sc-font);
+  font-variation-settings: "wdth" 100;
+  fill: color-mix(in srgb, var(--sc-label), #111111 calc(var(--l) * 100%));
+  stroke: color-mix(in srgb, transparent, var(--sc-sys) calc(var(--l) * 100%));
+  stroke-width: 7px;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+.sc-map .badge { cursor: pointer; outline: none; }
+/* The links of Klyroo.UI components keep the colors of their variant: the docs stylesheet colors every link, outside any layer. */
+.is-showcase a[data-color] { color: revert-layer; text-decoration-color: revert-layer; }
+.sc-map .badge .plate { stroke: var(--sc-edge); stroke-width: 3.5; transition: stroke-width 0.15s; }
+.sc-map .badge text {
+  font: 800 14.5px/1 var(--sc-font);
+  font-variation-settings: "wdth" 108;
+  text-anchor: middle;
+  pointer-events: none;
+}
+.sc-map .badge:hover .plate { stroke-width: 6; }
+.sc-map .badge .ring { fill: none; stroke: var(--sc-focus); stroke-width: 3; opacity: 0; }
+.sc-map .badge:focus-visible .ring { opacity: 1; }
+.sc-map .hub-ring { fill: var(--sc-edge); }
+.sc-map .hub-disc { fill: var(--sc-sys); }
+.sc-map .hub text {
+  font: 900 16px/1 var(--sc-font);
+  font-variation-settings: "wdth" 125;
+  text-anchor: middle;
+  fill: #111111;
+}
+.sc-map .train, .sc-map .rider { display: none; }
+.sc-map .rider { fill: var(--sc-sys); stroke: var(--sc-ink); stroke-width: 3.5; }
+.sc-map .car { fill: var(--sc-station); stroke: var(--sc-ink); stroke-width: 2.5; }
+.sc-map .head { fill: var(--sc-sys); }
+
+/* One line isolated: a hover on it or the focus of its badge dims the others and lights its stations with their labels. */
+.sc-map:has(.line-g:is(:hover, :focus-within)) .line-g:not(:hover, :focus-within) .line-i { opacity: 0.14; }
+.sc-map .line-g:is(:hover, :focus-within) .stn { --hov: 1; }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The lines draw themselves on load, each station appears as the line reaches it, then the trains run from the interchange. */
+  .sc-map[data-mode="stage"] .route { stroke-dashoffset: 1; animation: sc-draw 1.2s var(--sc-ease) var(--delay) both; }
+  .sc-map[data-mode="stage"] .stn :is(.tick, .lbl) { animation: sc-appear 0.4s var(--sc-ease) var(--sd) both; }
+  .sc-map[data-mode="stage"] .badge { animation: sc-appear 0.5s var(--sc-ease) calc(var(--delay) + 1s) both; }
+  .sc-map[data-mode="stage"] .train { display: inline; --tdelay: calc(var(--delay) + 1.6s); }
+  .sc-map[data-mode="stage"] .rider { display: inline; opacity: 0; offset-path: var(--path); offset-distance: 0%; offset-rotate: 0deg; }
+  .sc-map .train circle {
+    offset-path: var(--path);
+    offset-distance: 0%;
+    offset-rotate: 0deg;
+    animation: sc-run var(--run) ease-in-out var(--tdelay) infinite alternate backwards;
+  }
+  .sc-map .train .car-1 { animation-delay: calc(var(--tdelay) + 0.14s); }
+  .sc-map .train .car-2 { animation-delay: calc(var(--tdelay) + 0.28s); }
+  .sc-map .train .car-3 { animation-delay: calc(var(--tdelay) + 0.42s); }
+}
+@keyframes sc-draw { to { stroke-dashoffset: 0; } }
+@keyframes sc-appear { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sc-run { from { offset-distance: 0%; } to { offset-distance: 100%; } }
+@keyframes sc-station-lit { from { --lit: 0; } to { --lit: 1; } }
+@keyframes sc-pillars-out { to { opacity: 0; visibility: hidden; translate: 0 1rem; } }
+
+/* ---------- The chapters ---------- */
+.sc-chapter {
+  grid-column: 1;
+  display: grid;
+  align-content: center;
+  min-height: var(--stage-h);
+  box-sizing: border-box;
+  padding: 1.5rem 1.5rem 1.5rem var(--sc-gutter);
+  scroll-margin-top: var(--sc-nav-h);
+  position: relative;
+  z-index: 3;
+}
+.sc-chapter > * { min-width: 0; }
+.ch-card {
+  box-sizing: border-box;
+  background: var(--sc-panel);
+  border-radius: 1.125rem;
+  padding: 1.75rem 1.9rem 1.5rem;
+  max-width: 34rem;
+}
+:root.dark .ch-card { outline: 1px solid var(--sc-panel-line); }
+.ch-head h2 { margin: 0; font-size: 1rem; line-height: 1; }
+.ch-head .ch-pill, .ld-pill {
+  --kly-color: var(--c);
+  font: 800 1.375rem/1 var(--sc-font);
+  font-variation-settings: "wdth" 112;
+  border-radius: 0.5rem;
+}
+.ch-tagline { margin: 0.9rem 0 0; color: var(--sc-panel-text); font: 500 1.0625rem/1.4 var(--sc-font); text-wrap: pretty; }
+.ch-stops { list-style: none; margin: 1.5rem 0 0; padding: 0; position: relative; display: grid; gap: 1.1rem; }
+.ch-stops::before {
+  content: "";
+  position: absolute;
+  left: 0.5rem;
+  top: 0.6rem;
+  bottom: 0.6rem;
+  width: 6px;
+  margin-left: -3px;
+  border-radius: 3px;
+  background: var(--c);
+}
+.ch-stop { position: relative; display: grid; grid-template-columns: 1rem minmax(0, 1fr); gap: 1.1rem; align-items: start; }
+.ch-stop h3 {
+  margin: 0;
+  font: 800 1rem/1.2 var(--sc-font);
+  font-variation-settings: "wdth" 108;
+  color: color-mix(in srgb, #cfcabb, #ffffff calc(var(--lit) * 100%));
+}
+.ch-stop p { margin: 0.2rem 0 0; font: 400 0.9375rem/1.45 var(--sc-font); color: var(--sc-panel-muted); text-wrap: pretty; }
+.ch-dot {
+  position: relative;
+  z-index: 1;
+  width: 1rem;
+  height: 1rem;
+  margin-top: 0.1rem;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: color-mix(in srgb, #ffffff, var(--sc-sys) calc(var(--lit) * 100%));
+  border: 3px solid #111111;
+  box-shadow: 0 0 0 calc(2px + var(--lit) * 2px) color-mix(in srgb, var(--c), transparent calc((1 - var(--lit) * 0.35) * 55%));
+  transform: scale(calc(1 + var(--lit) * 0.3));
+}
+.ch-actions { display: flex; flex-wrap: wrap; gap: 0.625rem; margin-top: 1.5rem; }
+.ch-actions a { font-weight: 700; }
+.ch-install {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0.25rem 0.25rem 0.25rem 0.875rem;
+  background: #0a0c10;
+  border: 1px solid var(--sc-panel-line);
+  border-radius: 0.625rem;
+}
+.ch-install code { flex: 1; min-width: 0; font: 500 0.8125rem/1.3 var(--sc-mono); color: #dcd8cb; background: none; padding: 0; overflow-wrap: anywhere; }
+
+/* ---------- The line diagram (narrow screens) ---------- */
+.ld-lines { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.5rem; }
+.ld-line { position: relative; transition: opacity 0.3s var(--sc-ease); }
+.ld-badge { text-decoration: none; display: inline-block; border-radius: 0.5rem; }
+.ld-badge:focus-visible { outline: 3px solid var(--sc-focus); outline-offset: 3px; }
+.ld-stops { list-style: none; margin: 0.5rem 0 0 0.5rem; padding: 0.25rem 0 0.25rem 1.75rem; position: relative; display: grid; gap: 0.5rem; }
+.ld-stops::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 14px; margin-left: -7px; border-radius: 7px; background: var(--c); }
+.ld-stops li { position: relative; font: 700 1rem/1.25 var(--sc-font); color: var(--sc-text); display: flex; align-items: center; }
+.ld-dot {
+  position: absolute;
+  left: -1.75rem;
+  width: 0.9rem;
+  height: 0.9rem;
+  margin-left: -0.45rem;
+  border-radius: 50%;
+  background: var(--sc-station);
+  border: 3.5px solid var(--sc-edge);
+  box-sizing: border-box;
+  transition: background 0.2s, transform 0.2s var(--sc-ease);
+}
+.ld-lines:has(.ld-line:is(:hover, :focus-within)) .ld-line:not(:hover, :focus-within) { opacity: 0.3; }
+.ld-line:is(:hover, :focus-within) .ld-dot { background: var(--sc-sys); transform: scale(1.3); }
+
+/* ---------- The sections after the journey ---------- */
+.sc-sec { padding: clamp(4.5rem, 9vw, 8rem) var(--sc-gutter) clamp(3rem, 6vw, 5rem); }
+.sc-wrap { max-width: 78rem; margin: 0 auto; }
+.sc-h2 {
+  margin: 0 0 1rem;
+  max-width: 20ch;
+  color: var(--sc-strong);
+  font: 900 clamp(2.25rem, 4.6vw, 3.75rem) / 0.98 var(--sc-font);
+  font-variation-settings: "wdth" 118;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.sc-lede { margin: 0; max-width: 60ch; font: 500 1.1875rem/1.5 var(--sc-font); color: var(--sc-muted); text-wrap: pretty; }
+.sc code { font-family: var(--sc-mono); }
+.sc-lede code { font-size: 0.8em; white-space: nowrap; background: color-mix(in srgb, var(--sc-text), transparent 90%); padding: 0.1em 0.35em; border-radius: 4px; }
+
+.rules { list-style: none; margin: 3.5rem 0 0; padding: 0; }
+.rule {
+  display: grid;
+  grid-template-columns: minmax(12rem, 16rem) minmax(0, 1fr) minmax(0, 30rem);
+  gap: 1.5rem 3rem;
+  align-items: start;
+  padding: 2.25rem 0;
+  border-top: 1px solid var(--sc-line);
+  scroll-margin-top: calc(var(--sc-nav-h) + 1rem);
+}
+.rule:last-child { border-bottom: 1px solid var(--sc-line); }
+.rule-sign { display: flex; align-items: center; gap: 0.75rem; padding: 0.9rem 1.1rem; background: var(--sc-panel); border-radius: 0.875rem; }
+:root.dark .rule-sign { outline: 1px solid var(--sc-panel-line); }
+.rule-sign h3 { margin: 0; color: #ffffff; font: 800 1.25rem/1.1 var(--sc-font); font-variation-settings: "wdth" 118; }
+.rule-lead { margin: 0; font: 700 1.25rem/1.35 var(--sc-font); color: var(--sc-strong); text-wrap: pretty; }
+.proof { margin: 0.75rem 0 0; font: 400 1rem/1.55 var(--sc-font); color: var(--sc-muted); max-width: 52ch; text-wrap: pretty; }
+.rule-demo { min-width: 0; }
+.modes-lead { margin: 0 0 0.75rem; font: 600 0.9375rem/1.3 var(--sc-font); color: var(--sc-muted); }
+.modes ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.625rem; }
+.mode { background: none; border: 0; padding: 0; border-radius: 0.5rem; cursor: help; color: var(--sc-text); }
+.mode:focus-visible { outline: 3px solid var(--sc-focus); outline-offset: 2px; }
+.modes .mode > span { --kly-color: var(--sc-ink); color: var(--sc-text); border-color: var(--sc-edge); font-weight: 700; }
+
+.sc-code { min-width: 0; max-width: 100%; }
+.sc-code > div { min-width: 0; --klyroo-bg-muted: #0a0c10; }
+.sc-code pre { font-family: var(--sc-mono) !important; font-size: 0.8125rem !important; line-height: 1.6; background: #0a0c10 !important; white-space: pre; }
+.sc-code [data-slot="code-label"] { color: #bdb8aa; letter-spacing: 0.06em; text-transform: none; font-family: var(--sc-mono); }
+.sc-tabs { gap: 0.75rem; }
+.demo-panel, .tpl-panel, .tpl-intro, .rule-demo, .tpl-tabs, .close-copy { min-width: 0; grid-template-columns: minmax(0, 1fr); }
+.demo-panel { display: grid; gap: 0.75rem; padding-top: 0.5rem; }
+.demo-panel p, .tpl-panel p { margin: 0; font: 400 0.9375rem/1.5 var(--sc-font); color: var(--sc-muted); }
+
+.sc-templates { background: var(--sc-panel); color: var(--sc-panel-text); padding-bottom: clamp(4.5rem, 8vw, 7rem); }
+:root.dark .sc-templates { border-block: 1px solid var(--sc-panel-line); }
+.sc-templates .sc-wrap { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 3rem clamp(2rem, 6vw, 6rem); align-items: start; }
+.sc-templates .sc-h2 { color: #ffffff; }
+.sc-templates .sc-lede { color: var(--sc-panel-muted); }
+.sc-templates .sc-lede code { background: #23262d; }
+.tpl-intro { display: grid; gap: 1.5rem; }
+.tpl-panel { display: grid; gap: 0.875rem; padding-top: 1rem; }
+.tpl-panel p { color: var(--sc-panel-muted); }
+.sc-templates .sc-code { border-color: #2a2d35; }
+
+.sc-close .close-top { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: 2rem clamp(2rem, 5vw, 5rem); align-items: center; }
+.close-copy { display: grid; gap: 1.25rem; justify-items: start; }
+.close-copy .sc-h2 { margin: 0; }
+.close-copy .sc-plat { width: 100%; }
+.close-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.close-map { min-width: 0; overflow: clip; }
+.close-map .sc-map { height: clamp(22rem, 46vw, 36rem); }
+.close-libs-title { margin: 5rem 0 1.25rem; font: 800 1.5rem/1.1 var(--sc-font); font-variation-settings: "wdth" 118; color: var(--sc-strong); }
+.close-libs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); gap: 0; border-top: 3px solid var(--sc-ink); }
+:root.dark .close-libs { border-color: var(--sc-line); }
+.close-libs li { display: grid; gap: 0.4rem; align-content: start; padding: 1.1rem 1.25rem 1.25rem 0; border-bottom: 1px solid var(--sc-line); }
+.lib-name { display: inline-flex; align-items: center; gap: 0.6rem; color: var(--sc-strong); font: 800 1.125rem/1.2 var(--sc-font); font-variation-settings: "wdth" 112; text-decoration: none; }
+.lib-name .dot { background: var(--c); width: 0.9rem; height: 0.9rem; border: 3px solid var(--sc-edge); box-sizing: border-box; }
+.lib-name:hover { text-decoration: underline; text-underline-offset: 4px; }
+.close-libs p { margin: 0; font: 400 0.9375rem/1.45 var(--sc-font); color: var(--sc-muted); text-wrap: pretty; }
+.lib-links { display: flex; gap: 1rem; margin-top: 0.25rem; }
+.lib-link { color: var(--sc-strong); font: 700 0.9375rem/1.2 var(--sc-font); text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px; }
+.lib-link:hover { text-decoration-color: var(--sc-sys); }
+.close-meta { margin: 3.5rem 0 0; font: 500 0.875rem/1.5 var(--sc-font); color: var(--sc-muted); }
+.sc a:focus-visible, .sc button:focus-visible { outline: 3px solid var(--sc-focus); outline-offset: 3px; }
+.sc .sign a:focus-visible, .sc .sc-plat a:focus-visible, .sc .sc-plat button:focus-visible, .sc .ch-card a:focus-visible, .sc .ch-card button:focus-visible, .sc .sc-templates :focus-visible, .sc .sc-pillars :focus-visible { outline-color: var(--sc-sys); }
+
+/* ---------- Browser surfaces ---------- */
+.is-showcase ::selection { background: var(--sc-sys); color: #111111; }
+.is-showcase { caret-color: var(--sc-ink); accent-color: var(--sc-ink); }
+
+/* ---------- The journey: the scroll timeline ---------- */
+@media (prefers-reduced-motion: no-preference) and (min-width: 821px) {
+  @supports (animation-timeline: view()) {
+    .journey .cam { animation: journey-camera linear both; animation-timeline: --journey; animation-range: contain 0% contain 100%; }
+    .journey .line-g { animation: var(--line-anim) linear both; animation-timeline: --journey; animation-range: contain 0% contain 100%; }
+    .journey .stn { animation: sc-station-lit linear both; animation-timeline: --journey; animation-range: contain calc(var(--a) * 1%) contain calc(var(--b) * 1%); }
+    .journey .rider { animation: var(--rider-anim) linear both; animation-timeline: --journey; animation-range: contain 0% contain 100%; }
+    .journey .sc-pillars { animation: sc-pillars-out linear both; animation-timeline: --journey; animation-range: contain 0% contain 6%; }
+    /* The stations of a chapter light up one after the other as the page reaches them. */
+    .ch-stop { animation: sc-station-lit linear both; animation-timeline: view(); animation-range: entry 40% entry 95%; }
+    /* The close pulls the camera back: the whole network again, drawn as it comes into view. */
+    .close-map .cam { animation: sc-pull-back linear both; animation-timeline: view(); animation-range: entry 0% entry 90%; }
+    .close-map .route { stroke-dashoffset: 1; animation: sc-draw linear both; animation-timeline: view(); animation-range: entry 5% entry 80%; }
+  }
+}
+@keyframes sc-pull-back { from { transform: scale(1.7); } to { transform: scale(1); } }
+
+/* Without the journey (reduced motion, a narrow screen, no scroll timelines) every chapter is a plain card and the stations are lit. */
+@media (prefers-reduced-motion: reduce) {
+  .ch-stop, .sc-map .stn { --lit: 1; }
+  .ch-stop { --lit: 1; }
+  .sc-map .stn { --lit: 0; }
+  .stage { position: relative; grid-row: 1; }
+  .sc-chapter { grid-column: 1 / -1; min-height: 0; max-width: 46rem; padding-block: 1.5rem; }
+}
+@supports not (animation-timeline: view()) {
+  .ch-stop { --lit: 1; }
+}
+
+@media (max-width: 1100px) {
+  .rule { grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+  .rule-sign { justify-self: start; }
+  .sc-templates .sc-wrap, .sc-close .close-top { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 1000px) {
+  .sc-links { display: none; }
+}
+
+@media (max-width: 820px) {
+  .journey { display: flex; flex-direction: column; }
+  .opening { order: 0; min-height: 0; padding: 1.5rem var(--sc-gutter) 1rem; }
+  .stage { order: 1; position: static; height: auto; overflow: visible; padding: 1rem var(--sc-gutter) 0.5rem; }
+  .sc-chapter { order: 2; min-height: 0; padding: 0.75rem var(--sc-gutter); }
+  .ch-card { max-width: none; }
+  .stage .sc-map { display: none; }
+  .sc-diagram { display: block; }
+  .sc-pillars { position: static; width: 100%; margin-top: 1.5rem; animation: none; }
+  .close-map { display: none; }
+  .sc-plat { width: 100%; }
+  .sc-plat .num { width: 3.25rem; font-size: 2rem; }
+  .sc-plat .cmd { font-size: 0.8125rem; }
+  .sign { width: 100%; }
+  .copy { width: 100%; }
+  .ch-stop { animation: none; --lit: 1; }
+  .sc-nav .sc-search { display: none; }
+}
+@media (max-width: 520px) {
+  .sc-mark { font-size: 1.25rem; }
+  .sc-nav-inner { gap: 0.25rem; }
+  .sc-nav .sc-gh { padding-inline: 0.625rem; }
+}

@@ -74,6 +74,7 @@ Every key is optional, and a key that does not exist is an error. A library keep
 | `texture` | The ground behind the header and the hero: `blueprint-grid`, `dot-matrix`, `ruled-rows`, `baseline-grid`, `chart-ticks`, `halftone`, `cell-grid` or `node-dots`. Default: the one of the library in `libraries.yml`. |
 | `demo` | What the hero demonstrates, below. |
 | `repo` | The name of the repository, which is the path of the site. Default: the name of the folder. |
+| `home` | The home page: `docs` (the hero with its demonstration board, the default) or `showcase` (the metro map of the Klyroo network, see [The showcase home page](#the-showcase-home-page)). The docs pages are the same with both. |
 | `nav` | The pages in the order of the navigation (below). |
 
 An entry of `nav` is a file name below `docs/` without `.md`, or a map:
@@ -131,6 +132,15 @@ A board is a component in `Klyroo.Docs.Site/Components/Boards`, built from `Demo
 3. Add the name to `LibraryDocs.Boards` and to the `switch` of `Components/Pages/Home.razor`, then put `demo: { board: <name> }` in the `docs/site.yml` of the library.
 
 The leader lines start at the right edge of the lit code lines and end at the left edge of the panel holding each lit target. The board is complete without the script (nothing is lit and the chips are inert); with it, a chip lights its lines and targets and draws the lines once, with an exponential ease-out, and under `prefers-reduced-motion` they appear without drawing.
+
+## The showcase home page
+
+`home: showcase` (used by `klyroo-stack`) replaces the home page by the map of the network, in `Components/Showcase` and `Styles/showcase.css`. It is Blazor, rendered once as static HTML, with Klyroo.UI components (`KlyButton`, `KlyLink`, `KlyBadge`, `KlyKbd`, `KlyTooltip`, `KlyPopover`, `KlyTabs`, `KlyContentSearchButton`, `KlyColorModeButton`) and `KlyDisplay` of Klyroo.Display for the code blocks, which is why the project references `klyroo-display` and `docs-pages.yml` checks it out.
+
+- `NetworkData.cs` is the typed data: a line per library (legs, label side, tagline, install package) with its stations (a label on the map, the title of the README feature it stands for, what the README says), the four rules and the templates. A test checks every station against the README of its library when the repositories are side by side.
+- `NetworkLayout.cs` computes the geometry from it (routes with rounded bends, stations on the straight stretches, label angles, badges, the camera of each line) and the keyframes of the scroll journey. `MetroMap.razor` writes the SVG from the result: no coordinate is written by hand. `LineDiagram.razor` is the same data as a vertical diagram for a narrow screen.
+- The effects are CSS: `stroke-dashoffset` draws the lines, `offset-path` runs the trains, `:has()` isolates a line on hover or focus, and one view timeline (`animation-timeline: --journey`) rides the camera, lights the stations and moves the rider. Reduced motion, a narrow screen and a browser without scroll timelines get the plain map and plain chapters. The only script is the one the site already has: the copy buttons (`data-copy`) and the custom elements of Klyroo.UI.
+- Archivo (with its width axis) comes from `Fonts/ArchivoVariable.woff2` through the local provider of the Klyroo font pipeline, JetBrains Mono through the Google provider.
 
 ## Links
 

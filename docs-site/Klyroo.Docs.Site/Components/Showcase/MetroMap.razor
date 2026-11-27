@@ -1,0 +1,67 @@
+@* The map of the network, drawn as SVG from typed data (NetworkData.cs, NetworkLayout.cs): the routes, the stations, the trains and the badges are computed in C#, with no
+   coordinate written by hand. What moves is CSS (Styles/showcase.css): the lines draw themselves on load, the trains follow each route with offset-path, a hover or the focus
+   of a badge isolates its line with :has(), and a scroll timeline rides the camera along the lines. Without CSS support or with reduced motion it is the plain map. *@
+<div class="sc-map" data-mode="@Mode">
+    <svg viewBox="@Layout.ViewBox" role="group" aria-labelledby="@Id("title")" focusable="false" preserveAspectRatio="xMidYMid meet">
+        <title id="@Id("title")">The Klyroo network: @Layout.Lines.Count lines, one per library, meet at the Klyroo.Stack interchange. Each line ends in a badge that opens its chapter.</title>
+        <g class="cam">
+            @foreach (var line in Layout.Lines)
+            {
+                <g class="line-g" data-line="@line.Key" role="group" aria-label="@LineLabel(line)" style="@Vars(("--c", line.Badge.Fill), ("--delay", line.Delay.ToString("0.##", Inv) + "s"), ("--path", $"path('{line.Path}')"))">
+                    <g class="line-i">
+                        <path class="route" d="@line.Path" pathLength="1" />
+                        @for (var i = 0; i < line.Stations.Count; i++)
+                        {
+                            var station = line.Stations[i];
+                            <g class="stn" data-station="@i" aria-hidden="true" style="@Vars(("--sd", station.Delay.ToString("0.###", Inv) + "s"))">
+                                <circle class="tick" cx="@N(station.At.X)" cy="@N(station.At.Y)" r="6.5" />
+                                <text class="lbl" text-anchor="@station.Anchor" transform="translate(@N(station.Label.X) @N(station.Label.Y))@(station.Rotation == 0 ? "" : $" rotate({station.Rotation})")">@station.Station.Label</text>
+                            </g>
+                        }
+                        @if (Mode == "stage")
+                        {
+                            <g class="train" aria-hidden="true" style="@Vars(("--run", Math.Round(line.Length / 55 + 2, 1).ToString("0.#", Inv) + "s"))">
+                                <circle class="car car-3" r="4.5" /><circle class="car car-2" r="5" /><circle class="car car-1" r="5.5" /><circle class="car head" r="7" />
+                            </g>
+                            <circle class="rider" aria-hidden="true" r="9.5" />
+                        }
+                        <a class="badge" href="@Href(line)" aria-label="@(line.Library.Name): ride this line, its stations and where to go next">
+                            <rect class="ring" x="@N(line.Badge.X - 6)" y="@N(line.Badge.Y - 6)" width="@N(line.Badge.Width + 12)" height="@N(line.Badge.Height + 12)" rx="13" />
+                            <rect class="plate" x="@N(line.Badge.X)" y="@N(line.Badge.Y)" width="@N(line.Badge.Width)" height="@N(line.Badge.Height)" rx="8" style="fill: @line.Badge.Fill" />
+                            <text x="@N(line.Badge.Center.X)" y="@N(line.Badge.Center.Y + 5)" style="fill: @line.Badge.OnFill">@line.Library.Name</text>
+                        </a>
+                    </g>
+                </g>
+            }
+            <g class="hub" aria-hidden="true">
+                <circle class="hub-ring" r="@NetworkLayout.InterchangeRadius" />
+                <circle class="hub-disc" r="41" />
+                <text y="-4">Klyroo</text>
+                <text y="16">Stack</text>
+            </g>
+        </g>
+    </svg>
+</div>
+
+@code {
+    private static readonly System.Globalization.CultureInfo Inv = System.Globalization.CultureInfo.InvariantCulture;
+
+    [Parameter, EditorRequired] public NetworkLayout Layout { get; set; } = default!;
+
+    /// <summary>The ids of the map must be unique on the page: the close draws the whole network a second time.</summary>
+    [Parameter] public string Prefix { get; set; } = "map";
+
+    /// <summary><c>stage</c>: the sticky map of the journey, with the trains and the rider. <c>close</c>: the network pulled back, still.</summary>
+    [Parameter] public string Mode { get; set; } = "stage";
+
+    private string Id(string name) => Prefix + "-" + name;
+
+    private static string N(double value) => value.ToString("0.##", Inv);
+
+    // Chapters are on the page (and a line badge in the close leads to the same place).
+    private static string Href(PlacedLine line) => "#line-" + line.Key;
+
+    private static string LineLabel(PlacedLine line) => $"{line.Library.Name} line, stations: {string.Join(", ", line.Stations.Select(s => s.Station.Label))}";
+
+    private static string Vars(params (string Name, object Value)[] vars) => string.Join(";", vars.Select(v => $"{v.Name}:{Convert.ToString(v.Value, Inv)}"));
+}

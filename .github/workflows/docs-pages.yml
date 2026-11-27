@@ -31,7 +31,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # The three repositories side by side: the site project refers to ../../../klyroo-ui by relative path, like the other projects of klyroo-stack.
+      # The repositories side by side: the site project refers to ../../../klyroo-ui and ../../../klyroo-display by relative path, like the other projects of klyroo-stack.
       - name: Check out the library
         uses: actions/checkout@v4
         with:
@@ -48,6 +48,12 @@ jobs:
         with:
           repository: klyroo/klyroo-ui
           path: klyroo-ui
+      - name: Check out klyroo-display (referenced by relative path, for the code blocks of the home page of klyroo-stack)
+        if: inputs.repo != 'klyroo-display'
+        uses: actions/checkout@v4
+        with:
+          repository: klyroo/klyroo-display
+          path: klyroo-display
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x

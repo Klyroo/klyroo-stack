@@ -2,99 +2,107 @@
 @inject DocsSite Site
 @inject Libraries Libraries
 
-<PageTitle>@Site.Settings.Title documentation</PageTitle>
+@* The home page of the Klyroo network is the metro map (Components/Showcase), chosen by "home: showcase" in docs/site.yml. The docs pages keep the docs layout. *@
+@if (Site.Settings.IsShowcase)
+{
+    <ShowcaseHome />
+}
+else
+{
+    <PageTitle>@Site.Settings.Title documentation</PageTitle>
 
-<HeadContent>
-    <meta name="description" content="@Site.Settings.Description" />
-    <link rel="canonical" href="@Libraries.SiteUrl(Site.Settings.RepoName)" />
-</HeadContent>
+    <HeadContent>
+        <meta name="description" content="@Site.Settings.Description" />
+        <link rel="canonical" href="@Libraries.SiteUrl(Site.Settings.RepoName)" />
+    </HeadContent>
 
-<section class="hero" aria-labelledby="hero-title">
-    <div class="page-wrap">
-        <div class="hero-top">
-            <h1 class="hero-title" id="hero-title">
-                <span class="line">@Site.Settings.Headline[0]</span>
-                @if (Site.Settings.Headline.Count > 1)
-                {
-                    <span class="line accent">@Site.Settings.Headline[1]</span>
-                }
-            </h1>
-            <div class="hero-side">
-                <p class="hero-lead">@Site.Settings.Lead</p>
-                <div class="cta-row">
-                    @if (Start is not null)
+    <section class="hero" aria-labelledby="hero-title">
+        <div class="page-wrap">
+            <div class="hero-top">
+                <h1 class="hero-title" id="hero-title">
+                    <span class="line">@Site.Settings.Headline[0]</span>
+                    @if (Site.Settings.Headline.Count > 1)
                     {
-                        <a class="button button-accent" href="@Start.Href">@(Start.Slug == "getting-started" ? "Get started" : "Read the docs")<KlyIcon Name="ph:arrow-right" /></a>
+                        <span class="line accent">@Site.Settings.Headline[1]</span>
                     }
-                    @if (Site.Settings.HeroInstall is { } install)
-                    {
-                        <button type="button" class="install-chip" data-copy="@install" aria-label="Copy: @install">
-                            <code>@install</code>
-                            <span class="chip-icon"><svg class="code-copy-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.75" /><path d="M10.5 3.5v-.25A1.75 1.75 0 0 0 8.75 1.5h-5A1.75 1.75 0 0 0 2 3.25v5C2 9.2 2.8 10 3.75 10h.25" /></svg><svg class="code-check-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3.5 8.5 3 3 6-7" /></svg></span>
-                            <span class="code-copy-label sr-only">Copy</span>
-                            <span class="copy-status sr-only" role="status" aria-live="polite"></span>
-                        </button>
-                    }
+                </h1>
+                <div class="hero-side">
+                    <p class="hero-lead">@Site.Settings.Lead</p>
+                    <div class="cta-row">
+                        @if (Start is not null)
+                        {
+                            <a class="button button-accent" href="@Start.Href">@(Start.Slug == "getting-started" ? "Get started" : "Read the docs")<KlyIcon Name="ph:arrow-right" /></a>
+                        }
+                        @if (Site.Settings.HeroInstall is { } install)
+                        {
+                            <button type="button" class="install-chip" data-copy="@install" aria-label="Copy: @install">
+                                <code>@install</code>
+                                <span class="chip-icon"><svg class="code-copy-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.75" /><path d="M10.5 3.5v-.25A1.75 1.75 0 0 0 8.75 1.5h-5A1.75 1.75 0 0 0 2 3.25v5C2 9.2 2.8 10 3.75 10h.25" /></svg><svg class="code-check-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3.5 8.5 3 3 6-7" /></svg></span>
+                                <span class="code-copy-label sr-only">Copy</span>
+                                <span class="copy-status sr-only" role="status" aria-live="polite"></span>
+                            </button>
+                        }
+                    </div>
                 </div>
             </div>
+
+            @switch (Site.Settings.Demo)
+            {
+                case { Board: "table" }:
+                    <TableBoard />
+                    break;
+                case { Board: "form" }:
+                    <FormBoard />
+                    break;
+                case { Board: "query" }:
+                    <QueryBoard />
+                    break;
+                case { Board: "spreadsheet" }:
+                    <SpreadsheetBoard />
+                    break;
+                case { Board: "dashboard" }:
+                    <DashboardBoard />
+                    break;
+                case { Board: "display" }:
+                    <DisplayBoard />
+                    break;
+                case { Board: "agent" }:
+                    <AgentBoard />
+                    break;
+                case { Board: "ui" }:
+                    <UiBoard />
+                    break;
+                case { Code: not null } demo:
+                    <QuickBoard Demo="demo" />
+                    break;
+            }
         </div>
+    </section>
 
-        @switch (Site.Settings.Demo)
-        {
-            case { Board: "table" }:
-                <TableBoard />
-                break;
-            case { Board: "form" }:
-                <FormBoard />
-                break;
-            case { Board: "query" }:
-                <QueryBoard />
-                break;
-            case { Board: "spreadsheet" }:
-                <SpreadsheetBoard />
-                break;
-            case { Board: "dashboard" }:
-                <DashboardBoard />
-                break;
-            case { Board: "display" }:
-                <DisplayBoard />
-                break;
-            case { Board: "agent" }:
-                <AgentBoard />
-                break;
-            case { Board: "ui" }:
-                <UiBoard />
-                break;
-            case { Code: not null } demo:
-                <QuickBoard Demo="demo" />
-                break;
-        }
-    </div>
-</section>
+    @switch (Site.Settings.Demo?.Board)
+    {
+        case "table":
+            <section class="section showcases" aria-labelledby="showcases-title">
+                <div class="page-wrap">
+                    <h2 class="section-title" id="showcases-title">Beyond the first list</h2>
+                    <TableShowcases />
+                </div>
+            </section>
+            break;
+        case "form":
+            <section class="section showcases" aria-labelledby="showcases-title">
+                <div class="page-wrap">
+                    <h2 class="section-title" id="showcases-title">Beyond the first form</h2>
+                    <FormShowcases />
+                </div>
+            </section>
+            break;
+    }
 
-@switch (Site.Settings.Demo?.Board)
-{
-    case "table":
-        <section class="section showcases" aria-labelledby="showcases-title">
-            <div class="page-wrap">
-                <h2 class="section-title" id="showcases-title">Beyond the first list</h2>
-                <TableShowcases />
-            </div>
-        </section>
-        break;
-    case "form":
-        <section class="section showcases" aria-labelledby="showcases-title">
-            <div class="page-wrap">
-                <h2 class="section-title" id="showcases-title">Beyond the first form</h2>
-                <FormShowcases />
-            </div>
-        </section>
-        break;
+    <FeatureList Features="Site.HomeContent.Features" Title="@(Site.Settings.Demo?.Board is null ? "What it does" : "Everything it does")" />
+    <PackageList Packages="Site.HomeContent.Packages" />
+    <CloseBand />
 }
-
-<FeatureList Features="Site.HomeContent.Features" Title="@(Site.Settings.Demo?.Board is null ? "What it does" : "Everything it does")" />
-<PackageList Packages="Site.HomeContent.Packages" />
-<CloseBand />
 
 @code {
     private DocPage? Start => Site.Pages.FirstOrDefault(p => p.Slug == "getting-started") ?? Site.Find(LibraryDocs.IndexSlug) ?? Site.Pages.FirstOrDefault();

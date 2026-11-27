@@ -28,10 +28,13 @@ public sealed record DemoConfig(string? Board, string? File, string Language, st
 /// </summary>
 public sealed class SiteConfig
 {
-    private static readonly string[] Keys = ["title", "tagline", "description", "headline", "lead", "install", "github", "branch", "packages", "accent", "texture", "demo", "nav", "repo"];
+    private static readonly string[] Keys = ["title", "tagline", "description", "headline", "lead", "install", "github", "branch", "packages", "accent", "texture", "demo", "nav", "repo", "home"];
 
     /// <summary>The ground textures a site can have, one per library material (see <c>Styles/ground.css</c>).</summary>
     public static readonly IReadOnlyList<string> Textures = ["blueprint-grid", "dot-matrix", "ruled-rows", "baseline-grid", "chart-ticks", "halftone", "cell-grid", "node-dots"];
+
+    /// <summary>The home pages a site can have: the documentation home (a hero with its demonstration board) or the showcase of the Klyroo network (<c>Components/Showcase</c>).</summary>
+    public static readonly IReadOnlyList<string> Homes = ["docs", "showcase"];
 
     private static readonly string[] DemoKeys = ["board", "file", "language", "code", "focus", "result"];
     private static readonly string[] ResultKeys = ["title", "output", "preview"];
@@ -74,6 +77,9 @@ public sealed class SiteConfig
 
     /// <summary>The name of the repository, which is the address of the site (<c>/&lt;repo&gt;/</c>). Without it the name of the folder of the repository.</summary>
     public string? Repo { get; init; }
+
+    /// <summary>Which home page the site has, one of <see cref="Homes"/>. Without it <c>docs</c>.</summary>
+    public string Home { get; init; } = "docs";
 
     /// <summary>The pages in the order of the navigation, with their groups. Pages that are not listed follow, by file name.</summary>
     public IReadOnlyList<NavEntry> Nav { get; init; } = [];
@@ -118,10 +124,16 @@ public sealed class SiteConfig
             Texture = TextureText(Text("texture"), path),
             Demo = root.TryGetValue("demo", out var demo) && demo is not null ? ParseDemo(demo, path) : null,
             Repo = Text("repo"),
+            Home = HomeText(Text("home"), path),
             Packages = root.TryGetValue("packages", out var packages) ? List(packages, "packages", path).Select(p => p?.ToString() ?? "").Where(p => p.Length > 0).ToList() : [],
             Nav = root.TryGetValue("nav", out var nav) ? ParseNav(nav, "nav", path) : [],
         };
     }
+
+    private static string HomeText(string? home, string path) =>
+        home is null ? "docs"
+        : Homes.Contains(home, StringComparer.Ordinal) ? home
+        : throw new ContentException($"{path}: '{home}' is not a home page. The home pages are: {string.Join(", ", Homes)}.");
 
     private static string? AccentText(string? accent, string path)
     {

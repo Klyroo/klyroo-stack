@@ -8,6 +8,10 @@ title: Klyroo.Stack
 # The line under the title on the home page. Without it: the first paragraph of README.md.
 tagline: The hub of the Klyroo ecosystem
 
+# The home page: docs (the hero with its demonstration board, the default) or showcase (the metro map of the Klyroo network: a line per library, the
+# scroll journey, the four rules, the templates). Only the home page changes; the docs pages keep the docs layout.
+home: showcase
+
 # The command next to the title on the home page.
 install: dotnet add package Klyroo.Stack --prerelease
 

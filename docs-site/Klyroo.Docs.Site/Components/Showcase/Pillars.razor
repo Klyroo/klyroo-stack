@@ -1,0 +1,14 @@
+@* The four rules, as the small black panel of the first viewport: each one links to its rule below and says it in a tooltip. *@
+<aside class="sc-pillars" aria-labelledby="pillars-title">
+    <h2 id="pillars-title" class="sr-only">The four rules of the network</h2>
+    <ul>
+        @foreach (var pillar in NetworkData.Pillars)
+        {
+            <li>
+                <KlyTooltip Text="@pillar.Rule" Placement="KlyPlacement.Left" Delay="150">
+                    <a href="#rule-@pillar.Id"><i class="dot" aria-hidden="true"></i>@pillar.Short</a>
+                </KlyTooltip>
+            </li>
+        }
+    </ul>
+</aside>

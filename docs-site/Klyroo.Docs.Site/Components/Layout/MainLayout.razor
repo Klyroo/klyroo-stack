@@ -4,11 +4,17 @@
 @inject NavigationManager Navigation
 
 <KlyApp>
-    <div class="site tex-@Site.Settings.Texture @(_isHome ? "is-home" : "is-doc")">
+    <div class="site tex-@Site.Settings.Texture @(_isHome ? "is-home" : "is-doc") @(_isShowcase ? "is-showcase" : "")">
         <KlySkipLink />
         <div class="ground-wrap" aria-hidden="true"><div class="ground"></div></div>
 
         @* Links are relative: they resolve against <base href>, so the site works below the name of the repository, which is where GitHub Pages serves it. *@
+        @if (_isShowcase)
+        {
+            <ShowcaseNav />
+        }
+        else
+        {
         <header class="site-header">
             <div class="page-wrap header-inner">
                 <a href="./" class="brand" aria-label="@(Site.Settings.Title) home">
@@ -56,6 +62,7 @@
                 </div>
             </div>
         </header>
+        }
 
         <KlyContentSearch IndexUrl="search-index.json" />
 
@@ -63,6 +70,8 @@
             @Body
         </main>
 
+        @if (!_isShowcase)
+        {
         <footer class="site-footer">
             <div class="page-wrap footer-inner">
                 <div class="footer-top">
@@ -91,6 +100,7 @@
                 </div>
             </div>
         </footer>
+        }
     </div>
 </KlyApp>
 
@@ -98,6 +108,7 @@
     private DocPage? _docs;
     private DocPage? _api;
     private bool _isHome;
+    private bool _isShowcase;
     private bool _isApi;
     private bool _inDocs;
 
@@ -107,6 +118,7 @@
         _api = Site.Pages.FirstOrDefault(p => p.Slug == "api-reference");
         var path = Navigation.ToBaseRelativePath(Navigation.Uri).Split('?', '#')[0].Trim('/');
         _isHome = path.Length == 0;
+        _isShowcase = _isHome && Site.Settings.IsShowcase;
         _isApi = _api is not null && path == _api.Slug;
         _inDocs = !_isHome && Site.Find(path) is not null;
     }
