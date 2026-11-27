@@ -1,0 +1,11 @@
+@* A command or flag line set so that it wraps between its words and never inside one: "dotnet add package Klyroo.Form --prerelease" can go to two lines, but never
+   "Klyroo.Spreadsheet --" / "prerelease". Each word is a nowrap span, the spaces between them are the break points. *@
+@foreach (var word in Text.Split(' '))
+{
+    <span class="tok">@word</span>@(" ")
+}
+
+@code {
+    /// <summary>The command, as typed.</summary>
+    [Parameter, EditorRequired] public string Text { get; set; } = "";
+}

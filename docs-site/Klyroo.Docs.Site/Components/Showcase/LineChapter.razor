@@ -24,7 +24,7 @@
             <KlyButton Href="@Urls.Playground(Line.Line)" Variant="ButtonVariant.Outline" Size="KlySize.Md" Class="ch-play" TrailingIcon="@ArrowIcon">Open the playground</KlyButton>
         </div>
         <div class="ch-install">
-            <code>@Line.Line.InstallCommand</code>
+            <code><CommandText Text="@Line.Line.InstallCommand" /></code>
             <KlyTooltip Text="Copy the install line" Placement="KlyPlacement.Top">
                 <KlyButton Variant="ButtonVariant.Ghost" Size="KlySize.Xs" Square="true" Class="sc-copy" data-copy="@Line.Line.InstallCommand" aria-label="@($"Copy the install line of {Line.Library.Name}")">
                     <LeadingIcon>

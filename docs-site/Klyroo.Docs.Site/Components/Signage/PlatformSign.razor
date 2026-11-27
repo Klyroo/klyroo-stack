@@ -4,12 +4,7 @@
     <div class="num" aria-hidden="true">@Number</div>
     <div class="body">
         <span class="lab">Install</span>
-        <code class="cmd">
-            @foreach (var word in Command.Split(' '))
-            {
-                <span class="w">@word</span>@(" ")
-            }
-        </code>
+        <code class="cmd"><CommandText Text="@Command" /></code>
         <KlyTooltip Text="Copy the command" Placement="KlyPlacement.Top">
             <KlyButton Color="KlyColor.Primary" Size="KlySize.Sm" Square="true" Class="sc-copy" data-copy="@Command" aria-label="Copy the install command">
                 <LeadingIcon>

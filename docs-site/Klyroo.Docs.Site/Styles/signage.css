@@ -122,13 +122,15 @@ a:hover > .sc-pill { filter: none; }
   background: var(--sc-panel);
   border-radius: 0 0.875rem 0.875rem 0;
 }
-.sc-plat .cmd .w { white-space: nowrap; }
+.tok { white-space: nowrap; }
 .sc-plat .lab {
   color: var(--sc-sys);
   font: 800 0.9375rem/1 var(--sc-font);
   font-variation-settings: "wdth" 118;
 }
-.sc-plat .cmd { font: 700 0.9375rem/1.3 var(--sc-mono); color: #ffffff; background: none; padding: 0; flex: 1 1 14rem; }
+.sc-plat .cmd { font: 700 0.9375rem/1.3 var(--sc-mono); font-variant-ligatures: none; color: #ffffff; background: none; padding: 0; flex: 1 1 14rem; }
+/* The copy button of the platform sign keeps its glyph and has a 2rem hit area. */
+.sc-plat .sc-copy { min-width: 2rem; min-height: 2rem; }
 .sc-copy[data-copied] .code-copy-icon, .sc-copy:not([data-copied]) .code-check-icon { display: none; }
 .sc-more-btn { color: var(--sc-panel-text); }
 .sc-pkgs { list-style: none; margin: 0; padding: 0.25rem; display: grid; gap: 0.75rem; min-width: min(22rem, 80vw); }
@@ -140,8 +142,23 @@ a:hover > .sc-pill { filter: none; }
 /* ---------- The code panel (KlyCodeBlock of Klyroo.Display) ---------- */
 .sc-code { min-width: 0; max-width: 100%; }
 .sc-code > div { min-width: 0; --klyroo-bg-muted: #0a0c10; }
-.sc-code pre { font-family: var(--sc-mono) !important; font-size: 0.8125rem !important; line-height: 1.6; background: #0a0c10 !important; white-space: pre; }
+.sc-code pre { font-family: var(--sc-mono) !important; font-size: 0.8125rem !important; line-height: 1.6; background-color: #0a0c10 !important; white-space: pre; }
 .sc-code [data-slot="code-label"] { color: #bdb8aa; letter-spacing: 0.06em; text-transform: none; font-family: var(--sc-mono); }
+
+/* ---------- A scroller shows there is more ----------
+   A panel whose lines are cut at its edge fades the edge it can still scroll toward (a scroll-attached shadow), and the shadow goes when the end is reached (a cover that
+   scrolls with the content, in the color of the panel). The code panels, the results of the boards and the tables of a board share it. */
+:is(.board-code [data-slot="code-value"], .sc-code pre, .model, .output, .mini-scroll) {
+  --cue-bg: var(--sc-raised);
+  --cue-edge: rgb(17 17 17 / 0.32);
+  background-image: linear-gradient(to right, var(--cue-bg) 45%, transparent), linear-gradient(to left, var(--cue-bg) 45%, transparent), linear-gradient(to right, var(--cue-edge), transparent), linear-gradient(to left, var(--cue-edge), transparent);
+  background-repeat: no-repeat;
+  background-size: 2rem 100%, 2rem 100%, 1rem 100%, 1rem 100%;
+  background-position: left center, right center, left center, right center;
+  background-attachment: local, local, scroll, scroll;
+}
+:is(.board-code [data-slot="code-value"], .sc-code pre) { --cue-bg: var(--sc-well, #0a0c10); --cue-edge: rgb(246 243 234 / 0.38); }
+.sc-code pre { background-image: linear-gradient(to right, var(--cue-bg) 45%, transparent), linear-gradient(to left, var(--cue-bg) 45%, transparent), linear-gradient(to right, var(--cue-edge), transparent), linear-gradient(to left, var(--cue-edge), transparent) !important; }
 
 /* ---------- The footer band ---------- */
 .sc-foot {
@@ -168,13 +185,23 @@ a:hover > .sc-pill { filter: none; }
 @media (max-width: 520px) {
   .sc-wordmark { font-size: 1.1875rem; }
   .sc-mark { gap: 0.5rem; }
-  .sc-nav-inner { gap: 0.25rem; }
+  /* A long wordmark (klyroo/spreadsheet) goes to two lines, klyroo over /name, before it can reach the buttons; a short one stays on one line. */
+  .sc-nav .sc-mark { white-space: normal; flex: 0 1 auto; margin-right: auto; }
+  .sc-nav .sc-wordmark { line-height: 1.05; }
+  .sc-nav .sc-tools { flex: none; }
+  .sc-nav-inner { gap: 0.75rem; }
 }
-/* Under 400px the nav keeps the wordmark, the search, the menu, the color mode and an icon-only GitHub button (its label stays for screen readers). */
-@media (max-width: 400px) {
+/* Under 460px the nav keeps the wordmark, the search, the menu, the color mode and an icon-only GitHub button (its label stays for screen readers): with the label there is no room for klyroo/spreadsheet. */
+@media (max-width: 460px) {
   .sc-plate { width: 1.5rem; }
-  .sc-wordmark { font-size: 1.0625rem; }
+  .sc-nav .sc-wordmark { font-size: 1rem; }
   .sc-nav-inner { padding-inline: 0.75rem; }
   .sc-nav .sc-gh { padding-inline: 0.5rem; }
   .sc-nav .sc-gh [data-slot="label"] { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}
+/* The narrowest phones: tighter buttons and a smaller wordmark keep a clear gap before the menu button even for klyroo/spreadsheet. */
+@media (max-width: 340px) {
+  .sc-nav .sc-wordmark { font-size: 0.875rem; }
+  .sc-nav .sc-tools { gap: 0.125rem; }
+  .sc-nav-inner { padding-inline: 0.625rem; }
 }

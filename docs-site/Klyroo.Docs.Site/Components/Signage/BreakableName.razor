@@ -1,4 +1,5 @@
-@* A name set so that it wraps between its words rather than inside one: DataListExportTooLarge<wbr>Exception, never DataListExportTooLargeExce / ption. *@
+@* A name set so that it wraps between its words rather than inside one: DataListExportTooLarge<wbr>Exception, never DataListExportTooLargeExce / ption.
+   With DotsOnly (a package name) the only place it wraps is after a dot: Klyroo.Query.<wbr>EntityFrameworkCore. *@
 @for (var i = 0; i < _pieces.Count; i++)
 {
     @if (i > 0)
@@ -14,5 +15,8 @@
     /// <summary>The name or heading to set.</summary>
     [Parameter, EditorRequired] public string Text { get; set; } = "";
 
-    protected override void OnParametersSet() => _pieces = NameBreaks.Split(Text);
+    /// <summary>Wrap after a dot only, never between the words of PascalCase: for a package name, whose words are not a sentence.</summary>
+    [Parameter] public bool DotsOnly { get; set; }
+
+    protected override void OnParametersSet() => _pieces = DotsOnly ? DotBreaks.Split(Text) : NameBreaks.Split(Text);
 }
