@@ -56,7 +56,7 @@
             <KlyAlert Variant="KlyVariant.Soft" Color="KlyColor.Warning" Title="Some input was ignored" Description="@string.Join(" ", _problems)" />
         }
         <PgPanel Title="Result" Note="@($"{_total} matching, {_shown} shown")" Flush>
-            <div class="table-scroll py-3">
+            <div class="table-scroll table-scroll-ui table-scroll-pad">
                 <KlyTable Items="_rows">
                     <KlyColumn Title="Name" Field="r => r.Name" />
                     <KlyColumn Title="Department" Field="r => r.Department" />

@@ -66,8 +66,8 @@
                                 <span class="text-(--klyroo-text-dimmed)">@turn.Time</span>
                             </div>
                             <div class="grid min-w-0 gap-3 min-[1100px]:grid-cols-2">
-                                <div class="min-w-0"><p class="m-0 mb-1 text-xs text-(--klyroo-text-dimmed)">The model sends</p><div class="max-h-72 overflow-auto"><PgCode Code="@turn.Request" Language="CodeLanguage.Json" /></div></div>
-                                <div class="min-w-0"><p class="m-0 mb-1 text-xs text-(--klyroo-text-dimmed)">The bridge returns</p><div class="max-h-72 overflow-auto"><PgCode Code="@turn.Response" Language="CodeLanguage.Json" /></div></div>
+                                <div class="min-w-0"><p class="m-0 mb-1 text-xs text-(--klyroo-text-dimmed)">The model sends</p><PgCode Code="@turn.Request" Language="CodeLanguage.Json" /></div>
+                                <div class="min-w-0"><p class="m-0 mb-1 text-xs text-(--klyroo-text-dimmed)">The bridge returns</p><PgCode Code="@turn.Response" Language="CodeLanguage.Json" /></div>
                             </div>
                         </div>
                     }
@@ -113,7 +113,7 @@
                 {
                     <div class="min-w-0">
                         <KlyFacts Items="@ToolFacts(tool)" Surface="KlySurface.Plain" />
-                        <div class="max-h-64 overflow-auto"><PgCode Code="@JsonText.Indent(tool.InputSchema.GetRawText())" Language="CodeLanguage.Json" /></div>
+                        <PgCode Code="@JsonText.Indent(tool.InputSchema.GetRawText())" Language="CodeLanguage.Json" />
                     </div>
                 }
             </div>

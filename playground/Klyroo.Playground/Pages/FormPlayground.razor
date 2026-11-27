@@ -11,7 +11,7 @@
             <PgSwitch Key="prefill" Label="Start with sample data" Hint="Off starts from an empty model." @bind-Value="_prefill" OnChange="Rebuild" />
         </PgGroup>
         <PgGroup Title="Rules and conditions">
-            <PgSelect Key="src" Label="Rules come from" T="string" Options="_sources" @bind-Value="_source" OnChange="Rebuild" Disabled="@(_template != "contact")" Hint="@(_template != "contact" ? "Attributes are available on the contact model." : "The attributes of a twin of the contact model.")" />
+            <PgSelect Key="src" Label="Rules come from" T="string" Options="_sources" @bind-Value="_source" OnChange="Rebuild" Disabled="@(_template != "contact")" Hint="@(_template != "contact" ? "Only the Contact template has an attribute version: choose it to switch the source." : "The attributes of a twin of the contact model.")" />
             <PgSwitch Key="rules" Label="Rules" Hint="Required fields, an email check, lengths and ranges." @bind-Value="_rules" OnChange="Rebuild" Disabled="@(_template == "contact" && _source == "annotations")" />
             <PgSwitch Key="cond" Label="Conditions" Hint="Fields shown or required from other answers, a step skipped." @bind-Value="_conditions" OnChange="Rebuild" Disabled="@(_template == "contact" && _source == "annotations")" />
         </PgGroup>

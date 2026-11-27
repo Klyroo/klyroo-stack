@@ -85,7 +85,7 @@
         var agent = new AgentBridgeService();
         var form = new FormController<ContactModel>(_miniForm, new ContactModel { Name = "Ada" });
         agent.RegisterForm(form);
-        _agentJson = AgentJson.Write(new AgentSnapshotResult([.. agent.Snapshot().Take(2)]));
+        _agentJson = AgentJson.Write(new AgentSnapshotResult([.. agent.Snapshot().Take(1)]));
     }
 
     private RenderFragment Miniature(string slug) => slug switch
@@ -109,6 +109,6 @@
         "dashboard" => @<KlyDashboardGrid Columns="1"><KlyDashboardStat Label="Revenue" Value="148900" Compare="130400" Trend="@(new double[] { 102, 98, 115, 110, 132, 128, 149 })" Format="DashboardFormatPreset.Compact" /></KlyDashboardGrid>,
         "display" => @<KlyCodeBlock Label="Orders.sql" Code="@_miniQuery" Language="CodeLanguage.Sql" LineNumbers HighlightLines="@([new CodeLineRange(3, 4)])" Copy="false" />,
         "spreadsheet" => @<KlyFacts Items="_sheetFacts" Surface="KlySurface.Plain" />,
-        _ => @<div class="max-h-44 overflow-auto"><PgCode Code="@_agentJson" Language="CodeLanguage.Json" /></div>,
+        _ => @<PgCode Code="@_agentJson" Language="CodeLanguage.Json" />,
     };
 }

@@ -155,17 +155,25 @@ h1[tabindex="-1"]:focus-visible { outline: none; }
 .table-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-bottom: 1px solid var(--line); }
 .table-toolbar:empty { display: none; }
 .table-with-side { display: grid; gap: 1rem; padding: 0.75rem 1rem 0; }
+.table-with-side .table-scroll { padding-inline: 0; }
 @media (min-width: 900px) { .table-with-side { grid-template-columns: 15rem minmax(0, 1fr); } }
-.table-scroll {
-  overflow-x: auto;
-  max-width: 100%;
-  padding: 0 1rem;
-  /* Edge shadows where columns are hidden: the covers scroll with the table, the shadows stay (works where the scrollbar is hidden). */
-  background:
-    linear-gradient(to right, var(--klyroo-bg) 30%, transparent) left / 2rem 100% no-repeat local,
-    linear-gradient(to left, var(--klyroo-bg) 30%, transparent) right / 2rem 100% no-repeat local,
-    radial-gradient(farthest-side at 0 50%, var(--scroll-shadow), transparent) left / 0.5rem 100% no-repeat scroll,
-    radial-gradient(farthest-side at 100% 50%, var(--scroll-shadow), transparent) right / 0.5rem 100% no-repeat scroll;
+.table-scroll { overflow-x: auto; max-width: 100%; padding: 0 1rem; }
+/*
+  A KlyTable draws its own scroll box inside; the page frame gives it the padding and the edge shadows where columns are hidden
+  (the covers scroll with the table, the shadows stay), so the table runs to the card edge and the cue shows without a scrollbar.
+*/
+.table-scroll-ui { padding: 0; }
+.table-scroll-ui > .overflow-auto {
+  padding-inline: 1rem;
+  background-image:
+    linear-gradient(to right, var(--klyroo-bg) 30%, transparent),
+    linear-gradient(to left, var(--klyroo-bg) 30%, transparent),
+    radial-gradient(farthest-side at 0 50%, var(--scroll-shadow), transparent),
+    radial-gradient(farthest-side at 100% 50%, var(--scroll-shadow), transparent);
+  background-position: left, right, left, right;
+  background-size: 2rem 100%, 2rem 100%, 0.5rem 100%, 0.5rem 100%;
+  background-repeat: no-repeat;
+  background-attachment: local, local, scroll, scroll;
 }
 .table-footer { padding: 0.75rem 1rem; border-top: 1px solid var(--line); }
 .result-pad { padding: 1rem; }
@@ -179,7 +187,7 @@ h1[tabindex="-1"]:focus-visible { outline: none; }
 
 /* The code beside the result from 1280px, sticky, with its own scroll; below that it follows the result. */
 @media (min-width: 1280px) {
-  .pg-stage { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: start; }
+  .pg-stage { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); align-items: start; }
   .pg-stage > * { grid-column: 1; }
   .pg-stage > .pg-wide { grid-column: 1 / -1; }
   .pg-stage > .pg-code { grid-column: 2; grid-row: 1 / span 12; position: sticky; top: calc(var(--header-h) + 1rem); }
@@ -196,13 +204,24 @@ h1[tabindex="-1"]:focus-visible { outline: none; }
 .pg-flat [data-slot="table-root"], .pg-flat [data-slot="spreadsheet-import"] { border: 0; box-shadow: none; border-radius: 0; }
 .pg-flat [data-slot="spreadsheet-import"] { background: transparent; padding: 0; }
 
-/* A table of messages (the row issues) wraps its cells: a long message is read in full instead of cut at the edge of the card. */
-.pg-issues td, .pg-issues th { white-space: normal; overflow-wrap: anywhere; padding-inline: 0.5rem; }
-.pg-issues td:last-child, .pg-issues th:last-child { min-width: 9rem; }
+/* A table of messages (the row issues): the short columns keep their cell on one line, only the message wraps, and the table scrolls sideways with the edge shadows when the card is too narrow. */
+.pg-issues td, .pg-issues th { white-space: nowrap; }
+.pg-issues td:last-child, .pg-issues th:last-child { white-space: normal; min-width: 14rem; }
+.pg-issues-empty { margin: 0; padding: 0 1rem; }
+.table-scroll-pad { padding-block: 1rem; }
 
-/* Code in the stage wraps instead of cutting at the edge, so no line is clipped on any browser, whether it shows a scrollbar or not. */
-.pg-wrapcode [data-slot="code-value"] { white-space: pre-wrap; overflow-wrap: anywhere; overflow-x: hidden; }
-.pg-wrapcode [data-slot="code-value"] code { white-space: inherit; }
-.pg-wrapcode [data-slot="code-value"] code > span { width: auto; min-width: 0; }
-.pg-wrapcode [data-slot="code-value"] code > span[data-line] { padding-inline-start: calc(0.625rem + 3ch + 1rem); text-indent: calc(-3ch - 1rem); }
-.pg-wrapcode [data-slot="code-value"] code > span[data-line]::before { text-indent: 0; }
+/*
+  Code keeps its lines whole and scrolls sideways when one is wider than the block; the edge shadows show that more is hidden, on every browser,
+  also where the scrollbar is hidden (the covers scroll with the text, the shadows stay). The block shows every line: no height cap.
+*/
+[data-slot="code-value"] {
+  background-image:
+    linear-gradient(to right, var(--klyroo-bg-muted) 30%, transparent),
+    linear-gradient(to left, var(--klyroo-bg-muted) 30%, transparent),
+    radial-gradient(farthest-side at 0 50%, var(--scroll-shadow), transparent),
+    radial-gradient(farthest-side at 100% 50%, var(--scroll-shadow), transparent);
+  background-position: left, right, left, right;
+  background-size: 2rem 100%, 2rem 100%, 0.5rem 100%, 0.5rem 100%;
+  background-repeat: no-repeat;
+  background-attachment: local, local, scroll, scroll;
+}

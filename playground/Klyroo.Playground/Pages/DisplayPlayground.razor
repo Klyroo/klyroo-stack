@@ -241,7 +241,7 @@
             facts.Add(new KlyFact("Colored tokens") { Value = "none: the code is plain text" });
         }
         facts.Insert(0, new KlyFact("Lines") { Value = (_code.TrimEnd('\n').Split('\n').Length).ToString() });
-        facts.Insert(1, new KlyFact("Emphasized") { Value = Marked.Count == 0 ? "none" : CodeSamples.Literal(Marked), Mono = true });
+        facts.Insert(1, new KlyFact("Emphasized") { Value = Marked.Count == 0 ? "none" : "lines " + string.Join(", ", Marked.Select(r => r.Start == r.End ? r.Start.ToString() : $"{r.Start} to {r.End}")) });
         return facts;
     }
 

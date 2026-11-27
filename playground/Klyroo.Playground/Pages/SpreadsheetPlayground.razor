@@ -39,10 +39,10 @@
         </PgPanel>
         <div class="grid gap-5">
             <PgPanel Title="Row issues" Note="@($"{Words.Plural(_issueRows.Count, "line")} with an issue")" Flush>
-                <div class="table-scroll pg-issues py-4">
+                <div class="table-scroll table-scroll-ui table-scroll-pad pg-issues">
                     @if (_issueRows.Count == 0)
                     {
-                        <p class="m-0 text-sm text-(--klyroo-text-muted)">No issue: every line of the file is importable.</p>
+                        <p class="pg-issues-empty text-sm text-(--klyroo-text-muted)">No issue: every line of the file is importable.</p>
                     }
                     else
                     {
