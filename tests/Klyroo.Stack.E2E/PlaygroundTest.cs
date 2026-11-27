@@ -221,11 +221,11 @@ public abstract class PlaygroundTest(PlaygroundServer server) : IAsyncLifetime
         Page.WaitForFunctionAsync("part => decodeURIComponent(location.search).includes(part)", part, new() { Timeout = timeout });
 
     /// <summary>Opens a page and waits until it can be used in its mode.</summary>
-    protected Task Open(string mode, string component) => Open(Page, mode, component);
+    protected Task Open(string mode, string component, string query = "") => Open(Page, mode, component, query);
 
-    protected static async Task Open(IPage page, string mode, string component)
+    protected static async Task Open(IPage page, string mode, string component, string query = "")
     {
-        await page.GotoAsync($"/{mode}/components/{component}");
+        await page.GotoAsync($"/{mode}/components/{component}{query}");
         // Klyroo's browser side is loaded by blazor.web.js in every mode, static included.
         await page.WaitForFunctionAsync("() => !!customElements.get('kly-popover')");
         if (mode != "ssr")

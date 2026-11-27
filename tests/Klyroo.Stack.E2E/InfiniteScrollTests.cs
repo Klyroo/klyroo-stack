@@ -241,7 +241,9 @@ public class InfiniteScrollTests(PlaygroundServer server) : PlaygroundTest(serve
         {
             var context = await NewContext(new() { ReducedMotion = reduce ? ReducedMotion.Reduce : ReducedMotion.NoPreference });
             var page = await context.NewPageAsync();
-            await Open(page, mode, "infinite-scroll");
+            // The spinner only exists while a load runs, and a load of the demo lasts 600 ms: on a slow machine it was over (or not started) when the
+            // assertions looked. The demo holds the load for a minute here, far longer than the test, so the spinner is there for as long as it is asserted.
+            await Open(page, mode, "infinite-scroll", "?delay=60000");
 
             await page.GetByTestId("infinite-more").GetByRole(AriaRole.Button, new() { Name = "Load more" }).ClickAsync();
             var spinner = page.GetByTestId("infinite-more").Locator("[data-slot=trigger] svg");
