@@ -5,11 +5,14 @@ using Markdig;
 using Markdig.Extensions.AutoIdentifiers;
 using Markdig.Extensions.Alerts;
 using Markdig.Extensions.CustomContainers;
+using Markdig.Extensions.Tables;
 using Markdig.Extensions.TaskLists;
 using Markdig.Renderers;
 using Markdig.Renderers.Html;
+using Markdig.Renderers.Html.Inlines;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
+using Klyroo.Docs.Site.Components.Signage;
 
 namespace Klyroo.Docs.Site.Content;
 
@@ -150,6 +153,7 @@ public sealed partial class MarkdownRenderer
         {
             LinkReferences(document, untrusted);
         }
+        MarkProseColumns(document);
         var links = new List<string>();
         var images = new List<string>();
 
@@ -251,6 +255,8 @@ public sealed partial class MarkdownRenderer
         }
         // A wide table scrolls inside its own box, and the box can be reached with the keyboard.
         // Each box is a region with a name of its own (landmarks must be told apart).
+        // A table whose header cells are all empty (a table written only to lay out rows) gets no header band.
+        html = EmptyHeader().Replace(html, "");
         var tables = 0;
         html = Regex.Replace(html, "<table", _ => $"<div class=\"table-scroll\" tabindex=\"0\" role=\"region\" aria-label=\"Table {++tables}\"><table")
             .Replace("</table>", "</table></div>", StringComparison.Ordinal);
@@ -274,6 +280,9 @@ public sealed partial class MarkdownRenderer
 
     [GeneratedRegex(@"\s+")]
     private static partial Regex Whitespace();
+
+    [GeneratedRegex(@"<thead>\s*<tr>(?:\s*<th(?:\s[^>]*)?>\s*</th>)+\s*</tr>\s*</thead>\s*")]
+    private static partial Regex EmptyHeader();
 
     [GeneratedRegex("""<(h[1-6]) id="[^"]*">""")]
     private static partial Regex HeadingId();
@@ -350,6 +359,39 @@ public sealed partial class MarkdownRenderer
         }
     }
 
+    // A column whose cells hold sentences (more than ProseColumnLength characters in one of them) gets class "col-prose" on every cell: the stylesheet gives it a width
+    // to read in, and the table scrolls instead of squeezing the sentences into a strip next to short cells.
+    private const int ProseColumnLength = 48;
+
+    private static void MarkProseColumns(MarkdownDocument document)
+    {
+        foreach (var table in document.Descendants<Table>())
+        {
+            var rows = table.OfType<TableRow>().ToList();
+            var longest = new Dictionary<int, int>();
+            foreach (var row in rows)
+            {
+                for (var column = 0; column < row.Count; column++)
+                {
+                    var length = row[column] is TableCell cell
+                        ? cell.Descendants<LeafBlock>().Sum(b => b.Inline is { } inline ? InlineText(inline).Length : 0)
+                        : 0;
+                    longest[column] = Math.Max(longest.GetValueOrDefault(column), length);
+                }
+            }
+            foreach (var row in rows)
+            {
+                for (var column = 0; column < row.Count; column++)
+                {
+                    if (row[column] is TableCell cell && longest[column] > ProseColumnLength)
+                    {
+                        cell.GetAttributes().AddClass("col-prose");
+                    }
+                }
+            }
+        }
+    }
+
     private static string InlineText(ContainerInline container)
     {
         var text = new StringBuilder();
@@ -403,6 +445,7 @@ public sealed partial class MarkdownRenderer
             if (renderer is HtmlRenderer html)
             {
                 html.ObjectRenderers.Replace<CodeBlockRenderer>(new HighlightedCodeRenderer());
+                html.ObjectRenderers.Replace<CodeInlineRenderer>(new BreakableCodeRenderer());
                 html.ObjectRenderers.Replace<HtmlTaskListRenderer>(new TaskBoxRenderer());
                 html.ObjectRenderers.Replace<AlertBlockRenderer>(new AlertRenderer());
                 html.ObjectRenderers.Replace<HtmlCustomContainerRenderer>(new ContainerRenderer());
@@ -474,6 +517,32 @@ public sealed partial class MarkdownRenderer
         {
             var label = box.Parent?.ParentBlock?.Inline is { } inline ? InlineText(inline) : "";
             renderer.Write($"<input aria-label=\"{WebUtility.HtmlEncode(label)}\" disabled=\"disabled\" type=\"checkbox\"{(box.Checked ? " checked=\"checked\"" : "")} />");
+        }
+    }
+
+    // Inline code wraps between the words of an identifier (Klyroo.Table.<wbr>Core, IReadOnly<wbr>List<wbr><T>), never inside one: the same pieces as the table of contents.
+    private sealed class BreakableCodeRenderer : HtmlObjectRenderer<CodeInline>
+    {
+        protected override void Write(HtmlRenderer renderer, CodeInline code)
+        {
+            renderer.Write("<code").WriteAttributes(code).Write('>');
+            var pieces = NameBreaks.SplitCode(code.Content.ToString());
+            for (var i = 0; i < pieces.Count; i++)
+            {
+                if (i > 0)
+                {
+                    renderer.Write("<wbr>");
+                }
+                if (renderer.EnableHtmlEscape)
+                {
+                    renderer.WriteEscape(pieces[i]);
+                }
+                else
+                {
+                    renderer.Write(pieces[i]);
+                }
+            }
+            renderer.Write("</code>");
         }
     }
 

@@ -22,7 +22,7 @@
                         <i class="ds-dot" data-state="@(i == _index ? "here" : i < _index ? "ridden" : "ahead")"></i>
                     }
                 </span>
-                <span class="where">@if (_page.Group is not null){<span>@_page.Group</span><span aria-hidden="true"> / </span>}<strong>@_page.NavTitle</strong></span>
+                <span class="where">@if (_page.Group is not null){<span>@_page.Group<span aria-hidden="true">&nbsp;/</span></span>@(" ")}<strong>@_page.NavTitle</strong></span>
                 <KlyIcon Name="ph:list" Class="ds-icon" />
             </summary>
             <div class="menu"><LineNav Items="Site.Navigation" CurrentHref="@_page.Href" AriaLabel="Documentation menu" IdPrefix="lnm" /></div>

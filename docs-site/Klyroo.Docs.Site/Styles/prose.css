@@ -6,7 +6,7 @@
 
 .markdown-body {
   max-width: 100%;
-  font: 400 1.0625rem/1.7 var(--sc-read);
+  font: 400 1.0625rem/1.75 var(--sc-read);
   color: var(--sc-text);
   overflow-wrap: break-word;
 }
@@ -14,7 +14,7 @@
 /* The running text keeps a measure of about 70 characters of Public Sans (32em, 70 characters measured on a real paragraph); code, tables and callouts use the whole column. */
 .markdown-body > :where(p, ul, ol, dl, blockquote, h2, h3, h4, h5, h6, hr) { max-width: 32em; }
 
-.markdown-body :where(p) { margin: 1rem 0 0; text-wrap: pretty; }
+.markdown-body :where(p) { margin: 1rem 0 0; text-wrap: pretty; hyphens: manual; }
 .markdown-body > :first-child { margin-top: 0; }
 .markdown-body strong { color: var(--sc-strong); font-weight: 700; }
 .markdown-body :where(h2, h3, h4, h5, h6) strong { font-weight: inherit; }
@@ -26,7 +26,7 @@
   line-height: 1.18;
   letter-spacing: -0.012em;
   text-wrap: balance;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 .markdown-body h2 { margin: 3.5rem 0 0.875rem; font-size: 1.875rem; font-weight: 900; font-variation-settings: "wdth" 118; }
 .markdown-body h3 { margin: 2.5rem 0 0.625rem; font-size: 1.375rem; font-weight: 800; font-variation-settings: "wdth" 112; }
@@ -42,8 +42,6 @@
   font-size: 1.1875rem;
 }
 .markdown-body h3 + h4:has(> code) { margin-top: 1.25rem; padding-top: 0; border-top: 0; }
-.markdown-body :is(h2, h3, h4, h5):has(> code) > code { padding: 0; border: 0; background: none; font-size: 0.94em; font-weight: 700; color: inherit; overflow-wrap: anywhere; }
-
 .heading-anchor {
   display: inline-block;
   width: 1.5rem;
@@ -93,16 +91,36 @@
 
 .markdown-body img { max-width: 100%; height: auto; border-radius: 0.75rem; border: 3px solid var(--sc-rule); }
 
-/* Inline code */
+/* Inline code. It wraps only where the renderer put a <wbr> (between the words of an identifier, after a dot, before < and ( ) or at a space; a name longer than the line is the one case that still breaks inside. A name that wraps keeps one chip shape on each line. */
 .markdown-body :not(pre) > code, .doc-lead code, .prose-inline code {
-  padding: 0.1em 0.36em;
+  padding: 0.06em 0.3em;
+  margin-inline: 0;
   border-radius: 5px;
   background: color-mix(in oklab, var(--sc-strong) 10%, transparent);
   color: var(--sc-strong);
   font-family: var(--sc-mono);
   font-size: 0.855em;
   font-weight: 500;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* Code in a heading is the heading's own word set in the mono face: same size, weight and baseline, no chip and no letter-spacing of its own. */
+.markdown-body :is(h2, h3, h4, h5, h6) code {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-family: var(--sc-mono);
+  font-size: 1em;
+  font-weight: inherit;
+  font-variation-settings: normal;
+  letter-spacing: 0;
+  vertical-align: baseline;
+  overflow-wrap: break-word;
 }
 
 /* The classes of HighlightedCode, which maps the token kinds of Klyroo.Display.Core's CodeHighlighter onto the syntax colors (a function is colored as a command, punctuation keeps the text color). */
@@ -176,9 +194,28 @@
   line-height: 1.7;
   tab-size: 2;
   color: var(--sc-panel-text);
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--sc-panel-text) 55%, transparent) color-mix(in oklab, var(--sc-panel-text) 12%, transparent);
 }
 .code-block pre:focus-visible { outline: 3px solid var(--sc-sys); outline-offset: -3px; border-radius: 0 0 0.75rem 0.75rem; }
-.code-block pre code { padding: 0; border: 0; background: transparent; font-size: inherit; white-space: pre; color: inherit; }
+.code-block pre code { display: inline-block; min-width: 100%; box-sizing: border-box; padding: 0 0.25rem 0 0; border: 0; background: transparent; font-size: inherit; white-space: pre; color: inherit; overflow-wrap: normal; }
+
+/* A block that runs past its box fades out at the right edge until it is scrolled to its end; a block that fits has no fade. The scrollbar is always themed and visible. */
+@property --edge-fade {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@supports (animation-timeline: scroll()) {
+  .code-block pre {
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - var(--edge-fade)), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - var(--edge-fade)), transparent);
+    animation: edge-fade linear both;
+    animation-timeline: scroll(self inline);
+  }
+  @keyframes edge-fade { from { --edge-fade: 2.5rem; } to { --edge-fade: 0px; } }
+  @keyframes edge-cue { from { opacity: 1; } to { opacity: 0; } }
+}
 
 /* Callouts are platform signs: a strip of the kind on the left edge, the sign on signage white with a heavy outline, the title in Archivo wide. */
 .callout {
@@ -201,19 +238,40 @@
 .callout > .callout-title { margin: 0; color: var(--sc-strong); font: 800 0.9375rem/1.3 var(--sc-font); font-variation-settings: "wdth" 112; }
 .callout a, .callout a > code { color: var(--sc-strong); }
 
-/* A wide table scrolls inside its own box instead of widening the page. The head is a black sign. */
+/* A wide table scrolls inside its own box instead of widening the page, and says so: a themed scrollbar, and a shadow on the right edge that fades as the last column comes into view. The head is a black sign.
+   The box is a flex row so the shadow (a sticky ::after laid over the last 2.5rem of the table) can sit on the edge of the visible part. */
 .table-scroll {
+  display: flex;
   margin: 1.5rem 0 0;
   overflow-x: auto;
   border: 3px solid var(--sc-rule);
   border-radius: 0.75rem;
   background: var(--sc-raised);
   max-width: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: var(--sc-strong) color-mix(in oklab, var(--sc-strong) 14%, transparent);
 }
 :root.dark .table-scroll { border-width: 2px; }
 .table-scroll:focus-visible { outline: 3px solid var(--sc-focus); outline-offset: 3px; }
+@supports (animation-timeline: scroll()) {
+  .table-scroll::after {
+    content: "";
+    flex: none;
+    position: sticky;
+    right: 0;
+    align-self: stretch;
+    width: 2.5rem;
+    margin-inline-start: -2.5rem;
+    pointer-events: none;
+    background: linear-gradient(to left, color-mix(in oklab, var(--sc-strong) 34%, transparent), transparent);
+    opacity: 0;
+    animation: edge-cue linear both;
+    animation-timeline: scroll(nearest inline);
+  }
+  :root.dark .table-scroll::after { background: linear-gradient(to left, color-mix(in oklab, var(--sc-strong) 16%, transparent), transparent); }
+}
 
-.table-scroll table { width: 100%; border-collapse: separate; border-spacing: 0; font-family: var(--sc-read); font-size: 0.9rem; line-height: 1.55; font-variant-numeric: tabular-nums; }
+.table-scroll table { flex: 0 0 100%; width: 100%; border-collapse: separate; border-spacing: 0; font-family: var(--sc-read); font-size: 0.9rem; line-height: 1.55; font-variant-numeric: tabular-nums; }
 .table-scroll :is(th, td) { padding: 0.625rem 0.875rem; border-bottom: 1px solid var(--sc-line); text-align: start; vertical-align: top; }
 .table-scroll tbody tr:last-child td { border-bottom: 0; }
 .table-scroll th {
@@ -224,9 +282,20 @@
   white-space: nowrap;
   border-bottom: 4px solid var(--rail-h, var(--accent));
 }
-.table-scroll td code { overflow-wrap: anywhere; }
-.table-scroll td { min-width: 7rem; }
-.table-scroll td:first-child { min-width: 0; }
+/* Code in the black head is white on a lighter chip (the chip of the ground would be dark on black). */
+.table-scroll th code {
+  background: color-mix(in oklab, #ffffff 18%, transparent);
+  color: #ffffff;
+  font-size: 0.92em;
+  font-weight: 600;
+  font-variation-settings: normal;
+  letter-spacing: 0;
+}
+/* A column never gets narrower than a few words (or a few pieces of an identifier): the table scrolls instead of squeezing it into tall rows. */
+.table-scroll :is(th, td) { min-width: 7rem; }
+.table-scroll td:has(> code:only-child) { min-width: 9rem; }
+.table-scroll :is(th, td):first-child { min-width: 6rem; }
+.table-scroll :is(th, td).col-prose { min-width: 14rem; }
 
 /* Task lists, footnotes, definition lists */
 .contains-task-list { list-style: none; padding-inline-start: 0.25rem; }
