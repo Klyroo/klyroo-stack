@@ -25,6 +25,13 @@ public abstract class PlaygroundTest(PlaygroundServer server) : IAsyncLifetime
         return data;
     }
 
+    /// <summary>
+    /// A popover of the top layer cannot be scrolled to, and one taller than the room around its trigger runs out of the window: the trigger goes to the top of the screen first, so the
+    /// whole panel fits below it. The jump is instant: the documentation site scrolls smoothly (<c>scroll-behavior</c> on the page), so a plain <c>scrollIntoView</c> is still moving
+    /// when the next line opens the panel, which is then placed against a trigger that has not arrived (or that the click's own scroll leaves halfway), and its buttons end below the window.
+    /// </summary>
+    protected static Task ToTop(ILocator trigger) => trigger.EvaluateAsync("e => e.scrollIntoView({ block: 'start', behavior: 'instant' })");
+
     protected string BaseUrl => server.BaseUrl;
 
     /// <summary>True when the docs host started its template demos and every one answers.</summary>

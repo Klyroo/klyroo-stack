@@ -46,8 +46,6 @@ public class DataListRangeFilterTests(PlaygroundServer server) : PlaygroundTest(
 
     private static AriaRole Control(string mode) => mode == "ssr" ? AriaRole.Link : AriaRole.Button;
 
-    private static Task ToTop(ILocator trigger) => trigger.EvaluateAsync("e => e.scrollIntoView({ block: 'start' })");
-
     private async Task OpenTag(ILocator list, string name, string dialog)
     {
         await ToTop(Tag(list, name));

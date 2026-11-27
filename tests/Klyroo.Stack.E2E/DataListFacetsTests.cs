@@ -38,9 +38,6 @@ public class DataListFacetsTests(PlaygroundServer server) : PlaygroundTest(serve
     // The options of an editor, statically (a link per option) and interactively (a checkbox row): both carry data-value.
     private static ILocator Options(ILocator editor) => editor.Locator("[data-slot=filter-options] [data-value]");
 
-    // A popover of the top layer cannot be scrolled to: the trigger goes to the top of the screen first, so the whole panel fits below it.
-    private static Task ToTop(ILocator trigger) => trigger.EvaluateAsync("e => e.scrollIntoView({ block: 'start' })");
-
     private static async Task OpenTag(ILocator list, string name, string dialog)
     {
         await ToTop(Tag(list, name));

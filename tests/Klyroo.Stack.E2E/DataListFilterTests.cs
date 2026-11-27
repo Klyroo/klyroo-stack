@@ -39,9 +39,6 @@ public class DataListFilterTests(PlaygroundServer server) : PlaygroundTest(serve
     // A link statically rendered, a button once there is a .NET to run it.
     private static AriaRole Control(string mode) => mode == "ssr" ? AriaRole.Link : AriaRole.Button;
 
-    // A popover of the top layer cannot be scrolled to: the trigger goes to the top of the screen first, so the whole panel fits below it.
-    private static Task ToTop(ILocator trigger) => trigger.EvaluateAsync("e => e.scrollIntoView({ block: 'start' })");
-
     private async Task OpenTag(string name, string dialog)
     {
         await ToTop(Tag(name));
