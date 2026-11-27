@@ -138,26 +138,7 @@ h1[tabindex="-1"]:focus-visible { outline: none; }
 .pg-knobs { min-width: 0; }
 :root { --scroll-shadow: rgb(15 23 42 / 0.26); }
 :root.dark { --scroll-shadow: rgb(0 0 0 / 0.7); }
-/*
-  The scroll lives in the body of the knob card, so its border survives. The card may be as tall as the room under the header, so a short
-  panel shows every control and a tall one scrolls; the edges of the scroll area carry a shadow where more is hidden (scroll shadows: the
-  covers scroll with the content, the shadows stay), so the scroll shows even where the browser hides its scrollbar. On a short window the
-  panel is not sticky and not capped: the page scrolls instead, and no control is ever cut.
-*/
-.knobs-scroll { padding-bottom: 0.5rem; }
-@media (min-width: 1024px) and (min-height: 760px) {
-  .pg-knobs { position: sticky; top: calc(var(--header-h) + 1rem); }
-  .knobs-scroll {
-    max-height: calc(100vh - var(--header-h) - 5rem);
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    background:
-      linear-gradient(var(--klyroo-bg) 30%, transparent) top / 100% 2rem no-repeat local,
-      linear-gradient(transparent, var(--klyroo-bg) 70%) bottom / 100% 2rem no-repeat local,
-      radial-gradient(farthest-side at 50% 0, var(--scroll-shadow), transparent) top / 100% 0.625rem no-repeat scroll,
-      radial-gradient(farthest-side at 50% 100%, var(--scroll-shadow), transparent) bottom / 100% 0.625rem no-repeat scroll;
-  }
-}
+/* The knob card takes its natural height and scrolls with the page: no inner scroll, no sticky card taller than the window, so no control is ever cut. */
 
 /* Index: a ruled list of the libraries. */
 .lib-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }

@@ -142,6 +142,10 @@
             {
                 <PgSwitch Key="loading" Label="Loading" Hint="A skeleton instead of the content." @bind-Value="_loading" />
             }
+            @if (_component == "facts" && !_grouped)
+            {
+                <PgSwitch Key="noteload" Label="Notes row loading" Hint="One row shows its own skeleton while its value loads." @bind-Value="_noteLoading" />
+            }
         </PgGroup>
         }
         <PgGroup Title="Theme">
@@ -206,7 +210,7 @@
                             }
                             else
                             {
-                                <KlyFacts Items="_facts" Max="@(_blockMax == 0 ? null : _blockMax)" Step="@(_blockMax == 0 ? null : 2)" Loading="_loading" Surface="Surface" />
+                                <KlyFacts Items="Facts" Max="@(_blockMax == 0 ? null : _blockMax)" Step="@(_blockMax == 0 ? null : 2)" Loading="_loading" Surface="Surface" />
                             }
                         </div>
                         break;
@@ -273,6 +277,7 @@
     private KlyMeterLayout _meterLayout;
     private KlyListVariant _listVariant;
     private KlyTimelineLayout _timelineLayout;
+    private bool _noteLoading;
     private bool _trend = true, _grouped, _compare, _collapsible, _unchanged, _numbers;
 
     private KlySurface? Surface => _surface == "default" ? null : Enum.Parse<KlySurface>(_surface);
@@ -283,14 +288,14 @@
     private static readonly IReadOnlyList<double> _trendData = [102, 98, 115, 110, 132, 128, 149];
     private static readonly DateTimeOffset _now = new(2026, 3, 12, 9, 30, 0, TimeSpan.FromHours(1));
 
-    private static readonly IReadOnlyList<KlyFact> _facts =
+    private IReadOnlyList<KlyFact> Facts =>
     [
         new("Status") { Badge = new KlyBadgeItem("Paid") { Color = KlyColor.Success, Icon = "check" } },
         new("Reference") { Value = "ORD-1042", Copy = true, Mono = true },
         new("Customer") { Value = "Acme Corp", Href = "https://klyroo.github.io/klyroo-ui/" },
         new("Amount") { Value = "$12,400", Emphasis = true },
         new("Shipping address") { Value = null },
-        new("Notes") { Value = "Leave at the front desk" },
+        new("Notes") { Value = _noteLoading ? null : "Leave at the front desk", Loading = _noteLoading },
     ];
 
     private static readonly IReadOnlyList<KlyFactGroup> _factGroups =
@@ -394,6 +399,7 @@
         _surface = K.Str("surface", "default");
         if (_surfaces.All(x => x.Value != _surface)) _surface = "default";
         _grouped = K.Bool("grouped", false);
+        _noteLoading = K.Bool("noteload", false);
         _blockMax = K.Int("max", 0, 0, 8);
         _culture = K.Str("culture", "en-US");
         if (_cultures.All(c => c.Value != _culture)) _culture = "en-US";
@@ -500,7 +506,7 @@
                 sb.Append(BlockCommon()).Append(" />\n\n");
                 sb.Append(_grouped
                     ? "@code {\n    private readonly KlyFactGroup[] _groups =\n    [\n        new(\"Order\", [new KlyFact(\"Reference\") { Value = \"ORD-1042\", Copy = true, Mono = true }]),\n        new(\"Customer\", [new KlyFact(\"Name\") { Value = \"Acme Corp\" }]),\n    ];\n}\n"
-                    : "@code {\n    private readonly KlyFact[] _facts =\n    [\n        new(\"Status\") { Badge = new KlyBadgeItem(\"Paid\") { Color = KlyColor.Success } },\n        new(\"Reference\") { Value = \"ORD-1042\", Copy = true, Mono = true },\n        new(\"Shipping address\") { Value = null },\n    ];\n}\n");
+                    : "@code {\n    private readonly KlyFact[] _facts =\n    [\n        new(\"Status\") { Badge = new KlyBadgeItem(\"Paid\") { Color = KlyColor.Success } },\n        new(\"Reference\") { Value = \"ORD-1042\", Copy = true, Mono = true },\n        new(\"Shipping address\") { Value = null },\n        new(\"Notes\") { Value = \"Leave at the front desk\" },\n    ];\n}\n");
                 break;
             case "breakdown":
                 sb.Append($"<KlyBreakdown Title=\"Invoice\" Lines=\"_lines\" Total=\"_total\" Format=\"{_format}\" Culture=\"@_culture\"");
