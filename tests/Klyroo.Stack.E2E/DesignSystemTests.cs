@@ -43,9 +43,9 @@ public class DesignSystemTests(PlaygroundServer server) : PlaygroundTest(server)
         await Open("ssr", "theme-style");
 
         var page = await Page.EvaluateAsync<string>("() => getComputedStyle(document.documentElement).getPropertyValue('--klyroo-primary').trim()");
-        Assert.Equal("#ffd23f", page);
+        Assert.Equal("#b6ff00", page);
         var inside = await Page.GetByTestId("palette-demo").EvaluateAsync<string>("e => getComputedStyle(e).getPropertyValue('--klyroo-primary').trim()");
-        Assert.NotEqual("#ffd23f", inside);
+        Assert.NotEqual("#b6ff00", inside);
     }
 
     [Theory]
@@ -101,7 +101,7 @@ public class DesignSystemTests(PlaygroundServer server) : PlaygroundTest(server)
     {
         await Open("ssr", "chart");
         var series = Page.GetByTestId("chart-line").Locator("g[data-series][data-color='chart-1']").First;
-        Assert.Equal("#ffd23f", await series.EvaluateAsync<string>("e => getComputedStyle(e).getPropertyValue('--kly-color').trim()"));
+        Assert.Equal("#b6ff00", await series.EvaluateAsync<string>("e => getComputedStyle(e).getPropertyValue('--kly-color').trim()"));
 
         // The chart tokens are not fixed on :root: the series resolve --klyroo-primary at their own element.
         await Page.GetByTestId("chart-line").EvaluateAsync("e => e.style.setProperty('--klyroo-primary', '#ff0000')");
@@ -143,13 +143,13 @@ public class DesignSystemTests(PlaygroundServer server) : PlaygroundTest(server)
         await Page.GotoAsync("/docs/css-variables");
         var demo = Page.GetByTestId("utility-demo");
 
-        await Assertions.Expect(demo.GetByText("text-muted", new() { Exact = true })).ToHaveCSSAsync("color", Rgb("#5b6165"));
-        await Assertions.Expect(demo.GetByText("bg-muted").First).ToHaveCSSAsync("background-color", Rgb("#eeeeea"));
-        await Assertions.Expect(demo.GetByText("bg-primary")).ToHaveCSSAsync("background-color", Rgb("#ffd23f"));
+        await Assertions.Expect(demo.GetByText("text-muted", new() { Exact = true })).ToHaveCSSAsync("color", Rgb("#4b5563"));
+        await Assertions.Expect(demo.GetByText("bg-muted").First).ToHaveCSSAsync("background-color", Rgb("#f7f8fa"));
+        await Assertions.Expect(demo.GetByText("bg-primary")).ToHaveCSSAsync("background-color", Rgb("#b6ff00"));
 
         await Page.GetByRole(AriaRole.Button, new() { Name = "Toggle dark mode" }).ClickAsync();
         await Assertions.Expect(Page.Locator("html")).ToHaveClassAsync(new Regex("dark"));
-        await Assertions.Expect(demo.GetByText("text-muted", new() { Exact = true })).ToHaveCSSAsync("color", Rgb("#8a9196"));
-        await Assertions.Expect(demo.GetByText("bg-muted").First).ToHaveCSSAsync("background-color", Rgb("#111315"));
+        await Assertions.Expect(demo.GetByText("text-muted", new() { Exact = true })).ToHaveCSSAsync("color", Rgb("#9ca3af"));
+        await Assertions.Expect(demo.GetByText("bg-muted").First).ToHaveCSSAsync("background-color", Rgb("#11161d"));
     }
 }
