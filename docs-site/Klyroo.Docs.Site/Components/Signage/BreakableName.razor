@@ -1,0 +1,18 @@
+@* A name set so that it wraps between its words rather than inside one: DataListExportTooLarge<wbr>Exception, never DataListExportTooLargeExce / ption. *@
+@for (var i = 0; i < _pieces.Count; i++)
+{
+    @if (i > 0)
+    {
+        <wbr />
+    }
+    @_pieces[i]
+}
+
+@code {
+    private IReadOnlyList<string> _pieces = [];
+
+    /// <summary>The name or heading to set.</summary>
+    [Parameter, EditorRequired] public string Text { get; set; } = "";
+
+    protected override void OnParametersSet() => _pieces = NameBreaks.Split(Text);
+}

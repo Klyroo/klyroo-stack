@@ -61,7 +61,7 @@
                 @* Below xl the table of contents is a disclosure above the text; from xl up it is in the right column. *@
                 <details class="toc-mobile">
                     <summary>On this page<KlyIcon Name="ph:caret-down" /></summary>
-                    <div class="toc"><ul>@foreach (var link in _page.Toc){<li><a href="@(_page.Href + "#" + link.Id)" data-level="@Math.Clamp(link.Level, 2, 6)" title="@link.Text">@link.Text</a></li>}</ul></div>
+                    <div class="toc"><ul>@foreach (var link in _page.Toc){<li><a href="@(_page.Href + "#" + link.Id)" data-level="@Math.Clamp(link.Level, 2, 6)" title="@link.Text"><BreakableName Text="@link.Text" /></a></li>}</ul></div>
                 </details>
             }
 
@@ -98,7 +98,7 @@
             <aside class="doc-toc" aria-label="On this page">
                 <nav class="toc" data-toc>
                     <p class="toc-title">On this page</p>
-                    <ul>@foreach (var link in _page.Toc){<li><a href="@(_page.Href + "#" + link.Id)" data-level="@Math.Clamp(link.Level, 2, 6)" title="@link.Text">@link.Text</a></li>}</ul>
+                    <ul>@foreach (var link in _page.Toc){<li><a href="@(_page.Href + "#" + link.Id)" data-level="@Math.Clamp(link.Level, 2, 6)" title="@link.Text"><BreakableName Text="@link.Text" /></a></li>}</ul>
                 </nav>
             </aside>
         }

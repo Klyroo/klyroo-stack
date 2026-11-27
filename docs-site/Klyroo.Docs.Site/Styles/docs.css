@@ -262,7 +262,7 @@
   color: var(--sc-muted);
   font: 500 0.8125rem/1.4 var(--sc-font);
   text-decoration: none;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 .toc li { position: relative; }
 .toc li::before {

@@ -1,0 +1,20 @@
+using Klyroo.Docs.Site.Components.Signage;
+
+namespace Klyroo.Docs.Site.Tests;
+
+public class NameBreaksTests
+{
+    [Theory]
+    [InlineData("DataListExportTooLargeException", new[] { "Data", "List", "Export", "Too", "Large", "Exception" })]
+    [InlineData("DataListActionPartBase<TItem>", new[] { "Data", "List", "Action", "Part", "Base", "<TItem>" })]
+    [InlineData("Klyroo.Table.Server", new[] { "Klyroo.", "Table.", "Server" })]
+    [InlineData("HTTPClient", new[] { "HTTPClient" })]
+    [InlineData("Install the package", new[] { "Install the package" })]
+    [InlineData("Step 1. Install", new[] { "Step 1. Install" })]
+    public void A_name_wraps_only_between_its_words(string text, string[] pieces) =>
+        Assert.Equal(pieces, NameBreaks.Split(text));
+
+    [Fact]
+    public void The_pieces_put_back_together_give_the_name() =>
+        Assert.Equal("KlyTable<TItem>.Columns", string.Concat(NameBreaks.Split("KlyTable<TItem>.Columns")));
+}
