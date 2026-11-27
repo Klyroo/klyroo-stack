@@ -35,6 +35,22 @@
 @media (min-width: 1024px) { .doc-rail { display: block; } }
 @media (min-width: 1280px) { .doc-toc { display: block; } }
 
+/* A rail or a contents list taller than the window scrolls inside: its foot fades out until it is scrolled to the end, so the last entries never look cut. */
+@property --foot-fade {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@supports (animation-timeline: scroll()) {
+  .doc-rail, .doc-toc {
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--foot-fade)), transparent);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - var(--foot-fade)), transparent);
+    animation: foot-fade linear both;
+    animation-timeline: scroll(self block);
+  }
+  @keyframes foot-fade { from { --foot-fade: 3rem; } to { --foot-fade: 0px; } }
+}
+
 /* ---------- Below lg: the line as a compact strip, and the menu behind it ---------- */
 .docs-subbar {
   position: sticky;

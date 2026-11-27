@@ -21,7 +21,7 @@ public static class NameBreaks
         {
             if (piece.Length > ShortWord)
             {
-                pieces.AddRange(Cut(piece, humps: true));
+                pieces.AddRange(KeepPrefixes(Cut(piece, humps: true)));
             }
             else
             {
@@ -29,6 +29,25 @@ public static class NameBreaks
             }
         }
         return pieces;
+    }
+
+    /// <summary>The shortest word of a long name that may end or start a line: a prefix such as <c>Kly</c> stays with the next word and a short last word with the one before, so <c>KlyDynamicFormEngine</c> never shows <c>Kly</c> alone at the end of a line.</summary>
+    private const int ShortestPiece = 4;
+
+    // Joins a first word shorter than ShortestPiece to the word after it, and a last one to the word before it: the words inside a name keep their breaks.
+    private static List<string> KeepPrefixes(List<string> words)
+    {
+        if (words.Count > 1 && words[0].Length < ShortestPiece)
+        {
+            words[1] = words[0] + words[1];
+            words.RemoveAt(0);
+        }
+        if (words.Count > 1 && words[^1].Length < ShortestPiece)
+        {
+            words[^2] += words[^1];
+            words.RemoveAt(words.Count - 1);
+        }
+        return words;
     }
 
     private static List<string> Cut(string text, bool humps)

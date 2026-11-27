@@ -31,4 +31,10 @@ public class NameBreaksTests
         Assert.Equal("KlyTable<TItem>.Columns", string.Concat(NameBreaks.Split("KlyTable<TItem>.Columns")));
         Assert.Equal("KlyTable<TItem>.Columns", string.Concat(NameBreaks.SplitCode("KlyTable<TItem>.Columns")));
     }
+
+    [Theory]
+    [InlineData("KlyDynamicFormEngine", new[] { "KlyDynamic", "Form", "Engine" })]
+    [InlineData("KlyDashboardPageSyncUrl", new[] { "KlyDashboard", "Page", "SyncUrl" })]
+    public void A_short_prefix_of_a_long_name_stays_with_the_next_word(string text, string[] pieces) =>
+        Assert.Equal(pieces, NameBreaks.SplitCode(text));
 }
