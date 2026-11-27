@@ -128,7 +128,9 @@ public static partial class LibraryDocs
             var (path, result) = rendered[slug];
             var pageTitle = entry?.Title ?? result.Title ?? SlugTitle(slug.Split('/')[^1]);
             var meta = entry?.Description ?? Shorten(result.Summary, 200) ?? description;
-            var (lead, body) = SplitLead(result.Html, entry?.Description);
+            // The generator of api-reference.md writes a maintainer note under the title ("Generated ... Do not edit by hand."). It is for people editing the repository, so the
+            // page of the site leaves it out: the lead already says what the page is.
+            var (lead, body) = SplitLead(slug == "api-reference" ? GeneratedNote().Replace(result.Html, "", 1) : result.Html, entry?.Description);
             return new DocPage(slug, path, pageTitle, entry?.NavTitle ?? NavTitle(pageTitle, title), entry?.Description, meta, body, result.Headings, result.Text,
                 entry?.TocDepth ?? 3, entry?.IndexText ?? true, group, lead);
         }
@@ -207,6 +209,9 @@ public static partial class LibraryDocs
 
     // The paragraph under the title of a page is its lead: the description of site.yml when there is one, else the first paragraph, which leaves the body.
     // A paragraph that is long, or that holds more than a sentence or two of markup, stays in the body.
+    [System.Text.RegularExpressions.GeneratedRegex(@"^\s*<blockquote>\s*<p>Generated from the compiled assemblies[^<]*</p>\s*</blockquote>\s*")]
+    private static partial System.Text.RegularExpressions.Regex GeneratedNote();
+
     private static (string? Lead, string Body) SplitLead(string html, string? description)
     {
         if (description is { Length: > 0 })

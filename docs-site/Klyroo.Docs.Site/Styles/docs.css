@@ -172,18 +172,18 @@
   box-shadow: 0 0 0 3px var(--sc-ink);
 }
 :root.dark .crumbs { box-shadow: 0 0 0 3px var(--sc-panel-line); }
+/* Below lg the sticky strip says where you are, so the sign is not repeated. */
+@media (max-width: 1023px) { .crumbs { display: none; } }
 .crumbs .num {
   flex: none;
   display: grid;
   place-items: center;
-  min-width: 2.25rem;
-  padding-inline: 0.25rem;
+  width: 2.5rem;
   background: var(--sc-sys);
-  color: var(--sc-ink);
-  font: 900 1.25rem/1 var(--sc-font);
-  font-variation-settings: "wdth" 125;
   border-radius: 0.625rem 0 0 0.625rem;
 }
+/* The lit station of the rail: a yellow dot ringed in ink and in the color of the line. */
+.crumbs .num i { width: 1.0625rem; height: 1.0625rem; box-sizing: border-box; border-radius: 50%; background: var(--sc-sys); border: 3.5px solid var(--sc-ink); box-shadow: 0 0 0 3px var(--sc-sys), 0 0 0 6px var(--accent); }
 .crumbs ol {
   display: flex;
   flex-wrap: wrap;
@@ -218,9 +218,9 @@
 
 .doc-lead {
   margin: 1.125rem 0 0;
-  max-width: 62ch;
+  max-width: 35em;
   color: var(--sc-muted);
-  font: 500 clamp(1.0625rem, 1rem + 0.35vw, 1.1875rem)/1.55 var(--sc-font);
+  font: 400 clamp(1.0625rem, 1rem + 0.35vw, 1.1875rem)/1.55 var(--sc-read);
   text-wrap: pretty;
 }
 .doc-lead code { font-size: 0.88em; }
@@ -259,19 +259,17 @@
   position: relative;
   display: block;
   padding: 0.25rem 0.375rem 0.25rem 0.25rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   color: var(--sc-muted);
-  font: 500 0.8125rem/1.45 var(--sc-font);
+  font: 500 0.8125rem/1.4 var(--sc-font);
   text-decoration: none;
+  overflow-wrap: anywhere;
 }
 .toc li { position: relative; }
 .toc li::before {
   content: "";
   position: absolute;
   inset-inline-start: -1.125rem;
-  top: 50%;
+  top: 0.8125rem;
   width: 0.5625rem;
   height: 0.5625rem;
   margin-top: -0.28125rem;
@@ -331,7 +329,7 @@
   box-shadow: 0 0 0 0 var(--sc-sys);
   transition: box-shadow 160ms var(--sc-ease);
 }
-:root.dark .stop-sign { outline: 1px solid var(--sc-panel-line); }
+:root.dark .stop-sign { outline: 2px solid #4a5266; }
 .stop-sign:hover, .stop-sign:focus-visible { box-shadow: 0 0 0 4px var(--sc-sys); }
 .stop-sign svg { grid-area: icon; width: 1.5rem; height: 1.5rem; color: var(--sc-sys); }
 .stop-sign .title { grid-area: title; font: 800 1.0625rem/1.25 var(--sc-font); font-variation-settings: "wdth" 112; overflow-wrap: anywhere; }

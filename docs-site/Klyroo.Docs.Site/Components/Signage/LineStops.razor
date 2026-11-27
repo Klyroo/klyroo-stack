@@ -34,8 +34,18 @@
         </ol>
         <a class="ls-hub" href="@Libraries.SiteUrl("klyroo-stack")" style="--x: @Percent(HubX, W); --y: @Percent(HubY, H)">
             <span class="ls-disc"><b>Klyroo</b><b>Stack</b></span>
-            <span class="ls-change">Change here for the other lines</span>
+            <span class="sr-only">Klyroo.Stack, the interchange of the network</span>
         </a>
+        <nav class="ls-change" aria-label="Change here for the other lines">
+            <p class="ls-change-title">Change here for</p>
+            <ul>
+                @foreach (var other in Libraries.Items.Where(l => !l.Repo.Equals(Library.Repo, StringComparison.OrdinalIgnoreCase)))
+                {
+                    var accent = other.Accent ?? "#888888";
+                    <li><a href="@Libraries.SiteUrl(other.Repo)" aria-label="@(other.Name + " documentation")"><LineBadge Label="@other.Name" Fill="@accent" OnFill="@AccentColor.Compute(accent).OnFill" Size="KlySize.Sm" /></a></li>
+                }
+            </ul>
+        </nav>
     </figure>
 </div>
 

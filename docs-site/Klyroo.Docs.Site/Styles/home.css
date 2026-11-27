@@ -31,7 +31,7 @@
 .lh-title .line { display: block; }
 /* The second line is marked by a strip of the color of the line under it, the text stays white on the black. */
 .lh-title .mark { background: linear-gradient(var(--accent), var(--accent)) 0 100% / 100% 0.14em no-repeat; padding-bottom: 0.1em; }
-.lh-lead { margin: 0; max-width: 52ch; color: var(--sc-panel-text); font: 500 1rem/1.45 var(--sc-font); text-wrap: pretty; }
+.lh-lead { margin: 0; max-width: 52ch; color: var(--sc-panel-text); font: 500 1rem/1.45 var(--sc-read); text-wrap: pretty; }
 .lh-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.625rem; }
 .lh-cta a { font-weight: 700; }
 .lh-sign .sc-plat {
@@ -108,21 +108,14 @@ a.ls-stop:hover .ls-dot, a.ls-stop:focus-visible .ls-dot, .ls-stop:focus-visible
 .ls-hub:focus-visible { outline: none; }
 .ls-hub:focus-visible .ls-disc { outline: 3px solid var(--sc-focus); outline-offset: 3px; }
 :root.dark .ls-hub:focus-visible .ls-disc { outline-color: var(--sc-sys); }
-.ls-change {
-  position: absolute;
-  right: 9.2cqi;
-  top: 3.4cqi;
-  width: max-content;
-  max-width: 38cqi;
-  text-align: right;
-  font: 800 clamp(0.75rem, 2.05cqi, 0.9375rem)/1.2 var(--sc-font);
-  font-variation-settings: "wdth" 112;
-  color: var(--sc-strong);
-  text-decoration: underline;
-  text-decoration-color: var(--sc-sys);
-  text-decoration-thickness: 3px;
-  text-underline-offset: 3px;
-}
+/* The other lines: the "Change here for" list of the network, each line a plate that leads to its site. */
+.ls-change { position: absolute; left: 0; bottom: 0; width: 64cqi; box-sizing: border-box; border-radius: 0.75rem; background: var(--sc-panel); overflow: hidden; }
+:root.dark .ls-change { outline: 1px solid var(--sc-panel-line); }
+.ls-change-title { margin: 0; padding: 0.3125rem 0.75rem; background: var(--sc-sys); color: var(--sc-ink); font: 900 clamp(0.75rem, 1.9cqi, 0.9375rem)/1.1 var(--sc-font); font-variation-settings: "wdth" 118; }
+.ls-change ul { display: flex; flex-wrap: wrap; gap: 0.375rem; margin: 0; padding: 0.5rem 0.625rem 0.625rem; list-style: none; }
+.ls-change a { display: inline-block; border-radius: 0.5rem; text-decoration: none; }
+.ls-change a:hover .sc-pill { outline: 3px solid var(--sc-sys); outline-offset: 1px; }
+.ls-change .sc-pill { font-size: clamp(0.6875rem, 1.75cqi, 0.8125rem); }
 
 /* A narrow box: the line becomes a vertical strip with the same stations. */
 @container (max-width: 559px) {
@@ -139,11 +132,11 @@ a.ls-stop:hover .ls-dot, a.ls-stop:focus-visible .ls-dot, .ls-stop:focus-visible
   a.ls-stop:hover .ls-dot, a.ls-stop:focus-visible .ls-dot, .ls-stop:focus-visible .ls-dot { transform: translateY(-50%) scale(1.25); }
   .ls-stop span:not(.ls-dot) { position: static; transform: none; font-size: 1rem; text-shadow: none; white-space: normal; }
   .ls-hub { position: static; width: auto; height: auto; display: flex; align-items: center; gap: 0.875rem; }
-  .ls-disc { position: static; width: 4rem; height: 4rem; border-width: 4px; transform: none; flex: none; }
-  .ls-disc b { font-size: 0.8125rem; }
+  .ls-disc { position: static; width: 5rem; height: 5rem; border-width: 4px; transform: none; flex: none; }
+  .ls-disc b { font-size: 0.75rem; }
   .ls-hub:hover .ls-disc, .ls-hub:focus-visible .ls-disc { transform: scale(1.06); }
-  .ls-change { position: static; width: auto; flex: 1; min-width: 0; text-align: left; max-width: none; font-size: 0.9375rem; }
-  .ls-hub { max-width: 100%; }
+  .ls-change { position: static; width: 100%; }
+  .ls-change .sc-pill { font-size: 0.8125rem; }
 }
 
 /* ---------- Sections below the board ---------- */
@@ -171,7 +164,7 @@ a.ls-stop:hover .ls-dot, a.ls-stop:focus-visible .ls-dot, .ls-stop:focus-visible
   border-top: 4px solid var(--sc-rule);
 }
 .showcase-title { margin: 0; color: var(--sc-strong); font: 800 1.5rem/1.15 var(--sc-font); font-variation-settings: "wdth" 112; }
-.showcase-copy { margin: 0.625rem 0 0.875rem; max-width: 46ch; color: var(--sc-muted); font: 400 1rem/1.6 var(--sc-font); text-wrap: pretty; }
+.showcase-copy { margin: 0.625rem 0 0.875rem; max-width: 46ch; color: var(--sc-muted); font: 400 1rem/1.6 var(--sc-read); text-wrap: pretty; }
 .showcase-code .code-block { margin: 0; }
 .showcase-code .code-block pre { font-size: 0.78125rem; }
 .showcase-result { min-width: 0; }
@@ -211,7 +204,7 @@ a.ls-stop:hover .ls-dot, a.ls-stop:focus-visible .ls-dot, .ls-stop:focus-visible
   transform: translateX(0.0625rem);
 }
 .spec-row:target .spec-dot { background: var(--sc-sys); box-shadow: 0 0 0 3px var(--sc-ground), 0 0 0 6px var(--sc-edge); }
-.spec dd { margin: 0; max-width: 68ch; color: var(--sc-muted); font: 400 1rem/1.65 var(--sc-font); }
+.spec dd { margin: 0; max-width: 32em; color: var(--sc-muted); font: 400 1rem/1.65 var(--sc-read); }
 .spec dd code { padding: 0.1em 0.36em; border-radius: 5px; background: color-mix(in oklab, var(--sc-strong) 10%, transparent); color: var(--sc-strong); font-family: var(--sc-mono); font-size: 0.855em; overflow-wrap: anywhere; }
 .spec dd a { color: var(--sc-strong); text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 3px; }
 @media (min-width: 768px) { .spec-row { grid-template-columns: minmax(11rem, 17rem) minmax(0, 1fr); } }
@@ -227,7 +220,7 @@ a.ls-stop:hover .ls-dot, a.ls-stop:focus-visible .ls-dot, .ls-stop:focus-visible
 .package-name a:hover { text-decoration: underline; text-underline-offset: 4px; }
 .package-name code { font: inherit; background: none; padding: 0; }
 .layer { padding: 0.3125rem 0.625rem; border-radius: 0.375rem; background: var(--sc-sys); color: var(--sc-ink); font: 900 0.8125rem/1 var(--sc-font); font-variation-settings: "wdth" 112; }
-.package-text { color: var(--sc-panel-muted); font: 400 0.9375rem/1.6 var(--sc-font); min-width: 0; }
+.package-text { color: var(--sc-panel-muted); font: 400 0.9375rem/1.6 var(--sc-read); min-width: 0; }
 .package-text a { color: #ffffff; text-decoration-color: var(--sc-sys); }
 .package-text code { padding: 0.1em 0.35em; border-radius: 5px; background: #23262d; color: #f6f3ea; font-family: var(--sc-mono); font-size: 0.85em; overflow-wrap: anywhere; }
 .install-chip {
@@ -286,7 +279,7 @@ a.ls-stop:hover .ls-dot, a.ls-stop:focus-visible .ls-dot, .ls-stop:focus-visible
 .family-name:hover .sc-pill { outline: 3px solid var(--sc-sys); outline-offset: 2px; }
 .family-name[aria-current] .sc-pill { outline: 3px solid var(--sc-edge); outline-offset: 2px; }
 .family-plain { font: 800 1rem/1.2 var(--sc-font); }
-.family-text { color: var(--sc-muted); font: 400 0.9375rem/1.55 var(--sc-font); }
+.family-text { color: var(--sc-muted); font: 400 0.9375rem/1.55 var(--sc-read); }
 .family-text a { color: var(--sc-strong); text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 3px; }
 .family-text code { font-family: var(--sc-mono); font-size: 0.85em; }
 @media (min-width: 768px) { .family li { grid-template-columns: 15rem minmax(0, 1fr); } }

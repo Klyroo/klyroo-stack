@@ -6,17 +6,18 @@
 
 .markdown-body {
   max-width: 100%;
-  font: 400 1.0625rem/1.72 var(--sc-font);
+  font: 400 1.0625rem/1.7 var(--sc-read);
   color: var(--sc-text);
   overflow-wrap: break-word;
 }
 
-/* The running text keeps a measure of about 70 characters; code, tables and callouts use the whole column. */
-.markdown-body > :where(p, ul, ol, dl, blockquote, h2, h3, h4, h5, h6, hr) { max-width: 72ch; }
+/* The running text keeps a measure of about 70 characters of Public Sans (32em, 70 characters measured on a real paragraph); code, tables and callouts use the whole column. */
+.markdown-body > :where(p, ul, ol, dl, blockquote, h2, h3, h4, h5, h6, hr) { max-width: 32em; }
 
 .markdown-body :where(p) { margin: 1rem 0 0; text-wrap: pretty; }
 .markdown-body > :first-child { margin-top: 0; }
 .markdown-body strong { color: var(--sc-strong); font-weight: 700; }
+.markdown-body :where(h2, h3, h4, h5, h6) strong { font-weight: inherit; }
 
 .markdown-body :where(h2, h3, h4, h5, h6) {
   position: relative;
@@ -40,6 +41,7 @@
   border-top: 4px solid var(--sc-rule);
   font-size: 1.1875rem;
 }
+.markdown-body h3 + h4:has(> code) { margin-top: 1.25rem; padding-top: 0; border-top: 0; }
 .markdown-body :is(h2, h3, h4, h5):has(> code) > code { padding: 0; border: 0; background: none; font-size: 0.94em; font-weight: 700; color: inherit; overflow-wrap: anywhere; }
 
 .heading-anchor {
@@ -188,8 +190,7 @@
   background: var(--sc-raised);
   box-shadow: inset 8px 0 0 var(--c);
   color: var(--sc-text);
-  font-size: 0.9375rem;
-  line-height: 1.65;
+  font: 400 0.9375rem/1.65 var(--sc-read);
 }
 :root.dark .callout { border-width: 2px; }
 .callout[data-color="info"] { --c: #2f6fe0; }
@@ -212,7 +213,7 @@
 :root.dark .table-scroll { border-width: 2px; }
 .table-scroll:focus-visible { outline: 3px solid var(--sc-focus); outline-offset: 3px; }
 
-.table-scroll table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.9rem; line-height: 1.55; font-variant-numeric: tabular-nums; }
+.table-scroll table { width: 100%; border-collapse: separate; border-spacing: 0; font-family: var(--sc-read); font-size: 0.9rem; line-height: 1.55; font-variant-numeric: tabular-nums; }
 .table-scroll :is(th, td) { padding: 0.625rem 0.875rem; border-bottom: 1px solid var(--sc-line); text-align: start; vertical-align: top; }
 .table-scroll tbody tr:last-child td { border-bottom: 0; }
 .table-scroll th {

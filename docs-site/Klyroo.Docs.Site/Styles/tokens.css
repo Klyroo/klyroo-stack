@@ -22,6 +22,7 @@
 
 .world {
   --sc-font: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --sc-read: "Public Sans", ui-sans-serif, system-ui, sans-serif;
   --sc-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --sc-sys: #ffd23f;
   --sc-ink: #111111;
@@ -52,7 +53,7 @@
 
   /* The names the stylesheets of the Markdown content and of the boards use, drawn from the signage palette. */
   --font-display: var(--sc-font);
-  --font-body: var(--sc-font);
+  --font-body: var(--sc-read);
   --font-code: var(--sc-mono);
   --bg: var(--sc-ground);
   --raised: var(--sc-raised);

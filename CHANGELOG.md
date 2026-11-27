@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
-- Every documentation site is now one line of the Klyroo network, in the world of the showcase: black signage nav band with the wordmark and the plate of the line, the network menu, the library home as a black sign beside its own line diagram with the demonstration board restyled as signage, doc pages with the line diagram of the library as navigation, platform-sign breadcrumb, black code panels with a line-color gutter and previous and next stop signs, in light and station-night modes. The ground textures and the `texture` setting of `docs/site.yml` are gone (the key is still accepted and ignored).
+- Every documentation site is now one line of the Klyroo network, in the world of the showcase: black signage nav band with the wordmark and the plate of the line, the network menu, the library home as a black sign beside its own line diagram with the demonstration board restyled as signage, doc pages with the line diagram of the library as navigation, platform-sign breadcrumb, black code panels with a line-color gutter and previous and next stop signs, in light and station-night modes. The reading column is set in Public Sans (self-hosted, OFL) with a measure of about 70 characters; Archivo stays for titles, signs and navigation. The Klyroo.Display line on the stack map ends with "Players" (the block kinds moved to Klyroo.UI). The ground textures and the `texture` setting of `docs/site.yml` are gone (the key is still accepted and ignored).
 
 ### Added
 
