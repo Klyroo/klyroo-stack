@@ -290,12 +290,12 @@
         _nextCursor = result.NextCursor;
         _rows = [.. result.Items.Select(e => (IReadOnlyDictionary<string, string?>)new Dictionary<string, string?>
         {
-            ["name"] = e.Name, ["department"] = e.Department, ["country"] = e.Country, ["status"] = e.Status.ToString(),
+            ["name"] = e.Name, ["department"] = e.Department, ["country"] = e.Country, ["status"] = Words.Humanize(e.Status.ToString()),
             ["salary"] = "$" + e.Salary.ToString("N0", CultureInfo.InvariantCulture), ["hired"] = e.Hired.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
         })];
         _facets = [.. (result.Facets ?? []).Select(f => new DisplayFactGroup(
             $"{f.Key} ({_facetMode})",
-            [.. f.Options.Select(o => new DisplayFact { Label = o.Value, Value = o.Count.ToString(CultureInfo.InvariantCulture), Mono = true })]))];
+            [.. f.Options.Select(o => new DisplayFact { Label = f.Key == "status" ? Words.Humanize(o.Value) : o.Value, Value = o.Count.ToString(CultureInfo.InvariantCulture), Mono = true })]))];
 
         // The URL form holds one flat AND of rules: nested groups and OR are for requests, not for addresses.
         var flat = topRules.OfType<FilterRule>().ToList();

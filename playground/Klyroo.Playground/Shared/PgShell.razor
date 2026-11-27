@@ -17,14 +17,14 @@
     <div class="pg-bench">
         @* Beside the result from lg up; below it the same knobs open in a slideover, so the result stays in view on a phone. *@
         <aside class="pg-knobs hidden lg:block" aria-label="Knobs">
-            <KlyCard Ui="@(new CardUi { Body = "p-0", Header = "px-4 py-2.5" })">
+            <KlyCard Ui="@(new CardUi { Body = "p-0 sm:p-0", Header = "px-4 py-2.5 sm:px-4 sm:py-2.5" })">
                 <Header>
                     <div class="flex items-center justify-between gap-2">
                         <h2 class="m-0 text-sm font-semibold text-(--klyroo-text-highlighted)">Knobs</h2>
                         <KlyButton Label="Reset" Variant="ButtonVariant.Ghost" Color="KlyColor.Neutral" Size="KlySize.Xs" OnClick="ResetAsync" />
                     </div>
                 </Header>
-                <ChildContent>@Knobs</ChildContent>
+                <ChildContent><div class="knobs-scroll">@Knobs</div></ChildContent>
             </KlyCard>
         </aside>
         <div class="lg:hidden">

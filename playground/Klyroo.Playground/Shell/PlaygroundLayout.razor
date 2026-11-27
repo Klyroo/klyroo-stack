@@ -7,8 +7,10 @@
 </HeadContent>
 
 <KlyApp>
+    <div class="relative isolate tex-@(_library?.Texture ?? "blueprint-grid")">
+    <div class="ground-wrap" aria-hidden="true"><div class="ground"></div></div>
     <KlySkipLink Label="Skip to the playground" />
-    <KlyHeader Sticky="true">
+    <KlyHeader Sticky="true" Ui="@(new HeaderUi { Container = "page-wrap" })">
         <Left>
             <a href="" class="brand" aria-label="Klyroo playground, all playgrounds">
                 <KlyrooMark />
@@ -27,11 +29,16 @@
         </Right>
     </KlyHeader>
 
-    <div class="border-b border-(--klyroo-border)">
+    <nav class="pg-libnav border-b border-(--klyroo-border)" aria-label="Playgrounds">
         <div class="page-wrap overflow-x-auto py-1.5">
-            <div class="min-w-max"><KlyNavigationMenu Items="_items" AriaLabel="Playgrounds" Orientation="KlyOrientation.Horizontal" Color="KlyColor.Neutral" /></div>
+            <ul class="m-0 flex min-w-max list-none gap-1 p-0">
+                @foreach (var library in Libraries.All)
+                {
+                    <li><KlyLink Raw="true" Href="@(library.Slug + "/")" ActiveClass="bg-(--accent-soft) text-(--accent-ink) font-semibold" InactiveClass="text-(--klyroo-text-muted) hover:text-(--klyroo-text-highlighted)" style="@($"--dot: {library.Accent}")"><span class="dot" aria-hidden="true"></span>@library.Name</KlyLink></li>
+                }
+            </ul>
         </div>
-    </div>
+    </nav>
 
     <main id="main" tabindex="-1" class="min-h-[70vh] outline-none">
         @Body
@@ -43,6 +50,7 @@
             <KlyLink Href="https://github.com/klyroo/klyroo-stack/tree/main/playground" Label="Source of the playground" Target="KlyLinkTarget.Blank" />
         </div>
     </footer>
+    </div>
 </KlyApp>
 
 @code {

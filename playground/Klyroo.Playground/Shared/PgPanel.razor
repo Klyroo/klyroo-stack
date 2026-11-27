@@ -1,13 +1,13 @@
 @* A panel of the stage: a KlyCard with a head bar (title and a note about the data) and a body. *@
-<section aria-label="@Title" class="min-w-0">
-    <KlyCard Class="@Class" Ui="@(new CardUi { Body = Flush ? "p-0" : "p-4", Header = "px-4 py-2.5" })">
+<section aria-label="@Title" class="min-w-0 pg-flat">
+    <KlyCard Class="@Class" Ui="@(new CardUi { Body = Flush ? "p-0 sm:p-0" : "p-4 sm:p-4", Header = "px-4 py-2.5 sm:px-4 sm:py-2.5" })">
         <Header>
             <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
                 <h2 class="m-0 text-sm font-semibold text-(--klyroo-text-highlighted)">@Title</h2>
                 <span class="flex items-center gap-2">
                     @if (Note is not null)
                     {
-                        <KlyBadge Label="@Note" Variant="KlyVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Xs" />
+                        <span class="note-mono">@Note</span>
                     }
                     @Tools
                 </span>

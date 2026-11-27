@@ -30,15 +30,12 @@
         {
             <KlyAlert Variant="KlyVariant.Soft" Color="KlyColor.Primary" Title="Drill-down" Description="@_detail" Close="true" OnClose="ClearDetail" />
         }
-        <section aria-label="Dashboard" class="min-w-0" data-testid="dashboard">
-            <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
-                <h2 class="m-0 text-sm font-semibold text-(--klyroo-text-highlighted)">Dashboard</h2>
-                <KlyBadge Label="sample data" Variant="KlyVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Xs" />
-            </div>
-            <div class="min-w-0">
+        <PgPanel Title="Dashboard" Note="sample data" Flush="true">
+            <div class="p-4" data-testid="dashboard">
+
                 <KlyDashboardPage @key="_pageKey" Dashboard="_dashboard" Title="Sales" ShowFilters="_showFilters" SyncUrl="_syncUrl" Sticky="false"
                                   Description="Revenue, orders and customers for the filters above">
-                    <KlyDashboardGrid>
+                    <KlyDashboardGrid Variant="DashboardGridVariant.Panels">
                         <KlyDashboardStat Source="_kpis" Label="Revenue" Span="4" Value="_kpis.Data?.Revenue" Compare="@(_compare ? _kpis.Data?.PreviousRevenue : null)" Format="DashboardFormatPreset.Compact" Menu="_menu" />
                         <KlyDashboardStat Source="_kpis" Label="Orders" Span="4" Value="@(_kpis.Data is null ? null : (double)_kpis.Data.Orders)" Format="DashboardFormatPreset.Integer" Menu="_menu" />
                         <KlyDashboardStat Source="_kpis" Label="Average order" Span="4" Value="_kpis.Data?.AverageOrder" Goal="@(_kpis.Data is null ? null : 120d)" Format="DashboardFormatPreset.Decimal" Menu="_menu" />
@@ -48,7 +45,7 @@
                     </KlyDashboardGrid>
                 </KlyDashboardPage>
             </div>
-        </section>
+        </PgPanel>
         <div class="grid gap-5 min-[1100px]:grid-cols-2">
             <PgPanel Title="Loading stages" Note="@(_dashboard.Refreshing ? "refreshing" : "idle")">
                 <KlyDisplay Kind="DisplayKind.Facts" Facts="Stages()" Surface="DisplaySurface.Plain" />

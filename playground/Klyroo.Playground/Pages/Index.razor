@@ -1,4 +1,6 @@
 @page "/"
+@using System.Globalization
+@using Klyroo.Playground.Data
 
 <PageTitle>Klyroo playground</PageTitle>
 
@@ -15,22 +17,96 @@
         @foreach (var library in Libraries.All)
         {
             <li class="lib-row" style="--dot: @library.Accent">
-                <h2><span class="dot" aria-hidden="true"></span><a href="@library.Slug/">@library.Name</a></h2>
-                <div>
-                    <p>@library.Summary</p>
+                <div class="min-w-0">
+                    <h2><span class="dot" aria-hidden="true"></span><a href="@library.Slug/">@library.Name</a></h2>
+                    <p class="mt-2">@library.Summary</p>
                     <div class="mt-2.5 flex flex-wrap gap-1.5">
                         @foreach (var feature in library.Features)
                         {
                             <KlyBadge Label="@feature" Variant="KlyVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Sm" />
                         }
                     </div>
+                    <div class="mt-3">
+                        <KlyButton Href="@(library.Slug + "/")" Label="Open the playground" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Sm">
+                            <TrailingIcon><KlyIcon Name="ph:arrow-right" /></TrailingIcon>
+                        </KlyButton>
+                    </div>
                 </div>
-                <div>
-                    <KlyButton Href="@(library.Slug + "/")" Label="Open the playground" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Sm">
-                        <TrailingIcon><KlyIcon Name="ph:arrow-right" /></TrailingIcon>
-                    </KlyButton>
+                <div class="mini min-w-0" role="group" aria-label="@($"{library.Name}: a live sample")">
+                    @Miniature(library.Slug)
+                    <p class="note-mono m-0 mt-1.5">live sample, real component</p>
                 </div>
             </li>
         }
     </ul>
 </div>
+
+@code {
+    private static readonly IReadOnlyList<Employee> _three = Employees.All.Take(3).ToList();
+
+    private static readonly FormSchema<ContactModel> _miniForm = FormSchema.For<ContactModel>(s =>
+    {
+        s.FormKey = "mini";
+        s.Field(c => c.Name, f => f.Label("Your name").Required());
+        s.Field(c => c.Email, f => f.Label("Email").Required());
+    });
+
+    private IReadOnlyList<IReadOnlyDictionary<string, string?>> _queryRows = [];
+    private IReadOnlyList<DisplayFact> _sheetFacts = [];
+    private string _agentJson = "";
+
+    private static readonly IReadOnlyList<DisplayTableColumn> _queryColumns = [new("name", "Name"), new("department", "Department"), new("salary", "Salary", Numeric: true)];
+
+    protected override void OnInitialized()
+    {
+        // The query miniature runs a real request on the sample directory.
+        var request = new DataListRequest(new DataListPaging.Offset(0, 3), [new DataListSort("salary", true)],
+            DataListFilterGroup.And(new FilterRule("department", FilterOperator.Is, new FilterValue.Text("Engineering"))), null);
+        _queryRows = [.. EmployeeSchema.Instance.ExecuteInMemory(Employees.All, request).Items.Select(e => (IReadOnlyDictionary<string, string?>)new Dictionary<string, string?>
+        {
+            ["name"] = e.Name, ["department"] = e.Department, ["salary"] = "$" + e.Salary.ToString("N0", CultureInfo.InvariantCulture),
+        })];
+
+        // The spreadsheet miniature loads three lines into a real importer.
+        var importer = new SpreadsheetImporter<ProductRow>(SpreadsheetSchema.For<ProductRow>(s =>
+        {
+            s.Column(r => r.Sku, c => c.Label("SKU").Required());
+            s.Column(r => r.Price, c => c.Label("Price"));
+        }));
+        importer.LoadText("SKU,Price\nAB-1,12.5\nAB-2,abc\n,9", "sample.csv");
+        _sheetFacts =
+        [
+            new DisplayFact { Label = "Importable", Value = Words.Plural(importer.ImportableRows.Count, "row") },
+            new DisplayFact { Label = "Blocked", Value = Words.Plural(importer.InvalidRows.Count, "row"), Tone = KlyColor.Error },
+            new DisplayFact { Label = "First issue", Value = importer.InvalidRows[0].Issues[0].Message },
+        ];
+
+        // The agent miniature is the snapshot a bridge returns for a one-field form.
+        var agent = new AgentBridgeService();
+        var form = new FormController<ContactModel>(_miniForm, new ContactModel { Name = "Ada" });
+        agent.RegisterForm(form);
+        _agentJson = AgentJson.Write(new AgentSnapshotResult([.. agent.Snapshot().Take(2)]));
+    }
+
+    private RenderFragment Miniature(string slug) => slug switch
+    {
+        "ui" => @<div class="flex flex-wrap items-center gap-3">
+            <KlyButton Label="Save changes" Size="KlySize.Sm" />
+            <KlyBadge Label="New" Variant="KlyVariant.Subtle" />
+            <KlySwitch Label="Notifications" Value="true" />
+        </div>,
+        "query" => @<KlyDisplay Kind="DisplayKind.Table" TableColumns="_queryColumns" TableRows="_queryRows" Surface="DisplaySurface.Plain" />,
+        "table" => @<div class="pg-flat"><KlyDataList TItem="Employee" Schema="EmployeeSchema.Instance" Items="_three" UrlSync="false" PagingMode="DataListPagingMode.None" Label="Sample employees">
+            <KlyDataListTable TItem="Employee">
+                <KlyDataListFieldColumn TItem="Employee" Field="name" Title="Name" />
+                <KlyDataListFieldColumn TItem="Employee" Field="department" Title="Department" />
+                <KlyDataListFieldColumn TItem="Employee" Field="salary" Title="Salary" Format="C0" Align="DataListAlign.End" />
+            </KlyDataListTable>
+        </KlyDataList></div>,
+        "form" => @<KlyFormEngine TModel="ContactModel" Schema="_miniForm" SubmitLabel="Send" ShowReset="false" />,
+        "dashboard" => @<KlyDashboardGrid Columns="1"><KlyDashboardStat Label="Revenue" Value="148900" Compare="130400" Trend="@(new double[] { 102, 98, 115, 110, 132, 128, 149 })" Format="DashboardFormatPreset.Compact" /></KlyDashboardGrid>,
+        "display" => @<KlyDisplay Kind="DisplayKind.Stat" Title="Monthly revenue" Value="148,900" Unit="EUR" Delta="+14.2%" Trend="@(new double[] { 102, 98, 115, 110, 132, 128, 149 })" />,
+        "spreadsheet" => @<KlyDisplay Kind="DisplayKind.Facts" Facts="_sheetFacts" Surface="DisplaySurface.Plain" />,
+        _ => @<div class="max-h-48 overflow-auto"><KlyDisplay Kind="DisplayKind.Code" Value="@_agentJson" Language="json" Surface="DisplaySurface.Plain" /></div>,
+    };
+}

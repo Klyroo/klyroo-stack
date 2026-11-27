@@ -70,7 +70,7 @@
     [
         new DisplayFact { Label = "Changed", Value = _form.IsDirty ? "yes" : "no" },
         new DisplayFact { Label = "Blocking errors", Value = _form.HasBlockingErrors ? "yes" : "no", Tone = _form.HasBlockingErrors ? KlyColor.Error : KlyColor.Success },
-        new DisplayFact { Label = "Submit failed", Value = _form.SubmitFailed ? $"yes, {_form.SubmitFailureCount} time(s)" : "no" },
+        new DisplayFact { Label = "Submit failed", Value = _form.SubmitFailed ? $"yes, {Words.Plural(_form.SubmitFailureCount, "time")}" : "no" },
         new DisplayFact { Label = "Step", Value = _form.CurrentStepKey ?? "none: not a wizard" },
     ];
 

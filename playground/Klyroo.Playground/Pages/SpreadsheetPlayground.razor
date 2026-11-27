@@ -38,7 +38,7 @@
             }
         </PgPanel>
         <div class="grid gap-5 min-[1100px]:grid-cols-2">
-            <PgPanel Title="Row issues" Note="@($"{_issueRows.Count} line(s) with an issue")" Flush>
+            <PgPanel Title="Row issues" Note="@($"{Words.Plural(_issueRows.Count, "line")} with an issue")" Flush>
                 <div class="table-scroll py-3">
                     @if (_issueRows.Count == 0)
                     {
@@ -54,7 +54,7 @@
                 <KlyDisplay Kind="DisplayKind.Code" Value="@_typedJson" Language="json" Surface="DisplaySurface.Plain" />
             </PgPanel>
         </div>
-        <PgPanel Title="Submitted to OnSubmit" Note="@(_submittedCount is null ? "not submitted yet" : $"{_submittedCount} row(s)")">
+        <PgPanel Title="Submitted to OnSubmit" Note="@(_submittedCount is null ? "not submitted yet" : Words.Plural(_submittedCount.Value, "row"))">
             @if (_submittedJson is null)
             {
                 <p class="m-0 text-sm text-(--klyroo-text-muted)">Walk through the wizard to the last step and import: the rows OnSubmit receives appear here.</p>

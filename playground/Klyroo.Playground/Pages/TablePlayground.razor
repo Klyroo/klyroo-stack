@@ -82,9 +82,9 @@
                                 <KlyDataListFieldColumn TItem="Employee" Field="department" Title="Department" />
                                 <KlyDataListFieldColumn TItem="Employee" Field="title" Title="Title" />
                                 <KlyDataListFieldColumn TItem="Employee" Field="country" Title="Country" />
-                                <KlyDataListFieldColumn TItem="Employee" Field="status" Title="Status" />
+                                <KlyDataListTemplateColumn TItem="Employee" Key="status" Title="Status"><Template Context="employee">@Words.Humanize(employee.Status.ToString())</Template></KlyDataListTemplateColumn>
                                 <KlyDataListFieldColumn TItem="Employee" Field="salary" Title="Salary" Format="C0" Align="DataListAlign.End" Summary="@(_totals && !_tree ? DataListSummaryKind.Sum : DataListSummaryKind.None)" />
-                                <KlyDataListFieldColumn TItem="Employee" Field="hired" Title="Hired" Format="d" />
+                                <KlyDataListFieldColumn TItem="Employee" Field="hired" Title="Hired" Format="yyyy-MM-dd" />
                             </KlyDataListTable>
                         </div>
                     </div>
@@ -316,9 +316,9 @@
             "<KlyDataListFieldColumn TItem=\"Employee\" Field=\"department\" Title=\"Department\" />",
             "<KlyDataListFieldColumn TItem=\"Employee\" Field=\"title\" Title=\"Title\" />",
             "<KlyDataListFieldColumn TItem=\"Employee\" Field=\"country\" Title=\"Country\" />",
-            "<KlyDataListFieldColumn TItem=\"Employee\" Field=\"status\" Title=\"Status\" />",
+            "<KlyDataListTemplateColumn TItem=\"Employee\" Key=\"status\" Title=\"Status\"><Template Context=\"e\">@Humanize(e.Status)</Template></KlyDataListTemplateColumn>",
             "<KlyDataListFieldColumn TItem=\"Employee\" Field=\"salary\" Title=\"Salary\" Format=\"C0\" Align=\"DataListAlign.End\"" + (_totals && !_tree ? " Summary=\"DataListSummaryKind.Sum\"" : "") + " />",
-            "<KlyDataListFieldColumn TItem=\"Employee\" Field=\"hired\" Title=\"Hired\" Format=\"d\" />",
+            "<KlyDataListFieldColumn TItem=\"Employee\" Field=\"hired\" Title=\"Hired\" Format=\"yyyy-MM-dd\" />",
         ];
         foreach (var c in cols) sb.Append(pad).Append("        ").Append(c).Append('\n');
         sb.Append(pad).Append("    </KlyDataListTable>\n");

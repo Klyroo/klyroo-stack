@@ -49,7 +49,7 @@
                 </div>
             </div>
         </PgPanel>
-        <PgPanel Title="Log" Note="@($"{_log.Count} call(s), newest first")">
+        <PgPanel Title="Log" Note="@($"{Words.Plural(_log.Count, "call")}, newest first")">
             @if (_log.Count == 0)
             {
                 <p class="m-0 text-sm text-(--klyroo-text-muted)">Nothing sent yet. Load an example and press Send.</p>
@@ -290,7 +290,7 @@
         s.Column(r => r.Launch, c => c.Label("Launch date").Headers("Date de lancement").DateFormats("dd/MM/yyyy", "yyyy-MM-dd"));
         s.OnSubmit = rows =>
         {
-            _submittedNote = $"{rows.Count} row(s) reached OnSubmit.";
+            _submittedNote = $"{Words.Plural(rows.Count, "row")} reached OnSubmit.";
             InvokeAsync(StateHasChanged);
             return Task.FromResult<IReadOnlyList<SpreadsheetRejectedRow>?>(null);
         };

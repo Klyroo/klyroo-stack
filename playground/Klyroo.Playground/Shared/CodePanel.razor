@@ -1,14 +1,21 @@
-@* The code of the current knobs: one tab per file, each a KlyDisplay code block (colored from its Language, with its copy button). *@
-<section aria-label="Code for the current knobs" class="min-w-0">
-    <KlyCard Ui="@(new CardUi { Body = "p-0", Header = "px-4 py-2.5" })">
+@* The code of the current knobs, as the docs boards show it: a head bar with the file name in mono (the KlyDisplay code block draws it, with its copy button), tabs only when there is more than one file. *@
+<section aria-label="Code for the current knobs" class="pg-code min-w-0">
+    <KlyCard Ui="@(new CardUi { Body = "p-0 sm:p-0", Header = "px-4 py-2.5 sm:px-4 sm:py-2.5" })">
         <Header>
             <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
                 <h2 class="m-0 text-sm font-semibold text-(--klyroo-text-highlighted)">Code</h2>
-                <KlyBadge Label="updates with the knobs" Variant="KlyVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Xs" />
+                <span class="note-mono">@LanguageName(Tabs[Index].Language), updates with the knobs</span>
             </div>
         </Header>
         <ChildContent>
-            <KlyTabs Items="_items" Value="@_current" ValueChanged="OnTab" AriaLabel="Files" Ui="@(new TabsUi { List = "px-3 pt-2" })" />
+            @if (Tabs.Count > 1)
+            {
+                <KlyTabs Items="_items" Value="@_current" ValueChanged="OnTab" AriaLabel="Files" Variant="TabsVariant.Link" Ui="@(new TabsUi { List = "px-3" })" />
+            }
+            else
+            {
+                @Block(Tabs[0])
+            }
         </ChildContent>
     </KlyCard>
 </section>
@@ -19,12 +26,19 @@
     private string? _current = "0";
     private IReadOnlyList<KlyTabItem> _items = [];
 
+    private int Index => int.TryParse(_current, out var i) && i < Tabs.Count ? i : 0;
+
     protected override void OnParametersSet() =>
-        _items = [.. Tabs.Select((tab, i) => new KlyTabItem($"{tab.Name}") { Value = i.ToString(), Content = Render(tab) })];
+        _items = [.. Tabs.Select((tab, i) => new KlyTabItem(tab.Name) { Value = i.ToString(), Content = Block(tab) })];
 
     private void OnTab(string? value) => _current = value;
 
-    private static RenderFragment Render(CodeTab tab) => @<div class="max-h-[30rem] min-w-0 overflow-auto">
-        <KlyDisplay Kind="DisplayKind.Code" Value="@tab.Text" Language="@tab.Language" Surface="DisplaySurface.Plain" />
+    private static string LanguageName(string language) => language switch
+    {
+        "html" => "Razor", "csharp" => "C#", "json" => "JSON", "css" => "CSS", _ => language,
+    };
+
+    private RenderFragment Block(CodeTab tab) => @<div class="code-scroll max-h-[34rem] min-w-0 overflow-auto">
+        <KlyDisplay Kind="DisplayKind.Code" Title="@(Tabs.Count > 1 ? LanguageName(tab.Language) : tab.Name)" Value="@tab.Text" Language="@tab.Language" Surface="DisplaySurface.Plain" />
     </div>;
 }

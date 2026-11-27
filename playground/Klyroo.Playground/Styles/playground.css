@@ -136,14 +136,16 @@ h1[tabindex="-1"]:focus-visible { outline: none; }
 .pg-stage { display: grid; gap: 1.25rem; min-width: 0; }
 
 .pg-knobs { min-width: 0; }
-@media (min-width: 1024px) {
-  .pg-knobs { position: sticky; top: calc(var(--header-h) + 1rem); max-height: calc(100vh - var(--header-h) - 2rem); overflow-y: auto; border-radius: var(--r-lg); }
-}
+/* The scroll lives in the body of the knob card, so its border survives; a fade at the foot is the cue that more is below. */
+.knobs-scroll { overflow-y: auto; padding-bottom: 1.5rem; mask-image: linear-gradient(to bottom, #000 calc(100% - 1.75rem), transparent); }
+@media (min-width: 1024px) { .knobs-scroll { max-height: calc(100vh - var(--header-h) - 6.5rem); } }
+@media (min-width: 1024px) { .pg-knobs { position: sticky; top: calc(var(--header-h) + 1rem); } }
 
 /* Index: a ruled list of the libraries. */
 .lib-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
 .lib-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.5rem 1.5rem; padding: 1.25rem 0; border-bottom: 1px solid var(--line); }
-@media (min-width: 900px) { .lib-row { grid-template-columns: 15rem minmax(0, 1fr) auto; align-items: baseline; } }
+@media (min-width: 900px) { .lib-row { grid-template-columns: minmax(0, 1fr) minmax(0, 26rem); align-items: start; } }
+.mini { padding: 0.75rem; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--raised); box-shadow: var(--shadow-panel); }
 .lib-row h2 { margin: 0; display: flex; align-items: center; gap: 0.625rem; color: var(--strong); font-size: 1.1875rem; font-weight: 620; letter-spacing: -0.02em; }
 .lib-row h2 .dot { width: 0.75rem; height: 0.75rem; border-radius: 50%; background: var(--dot); flex: none; }
 .lib-row p { margin: 0; color: var(--muted); max-width: 64ch; }
@@ -163,3 +165,21 @@ h1[tabindex="-1"]:focus-visible { outline: none; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
+
+/* The code beside the result from 1280px, sticky, with its own scroll; below that it follows the result. */
+@media (min-width: 1280px) {
+  .pg-stage { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: start; }
+  .pg-stage > * { grid-column: 1; }
+  .pg-stage > .pg-wide { grid-column: 1 / -1; }
+  .pg-stage > .pg-code { grid-column: 2; grid-row: 1 / span 12; position: sticky; top: calc(var(--header-h) + 1rem); }
+  .pg-code .code-scroll { max-height: calc(100vh - var(--header-h) - 9rem); }
+}
+
+/* The library nav: dot, muted label, the current one in accent ink on accent-soft. */
+.pg-libnav a { display: inline-flex; align-items: center; gap: 0.5rem; height: 2.25rem; padding: 0 0.75rem; border-radius: var(--r-sm); font-size: 0.875rem; font-weight: 500; white-space: nowrap; text-decoration: none; }
+.pg-libnav a:hover { background: var(--accent-soft); }
+.pg-libnav .dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--dot, var(--dim)); flex: none; }
+.note-mono { color: var(--dim); font-family: var(--font-code); font-size: 0.6875rem; line-height: 1.4; }
+
+/* Frames the libraries draw inside a stage panel are dropped: the panel is the frame. */
+.pg-flat [data-slot="table-root"], .pg-flat [data-slot="spreadsheet-import"] { border: 0; box-shadow: none; border-radius: 0; background: transparent; }
