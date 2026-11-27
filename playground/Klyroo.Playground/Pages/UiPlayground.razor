@@ -43,6 +43,8 @@
                 <PgSelect Key="orientation" Label="Orientation" T="KlyOrientation" Options="_orientations" @bind-Value="_orientation" />
             }
         </PgGroup>
+        @if (_component != "tabs")
+        {
         <PgGroup Title="Content">
             @if (_component is "button" or "badge" or "switch" or "alert")
             {
@@ -115,6 +117,9 @@
                 <PgSwitch Key="trailing" Label="Trailing icon" @bind-Value="_trailing" />
             }
         </PgGroup>
+        }
+        @if (_component is not ("avatar" or "badge" or "progress" or "tabs" or "timeline"))
+        {
         <PgGroup Title="States">
             @if (_component is "button" or "input" or "switch")
             {
@@ -137,11 +142,8 @@
             {
                 <PgSwitch Key="loading" Label="Loading" Hint="A skeleton instead of the content." @bind-Value="_loading" />
             }
-            @if (_component is "avatar" or "badge" or "progress" or "tabs" or "timeline")
-            {
-                <p class="m-0 text-sm text-(--klyroo-text-muted)">This component has no interactive state to toggle: change its look above.</p>
-            }
         </PgGroup>
+        }
         <PgGroup Title="Theme">
             <KlyFormField Label="Color mode" Help="Light, dark or the system setting, remembered by the browser.">
                 <KlyColorModeSelect />
@@ -225,7 +227,7 @@
                         </div>
                         break;
                     case "timeline":
-                        <div class="w-full max-w-xl">
+                        <div class="w-full max-w-md">
                             <KlyTimeline Layout="_timelineLayout" Items="_events" Now="_now" ShowNumbers="_numbers" Max="@(_blockMax == 0 ? null : _blockMax)" Step="@(_blockMax == 0 ? null : 2)" AriaLabel="Sample timeline" />
                         </div>
                         break;
@@ -288,7 +290,7 @@
         new("Customer") { Value = "Acme Corp", Href = "https://klyroo.github.io/klyroo-ui/" },
         new("Amount") { Value = "$12,400", Emphasis = true },
         new("Shipping address") { Value = null },
-        new("Notes") { Loading = true },
+        new("Notes") { Value = "Leave at the front desk" },
     ];
 
     private static readonly IReadOnlyList<KlyFactGroup> _factGroups =

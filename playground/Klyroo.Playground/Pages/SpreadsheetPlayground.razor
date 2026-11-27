@@ -11,7 +11,7 @@
          Lead="Import a product file in five steps: file, columns, values, review, import. Start from a bundled sample with a banner, renamed headers and bad rows, or drop a file of your own. The schema is the typed side: switch its rules and watch the review and the typed rows change.">
     <Knobs>
         <PgGroup Title="File">
-            <PgSelect Key="file" Label="Sample file" T="string" Options="_files" @bind-Value="_file" OnChange="ReloadAsync" Hint="Or use the file step of the wizard to choose or drop your own CSV, TSV or Excel file." />
+            <PgSelect Key="file" Label="Sample file" T="string" Options="_files" @bind-Value="_file" OnChange="ReloadAsync" Hint="The messy files have a banner, French headers and bad rows. Or use the file step of the wizard to choose or drop your own CSV, TSV or Excel file." />
             <div class="flex flex-wrap gap-2">
                 <KlyButton Href="samples/messy-products.csv" Label="messy .csv" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Xs" Download="messy-products.csv" />
                 <KlyButton Href="samples/clean-products.csv" Label="clean .csv" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Xs" Download="clean-products.csv" />
@@ -37,12 +37,12 @@
                 <KlySpreadsheetImport @key="_importerKey" Importer="_importer" Title="Import products" />
             }
         </PgPanel>
-        <div class="grid gap-5 min-[1100px]:grid-cols-2">
+        <div class="grid gap-5">
             <PgPanel Title="Row issues" Note="@($"{Words.Plural(_issueRows.Count, "line")} with an issue")" Flush>
-                <div class="table-scroll py-3">
+                <div class="table-scroll pg-issues py-4">
                     @if (_issueRows.Count == 0)
                     {
-                        <p class="m-0 px-1 text-sm text-(--klyroo-text-muted)">No issue: every line of the file is importable.</p>
+                        <p class="m-0 text-sm text-(--klyroo-text-muted)">No issue: every line of the file is importable.</p>
                     }
                     else
                     {
@@ -76,7 +76,7 @@
 @code {
     private readonly LibraryInfo _lib = Libraries.Find("spreadsheet")!;
 
-    private static readonly IReadOnlyList<PgOption<string>> _files = PgOptions.Of(("messy-csv", "Messy CSV: banner, French headers, bad rows"), ("messy-xlsx", "Messy Excel file with two sheets"), ("clean-csv", "Clean CSV"), ("none", "No file: bring your own"));
+    private static readonly IReadOnlyList<PgOption<string>> _files = PgOptions.Of(("messy-csv", "Messy CSV"), ("messy-xlsx", "Messy Excel, two sheets"), ("clean-csv", "Clean CSV"), ("none", "No file: bring your own"));
     private static readonly IReadOnlyList<PgOption<string>> _separators = PgOptions.Of((",", "Comma, 49,90"), (".", "Point, 49.90"));
 
     private string _file = "messy-csv", _decimal = ",";

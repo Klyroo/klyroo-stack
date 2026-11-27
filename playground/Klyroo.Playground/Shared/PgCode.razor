@@ -3,7 +3,7 @@
 
 @code {
     /// <summary>The slot classes that remove the surface of the block.</summary>
-    public static readonly CodeBlockUi Plain = new() { Root = "rounded-none border-0 bg-transparent shadow-none" };
+    public static readonly CodeBlockUi Plain = new() { Root = "pg-wrapcode rounded-none border-0 bg-transparent p-0 shadow-none" };
 
     [Parameter, EditorRequired] public string Code { get; set; } = "";
     [Parameter] public CodeLanguage? Language { get; set; }

@@ -35,7 +35,7 @@
         <KlyAlert Variant="KlyVariant.Soft" Color="KlyColor.Info" Title="This is a simulation" Description="No model is called and nothing is sent anywhere. The JSON you type is what a model would send to the tools; the results are what AgentBridgeService really returns for the live component below." />
         <PgPanel Title="Console" Note="InvokeToolAsync(tool, arguments)">
             <div class="flex flex-col gap-3">
-                <div class="grid gap-3 sm:grid-cols-[12rem_1fr]">
+                <div class="grid gap-3 sm:grid-cols-[17rem_1fr]">
                     <KlyFormField Label="Tool">
                         <KlySelect TValue="string" Items="_toolItems" Value="@_tool" ValueChanged="OnToolChanged" />
                     </KlyFormField>
@@ -106,6 +106,7 @@
                 <div class="mt-3"><KlyAlert Variant="KlyVariant.Soft" Color="KlyColor.Success" Title="Submitted" Description="@_submittedNote" /></div>
             }
         </PgPanel>
+        <div class="rounded-[calc(var(--klyroo-radius)*2)] bg-(--klyroo-bg) px-4 py-2.5 ring ring-inset ring-(--klyroo-border)">
         <KlyCollapsible Label="The tools a model is given (GetToolDefinitions)" ShowIcon="true">
             <div class="flex flex-col gap-3 pt-3">
                 @foreach (var tool in AgentBridgeService.GetToolDefinitions())
@@ -117,6 +118,7 @@
                 }
             </div>
         </KlyCollapsible>
+        </div>
         <CodePanel Tabs="CodeTabs" />
     </Stage>
 </PgShell>
@@ -128,7 +130,7 @@
     private readonly LibraryInfo _lib = Libraries.Find("agent")!;
 
     private static readonly IReadOnlyList<PgOption<string>> _targets = PgOptions.Of(("form", "A form: the signup wizard"), ("spreadsheet", "A spreadsheet import"), ("dashboard", "A dashboard"));
-    private static readonly IReadOnlyList<PgOption<string>> _policies = PgOptions.Of(("none", "No policy: confirmations are refused"), ("deny", "A policy that refuses what needs confirmation"), ("approve", "A policy that approves everything"));
+    private static readonly IReadOnlyList<PgOption<string>> _policies = PgOptions.Of(("none", "No policy"), ("deny", "Policy that refuses"), ("approve", "Policy that approves"));
     private static readonly IReadOnlyList<IKlySelectItem<string>> _toolItems = [new KlySelectItem<string>("snapshot", "snapshot: read the components"), new KlySelectItem<string>("query", "query: list choices and records"), new KlySelectItem<string>("act", "act: run steps in order")];
 
     private string _target = "form", _policy = "none", _tool = "snapshot", _arguments = "{}", _jsonError = "";

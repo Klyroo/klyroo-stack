@@ -30,11 +30,11 @@
     </KlyHeader>
 
     <nav class="pg-libnav border-b border-(--klyroo-border)" aria-label="Playgrounds">
-        <div class="page-wrap overflow-x-auto py-1.5">
-            <ul class="m-0 flex min-w-max list-none gap-1 p-0">
+        <div class="page-wrap py-1.5">
+            <ul class="m-0 flex list-none flex-wrap gap-x-1 gap-y-0.5 p-0">
                 @foreach (var library in Libraries.All)
                 {
-                    <li><KlyLink Raw="true" Href="@(library.Slug + "/")" ActiveClass="bg-(--accent-soft) text-(--accent-ink) font-semibold" InactiveClass="text-(--klyroo-text-muted) hover:text-(--klyroo-text-highlighted)" style="@($"--dot: {library.Accent}")"><span class="dot" aria-hidden="true"></span>@library.Name</KlyLink></li>
+                    <li><KlyLink Raw="true" Href="@(library.Slug + "/")" ActiveClass="bg-(--accent-soft) text-(--accent-ink) font-semibold" InactiveClass="text-(--klyroo-text-muted) hover:text-(--klyroo-text-highlighted)" style="@($"--dot: {library.Accent}")"><span class="dot" aria-hidden="true"></span><span><span class="max-sm:sr-only">Klyroo.</span>@library.Name.Replace("Klyroo.", "")</span></KlyLink></li>
                 }
             </ul>
         </div>

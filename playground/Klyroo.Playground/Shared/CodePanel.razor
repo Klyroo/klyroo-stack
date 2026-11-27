@@ -100,7 +100,7 @@
         "html" => "Razor", "csharp" => "C#", "json" => "JSON", "css" => "CSS", _ => language,
     };
 
-    private RenderFragment Block(CodeTab tab) => @<div class="code-scroll max-h-[34rem] min-w-0 overflow-auto" @ref="_box" data-testid="code-scroll">
+    private RenderFragment Block(CodeTab tab) => @<div class="code-scroll max-h-[34rem] min-w-0 overflow-auto p-4" @ref="_box" data-testid="code-scroll">
         <PgCode Label="@(Tabs.Count > 1 ? LanguageName(tab.Language) : tab.Name)" Code="@tab.Text" Language="@CodeHighlighter.ResolveLanguage(tab.Language)" LineNumbers="true"
                 HighlightLines="@(_marks.TryGetValue(tab.Name, out var ranges) ? ranges : null)" />
     </div>;

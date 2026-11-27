@@ -33,8 +33,8 @@
                     </div>
                 </div>
                 <div class="mini min-w-0" role="group" aria-label="@($"{library.Name}: a live sample")">
-                    @Miniature(library.Slug)
-                    <p class="note-mono m-0 mt-1.5">live sample, real component</p>
+                    <div class="mini-body">@Miniature(library.Slug)</div>
+                    <p class="note-mono m-0 mt-3">live sample, real component</p>
                 </div>
             </li>
         }
@@ -97,13 +97,11 @@
         </div>,
         "query" => @<KlyTable Items="_queryRows">
             <KlyColumn Title="Name" Field="r => r.Name" />
-            <KlyColumn Title="Department" Field="r => r.Department" />
             <KlyColumn Title="Salary" Field="r => r.Salary" Numeric="true" />
         </KlyTable>,
         "table" => @<div class="pg-flat"><KlyDataList TItem="Employee" Schema="EmployeeSchema.Instance" Items="_three" UrlSync="false" PagingMode="DataListPagingMode.None" Label="Sample employees">
             <KlyDataListTable TItem="Employee">
                 <KlyDataListFieldColumn TItem="Employee" Field="name" Title="Name" />
-                <KlyDataListFieldColumn TItem="Employee" Field="department" Title="Department" />
                 <KlyDataListFieldColumn TItem="Employee" Field="salary" Title="Salary" Format="C0" Align="DataListAlign.End" />
             </KlyDataListTable>
         </KlyDataList></div>,
@@ -111,6 +109,6 @@
         "dashboard" => @<KlyDashboardGrid Columns="1"><KlyDashboardStat Label="Revenue" Value="148900" Compare="130400" Trend="@(new double[] { 102, 98, 115, 110, 132, 128, 149 })" Format="DashboardFormatPreset.Compact" /></KlyDashboardGrid>,
         "display" => @<KlyCodeBlock Label="Orders.sql" Code="@_miniQuery" Language="CodeLanguage.Sql" LineNumbers HighlightLines="@([new CodeLineRange(3, 4)])" Copy="false" />,
         "spreadsheet" => @<KlyFacts Items="_sheetFacts" Surface="KlySurface.Plain" />,
-        _ => @<div class="max-h-48 overflow-auto"><PgCode Code="@_agentJson" Language="CodeLanguage.Json" /></div>,
+        _ => @<div class="max-h-44 overflow-auto"><PgCode Code="@_agentJson" Language="CodeLanguage.Json" /></div>,
     };
 }

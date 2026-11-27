@@ -5,12 +5,12 @@
         <h1 class="pg-title">@Library.Name <span class="accent">playground</span></h1>
         <p class="pg-lead">@Lead</p>
         <div class="flex flex-wrap items-center gap-2">
-            <KlyButton Href="@Library.DocsUrl" Label="@($"{Library.Name} documentation")" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Sm" Target="KlyLinkTarget.Blank" />
+            <KlyButton Href="@Library.DocsUrl" Label="@($"{Library.Name} documentation")" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Sm" Class="max-sm:min-h-9" Target="KlyLinkTarget.Blank" />
             @if (DocsPage is not null)
             {
-                <KlyButton Href="@(Library.DocsUrl + DocsPage)" Label="@DocsLabel" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Sm" Target="KlyLinkTarget.Blank" />
+                <KlyButton Href="@(Library.DocsUrl + DocsPage)" Label="@DocsLabel" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Sm" Class="max-sm:min-h-9" Target="KlyLinkTarget.Blank" />
             }
-            <KlyButton Href="@Library.ApiUrl" Label="API reference" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Sm" Target="KlyLinkTarget.Blank" />
+            <KlyButton Href="@Library.ApiUrl" Label="API reference" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Sm" Class="max-sm:min-h-9" Target="KlyLinkTarget.Blank" />
         </div>
     </div>
 
@@ -19,9 +19,9 @@
         <aside class="pg-knobs hidden lg:block" aria-label="Knobs">
             <KlyCard Ui="@(new CardUi { Body = "p-0 sm:p-0", Header = "px-4 py-2.5 sm:px-4 sm:py-2.5" })">
                 <Header>
-                    <div class="flex items-center justify-between gap-2">
+                    <div class="flex min-h-6 items-center justify-between gap-2">
                         <h2 class="m-0 text-sm font-semibold text-(--klyroo-text-highlighted)">Knobs</h2>
-                        <KlyButton Label="Reset" Variant="ButtonVariant.Ghost" Color="KlyColor.Neutral" Size="KlySize.Xs" OnClick="ResetAsync" />
+                        <KlyButton Label="Reset" Variant="ButtonVariant.Ghost" Color="KlyColor.Neutral" Size="KlySize.Xs" Class="-my-1" OnClick="ResetAsync" />
                     </div>
                 </Header>
                 <ChildContent><div class="knobs-scroll">@Knobs</div></ChildContent>
@@ -30,7 +30,7 @@
         <div class="lg:hidden">
             <KlySlideover @bind-Open="_knobsOpen" Title="Knobs" Side="SlideoverSide.Left" Close="true">
                 <ChildContent>
-                    <KlyButton Label="Knobs" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Sm">
+                    <KlyButton Label="Knobs" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" Size="KlySize.Sm" Class="max-sm:min-h-9">
                         <LeadingIcon><KlyIcon Name="ph:sliders-horizontal" /></LeadingIcon>
                     </KlyButton>
                 </ChildContent>

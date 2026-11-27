@@ -125,7 +125,7 @@ h1[tabindex="-1"]:focus-visible { outline: none; }
   max-width: 28ch;
 }
 .pg-title .accent { color: var(--accent-display); }
-.pg-lead { margin: 0; max-width: 72ch; color: var(--muted); font-size: 1.0625rem; line-height: 1.55; }
+.pg-lead { margin: 0; max-width: 72ch; color: var(--muted); font-size: 1.0625rem; line-height: 1.55; text-wrap: pretty; }
 .pg-links { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; font-size: 0.9rem; }
 
 /* The workbench: knobs on the left, the result and the code on the right. */
@@ -136,26 +136,56 @@ h1[tabindex="-1"]:focus-visible { outline: none; }
 .pg-stage { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; min-width: 0; }
 
 .pg-knobs { min-width: 0; }
-/* The scroll lives in the body of the knob card, so its border survives; a fade at the foot is the cue that more is below. */
-.knobs-scroll { overflow-y: auto; padding-bottom: 1.5rem; mask-image: linear-gradient(to bottom, #000 calc(100% - 1.75rem), transparent); }
-@media (min-width: 1024px) { .knobs-scroll { max-height: calc(100vh - var(--header-h) - 6.5rem); } }
-@media (min-width: 1024px) { .pg-knobs { position: sticky; top: calc(var(--header-h) + 1rem); } }
+:root { --scroll-shadow: rgb(15 23 42 / 0.26); }
+:root.dark { --scroll-shadow: rgb(0 0 0 / 0.7); }
+/*
+  The scroll lives in the body of the knob card, so its border survives. The card may be as tall as the room under the header, so a short
+  panel shows every control and a tall one scrolls; the edges of the scroll area carry a shadow where more is hidden (scroll shadows: the
+  covers scroll with the content, the shadows stay), so the scroll shows even where the browser hides its scrollbar. On a short window the
+  panel is not sticky and not capped: the page scrolls instead, and no control is ever cut.
+*/
+.knobs-scroll { padding-bottom: 0.5rem; }
+@media (min-width: 1024px) and (min-height: 760px) {
+  .pg-knobs { position: sticky; top: calc(var(--header-h) + 1rem); }
+  .knobs-scroll {
+    max-height: calc(100vh - var(--header-h) - 5rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background:
+      linear-gradient(var(--klyroo-bg) 30%, transparent) top / 100% 2rem no-repeat local,
+      linear-gradient(transparent, var(--klyroo-bg) 70%) bottom / 100% 2rem no-repeat local,
+      radial-gradient(farthest-side at 50% 0, var(--scroll-shadow), transparent) top / 100% 0.625rem no-repeat scroll,
+      radial-gradient(farthest-side at 50% 100%, var(--scroll-shadow), transparent) bottom / 100% 0.625rem no-repeat scroll;
+  }
+}
 
 /* Index: a ruled list of the libraries. */
 .lib-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
 .lib-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.5rem 1.5rem; padding: 1.25rem 0; border-bottom: 1px solid var(--line); }
 @media (min-width: 900px) { .lib-row { grid-template-columns: minmax(0, 1fr) minmax(0, 26rem); align-items: start; } }
+.mini-body { min-width: 0; overflow-x: auto; }
 .mini { padding: 0.75rem; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--raised); box-shadow: var(--shadow-panel); }
 .lib-row h2 { margin: 0; display: flex; align-items: center; gap: 0.625rem; color: var(--strong); font-size: 1.1875rem; font-weight: 620; letter-spacing: -0.02em; }
 .lib-row h2 .dot { width: 0.75rem; height: 0.75rem; border-radius: 50%; background: var(--dot); flex: none; }
 .lib-row p { margin: 0; color: var(--muted); max-width: 64ch; }
+.lib-row .mini .note-mono { margin: 0.75rem 0 0; }
 
 /* Results and tables of the stage */
 .table-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-bottom: 1px solid var(--line); }
 .table-toolbar:empty { display: none; }
 .table-with-side { display: grid; gap: 1rem; padding: 0.75rem 1rem 0; }
 @media (min-width: 900px) { .table-with-side { grid-template-columns: 15rem minmax(0, 1fr); } }
-.table-scroll { overflow-x: auto; max-width: 100%; padding: 0 1rem; }
+.table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+  padding: 0 1rem;
+  /* Edge shadows where columns are hidden: the covers scroll with the table, the shadows stay (works where the scrollbar is hidden). */
+  background:
+    linear-gradient(to right, var(--klyroo-bg) 30%, transparent) left / 2rem 100% no-repeat local,
+    linear-gradient(to left, var(--klyroo-bg) 30%, transparent) right / 2rem 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, var(--scroll-shadow), transparent) left / 0.5rem 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, var(--scroll-shadow), transparent) right / 0.5rem 100% no-repeat scroll;
+}
 .table-footer { padding: 0.75rem 1rem; border-top: 1px solid var(--line); }
 .result-pad { padding: 1rem; }
 .mono { font-family: var(--font-code); }
@@ -182,4 +212,16 @@ h1[tabindex="-1"]:focus-visible { outline: none; }
 .note-mono { color: var(--dim); font-family: var(--font-code); font-size: 0.6875rem; line-height: 1.4; }
 
 /* Frames the libraries draw inside a stage panel are dropped: the panel is the frame. */
-.pg-flat [data-slot="table-root"], .pg-flat [data-slot="spreadsheet-import"] { border: 0; box-shadow: none; border-radius: 0; background: transparent; }
+.pg-flat [data-slot="table-root"], .pg-flat [data-slot="spreadsheet-import"] { border: 0; box-shadow: none; border-radius: 0; }
+.pg-flat [data-slot="spreadsheet-import"] { background: transparent; padding: 0; }
+
+/* A table of messages (the row issues) wraps its cells: a long message is read in full instead of cut at the edge of the card. */
+.pg-issues td, .pg-issues th { white-space: normal; overflow-wrap: anywhere; padding-inline: 0.5rem; }
+.pg-issues td:last-child, .pg-issues th:last-child { min-width: 9rem; }
+
+/* Code in the stage wraps instead of cutting at the edge, so no line is clipped on any browser, whether it shows a scrollbar or not. */
+.pg-wrapcode [data-slot="code-value"] { white-space: pre-wrap; overflow-wrap: anywhere; overflow-x: hidden; }
+.pg-wrapcode [data-slot="code-value"] code { white-space: inherit; }
+.pg-wrapcode [data-slot="code-value"] code > span { width: auto; min-width: 0; }
+.pg-wrapcode [data-slot="code-value"] code > span[data-line] { padding-inline-start: calc(0.625rem + 3ch + 1rem); text-indent: calc(-3ch - 1rem); }
+.pg-wrapcode [data-slot="code-value"] code > span[data-line]::before { text-indent: 0; }
