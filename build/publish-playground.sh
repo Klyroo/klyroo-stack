@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Publishes the Klyroo playground (playground/Klyroo.Playground, a standalone Blazor WebAssembly app) as static files ready for GitHub Pages.
 #
-#   build/publish-playground.sh <out-dir> [base-path]
+#   build/publish-playground.sh <out-dir> [base-path] [site-404]
 #
 # base-path is where the files will be served (default /klyroo-stack/playground/, which is https://klyroo.github.io/klyroo-stack/playground/).
 # Use / for a server that serves the playground at its root. The script writes:
@@ -10,13 +10,15 @@
 #     route to index.html as ?/table/ and index.html puts the address back before Blazor starts (a reload or a deep link then works);
 #   - .nojekyll, so Pages serves the _framework and _klyroo folders as they are.
 # The stack Pages workflow can copy <out-dir> to /playground/ next to the showcase it publishes at the root of klyroo-stack.
+# GitHub Pages only ever serves the 404.html at the root of the site, never the one below /playground/. When the playground is published inside
+# a larger site, pass that site's 404.html as site-404: the script adds the same route forwarding to it for addresses below base-path.
 #
 # The sibling repositories (klyroo-ui, klyroo-query, ...) are expected next to klyroo-stack, like for the other projects of this repository.
 # The first build downloads the Tailwind CLI, the fonts and the icons and keeps them in ~/.klyroo (set KlyrooOffline=true to forbid the network).
 set -euo pipefail
 
-if [[ $# -lt 1 || $# -gt 2 ]]; then
-  echo "usage: $0 <out-dir> [base-path]" >&2
+if [[ $# -lt 1 || $# -gt 3 ]]; then
+  echo "usage: $0 <out-dir> [base-path] [site-404]" >&2
   exit 2
 fi
 
@@ -51,6 +53,26 @@ touch "$out/.nojekyll"
 for file in index.html 404.html; do
   sed -i "s#${default_base}#${base}#g" "$out/$file"
 done
+
+# The site's own 404 page forwards the playground's addresses (Pages ignores <out-dir>/404.html when the playground sits below a site).
+if [[ $# -eq 3 ]]; then
+  site404="$3"
+  [[ -f "$site404" ]] || { echo "$site404 does not exist: export the site before publishing the playground into it." >&2; exit 1; }
+  if ! grep -q 'data-klyroo-playground-forward' "$site404"; then
+    script="<script data-klyroo-playground-forward>(function(l){var b='${base}';if(l.pathname.indexOf(b)!==0||l.pathname===b)return;var r=l.pathname.slice(b.length);l.replace(b+'?/'+r.replace(/&/g,'~and~')+(l.search?'&'+l.search.slice(1).replace(/&/g,'~and~'):'')+l.hash);})(window.location);</script>"
+    python3 - "$site404" "$script" <<'PY'
+import sys
+path, script = sys.argv[1], sys.argv[2]
+html = open(path, encoding="utf-8").read()
+i = html.find("<head>")
+if i < 0:
+    sys.exit(path + " has no <head>")
+i += len("<head>")
+open(path, "w", encoding="utf-8").write(html[:i] + script + html[i:])
+PY
+    echo "Added the playground route forwarding to $site404"
+  fi
+fi
 
 echo "Published the playground to $out for the base path $base"
 du -sh "$out" | cut -f1 | sed 's/^/Size on disk: /'

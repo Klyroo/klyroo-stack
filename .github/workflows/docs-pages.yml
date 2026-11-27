@@ -87,7 +87,7 @@ jobs:
         if: inputs.playground
         env:
           REPO: ${{ inputs.repo }}
-        run: klyroo-stack/build/publish-playground.sh "$GITHUB_WORKSPACE/_site/playground" "/$REPO/playground/"
+        run: klyroo-stack/build/publish-playground.sh "$GITHUB_WORKSPACE/_site/playground" "/$REPO/playground/" "$GITHUB_WORKSPACE/_site/404.html"
       - uses: actions/upload-pages-artifact@v4
         with:
           path: _site
