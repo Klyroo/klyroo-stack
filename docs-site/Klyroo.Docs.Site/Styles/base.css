@@ -53,6 +53,8 @@
 }
 .world a[data-color] { color: revert-layer; text-decoration-color: revert-layer; }
 
+/* Code is text to copy: no ligatures, so => and != read as the characters a reader types, the same in inline code and in code blocks. */
+code, kbd, samp, pre { font-variant-ligatures: none; font-feature-settings: "calt" 0, "liga" 0; }
 kbd {
   font-family: var(--sc-mono);
   font-size: 0.72rem;
