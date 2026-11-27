@@ -44,7 +44,7 @@
                     </KlyFormField>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
-                    <KlyButton Label="Send" Color="KlyColor.Primary" OnClick="SendAsync" Loading="_busy" Disabled="@(_jsonError is not null)" />
+                    <KlyButton Label="Send" Color="KlyColor.Primary" OnClick="SendAsync" Loading="_busy" Disabled="@(_jsonError.Length > 0)" />
                     <KlyButton Label="Clear the log" Variant="ButtonVariant.Ghost" Color="KlyColor.Neutral" OnClick="ClearLog" Disabled="@(_log.Count == 0)" />
                 </div>
             </div>

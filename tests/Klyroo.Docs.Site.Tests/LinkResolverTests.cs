@@ -66,3 +66,16 @@ public class LinkResolverTests
         Assert.Equal(2, problems.Count);
     }
 }
+
+public sealed class PlaygroundLinkTests
+{
+    [Fact]
+    public void LibrariesYmlLinksEveryLibraryToItsPlayground()
+    {
+        var libraries = Klyroo.Docs.Site.Library.Libraries.Load(Path.Combine(AppContext.BaseDirectory, "libraries.yml"));
+        Assert.Equal("https://klyroo.github.io/klyroo-stack/playground/table/", libraries.PlaygroundOf("klyroo-table"));
+        Assert.Equal("https://klyroo.github.io/klyroo-stack/playground/ui/", libraries.PlaygroundOf("klyroo-ui"));
+        Assert.Null(libraries.PlaygroundOf("klyroo-stack"));
+        Assert.All(libraries.Items, l => Assert.NotNull(libraries.PlaygroundOf(l.Repo)));
+    }
+}
