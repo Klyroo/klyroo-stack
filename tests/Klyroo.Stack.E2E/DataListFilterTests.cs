@@ -68,7 +68,7 @@ public class DataListFilterTests(PlaygroundServer server) : PlaygroundTest(serve
         else
         {
             await AddPanel.GetByRole(AriaRole.Button, new() { Name = "Customer", Exact = true }).ClickAsync();
-            await AddPanel.GetByLabel("Value for Customer").PressSequentiallyAsync("globex", new() { Delay = 20 });
+            await TypeInOneTask(AddPanel.GetByLabel("Value for Customer"), "globex");
         }
 
         await WaitForQuery("?flt.f.customer=globex");
@@ -132,7 +132,7 @@ public class DataListFilterTests(PlaygroundServer server) : PlaygroundTest(serve
 
         await field.FillAsync("acme");
         await WaitForQuery("?flt.f.customer=acme");
-        await field.PressSequentiallyAsync(" c", new() { Delay = 20 });
+        await TypeInOneTask(field, " c");
         await WaitForQuery("?flt.f.customer=acme c");
         await Assertions.Expect(Tag("Customer contains acme c")).ToBeVisibleAsync();
 
@@ -152,7 +152,7 @@ public class DataListFilterTests(PlaygroundServer server) : PlaygroundTest(serve
         var field = Editor("Edit filter Customer").GetByLabel("Value for Customer");
 
         // The typing is still inside its 300 ms pause when the address changes under it (what Back or a link does).
-        await field.PressSequentiallyAsync("zz", new() { Delay = 10 });
+        await TypeInOneTask(field, "zz");
         await Page.EvaluateAsync("() => Blazor.navigateTo(location.pathname + '?flt.f.customer=globex')");
 
         await WaitForQuery("?flt.f.customer=globex");

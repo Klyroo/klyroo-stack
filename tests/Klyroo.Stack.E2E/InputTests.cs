@@ -14,7 +14,7 @@ public class InputTests(PlaygroundServer server) : PlaygroundTest(server)
     {
         await Open(mode, "input");
 
-        await Debounced.PressSequentiallyAsync("hello", new() { Delay = 40 });
+        await TypeInOneTask(Debounced, "hello");
 
         await Assertions.Expect(State).ToHaveTextAsync("Value: hello");
         await Assertions.Expect(Reports).ToHaveTextAsync("Reports: 1");
@@ -31,10 +31,10 @@ public class InputTests(PlaygroundServer server) : PlaygroundTest(server)
     {
         await Open(mode, "input");
 
-        await Debounced.PressSequentiallyAsync("ab", new() { Delay = 40 });
+        await TypeInOneTask(Debounced, "ab");
         await Assertions.Expect(Reports).ToHaveTextAsync("Reports: 0");
         await Assertions.Expect(State).ToHaveTextAsync("Value: ab");
-        await Debounced.PressSequentiallyAsync("cd", new() { Delay = 40 });
+        await TypeInOneTask(Debounced, "cd");
 
         await Assertions.Expect(State).ToHaveTextAsync("Value: abcd");
         await Assertions.Expect(Reports).ToHaveTextAsync("Reports: 2");
@@ -63,7 +63,7 @@ public class InputTests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task Escape_clears_the_field_and_reports_the_empty_value(string mode)
     {
         await Open(mode, "input");
-        await Debounced.PressSequentiallyAsync("gone", new() { Delay = 40 });
+        await TypeInOneTask(Debounced, "gone");
         await Assertions.Expect(State).ToHaveTextAsync("Value: gone");
 
         await Page.Keyboard.PressAsync("Escape");
@@ -219,7 +219,7 @@ public class InputTests(PlaygroundServer server) : PlaygroundTest(server)
         // The pause is held open (the script reads the attribute when a key is typed), so "d" is still waiting when the reset is clicked
         // however slowly the click is made; the report of "abc" is made by Enter.
         await Debounced.EvaluateAsync("e => e.setAttribute('data-kly-debounce', '600000')");
-        await Debounced.PressSequentiallyAsync("abc", new() { Delay = 20 });
+        await TypeInOneTask(Debounced, "abc");
         await Debounced.PressAsync("Enter");
         await Assertions.Expect(State).ToHaveTextAsync("Value: abc");
         await Debounced.PressSequentiallyAsync("d", new() { Delay = 20 });

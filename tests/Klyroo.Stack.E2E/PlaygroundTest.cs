@@ -15,6 +15,53 @@ public abstract class PlaygroundTest(PlaygroundServer server) : IAsyncLifetime
         "infinite-scroll", "select-menu", "input-menu", "listbox", "command-palette",
     ];
 
+    /// <summary>Types a text into a field character by character, each with the input event of a keystroke, all in one task of the page: no pause between them. Keys sent one by one from the test process
+    /// can be held apart past a debounce when the machine is busy (the test process is starved, not the page), and the field then rightly reports twice.</summary>
+    protected static async Task TypeInOneTask(ILocator field, string text)
+    {
+        await field.FocusAsync();
+        await field.EvaluateAsync(
+            """
+            (input, text) => {
+              const set = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set;
+              for (const character of text) {
+                set.call(input, input.value + character);
+                input.dispatchEvent(new InputEvent('input', { bubbles: true, data: character, inputType: 'insertText' }));
+              }
+            }
+            """,
+            text);
+    }
+
+    /// <summary>
+    /// Starts writing down every text the live region of a menu announces, and whether its list is busy at that moment. A loading state lasts as long
+    /// as the source takes (400 ms in the examples): read it with a polling assertion and a busy machine can starve the test process past it, so the
+    /// page keeps the record and <see cref="ExpectAnnounced"/> reads it afterwards.
+    /// </summary>
+    protected static Task RecordAnnouncements(ILocator menu) => menu.EvaluateAsync(
+        """
+        menu => {
+          const seen = menu.__announced = [];
+          const read = () => {
+            const announcer = menu.querySelector('[data-slot=announcer]');
+            const list = menu.querySelector('[role=listbox]');
+            if (announcer) seen.push({ text: announcer.textContent.trim(), busy: list?.getAttribute('aria-busy') === 'true' });
+          };
+          read();
+          new MutationObserver(read).observe(menu, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['aria-busy'] });
+        }
+        """);
+
+    /// <summary>Waits until the menu recorded by <see cref="RecordAnnouncements"/> has announced <paramref name="text"/> while its list was busy.</summary>
+    protected static async Task ExpectAnnounced(ILocator menu, string text)
+    {
+        for (var deadline = DateTime.UtcNow.AddSeconds(10); ; await Task.Delay(50, TestContext.Current.CancellationToken))
+        {
+            if (await menu.EvaluateAsync<bool>("(menu, text) => menu.__announced.some(a => a.text === text && a.busy)", text)) return;
+            Assert.True(DateTime.UtcNow < deadline, $"the menu never announced \"{text}\" while its list was busy");
+        }
+    }
+
     public static TheoryData<string, string> EveryPageInEveryMode()
     {
         var data = new TheoryData<string, string>();

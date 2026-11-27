@@ -30,13 +30,14 @@ public class RemoteInputMenuTests(PlaygroundServer server) : PlaygroundTest(serv
         var menu = Menu("remote-free");
         await Assertions.Expect(Page.GetByTestId("remote-free-requests")).ToHaveTextAsync("Free field calls: 0");
 
+        await RecordAnnouncements(menu);
         await Input("remote-free").ClickAsync();
 
-        await Assertions.Expect(menu.Locator("[data-slot=announcer]")).ToHaveTextAsync("Loading...");
+        await ExpectAnnounced(menu, "Loading...");
         await Assertions.Expect(Options(menu)).ToHaveCountAsync(20);
         await Assertions.Expect(Page.GetByTestId("remote-free-last")).ToHaveTextAsync("Last call: search \"\", skip 0, take 20");
 
-        await Input("remote-free").PressSequentiallyAsync("germ");
+        await TypeInOneTask(Input("remote-free"), "germ");
 
         await Assertions.Expect(Options(menu)).ToHaveCountAsync(1);
         await Assertions.Expect(Options(menu).First).ToHaveTextAsync("Germany");
@@ -54,7 +55,7 @@ public class RemoteInputMenuTests(PlaygroundServer server) : PlaygroundTest(serv
         var menu = Menu("remote-free");
 
         await Input("remote-free").ClickAsync();
-        await Input("remote-free").PressSequentiallyAsync("germ");
+        await TypeInOneTask(Input("remote-free"), "germ");
         await Assertions.Expect(Options(menu)).ToHaveCountAsync(1);
         await Page.Keyboard.PressAsync("ArrowDown");
         await Page.Keyboard.PressAsync("Enter");
@@ -185,7 +186,7 @@ public class RemoteInputMenuTests(PlaygroundServer server) : PlaygroundTest(serv
         await Assertions.Expect(menu.Locator("[data-slot=hint]")).ToBeVisibleAsync();
         await AssertNoAccessibilityViolations();
 
-        await Input("remote-input-error").PressSequentiallyAsync("zz");
+        await TypeInOneTask(Input("remote-input-error"), "zz");
         await Assertions.Expect(menu.Locator("[data-slot=empty]")).ToBeVisibleAsync();
         await AssertNoAccessibilityViolations();
     }
@@ -201,7 +202,7 @@ public class RemoteInputMenuTests(PlaygroundServer server) : PlaygroundTest(serv
 
         // Typing in the free field never opens an empty list.
         await Input("remote-free").ClickAsync();
-        await Input("remote-free").PressSequentiallyAsync("Par");
+        await TypeInOneTask(Input("remote-free"), "Par");
         await Page.WaitForTimeoutAsync(300);
         await Assertions.Expect(Page.Locator("kly-input-menu [data-slot=content]:popover-open")).ToHaveCountAsync(0);
 

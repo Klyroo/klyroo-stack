@@ -458,23 +458,6 @@ public class DataListTests(PlaygroundServer server) : PlaygroundTest(server)
 
     private ILocator UrlSearch => SearchField(Url, "Search Invoices in the URL");
 
-    /// <summary>Types a text into a field character by character, each with the input event of a keystroke, all in one task of the page: no pause between them.</summary>
-    private static async Task TypeInOneTask(ILocator field, string text)
-    {
-        await field.FocusAsync();
-        await field.EvaluateAsync(
-            """
-            (input, text) => {
-              const set = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set;
-              for (const character of text) {
-                set.call(input, input.value + character);
-                input.dispatchEvent(new InputEvent('input', { bubbles: true, data: character, inputType: 'insertText' }));
-              }
-            }
-            """,
-            text);
-    }
-
     private Task<int> HistoryLength() => Page.EvaluateAsync<int>("() => history.length");
 
     [Theory]
@@ -593,7 +576,7 @@ public class DataListTests(PlaygroundServer server) : PlaygroundTest(server)
         await OpenList(mode, mode == "ssr" ? "?q=zzz" : "");
         if (mode != "ssr")
         {
-            await UrlSearch.PressSequentiallyAsync("zzz", new() { Delay = 20 });
+            await TypeInOneTask(UrlSearch, "zzz");
             await WaitForQuery("?q=zzz");
         }
         var empty = Url.Locator("[data-slot=empty-row]");
@@ -628,7 +611,7 @@ public class DataListTests(PlaygroundServer server) : PlaygroundTest(server)
     public async Task Back_after_the_empty_state_was_cleared_shows_the_search_in_the_field_again(string mode)
     {
         await OpenList(mode, "?s=customer");
-        await UrlSearch.PressSequentiallyAsync("zzz", new() { Delay = 20 });
+        await TypeInOneTask(UrlSearch, "zzz");
         await WaitForQuery("?s=customer&q=zzz");
         await Url.Locator("[data-slot=empty-row]").GetByRole(AriaRole.Button, new() { Name = "Clear search" }).ClickAsync();
         await WaitForQuery("?s=customer");

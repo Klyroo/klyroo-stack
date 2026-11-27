@@ -132,7 +132,7 @@ public class DataListFilterPanelTests(PlaygroundServer server) : PlaygroundTest(
         }
         else
         {
-            await field.PressSequentiallyAsync("globex", new() { Delay = 20 });
+            await TypeInOneTask(field, "globex");
         }
 
         await WaitForQuery("?pnl.f.customer=globex");
@@ -311,7 +311,7 @@ public class DataListFilterPanelTests(PlaygroundServer server) : PlaygroundTest(
         }
         else
         {
-            await field.PressSequentiallyAsync("umbrella", new() { Delay = 20 });
+            await TypeInOneTask(field, "umbrella");
         }
 
         await WaitForQueryContaining("pnl.f.customer=umbrella");
@@ -545,14 +545,14 @@ public class DataListFilterPanelTests(PlaygroundServer server) : PlaygroundTest(
         var field = Sidebar.GetByLabel("Value for Customer");
 
         // No pause: the click lands before the debounce of the field ends, and Apply was idle when the typing began.
-        await field.PressSequentiallyAsync("stark");
+        await TypeInOneTask(field, "stark");
         await apply.ClickAsync();
 
         await WaitForQuery("?pns.f.customer=stark");
         await Assertions.Expect(DrawerList.Locator("[data-slot=result-count]")).ToHaveTextAsync("1–10 of 10");
 
         await field.FillAsync("");
-        await field.PressSequentiallyAsync("umbrella");
+        await TypeInOneTask(field, "umbrella");
         // Tab leaves the field (that reports the text), then the keyboard reaches Apply, which was idle when the typing began.
         await Page.Keyboard.PressAsync("Tab");
         await apply.FocusAsync();
@@ -688,7 +688,7 @@ public class DataListFilterPanelTests(PlaygroundServer server) : PlaygroundTest(
         else
         {
             await Expand(Drawer, "reviewed");
-            await Drawer.GetByLabel("Value for Customer").PressSequentiallyAsync("stark", new() { Delay = 20 });
+            await TypeInOneTask(Drawer.GetByLabel("Value for Customer"), "stark");
             await Drawer.GetByRole(AriaRole.Button, new() { Name = "Yes", Exact = true }).ClickAsync();
             // Nothing is applied before Apply.
             await Task.Delay(500, TestContext.Current.CancellationToken);

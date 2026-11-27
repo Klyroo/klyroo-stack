@@ -38,11 +38,11 @@ public class RemoteSelectMenuTests(PlaygroundServer server) : PlaygroundTest(ser
         var menu = Menu("remote-select");
         await Assertions.Expect(Calls()).ToHaveTextAsync("Source calls: 0");
 
+        await RecordAnnouncements(menu);
         await OpenList(menu, "remote-select");
 
-        // The source answers after 400 ms: until then the list says it is loading.
-        await Assertions.Expect(menu.Locator("[data-slot=announcer]")).ToHaveTextAsync("Loading...");
-        await Assertions.Expect(menu.GetByRole(AriaRole.Listbox, new() { IncludeHidden = true })).ToHaveAttributeAsync("aria-busy", "true");
+        // The source answers after 400 ms: until then the list says it is loading, and is busy.
+        await ExpectAnnounced(menu, "Loading...");
         await Assertions.Expect(Options(menu)).ToHaveCountAsync(20);
         await Assertions.Expect(Options(menu).First).ToHaveTextAsync("Argentina");
         await Assertions.Expect(menu.GetByRole(AriaRole.Listbox)).Not.ToHaveAttributeAsync("aria-busy", "true");
@@ -62,7 +62,7 @@ public class RemoteSelectMenuTests(PlaygroundServer server) : PlaygroundTest(ser
         await OpenList(menu, "remote-select");
         await Assertions.Expect(Options(menu)).ToHaveCountAsync(20);
 
-        await Search(menu).PressSequentiallyAsync("germ");
+        await TypeInOneTask(Search(menu), "germ");
 
         await Assertions.Expect(Options(menu)).ToHaveCountAsync(1);
         await Assertions.Expect(Options(menu).First).ToHaveTextAsync("Germany");
@@ -124,7 +124,7 @@ public class RemoteSelectMenuTests(PlaygroundServer server) : PlaygroundTest(ser
         await Open(mode, "select-menu");
         var menu = Menu("remote-select");
         await OpenList(menu, "remote-select");
-        await Search(menu).PressSequentiallyAsync("jap");
+        await TypeInOneTask(Search(menu), "jap");
         await Assertions.Expect(Options(menu)).ToHaveCountAsync(1);
 
         await Page.Keyboard.PressAsync("Enter");
@@ -135,7 +135,7 @@ public class RemoteSelectMenuTests(PlaygroundServer server) : PlaygroundTest(ser
         await Assertions.Expect(Trigger("remote-select")).ToBeFocusedAsync();
 
         await OpenList(menu, "remote-select");
-        await Search(menu).PressSequentiallyAsync("fra");
+        await TypeInOneTask(Search(menu), "fra");
         await Assertions.Expect(Options(menu)).ToHaveCountAsync(1);
         await Assertions.Expect(Options(menu).First).ToHaveTextAsync("France");
         // Japan is no longer in the list; the field still names it.
@@ -324,7 +324,7 @@ public class RemoteSelectMenuTests(PlaygroundServer server) : PlaygroundTest(ser
         await Assertions.Expect(Options(menu)).ToHaveCountAsync(20);
 
         // Peru is not in the first page: while the answer is on its way, the text matches no option shown, so Create is offered...
-        await Search(menu).PressSequentiallyAsync("peru");
+        await TypeInOneTask(Search(menu), "peru");
 
         // ...and goes away when the answer brings Peru itself.
         await Assertions.Expect(Options(menu)).ToHaveCountAsync(1);
@@ -350,7 +350,7 @@ public class RemoteSelectMenuTests(PlaygroundServer server) : PlaygroundTest(ser
         await Open(mode, "select-menu");
         var menu = Menu("remote-select");
         await OpenList(menu, "remote-select");
-        await Search(menu).PressSequentiallyAsync("ja");
+        await TypeInOneTask(Search(menu), "ja");
         await Assertions.Expect(Options(menu)).ToHaveCountAsync(1);
         await Assertions.Expect(Search(menu)).ToHaveAttributeAsync("aria-activedescendant", new Regex(".+"));
 
@@ -378,7 +378,7 @@ public class RemoteSelectMenuTests(PlaygroundServer server) : PlaygroundTest(ser
         await Open(mode, "select-menu");
         var menu = Menu("remote-select");
         await OpenList(menu, "remote-select");
-        await Search(menu).PressSequentiallyAsync("ja");
+        await TypeInOneTask(Search(menu), "ja");
         await Assertions.Expect(Options(menu)).ToHaveCountAsync(1);
         await Page.Keyboard.PressAsync("Escape");
 

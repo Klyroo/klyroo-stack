@@ -111,9 +111,9 @@ public class QueryStateTests(PlaygroundServer server) : PlaygroundTest(server)
         await OpenState(mode, "?utm_source=mail");
         var before = await HistoryLength();
 
-        await Search.PressSequentiallyAsync("revi", new() { Delay = 40 });
+        await TypeInOneTask(Search, "revi");
         await WaitForQuery("?utm_source=mail&q=revi");
-        await Search.PressSequentiallyAsync("ew", new() { Delay = 40 });
+        await TypeInOneTask(Search, "ew");
         await WaitForQuery("?utm_source=mail&q=review");
 
         Assert.Equal(before, await HistoryLength());
@@ -189,7 +189,7 @@ public class QueryStateTests(PlaygroundServer server) : PlaygroundTest(server)
         await Status("open").ClickAsync();
         await WaitForQuery("?status=open");
 
-        await Search.PressSequentiallyAsync("plan", new() { Delay = 40 });
+        await TypeInOneTask(Search, "plan");
         await WaitForQuery("?status=open&q=plan");
         await Page.GoBackAsync();
 
