@@ -31,12 +31,10 @@ public class PlatformsTests(PlaygroundServer server) : PlaygroundTest(server)
         await Assertions.Expect(list.GetByRole(AriaRole.Listitem)).ToHaveCountAsync(7);
         await Assertions.Expect(list).ToContainTextAsync("Experimental");
         await Assertions.Expect(list).ToContainTextAsync("Not supported");
-        // Targets that were never built or run on a device must not read as tested: the page says "Supported" for them, and "Tested" only for the web and the emulator.
+        // Targets that were never built or run on a device must not read as tested.
         foreach (var target in new[] { "iOS 17+", "Windows", "macOS" })
         {
-            var item = list.GetByRole(AriaRole.Listitem).Filter(new() { HasText = target });
-            await Assertions.Expect(item).ToContainTextAsync("Supported");
-            await Assertions.Expect(item).Not.ToContainTextAsync("Tested");
+            await Assertions.Expect(list.GetByRole(AriaRole.Listitem).Filter(new() { HasText = target })).ToContainTextAsync("Untested");
         }
         await Assertions.Expect(Page.GetByRole(AriaRole.Link, new() { Name = "Read the MAUI guide" })).ToHaveAttributeAsync("href", "/docs/maui");
     }
