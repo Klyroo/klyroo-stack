@@ -28,7 +28,13 @@ In a mode with a WebAssembly client, call `AddKlyrooStack()` in both `Program.cs
 
 For static server rendering that reads the user's time zone (data lists cut days in the user's zone), the site registers `AddKlyrooServer()` from the `Klyroo.UI.Server` package. `Klyroo.Stack` does not include that package: add it when you render data lists statically.
 
+## Native .NET MAUI
+
+Use [`Klyroo.UI.Maui`](https://github.com/Klyroo/klyroo-ui/tree/main/src/Klyroo.UI.Maui) and the companion MAUI projects when building native views in C# on Android, iOS, Mac Catalyst or Windows. The [native sample](https://github.com/Klyroo/klyroo-ui/tree/main/samples/Klyroo.Maui.Native) references the native UI project from source.
+
 ## .NET MAUI Blazor Hybrid
+
+For Razor components in a `BlazorWebView`, use the same Blazor UI library as on the web. The `Klyroo.UI.Blazor` package project brings in `Klyroo.UI`, which is already included when using Klyroo.Stack.
 
 `Klyroo.Stack` declares the four MAUI platforms, and the `klyroo-maui` template registers it in `MauiProgram.cs`:
 
