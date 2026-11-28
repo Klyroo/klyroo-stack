@@ -30,6 +30,16 @@ public class PopoverTests(PlaygroundServer server) : PlaygroundTest(server)
         var trigger = Page.GetByTestId("unbound-trigger");
 
         await trigger.ClickAsync();
+        // The panel opens at the start of the page and the positioning script moves it next to its trigger a frame later: read the boxes once it has moved,
+        // or a busy machine reads the panel where it opened.
+        await Page.WaitForFunctionAsync(
+            """
+            () => {
+              const t = document.querySelector('[data-testid=unbound-trigger]')?.getBoundingClientRect();
+              const p = document.querySelector('[data-testid=unbound-panel]')?.closest('[popover]')?.getBoundingClientRect();
+              return !!t && !!p && p.left >= t.right;
+            }
+            """);
 
         var t = (await trigger.BoundingBoxAsync())!;
         var p = (await Page.Locator("[data-testid=unbound-panel]").Locator("xpath=ancestor::*[@popover][1]").BoundingBoxAsync())!;
