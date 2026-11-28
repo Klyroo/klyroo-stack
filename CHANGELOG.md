@@ -49,6 +49,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- Playground code and tables show a higher-contrast horizontal scroll cue in dark mode. Query cursor tokens wrap inside their panel, Spreadsheet import steps use the full card width, and the Table showcase heading is shorter on phones.
+
 - The wordmark of a long library name (klyroo/spreadsheet) is set a little smaller on phones, so it stays on one line from 390 pixels up.
 - The documentation sites show everything whole on phones and desktops: install commands and package names wrap between words instead of ending in an ellipsis, wide tables and code blocks scroll inside the column with an edge fade that shows there is more, inline code breaks only between the words of a name, code in a table header or a heading keeps the look of its surroundings, the mobile breadcrumb wraps instead of cutting the page name, the lit station of the mobile strip is a full ring, a table with an empty header row has no header band, and a long rail or contents list fades at its foot. Code is set without ligatures.
 - The library homes and the showcase: the nav wordmark keeps its distance from the menu button at 320 pixels, the boards wrap the address they write and show an edge fade on their tables and code, the feature descriptions start with a capital, the showcase title no longer lets a descender touch the next line, and headlines are balanced.

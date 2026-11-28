@@ -137,7 +137,7 @@ h1[tabindex="-1"]:focus-visible { outline: none; }
 
 .pg-knobs { min-width: 0; }
 :root { --scroll-shadow: rgb(15 23 42 / 0.26); }
-:root.dark { --scroll-shadow: rgb(0 0 0 / 0.7); }
+:root.dark { --scroll-shadow: rgb(148 163 184 / 0.55); }
 /* The knob card takes its natural height and scrolls with the page: no inner scroll, no sticky card taller than the window, so no control is ever cut. */
 
 /* Index: a ruled list of the libraries. */
@@ -203,6 +203,11 @@ h1[tabindex="-1"]:focus-visible { outline: none; }
 /* Frames the libraries draw inside a stage panel are dropped: the panel is the frame. */
 .pg-flat [data-slot="table-root"], .pg-flat [data-slot="spreadsheet-import"] { border: 0; box-shadow: none; border-radius: 0; }
 .pg-flat [data-slot="spreadsheet-import"] { background: transparent; padding: 0; }
+
+/* Give the import steps the full width of the playground card. */
+.pg-flat [data-slot="spreadsheet-header"] > :has(> [data-slot="spreadsheet-stepper"]) {
+  flex-basis: 100%;
+}
 
 /* A table of messages (the row issues): the short columns keep their cell on one line, only the message wraps, and the table scrolls sideways with the edge shadows when the card is too narrow. */
 .pg-issues td, .pg-issues th { white-space: nowrap; }

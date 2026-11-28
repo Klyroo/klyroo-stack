@@ -71,7 +71,7 @@
                 <div class="table-footer flex flex-wrap items-center gap-2">
                     <KlyButton Label="Next page by cursor" Size="KlySize.Sm" Variant="ButtonVariant.Outline" Color="KlyColor.Neutral" Disabled="@(_nextCursor is null)" OnClick="NextCursor" />
                     <KlyButton Label="Back to the first page" Size="KlySize.Sm" Variant="ButtonVariant.Ghost" Color="KlyColor.Neutral" Disabled="@(_cursor is null)" OnClick="ResetCursorClick" />
-                    <span class="mono text-xs text-(--klyroo-text-muted)">after: @(_cursor ?? "(start)") · next: @(_nextCursor ?? "(end)")</span>
+                    <span class="mono min-w-0 text-xs [overflow-wrap:anywhere] text-(--klyroo-text-muted)">after: @(_cursor ?? "(start)") · next: @(_nextCursor ?? "(end)")</span>
                 </div>
             }
         </PgPanel>
