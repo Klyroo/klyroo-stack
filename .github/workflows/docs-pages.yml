@@ -59,7 +59,7 @@ jobs:
         with:
           repository: klyroo/klyroo-display
           path: klyroo-display
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.x
       # The build downloads the Tailwind CLI, the fonts and the icons once and keeps them in ~/.klyroo: reuse them
