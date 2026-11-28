@@ -195,6 +195,7 @@ a:hover > .sc-pill { filter: none; }
 @media (max-width: 460px) {
   .sc-plate { width: 1.5rem; }
   .sc-nav .sc-wordmark { font-size: 1rem; }
+  .sc-nav .sc-wordmark[data-long] { font-size: 0.9rem; }
   .sc-nav-inner { padding-inline: 0.75rem; }
   .sc-nav .sc-gh { padding-inline: 0.5rem; }
   .sc-nav .sc-gh [data-slot="label"] { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }

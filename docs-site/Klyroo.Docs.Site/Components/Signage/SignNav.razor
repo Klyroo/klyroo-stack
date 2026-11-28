@@ -9,7 +9,7 @@
     <div class="sc-nav-inner">
         <a href="./" class="sc-mark" aria-label="@(Site.Settings.Title) home">
             <LineBadge Fill="@PlateFill" />
-            <span class="sc-wordmark">klyroo<wbr /><b>/@Site.Settings.ShortName</b></span>
+            <span class="sc-wordmark" data-long="@(Site.Settings.ShortName.Length >= LongName ? "true" : null)">klyroo<wbr /><b>/@Site.Settings.ShortName</b></span>
         </a>
         <nav class="sc-links" aria-label="Primary">
             @foreach (var link in _links)
@@ -110,4 +110,8 @@
     }
 
     private static RenderFragment Dot(string fill) => @<i class="sc-net-dot" aria-hidden="true" style="background: @fill"></i>;
+
+    // A name this long (spreadsheet) sets the wordmark a little smaller on phones, so klyroo/spreadsheet still fits on one line at 390 pixels.
+    private const int LongName = 10;
 }
+
